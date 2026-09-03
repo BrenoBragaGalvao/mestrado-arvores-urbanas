@@ -20,26 +20,38 @@ Desenvolver e avaliar uma metodologia para identificar árvores urbanas a partir
 
 ## Fluxo metodológico
 
-```text
-Imagem aérea
-    ↓
-Segmentação
-    ↓
-Extração de características espectrais
-    ↓
-NDVI + brilho + bordas
-    ↓
-K-Means
-    ↓
-Amostras de treinamento
-    ↓
-Random Forest
-    ↓
-Detecção das árvores
-    ↓
-Análise espacial
-    ↓
-Proximidade com linhas de energia
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 50, "rankSpacing": 55}}}%%
+flowchart TD
+    A("🛰️ Imagem aérea") --> B("🧩 Segmentação")
+
+    B --> C("📊 Extração de<br/>características espectrais")
+
+    C --> D("🌿 NDVI")
+    C --> E("💡 Brilho / Intensidade")
+    C --> F("◻️ Bordas")
+
+    D --> G("🔎 K-Means")
+    E --> G
+    F --> G
+
+    G --> H("🏷️ Amostras de<br/>treinamento")
+
+    H --> I("🌲 Random Forest")
+
+    I --> J("🌳 Detecção das árvores")
+
+    J --> K("🗺️ Análise espacial")
+
+    K --> L("⚡ Proximidade com<br/>linhas de energia")
+
+    classDef etapa fill:#eaf4ff,stroke:#8bbbe8,stroke-width:1.5px,color:#173b63;
+    classDef principal fill:#d8ecff,stroke:#629fd6,stroke-width:2px,color:#102f50,font-weight:bold;
+
+    class A,B,C,D,E,F,H,J,K etapa;
+    class G,I,L principal;
+
+    linkStyle default stroke:#8aa9c4,stroke-width:1.5px;
 ```
 
 ## Tecnologias e bibliotecas
