@@ -76,7 +76,50 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+.ipynb_checkpoints/
+
+# Geospatial data and generated results
+*.tif
+*.tiff
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.qix
+*.sbn
+*.sbx
+*.shp.xml
+*.gpkg
+*.gpkg-shm
+*.gpkg-wal
+*.geojson
+polygons.json
+arvores_segmentadas.json
+
+# Heavy data, outputs, and trained models
+data/raw/
+data/interim/
+data/processed/
+outputs/
+models/
+*.joblib
+*.pkl
+*.pickle
+*.onnx
+*.pt
+*.pth
+*.h5
+*.keras
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
 
 # IPython
 profile_default/
