@@ -1,122 +1,180 @@
-# Detecção de Árvores Urbanas em Imagens Aéreas
+# Combinação de Características de Brilho, Bordas e NDVI para Detecção de Árvores Urbanas e Avaliação de Proximidade com Linhas de Energia
 
-Projeto de mestrado dedicado à detecção e à caracterização de árvores urbanas em imagens aéreas. A abordagem combina características de brilho, bordas e Índice de Vegetação por Diferença Normalizada (NDVI) e, posteriormente, avalia a proximidade das árvores identificadas em relação às linhas de energia elétrica.
+Abordagem orientada a objetos para detecção de árvores urbanas em imagens multiespectrais de alta resolução e análise espacial de proximidade com infraestrutura elétrica.
 
-## Objetivo
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)
+![Google Colab](https://img.shields.io/badge/Google_Colab-Execução-F9AB00?style=flat-square&logo=googlecolab&logoColor=white)
+![Machine Learning](https://img.shields.io/badge/Machine_Learning-Random_Forest-4C78A8?style=flat-square)
+![Remote Sensing](https://img.shields.io/badge/Remote_Sensing-Imagens_multiespectrais-5B8C5A?style=flat-square)
+![Geospatial Analysis](https://img.shields.io/badge/Geospatial_Analysis-Objetos_georreferenciados-5470A8?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Em_desenvolvimento-E5A50A?style=flat-square)
 
-Desenvolver e avaliar uma metodologia para identificar árvores urbanas a partir de dados geoespaciais e imagens aéreas, utilizando técnicas de segmentação de imagens, análise espectral e aprendizado de máquina.
+## Visão geral
 
-## Principais etapas metodológicas
+A vegetação próxima às redes elétricas aéreas demanda atividades recorrentes de inspeção e manejo, tanto para reduzir interferências na infraestrutura quanto para apoiar o planejamento da arborização urbana. Levantamentos de campo, inspeções aéreas e tecnologias como LiDAR, embora relevantes, podem envolver custos elevados e restrições operacionais.
 
-1. Segmentação de imagens baseada em objetos;
-2. Extração de características espectrais;
-3. Cálculo de NDVI;
-4. Análise de brilho e intensidade;
-5. Detecção de bordas;
-6. Agrupamento não supervisionado com K-Means;
-7. Classificação supervisionada com Random Forest;
-8. Análise espacial das árvores detectadas;
-9. Avaliação da proximidade das árvores em relação às linhas de energia.
+Este projeto de mestrado investiga uma abordagem baseada em imagens multiespectrais de alta resolução para detectar árvores urbanas e, posteriormente, avaliar sua proximidade com linhas de energia. A metodologia adota análise orientada a objetos, combinando informações espectrais, radiométricas e estruturais com técnicas de aprendizado de máquina.
+
+O README apresenta uma síntese do problema, da proposta metodológica, do estágio atual dos experimentos e da organização necessária para reproduzir a pipeline, sem substituir a documentação científica completa da pesquisa.
+
+## Questão de pesquisa
+
+> A combinação de brilho, densidade de bordas e NDVI em objetos segmentados permite discriminar árvores de gramíneas e, simultaneamente, preservar uma geometria adequada para avaliação de proximidade com linhas de energia?
+
+## Contribuições metodológicas
+
+### 1. Combinação complementar de características
+
+A abordagem utiliza, em nível de objeto:
+
+- 🌿 **NDVI** — informação espectral da vegetação;
+- 💡 **brilho HSV** — informação radiométrica;
+- ◻️ **bordas de Canny** — informação estrutural e heterogeneidade local.
+
+Não se propõe um novo índice espectral. A contribuição metodológica investigada é a utilização conjunta e interpretável dessas três características para discriminar árvores de gramíneas.
+
+### 2. Estratégia híbrida de classificação
+
+A pipeline combina duas etapas de aprendizado de máquina com funções distintas:
+
+- **K-Means** → pré-seleção de vegetação;
+- **Random Forest** → classificação supervisionada entre árvore e gramínea.
+
+Essa integração constitui um dos elementos de originalidade da abordagem, cuja contribuição será avaliada por meio dos experimentos planejados, sem pressupor superioridade em relação a outros métodos.
+
+### 3. Preservação da geometria
+
+Os objetos permanecem representados como polígonos georreferenciados ao longo do processamento. Assim, os mesmos objetos classificados podem ser posteriormente utilizados em:
+
+- cálculo de área;
+- proxy de porte;
+- interseção espacial;
+- análise de distância;
+- proximidade com linhas de energia.
+
+A preservação da geometria é uma contribuição metodológica investigada por conectar a etapa de classificação à análise espacial da infraestrutura elétrica.
 
 ## Fluxo metodológico
 
-```text
-Imagem aérea
-    ↓
-Segmentação
-    ↓
-Extração de características espectrais
-    ↓
-NDVI + brilho + bordas
-    ↓
-K-Means
-    ↓
-Amostras de treinamento
-    ↓
-Random Forest
-    ↓
-Detecção das árvores
-    ↓
-Análise espacial
-    ↓
-Proximidade com linhas de energia
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 50, "rankSpacing": 55}}}%%
+flowchart TD
+    A("🛰️ Imagem aérea<br/>RGB + multiespectral") --> B("🧩 Segmentação Quickshift")
+    B --> C("🔷 Objetos segmentados")
+    C --> D("📊 Estatísticas espectrais<br/>RGB–NIR")
+    D --> E("🔎 K-Means")
+    E --> F("🌱 Pré-seleção de vegetação")
+    F --> G("🏷️ Amostras<br/>árvore / gramínea")
+    G --> H("⚙️ Extração das características")
+
+    H --> I("🌿 NDVI")
+    H --> J("💡 Brilho /<br/>Intensidade HSV")
+    H --> K("◻️ Bordas de Canny")
+
+    I --> L("📋 Características por objeto")
+    J --> L
+    K --> L
+
+    L --> M("🌲 Random Forest")
+    M --> N("✅ Classificação<br/>árvore × gramínea")
+    N --> O("🌳 Árvores detectadas")
+    O --> P("🗺️ Análise espacial")
+    P --> Q("⚡ Proximidade com<br/>linhas de energia")
+
+    classDef etapa fill:#eaf4ff,stroke:#8bbbe8,stroke-width:1.5px,color:#173b63;
+    classDef destaque fill:#d8ecff,stroke:#629fd6,stroke-width:2px,color:#102f50;
+
+    class A,B,C,D,F,G,H,I,J,K,L,N,O,P etapa;
+    class E,M,Q destaque;
+
+    linkStyle default stroke:#8aa9c4,stroke-width:1.5px;
 ```
 
-## Tecnologias e bibliotecas
+## Resultados atuais
 
-- **Linguagem e ambientes:** Python, Google Colab, Google Drive e GitHub;
-- **Processamento numérico e tabular:** NumPy e Pandas;
-- **Análise geoespacial:** Rasterio, GeoPandas e Shapely;
-- **Processamento de imagens:** scikit-image;
-- **Aprendizado de máquina:** scikit-learn;
-- **Visualização:** Matplotlib e Seaborn.
+> **Resultados do experimento inicial atualmente documentado.**
+
+| Indicador | Resultado |
+| --- | ---: |
+| Objetos rotulados | 133 |
+| Treinamento | 106 |
+| Teste | 27 |
+| Acurácia global | **0,81** |
+
+| Classe | Precisão | Recall | F1-score |
+| --- | ---: | ---: | ---: |
+| Árvores | 0,83 | 0,77 | 0,80 |
+| Gramíneas | 0,80 | 0,86 | 0,83 |
+
+A segmentação inicial produziu **15.633 objetos**, dos quais **3.002** foram identificados como candidatos de vegetação na cena analisada.
+
+> **Escopo dos resultados:** os experimentos de ablação, comparação RGB–NIR, SVM e validação cruzada estratificada ainda estão planejados ou em execução e, portanto, não são apresentados como resultados concluídos.
+
+## Tecnologias
+
+| Área | Tecnologias |
+| --- | --- |
+| Linguagem | Python |
+| Execução | Google Colab |
+| Rasters | Rasterio |
+| Dados vetoriais | GeoPandas, Shapely |
+| Processamento | NumPy, Pandas |
+| Imagens | scikit-image |
+| Machine Learning | scikit-learn |
+| Visualização | Matplotlib, Seaborn |
+| Versionamento | GitHub + Codex |
+| Dados pesados | Google Drive |
 
 As dependências necessárias para executar o projeto estão registradas em [`requirements-colab.txt`](requirements-colab.txt).
 
-## Estrutura do repositório
+## Estrutura do projeto
 
-```text
-mestrado-arvores-urbanas/
-├── Segmentacao_classificacao.ipynb  # Notebook principal da metodologia
-├── requirements-colab.txt           # Dependências do ambiente Google Colab
-├── README.md                        # Documentação principal do projeto
-├── .gitignore                       # Regras de arquivos não versionados
-└── data/
-    └── README.md                    # Orientações sobre os dados do projeto
-```
+| Item | Finalidade |
+| --- | --- |
+| 📓 [`Segmentacao_classificacao.ipynb`](Segmentacao_classificacao.ipynb) | Notebook principal da metodologia |
+| 📦 [`requirements-colab.txt`](requirements-colab.txt) | Dependências do ambiente |
+| 📘 `README.md` | Documentação principal |
+| 🚫 `.gitignore` | Arquivos não versionados |
+| 📂 [`data/README.md`](data/README.md) | Orientações sobre os dados |
 
-Os arquivos geoespaciais pesados não são versionados no GitHub. Eles permanecem armazenados no Google Drive, o que evita incorporar arquivos volumosos ao histórico do repositório e mantém a organização utilizada pelo notebook.
+O GitHub armazena o código e a documentação do projeto. Os dados geoespaciais pesados permanecem no Google Drive.
 
-## Organização dos dados no Google Drive
-
-Para preservar os caminhos de dados esperados pelo projeto, organize os diretórios no Google Drive da seguinte forma:
+## Dados e armazenamento
 
 ```text
 MyDrive/
 └── mestrado-arvores-urbanas/
     ├── data/
     │   ├── raw/
-    │   │   ├── AOI.tif
-    │   │   ├── AOI_MULTI.tif
-    │   │   ├── AOI.shp
-    │   │   ├── Grama.shp
-    │   │   ├── Arvores.shp
-    │   │   ├── Linhas.shp
-    │   │   └── Postes.shp
     │   └── interim/
     └── outputs/
 ```
 
-- `data/raw/`: contém os dados originais de entrada;
-- `data/interim/`: contém produtos intermediários gerados durante o processamento;
-- `outputs/`: contém os resultados finais das análises.
+- `data/raw/`: dados originais de entrada;
+- `data/interim/`: produtos intermediários do processamento;
+- `outputs/`: resultados gerados pelas análises.
 
-> **Nota:** arquivos Shapefile normalmente são acompanhados por arquivos auxiliares, como `.dbf`, `.shx` e `.prj`. Quando disponíveis, mantenha esses componentes junto aos respectivos arquivos `.shp` em `data/raw/`.
+Consulte [`data/README.md`](data/README.md) para orientações sobre os arquivos esperados. Arquivos Shapefile e seus componentes auxiliares, como `.dbf`, `.shx` e `.prj`, devem permanecer juntos no diretório correspondente.
 
-## Execução no Google Colab
+## Como executar
 
-1. Faça upload dos dados para o Google Drive seguindo a estrutura indicada acima.
+1. Organize os dados no Google Drive conforme a estrutura apresentada em [Dados e armazenamento](#dados-e-armazenamento).
 2. Abra [`Segmentacao_classificacao.ipynb`](Segmentacao_classificacao.ipynb) no Google Colab.
-3. Monte o Google Drive na sessão do Colab quando solicitado pelo notebook.
-4. Instale as dependências registradas no arquivo do projeto:
+3. Monte o Google Drive quando solicitado pelo notebook.
+4. Instale as dependências do projeto:
 
    ```python
    !pip install -r requirements-colab.txt
    ```
 
-5. Execute as células do notebook na ordem apresentada, verificando se os arquivos de entrada estão disponíveis em `MyDrive/mestrado-arvores-urbanas/data/raw/`.
-6. Consulte os produtos intermediários em `data/interim/` e os resultados finais em `outputs/`.
+5. Execute as células do notebook na ordem apresentada.
+6. Consulte os produtos intermediários em `data/interim/` e os resultados em `outputs/`.
 
 ## Status do projeto
 
 > **Em desenvolvimento.**
 
-As atividades atuais estão concentradas em:
-
-- organização e reprodutibilidade da pipeline;
-- validação dos dados geoespaciais;
-- aprimoramento da segmentação e classificação;
-- avaliação metodológica dos resultados.
+A pesquisa encontra-se em fase de avaliação metodológica. As métricas apresentadas correspondem ao experimento inicial documentado; análises comparativas e testes adicionais permanecem planejados ou em execução.
 
 ## Autor
 
