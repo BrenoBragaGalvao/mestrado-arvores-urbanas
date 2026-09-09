@@ -17,7 +17,7 @@ Levantamentos de campo, inspeções aéreas e aquisições LiDAR podem fornecer 
 
 O projeto investiga uma abordagem orientada a objetos: a imagem é segmentada em regiões espacialmente coerentes e cada objeto é descrito por características espectrais, radiométricas e estruturais.
 
-Além de apoiar a discriminação entre árvores e gramíneas, essa representação conserva polígonos georreferenciados, possibilitando o cálculo da área da copa, a estimativa empírica da altura e a análise de proximidade com linhas de energia.
+Além de apoiar a discriminação entre árvores e gramíneas, essa representação conserva polígonos georreferenciados, possibilitando o cálculo da área da copa, uma estimativa empírica da altura e a análise de proximidade com linhas de energia.
 
 ## Propostas de pesquisa
 
@@ -68,7 +68,7 @@ Essa estrutura permite realizar:
 </p>
 
 <p align="center">
-  <em>Figura — Fluxo detalhado das 17 etapas da metodologia proposta, desde a preparação dos dados e segmentação dos objetos até a classificação árvore–gramínea, estimativa da altura e avaliação de proximidade com a infraestrutura elétrica.</em>
+  <em>Figura — Fluxo detalhado das 17 etapas da metodologia proposta, desde a preparação dos dados e segmentação dos objetos até a classificação árvore–gramínea, estimativa empírica da altura e avaliação de proximidade com a infraestrutura elétrica.</em>
 </p>
 
 O processamento foi organizado em **17 etapas encadeadas**:
@@ -95,27 +95,44 @@ O processamento foi organizado em **17 etapas encadeadas**:
 
 Após a classificação pelo Random Forest, apenas os objetos classificados como **árvore** seguem para a etapa de análise espacial.
 
-Inicialmente é calculada a área da copa de cada objeto. Em seguida, essa área é utilizada na relação empírica:
+A fundamentação alométrica foi inspirada nos modelos **crown width–tree height (CW–H)** avaliados por Chatziathanasiou, Kitikidou e Milios (2024). O artigo testa diferentes formas de regressão entre largura da copa e altura total da árvore e inclui, entre elas, o modelo potencial:
 
 $$
-\widehat{H} = 2{,}5A^{0{,}4}
+\widehat{CW}=b_0H^{b_1}
+$$
+
+Neste projeto, a segmentação fornece a **área projetada da copa** dos objetos, e não uma largura de copa medida em campo. Por isso, a forma funcional potencial foi **adaptada empiricamente** para relacionar a área do objeto a uma estimativa de altura:
+
+$$
+\widehat{H}=aA^b
+$$
+
+O notebook explora diferentes pares de coeficientes e formas linear/potencial. A configuração atualmente adotada no fluxo é a **C3**, com \(a=2{,}5\) e \(b=0{,}4\):
+
+$$
+\widehat{H}=2{,}5A^{0{,}4}
 $$
 
 em que:
 
-- **A** representa a área da copa;
-- **\(\widehat{H}\)** representa a altura estimada.
+- **A** representa a área projetada do objeto/copa;
+- **\(\widehat{H}\)** representa uma estimativa empírica da altura;
+- **2,5** e **0,4** são coeficientes da configuração C3 adotada no experimento atual.
 
-A relação estabelece uma estimativa empírica da altura a partir da área da copa.
+> **Importante:** a equação \(\widehat{H}=2{,}5A^{0{,}4}\) **não é uma equação publicada diretamente por Chatziathanasiou et al. (2024)**. O artigo fundamenta a relação alométrica CW–H e a família funcional potencial. A transformação **área da copa → altura estimada** e os coeficientes **2,5** e **0,4** são uma adaptação experimental deste projeto e ainda precisam de validação independente com alturas reais medidas em campo.
 
-Ela não representa uma medição direta realizada em campo.
+A descrição detalhada das configurações testadas e da fundamentação está em [`docs/allometria.md`](docs/allometria.md).
+
+### Referência da fundamentação alométrica
+
+Chatziathanasiou, S.; Kitikidou, K.; Milios, E. **Crown Width–Tree Height Models for Magnolia grandiflora, Prunus cerasifera, and Acer negundo Growing in Cities in Northeastern Greece.** *Land*, 2024, 13, 1579. DOI: `10.3390/land13101579`.
 
 ## Critério de seleção
 
-Após a estimativa da altura, foi utilizado o seguinte critério:
+Após a estimativa empírica da altura, foi utilizado o seguinte critério:
 
 $$
-\widehat{H} > 7\,m
+\widehat{H}>7\,m
 $$
 
 Dessa forma, somente os objetos classificados como árvore e com **altura estimada superior a 7 m** seguem para a análise de proximidade com a infraestrutura elétrica.
@@ -179,7 +196,7 @@ As próximas etapas da pesquisa incluem:
 - comparar configurações **RGB** e **RGB + NIR**;
 - comparar o **Random Forest** com outros classificadores, como **SVM**;
 - aplicar estratégias de validação mais robustas;
-- validar a relação utilizada para estimativa da altura.
+- validar a relação área da copa–altura com alturas reais medidas em campo e métricas como RMSE, MAE e \(R^2\).
 
 O objetivo dessas etapas é fortalecer a validação experimental e demonstrar de forma comparativa onde a abordagem proposta contribui em relação às técnicas existentes.
 
@@ -206,6 +223,7 @@ As dependências do ambiente estão registradas em [`requirements-colab.txt`](re
 | --- | --- |
 | 📓 `Segmentacao_classificacao.ipynb` | Notebook principal da metodologia |
 | 🖼️ `docs/pipeline_17_etapas.png` | Fluxo visual detalhado das 17 etapas |
+| 📐 `docs/allometria.md` | Fundamentação, adaptação e configurações da relação alométrica |
 | 📦 `requirements-colab.txt` | Dependências do ambiente |
 | 📘 `README.md` | Documentação principal |
 | 🚫 `.gitignore` | Arquivos não versionados |
