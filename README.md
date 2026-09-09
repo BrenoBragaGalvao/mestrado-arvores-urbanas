@@ -64,7 +64,7 @@ Essa estrutura permite realizar:
 ## Fluxo metodológico
 
 <p align="center">
-  <img src="docs/pipeline_17_etapas.jpg" alt="Fluxo detalhado das 17 etapas da metodologia" width="100%">
+  <img src="docs/pipeline_17_etapas.png" alt="Fluxo detalhado das 17 etapas da metodologia" width="100%">
 </p>
 
 <p align="center">
@@ -205,7 +205,7 @@ As dependências do ambiente estão registradas em [`requirements-colab.txt`](re
 | Item | Finalidade |
 | --- | --- |
 | 📓 `Segmentacao_classificacao.ipynb` | Notebook principal da metodologia |
-| 🖼️ `docs/pipeline_17_etapas.jpg` | Fluxo visual detalhado das 17 etapas |
+| 🖼️ `docs/pipeline_17_etapas.png` | Fluxo visual detalhado das 17 etapas |
 | 📦 `requirements-colab.txt` | Dependências do ambiente |
 | 📘 `README.md` | Documentação principal |
 | 🚫 `.gitignore` | Arquivos não versionados |
@@ -227,3 +227,49 @@ MyDrive/
     │   └── interim/
     └── outputs/
 ```
+
+| Diretório | Finalidade |
+| --- | --- |
+| 📥 `data/raw/` | Dados originais |
+| ⚙️ `data/interim/` | Produtos intermediários |
+| 📤 `outputs/` | Resultados finais |
+
+### Dados de entrada
+
+| Arquivo | Função |
+| --- | --- |
+| `AOI.tif` | Imagem RGB |
+| `AOI_MULTI.tif` | Imagem multiespectral RGB + NIR |
+| `AOI.shp` | Área de interesse |
+| `Arvores.shp` | Amostras de árvores |
+| `Grama.shp` | Amostras de gramíneas |
+| `Linhas.shp` | Linhas de energia |
+| `Postes.shp` | Referência cartográfica dos postes |
+
+> **Nota:** cada Shapefile depende de arquivos auxiliares, como `.shx`, `.dbf`, `.prj` e `.cpg`. Quando disponíveis, mantenha todos os componentes junto ao respectivo arquivo `.shp` em `data/raw/`.
+
+## Como executar
+
+1. Organize os dados no Google Drive conforme a estrutura indicada acima.
+2. Abra [`Segmentacao_classificacao.ipynb`](Segmentacao_classificacao.ipynb), a partir do GitHub, no Google Colab.
+3. Monte o Google Drive na sessão do Colab.
+4. Instale as dependências:
+
+```bash
+pip install -r requirements-colab.txt
+```
+
+5. Execute as células do notebook na ordem apresentada.
+6. Verifique os produtos gerados em `data/interim/` e `outputs/`.
+
+## Status do projeto
+
+> **Em desenvolvimento.** A metodologia, os experimentos comparativos e a validação estão sendo aprimorados no contexto da pesquisa de mestrado.
+
+Os resultados apresentados atualmente devem ser considerados **preliminares**.
+
+## Autor
+
+**Breno Braga Galvão**
+
+Projeto desenvolvido no contexto de pesquisa acadêmica de mestrado.
