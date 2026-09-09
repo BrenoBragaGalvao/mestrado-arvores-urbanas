@@ -64,7 +64,7 @@ Essa estrutura permite realizar:
 ## Fluxo metodológico
 
 <p align="center">
-  <img src="docs/pipeline_17_etapas.webp" alt="Fluxo detalhado das 17 etapas da metodologia" width="100%">
+  <img src="docs/pipeline_17_etapas.png" alt="Fluxo detalhado das 17 etapas da metodologia" width="100%">
 </p>
 
 <p align="center">
@@ -205,7 +205,7 @@ As dependências do ambiente estão registradas em [`requirements-colab.txt`](re
 | Item | Finalidade |
 | --- | --- |
 | 📓 `Segmentacao_classificacao.ipynb` | Notebook principal da metodologia |
-| 🖼️ `docs/pipeline_17_etapas.webp` | Fluxo visual detalhado das 17 etapas |
+| 🖼️ `docs/pipeline_17_etapas.png` | Fluxo visual detalhado das 17 etapas |
 | 📦 `requirements-colab.txt` | Dependências do ambiente |
 | 📘 `README.md` | Documentação principal |
 | 🚫 `.gitignore` | Arquivos não versionados |
@@ -226,3 +226,4 @@ MyDrive/
     │   ├── raw/
     │   └── interim/
     └── outputs/
+```
