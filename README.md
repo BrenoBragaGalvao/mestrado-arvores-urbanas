@@ -26,9 +26,7 @@ Além de apoiar a discriminação entre árvores e gramíneas, essa representaç
 
 ## Contribuições metodológicas
 
-As propostas abaixo representam a **contribuição metodológica investigada** e os **elementos de originalidade da abordagem**.
-
-Sua avaliação comparativa ainda está em desenvolvimento; portanto, não se pressupõe superioridade em relação a outros métodos.
+As propostas abaixo representam a **contribuição metodológica investigada** e os **elementos de originalidade da abordagem**. Sua avaliação comparativa ainda está em desenvolvimento; portanto, não se pressupõe superioridade em relação a outros métodos.
 
 ### Combinação complementar de características
 
@@ -38,9 +36,7 @@ A descrição dos objetos integra fontes de informação complementares:
 - **brilho HSV:** informação radiométrica derivada da intensidade;
 - **bordas de Canny:** informação estrutural relacionada à ocorrência de bordas no interior dos objetos.
 
-O trabalho **não propõe um novo índice espectral**.
-
-A investigação concentra-se na combinação dessas características já estabelecidas para discriminar classes de vegetação em uma unidade de análise orientada a objetos.
+O trabalho **não propõe um novo índice espectral**. A investigação concentra-se na combinação dessas características já estabelecidas para discriminar classes de vegetação em uma unidade de análise orientada a objetos.
 
 ### Estratégia híbrida
 
@@ -51,9 +47,7 @@ Essa organização busca reduzir o espaço inicial de análise antes da classifi
 
 ### Preservação da geometria
 
-Os objetos permanecem representados como polígonos georreferenciados ao longo do fluxo.
-
-Essa estrutura permite realizar:
+Os objetos permanecem representados como polígonos georreferenciados ao longo do fluxo. Essa estrutura permite realizar:
 
 - cálculo da área da copa;
 - estimativa empírica da altura;
@@ -91,9 +85,7 @@ O processamento foi organizado em **17 etapas encadeadas**:
 16. sobreposição das árvores selecionadas com linhas de energia e postes;
 17. análise de interseção e proximidade em distâncias de **1 m, 3 m e 5 m**.
 
-## Estimativa empírica da altura
-
-Após a classificação pelo Random Forest, apenas os objetos classificados como **árvore** seguem para a etapa de análise espacial.
+## Fundamentação alométrica e estimativa empírica da altura
 
 A fundamentação alométrica foi inspirada nos modelos **crown width–tree height (CW–H)** avaliados por Chatziathanasiou, Kitikidou e Milios (2024). O artigo testa diferentes formas de regressão entre largura da copa e altura total da árvore e inclui, entre elas, o modelo potencial:
 
@@ -101,13 +93,18 @@ $$
 \widehat{CW}=b_0H^{b_1}
 $$
 
-Neste projeto, a segmentação fornece a **área projetada da copa** dos objetos, e não uma largura de copa medida em campo. Por isso, a forma funcional potencial foi **adaptada empiricamente** para relacionar a área do objeto a uma estimativa de altura:
+No presente projeto, a segmentação fornece a **área projetada da copa** dos objetos, e não uma largura de copa medida em campo. Por isso, a forma funcional potencial foi **adaptada empiricamente** para relacionar a área do objeto a uma estimativa de altura:
 
 $$
 \widehat{H}=aA^b
 $$
 
-O notebook explora diferentes pares de coeficientes e formas linear/potencial. A configuração atualmente adotada no fluxo é a **C3**, com \(a=2{,}5\) e \(b=0{,}4\):
+O notebook explora diferentes pares de coeficientes e formas linear/potencial. A configuração atualmente adotada no fluxo é a **C3**, com:
+
+- **a = 2,5**;
+- **b = 0,4**.
+
+Assim, a relação utilizada no fluxo atual é:
 
 $$
 \widehat{H}=2{,}5A^{0{,}4}
@@ -116,20 +113,20 @@ $$
 em que:
 
 - **A** representa a área projetada do objeto/copa;
-- **\(\widehat{H}\)** representa uma estimativa empírica da altura;
-- **2,5** e **0,4** são coeficientes da configuração C3 adotada no experimento atual.
+- **H estimado** representa uma estimativa empírica da altura;
+- **2,5** e **0,4** são os coeficientes da configuração C3 adotada no experimento atual.
 
-> **Importante:** a equação \(\widehat{H}=2{,}5A^{0{,}4}\) **não é uma equação publicada diretamente por Chatziathanasiou et al. (2024)**. O artigo fundamenta a relação alométrica CW–H e a família funcional potencial. A transformação **área da copa → altura estimada** e os coeficientes **2,5** e **0,4** são uma adaptação experimental deste projeto e ainda precisam de validação independente com alturas reais medidas em campo.
+> **Importante:** a equação apresentada acima **não foi publicada diretamente por Chatziathanasiou et al. (2024)**. O artigo fornece a fundamentação para a relação alométrica CW–H e para o uso de uma forma funcional potencial. A transformação **área da copa → altura estimada** e os coeficientes **2,5** e **0,4** correspondem a uma adaptação experimental deste projeto e ainda precisam de validação independente com alturas reais medidas em campo.
 
 A descrição detalhada das configurações testadas e da fundamentação está em [`docs/allometria.md`](docs/allometria.md).
 
 ### Referência da fundamentação alométrica
 
-Chatziathanasiou, S.; Kitikidou, K.; Milios, E. **Crown Width–Tree Height Models for Magnolia grandiflora, Prunus cerasifera, and Acer negundo Growing in Cities in Northeastern Greece.** *Land*, 2024, 13, 1579. DOI: `10.3390/land13101579`.
+**Chatziathanasiou, S.; Kitikidou, K.; Milios, E.** Crown Width–Tree Height Models for *Magnolia grandiflora*, *Prunus cerasifera*, and *Acer negundo* Growing in Cities in Northeastern Greece. *Land*, 2024, 13, 1579. DOI: `10.3390/land13101579`.
 
 ## Critério de seleção
 
-Após a estimativa empírica da altura, foi utilizado o seguinte critério:
+Após a estimativa empírica da altura, foi utilizado o seguinte critério operacional:
 
 $$
 \widehat{H}>7\,m
@@ -137,7 +134,7 @@ $$
 
 Dessa forma, somente os objetos classificados como árvore e com **altura estimada superior a 7 m** seguem para a análise de proximidade com a infraestrutura elétrica.
 
-O limiar de 7 m funciona como um **critério operacional de seleção** dentro do fluxo metodológico atual.
+O limiar de **7 m** funciona como um **critério operacional de seleção** dentro do fluxo metodológico atual.
 
 ## Análise de proximidade
 
@@ -196,7 +193,7 @@ As próximas etapas da pesquisa incluem:
 - comparar configurações **RGB** e **RGB + NIR**;
 - comparar o **Random Forest** com outros classificadores, como **SVM**;
 - aplicar estratégias de validação mais robustas;
-- validar a relação área da copa–altura com alturas reais medidas em campo e métricas como RMSE, MAE e \(R^2\).
+- validar a relação área da copa–altura com alturas reais medidas em campo e métricas como **RMSE, MAE e R²**.
 
 O objetivo dessas etapas é fortalecer a validação experimental e demonstrar de forma comparativa onde a abordagem proposta contribui em relação às técnicas existentes.
 
@@ -229,9 +226,7 @@ As dependências do ambiente estão registradas em [`requirements-colab.txt`](re
 | 🚫 `.gitignore` | Arquivos não versionados |
 | 📂 `data/README.md` | Orientações sobre os dados |
 
-O **GitHub** concentra o código e a documentação versionados, enquanto o **Google Drive** armazena os dados geoespaciais pesados e os produtos do processamento.
-
-Essa separação evita incorporar arquivos volumosos ao histórico do repositório.
+O **GitHub** concentra o código e a documentação versionados, enquanto o **Google Drive** armazena os dados geoespaciais pesados e os produtos do processamento. Essa separação evita incorporar arquivos volumosos ao histórico do repositório.
 
 ## Dados e armazenamento
 
