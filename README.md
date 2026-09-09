@@ -17,9 +17,10 @@ Levantamentos de campo, inspeções aéreas e aquisições LiDAR podem fornecer 
 
 O projeto investiga uma abordagem orientada a objetos: a imagem é segmentada em regiões espacialmente coerentes e cada objeto é descrito por características espectrais, radiométricas e estruturais. Além de apoiar a discriminação entre árvores e gramíneas, essa representação conserva polígonos georreferenciados úteis à análise de proximidade com linhas de energia.
 
-## Questão de pesquisa
+## Propostas de pesquisa
 
-> A combinação de brilho, densidade de bordas e NDVI em objetos segmentados permite discriminar árvores de gramíneas e, simultaneamente, preservar uma geometria adequada para avaliação de proximidade com linhas de energia?
+- **Proposta 1:** combinar NDVI + brilho + bordas para distinguir árvores e gramíneas.
+- **Proposta 2:** localizar árvores em proximidade com a rede elétrica.
 
 ## Contribuições metodológicas
 
