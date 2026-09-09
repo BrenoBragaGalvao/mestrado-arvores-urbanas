@@ -15,7 +15,9 @@ A proximidade entre vegetação arbórea e redes de distribuição de energia po
 
 Levantamentos de campo, inspeções aéreas e aquisições LiDAR podem fornecer informações detalhadas, mas envolvem custos, logística e restrições operacionais que dificultam sua aplicação frequente em grandes áreas. Neste contexto, imagens multiespectrais de alta resolução constituem uma fonte complementar para localizar e caracterizar a vegetação urbana.
 
-O projeto investiga uma abordagem orientada a objetos: a imagem é segmentada em regiões espacialmente coerentes e cada objeto é descrito por características espectrais, radiométricas e estruturais. Além de apoiar a discriminação entre árvores e gramíneas, essa representação conserva polígonos georreferenciados úteis à análise de proximidade com linhas de energia.
+O projeto investiga uma abordagem orientada a objetos: a imagem é segmentada em regiões espacialmente coerentes e cada objeto é descrito por características espectrais, radiométricas e estruturais.
+
+Além de apoiar a discriminação entre árvores e gramíneas, essa representação conserva polígonos georreferenciados, possibilitando o cálculo da área da copa, a estimativa empírica da altura e a análise de proximidade com linhas de energia.
 
 ## Propostas de pesquisa
 
@@ -24,7 +26,9 @@ O projeto investiga uma abordagem orientada a objetos: a imagem é segmentada em
 
 ## Contribuições metodológicas
 
-As propostas abaixo representam a **contribuição metodológica investigada** e os **elementos de originalidade da abordagem**. Sua avaliação comparativa ainda está em desenvolvimento; portanto, não se pressupõe superioridade em relação a outros métodos.
+As propostas abaixo representam a **contribuição metodológica investigada** e os **elementos de originalidade da abordagem**.
+
+Sua avaliação comparativa ainda está em desenvolvimento; portanto, não se pressupõe superioridade em relação a outros métodos.
 
 ### Combinação complementar de características
 
@@ -32,32 +36,40 @@ A descrição dos objetos integra fontes de informação complementares:
 
 - **NDVI:** informação espectral associada à resposta da vegetação;
 - **brilho HSV:** informação radiométrica derivada da intensidade;
-- **bordas de Canny:** heterogeneidade estrutural observada no interior dos objetos.
+- **bordas de Canny:** informação estrutural relacionada à ocorrência de bordas no interior dos objetos.
 
-O trabalho **não propõe um novo índice espectral**. A investigação concentra-se na combinação dessas características já estabelecidas para discriminar classes de vegetação em uma unidade de análise orientada a objetos.
+O trabalho **não propõe um novo índice espectral**.
+
+A investigação concentra-se na combinação dessas características já estabelecidas para discriminar classes de vegetação em uma unidade de análise orientada a objetos.
 
 ### Estratégia híbrida
 
-- **K-Means:** realiza a pré-seleção não supervisionada de objetos candidatos a vegetação;
+- **K-Means:** realiza a pré-seleção não supervisionada de objetos candidatos à vegetação;
 - **Random Forest:** executa a classificação supervisionada dos candidatos em **árvore** ou **gramínea**.
 
 Essa organização busca reduzir o espaço inicial de análise antes da classificação, sem antecipar conclusões sobre ganhos de desempenho.
 
 ### Preservação da geometria
 
-Os objetos permanecem representados como polígonos georreferenciados ao longo do fluxo. Essa estrutura permite obter ou investigar:
+Os objetos permanecem representados como polígonos georreferenciados ao longo do fluxo.
 
-- área;
-- proxy de porte;
-- interseção;
-- distância;
-- proximidade com linhas de energia.
+Essa estrutura permite realizar:
+
+- cálculo da área da copa;
+- estimativa empírica da altura;
+- interseção espacial;
+- cálculo de distância;
+- análise de proximidade com linhas de energia e postes.
 
 ## Fluxo metodológico
 
-![Fluxo detalhado das 17 etapas da metodologia](docs/pipeline_17_etapas.svg)
+<p align="center">
+  <img src="docs/pipeline_17_etapas.png" alt="Fluxo detalhado das 17 etapas da metodologia" width="100%">
+</p>
 
-*Figura — Fluxo detalhado das 17 etapas da metodologia proposta, desde a preparação dos dados e geração dos objetos até a classificação árvore–gramínea, triagem por porte e avaliação de proximidade com a infraestrutura elétrica.*
+<p align="center">
+  <em>Figura — Fluxo detalhado das 17 etapas da metodologia proposta, desde a preparação dos dados e segmentação dos objetos até a classificação árvore–gramínea, estimativa da altura e avaliação de proximidade com a infraestrutura elétrica.</em>
+</p>
 
 O processamento foi organizado em **17 etapas encadeadas**:
 
@@ -69,35 +81,62 @@ O processamento foi organizado em **17 etapas encadeadas**:
 6. seleção do agrupamento associado à vegetação;
 7. associação das amostras rotuladas de **árvores** e **gramíneas**;
 8. cálculo das características adicionais: **NDVI, brilho HSV e bordas de Canny**;
-9. composição da pilha de características por objeto;
+9. composição da pilha de características;
 10. construção da tabela de treinamento;
 11. treinamento e validação do **Random Forest com 500 árvores de decisão**;
-12. classificação dos candidatos em árvore ou gramínea;
-13. seleção dos objetos previstos como árvore e cálculo de suas áreas;
-14. cálculo do **proxy empírico de porte** a partir da área;
-15. aplicação do limiar operacional de triagem;
-16. sobreposição dos objetos selecionados com a infraestrutura elétrica;
-17. análise de interseção e proximidade em faixas de **1 m, 3 m e 5 m**.
+12. classificação dos candidatos em **árvore** ou **gramínea**;
+13. seleção dos objetos classificados como árvore e cálculo da área da copa;
+14. estimativa empírica da altura a partir da área da copa;
+15. seleção das árvores com altura estimada superior a **7 m**;
+16. sobreposição das árvores selecionadas com linhas de energia e postes;
+17. análise de interseção e proximidade em distâncias de **1 m, 3 m e 5 m**.
 
-### Proxy de porte e limiar operacional
+## Estimativa empírica da altura
 
-Após a classificação pelo Random Forest, apenas os objetos previstos como **árvore** seguem para a etapa espacial. A área de cada polígono é utilizada em uma relação potencial:
+Após a classificação pelo Random Forest, apenas os objetos classificados como **árvore** seguem para a etapa de análise espacial.
 
-\[
-\widehat{H} = 2{,}5\,A^{0{,}4}
-\]
+Inicialmente é calculada a área da copa de cada objeto. Em seguida, essa área é utilizada na relação empírica:
 
-em que **A** representa a área do objeto/copa e **\(\widehat{H}\)** é utilizado como **proxy empírico de porte**.
+$$
+\widehat{H} = 2{,}5A^{0{,}4}
+$$
 
-Para a triagem espacial, foi adotado o critério operacional:
+em que:
 
-\[
+- **A** representa a área da copa;
+- **\(\widehat{H}\)** representa a altura estimada.
+
+A relação estabelece uma estimativa empírica da altura a partir da área da copa.
+
+Ela não representa uma medição direta realizada em campo.
+
+## Critério de seleção
+
+Após a estimativa da altura, foi utilizado o seguinte critério:
+
+$$
 \widehat{H} > 7\,m
-\]
+$$
 
-Os objetos que atendem ao critério seguem para a análise de proximidade com `Linhas.shp` e para a sobreposição com `Postes.shp`, considerando interseção e distâncias acumuladas de até **1 m, 3 m e 5 m**.
+Dessa forma, somente os objetos classificados como árvore e com **altura estimada superior a 7 m** seguem para a análise de proximidade com a infraestrutura elétrica.
 
-> **Importante:** \(\widehat{H}\) é empregado como um **proxy empírico de porte**, e não como uma altura métrica independentemente validada em campo. O valor de 7 m funciona como **limiar operacional de triagem** dentro do fluxo atual. A análise de proximidade é bidimensional.
+O limiar de 7 m funciona como um **critério operacional de seleção** dentro do fluxo metodológico atual.
+
+## Análise de proximidade
+
+As árvores selecionadas são sobrepostas aos dados vetoriais da infraestrutura elétrica:
+
+- `Linhas.shp` — linhas de energia;
+- `Postes.shp` — referência cartográfica dos postes.
+
+A análise espacial considera:
+
+- interseção com a infraestrutura;
+- distância de até **1 m**;
+- distância de até **3 m**;
+- distância de até **5 m**.
+
+A análise é realizada em **duas dimensões**, considerando a geometria projetada dos objetos.
 
 ## Resultados atuais
 
@@ -105,28 +144,44 @@ Os objetos que atendem ao critério seguem para a análise de proximidade com `L
 
 | Indicador | Valor |
 | --- | ---: |
+| Objetos segmentados | 15.633 |
+| Candidatos à vegetação | 3.002 |
 | Objetos rotulados | 133 |
 | Treinamento | 106 |
 | Teste | 27 |
 | Acurácia global | 0,81 |
+
+### Desempenho por classe
 
 | Classe | Precisão | Recall | F1-score |
 | --- | ---: | ---: | ---: |
 | Árvores | 0,83 | 0,77 | 0,80 |
 | Gramíneas | 0,80 | 0,86 | 0,83 |
 
-A segmentação inicial produziu **15.633 objetos**, dos quais **3.002** foram selecionados como candidatos de vegetação. Esses números descrevem apenas o experimento inicial e não devem ser interpretados como avaliação conclusiva da metodologia.
+A segmentação inicial produziu **15.633 objetos**, dos quais **3.002** foram selecionados como candidatos à vegetação.
 
-As seguintes análises estão planejadas ou em execução:
+O conjunto rotulado utilizado no experimento inicial possui **133 objetos**, sendo **106 destinados ao treinamento** e **27 ao teste**.
 
-- estudo de ablação das características;
-- comparação entre configurações RGB e RGB–NIR;
-- comparação do Random Forest com SVM;
-- validação cruzada estratificada;
-- validação independente do proxy de porte;
-- confirmação das contagens espaciais produzidas nas etapas de triagem e proximidade.
+A configuração inicial utilizando **NDVI + brilho HSV + bordas de Canny** apresentou **acurácia global de 81%** no conjunto de teste.
 
-Nenhum resultado dessas análises é antecipado neste documento.
+Esses valores descrevem apenas o experimento inicial e não devem ser interpretados como avaliação conclusiva da metodologia.
+
+## Próximas etapas
+
+As próximas etapas da pesquisa incluem:
+
+- ampliar a quantidade de testes e experimentos;
+- comparar os resultados com outras técnicas de classificação;
+- utilizar novos conjuntos de dados reais para validação;
+- ampliar a revisão bibliográfica, identificando limitações e lacunas dos métodos existentes;
+- buscar bases de dados públicas e dados utilizados em outros trabalhos para ampliar os experimentos;
+- avaliar separadamente a contribuição das características NDVI, brilho HSV e bordas de Canny;
+- comparar configurações **RGB** e **RGB + NIR**;
+- comparar o **Random Forest** com outros classificadores, como **SVM**;
+- aplicar estratégias de validação mais robustas;
+- validar a relação utilizada para estimativa da altura.
+
+O objetivo dessas etapas é fortalecer a validação experimental e demonstrar de forma comparativa onde a abordagem proposta contribui em relação às técnicas existentes.
 
 ## Tecnologias
 
@@ -150,13 +205,15 @@ As dependências do ambiente estão registradas em [`requirements-colab.txt`](re
 | Item | Finalidade |
 | --- | --- |
 | 📓 `Segmentacao_classificacao.ipynb` | Notebook principal da metodologia |
-| 🖼️ `docs/pipeline_17_etapas.svg` | Fluxo visual detalhado da metodologia |
+| 🖼️ `docs/pipeline_17_etapas.png` | Fluxo visual detalhado das 17 etapas |
 | 📦 `requirements-colab.txt` | Dependências do ambiente |
 | 📘 `README.md` | Documentação principal |
 | 🚫 `.gitignore` | Arquivos não versionados |
 | 📂 `data/README.md` | Orientações sobre os dados |
 
-O **GitHub** concentra o código e a documentação versionados, enquanto o **Google Drive** armazena os dados geoespaciais pesados e os produtos do processamento. Essa separação evita incorporar arquivos volumosos ao histórico do repositório.
+O **GitHub** concentra o código e a documentação versionados, enquanto o **Google Drive** armazena os dados geoespaciais pesados e os produtos do processamento.
+
+Essa separação evita incorporar arquivos volumosos ao histórico do repositório.
 
 ## Dados e armazenamento
 
@@ -169,48 +226,3 @@ MyDrive/
     │   ├── raw/
     │   └── interim/
     └── outputs/
-```
-
-| Diretório | Finalidade |
-| --- | --- |
-| 📥 `data/raw/` | Dados originais |
-| ⚙️ `data/interim/` | Produtos intermediários |
-| 📤 `outputs/` | Resultados finais |
-
-### Dados de entrada
-
-| Arquivo | Função |
-| --- | --- |
-| `AOI.tif` | Imagem RGB |
-| `AOI_MULTI.tif` | Imagem multiespectral RGB + NIR |
-| `AOI.shp` | Área de interesse |
-| `Arvores.shp` | Amostras de árvores |
-| `Grama.shp` | Amostras de gramíneas |
-| `Linhas.shp` | Linhas de energia |
-| `Postes.shp` | Referência cartográfica dos postes |
-
-> **Nota:** cada Shapefile depende de arquivos auxiliares, como `.shx`, `.dbf`, `.prj` e `.cpg`. Quando disponíveis, mantenha todos os componentes junto ao respectivo arquivo `.shp` em `data/raw/`.
-
-## Como executar
-
-1. Organize os dados no Google Drive conforme a estrutura indicada acima.
-2. Abra [`Segmentacao_classificacao.ipynb`](Segmentacao_classificacao.ipynb), a partir do GitHub, no Google Colab.
-3. Monte o Google Drive na sessão do Colab.
-4. Instale as dependências:
-
-   ```python
-   !pip install -r requirements-colab.txt
-   ```
-
-5. Execute as células do notebook na ordem apresentada.
-6. Verifique os produtos gerados em `data/interim/` e `outputs/`.
-
-## Status do projeto
-
-> **Em desenvolvimento.** A metodologia, os experimentos comparativos e a validação estão sendo aprimorados no contexto da pesquisa de mestrado.
-
-## Autor
-
-**Breno Braga Galvão**
-
-Projeto desenvolvido no contexto de pesquisa acadêmica de mestrado.
