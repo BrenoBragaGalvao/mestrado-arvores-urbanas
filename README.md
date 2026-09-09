@@ -55,39 +55,49 @@ Os objetos permanecem representados como polígonos georreferenciados ao longo d
 
 ## Fluxo metodológico
 
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 42, "rankSpacing": 48, "curve": "basis"}}}%%
-flowchart TD
-    A("🛰️ Imagem aérea RGB + multiespectral") --> B("🧩 Segmentação Quickshift")
-    B --> C("Objetos segmentados")
-    C --> D("📊 Estatísticas espectrais RGB–NIR")
-    D --> E("K-Means")
-    E --> F("🌱 Pré-seleção de vegetação")
-    F --> G("🏷️ Amostras árvore / gramínea")
-    G --> H("Extração das características")
+![Fluxo detalhado das 17 etapas da metodologia](docs/pipeline_17_etapas.svg)
 
-    H --> I("🌿 NDVI")
-    H --> J("💡 Brilho / Intensidade HSV")
-    H --> K("◻️ Bordas de Canny")
+*Figura — Fluxo detalhado das 17 etapas da metodologia proposta, desde a preparação dos dados e geração dos objetos até a classificação árvore–gramínea, triagem por porte e avaliação de proximidade com a infraestrutura elétrica.*
 
-    I --> L("Características por objeto")
-    J --> L
-    K --> L
-    L --> M("🌲 Random Forest")
-    M --> N("Classificação árvore × gramínea")
-    N --> O("🌳 Árvores detectadas")
-    O --> P("🗺️ Análise espacial")
-    P --> Q("⚡ Proximidade com linhas de energia")
+O processamento foi organizado em **17 etapas encadeadas**:
 
-    classDef etapa fill:#EAF4FF,stroke:#8BBBE8,stroke-width:1.5px,color:#173B63;
-    classDef caracteristica fill:#F4F9FF,stroke:#8BBBE8,stroke-width:1.5px,color:#173B63;
-    classDef destaque fill:#D8ECFF,stroke:#629FD6,stroke-width:2px,color:#102F50,font-weight:bold;
+1. preparação dos dados RGB, RGB–NIR e vetoriais;
+2. segmentação da imagem por **Quickshift**;
+3. conversão dos segmentos em polígonos georreferenciados;
+4. cálculo de estatísticas espectrais RGB–NIR por objeto;
+5. agrupamento não supervisionado por **K-Means** em 6 clusters;
+6. seleção do agrupamento associado à vegetação;
+7. associação das amostras rotuladas de **árvores** e **gramíneas**;
+8. cálculo das características adicionais: **NDVI, brilho HSV e bordas de Canny**;
+9. composição da pilha de características por objeto;
+10. construção da tabela de treinamento;
+11. treinamento e validação do **Random Forest com 500 árvores de decisão**;
+12. classificação dos candidatos em árvore ou gramínea;
+13. seleção dos objetos previstos como árvore e cálculo de suas áreas;
+14. cálculo do **proxy empírico de porte** a partir da área;
+15. aplicação do limiar operacional de triagem;
+16. sobreposição dos objetos selecionados com a infraestrutura elétrica;
+17. análise de interseção e proximidade em faixas de **1 m, 3 m e 5 m**.
 
-    class A,B,C,D,F,G,H,L,N,O,P etapa;
-    class I,J,K caracteristica;
-    class E,M,Q destaque;
-    linkStyle default stroke:#8AA9C4,stroke-width:1.5px;
-```
+### Proxy de porte e limiar operacional
+
+Após a classificação pelo Random Forest, apenas os objetos previstos como **árvore** seguem para a etapa espacial. A área de cada polígono é utilizada em uma relação potencial:
+
+\[
+\widehat{H} = 2{,}5\,A^{0{,}4}
+\]
+
+em que **A** representa a área do objeto/copa e **\(\widehat{H}\)** é utilizado como **proxy empírico de porte**.
+
+Para a triagem espacial, foi adotado o critério operacional:
+
+\[
+\widehat{H} > 7\,m
+\]
+
+Os objetos que atendem ao critério seguem para a análise de proximidade com `Linhas.shp` e para a sobreposição com `Postes.shp`, considerando interseção e distâncias acumuladas de até **1 m, 3 m e 5 m**.
+
+> **Importante:** \(\widehat{H}\) é empregado como um **proxy empírico de porte**, e não como uma altura métrica independentemente validada em campo. O valor de 7 m funciona como **limiar operacional de triagem** dentro do fluxo atual. A análise de proximidade é bidimensional.
 
 ## Resultados atuais
 
@@ -112,7 +122,9 @@ As seguintes análises estão planejadas ou em execução:
 - estudo de ablação das características;
 - comparação entre configurações RGB e RGB–NIR;
 - comparação do Random Forest com SVM;
-- validação cruzada estratificada.
+- validação cruzada estratificada;
+- validação independente do proxy de porte;
+- confirmação das contagens espaciais produzidas nas etapas de triagem e proximidade.
 
 Nenhum resultado dessas análises é antecipado neste documento.
 
@@ -138,6 +150,7 @@ As dependências do ambiente estão registradas em [`requirements-colab.txt`](re
 | Item | Finalidade |
 | --- | --- |
 | 📓 `Segmentacao_classificacao.ipynb` | Notebook principal da metodologia |
+| 🖼️ `docs/pipeline_17_etapas.svg` | Fluxo visual detalhado da metodologia |
 | 📦 `requirements-colab.txt` | Dependências do ambiente |
 | 📘 `README.md` | Documentação principal |
 | 🚫 `.gitignore` | Arquivos não versionados |
