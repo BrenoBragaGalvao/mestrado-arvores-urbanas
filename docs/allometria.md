@@ -1,41 +1,25 @@
-# Relação alométrica usada na estimativa empírica da altura
+# Estimativa experimental de altura por área da copa
 
-## Referência científica
+## Fundamentação e ressalva científica
 
-A fundamentação para o uso de uma relação alométrica entre dimensões de copa e altura vem de:
+Referência bibliográfica discutida neste projeto:
 
-> Chatziathanasiou, S.; Kitikidou, K.; Milios, E. **Crown Width–Tree Height Models for Magnolia grandiflora, Prunus cerasifera, and Acer negundo Growing in Cities in Northeastern Greece.** *Land*, 2024, 13, 1579. https://doi.org/10.3390/land13101579
+> Chatziathanasiou, S.; Kitikidou, K.; Milios, E. *Crown Width–Tree Height Models for Magnolia grandiflora, Prunus cerasifera, and Acer negundo Growing in Cities in Northeastern Greece*. **Land**, 2024, 13, 1579. https://doi.org/10.3390/land13101579
 
-O artigo avalia diferentes modelos de regressão entre **largura de copa (CW)** e **altura total da árvore (H)**. Entre os modelos testados está o modelo potencial:
+O trabalho citado discute relações entre **largura de copa** e **altura**. O notebook **não utiliza diretamente coeficientes desse artigo**: adota uma relação experimental **área projetada do polígono → estimativa de altura**, com coeficientes escolhidos no âmbito do projeto:
 
-$$
-\widehat{CW}=b_0H^{b_1}
-$$
+```python
+altura_estimada = a * area ** b
+```
 
-## Adaptação realizada neste projeto
+Assim, a relação é uma **hipótese/estimativa empírica**, ainda sem validação por alturas reais observadas em campo. Não deve ser apresentada como medida de altura obtida por sensoriamento remoto, nem como equação literalmente publicada pelos autores citados.
 
-O projeto não aplica diretamente os coeficientes publicados no artigo. A segmentação produz polígonos georreferenciados e, para cada objeto classificado como árvore, é calculada a **área projetada da copa**.
+## Configurações presentes no notebook original
 
-A forma funcional potencial foi então usada como referência para uma relação empírica entre área da copa e uma estimativa de altura:
-
-$$
-\widehat{H}=aA^b
-$$
-
-em que:
-
-- **A** = área projetada do objeto/copa;
-- **\(\widehat{H}\)** = estimativa empírica da altura;
-- **a** e **b** = coeficientes avaliados experimentalmente no notebook.
-
-Portanto, **a forma funcional potencial é inspirada na literatura**, enquanto a substituição de largura de copa por área e os coeficientes usados neste projeto constituem uma **adaptação experimental**.
-
-## Configurações históricas exploradas
-
-Na etapa anterior da pesquisa, foram exploradas versões potencial e linear para diferentes pares de coeficientes. A **versão principal atual**, `Segmentacao_area_completa.ipynb`, mantém somente a configuração **C3 na forma potencial**, para evitar confusão entre testes exploratórios anteriores e a execução principal:
+O notebook atual [`Segmentacao_area_completa.ipynb`](../Segmentacao_area_completa.ipynb) contém **as seis configurações C1–C6**, com **duas formas em cada uma**: potencial (`a * area ** b`) e linear (`a + area * b`).
 
 | Configuração | a | b |
-| --- | ---: | ---: |
+|---|---:|---:|
 | C1 | 0,5 | 0,7 |
 | C2 | 0,6 | 0,8 |
 | C3 | 2,5 | 0,4 |
@@ -43,33 +27,19 @@ Na etapa anterior da pesquisa, foram exploradas versões potencial e linear para
 | C5 | 0,4 | 0,9 |
 | C6 | 1,35 | 0,72 |
 
-Na configuração atualmente adotada no notebook principal, utiliza-se **C3** na forma potencial:
+O notebook constrói os campos `Power_tree_size_C1` a `Power_tree_size_C6` e `Linear_tree_size_C1` a `Linear_tree_size_C6` e apresenta gráficos exploratórios. Para a seleção dos objetos usados na proximidade de postes, usa especificamente:
 
-$$
-\widehat{H}=2{,}5A^{0{,}4}
-$$
+```python
+tree_polys['Power_tree_size_C3'] = 2.5 * (tree_polys['area'] ** 0.4)
+filter_tree = tree_polys[tree_polys['Power_tree_size_C3'] > 7]
+```
 
-O notebook posteriormente aplica o filtro:
+**Cuidado:** o código original não exige que `predicted_classe == 'arvore'` ao criar `filter_tree`. A seleção combina os segmentos candidatos existentes com o limiar empírico de C3 e pode incluir segmentos classificados como gramíneas. A documentação registra esse comportamento; **não modifica o código**.
 
-$$
-\widehat{H}>7\,m
-$$
+## Como validar cientificamente
 
-para manter apenas os objetos que seguem para a análise de proximidade com a infraestrutura elétrica.
+Se forem obtidas medições reais de altura, comparar estimativas e observações por **MAE**, **RMSE**, análise de resíduos e, quando adequado, **R²**, além de avaliar o ajuste por espécies, classes de porte e área urbana.
 
-## Interpretação correta
+Até essa validação, o valor `> 7` deve ser descrito como **limiar da estimativa empírica**, não como confirmação de árvores com altura real maior que 7 metros.
 
-A relação usada no projeto deve ser apresentada como **estimativa empírica de altura**, e não como altura medida em campo nem como equação diretamente publicada por Chatziathanasiou et al. (2024).
-
-O artigo fornece a fundamentação para a relação alométrica CW–H e para a família funcional potencial. A transformação **área da copa → altura estimada** e os coeficientes **2,5** e **0,4** são específicos do experimento atual e ainda precisam de validação independente com alturas reais medidas em campo.
-
-## Próxima validação recomendada
-
-Quando houver alturas observadas de campo, comparar \(\widehat{H}\) com \(H\) por meio de métricas como:
-
-- RMSE;
-- MAE;
-- coeficiente de determinação \(R^2\);
-- análise gráfica entre altura observada e estimada.
-
-Essa etapa permitirá verificar quantitativamente se a configuração C3 é de fato a mais adequada para os dados da área de estudo.
+Também não se deve transformar proximidade geométrica de 1, 3 ou 5 metros a postes em afirmação de risco elétrico comprovado.

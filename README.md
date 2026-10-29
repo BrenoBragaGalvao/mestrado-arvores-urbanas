@@ -1,137 +1,98 @@
-# Árvores urbanas: segmentação, classificação e proximidade com infraestrutura elétrica
+# Árvores urbanas: segmentação, classificação e proximidade de postes
 
-**Pesquisa de mestrado — Breno Braga Galvão** | Python • Google Colab • Sensoriamento remoto • GeoPandas • Machine Learning
+**Pesquisa de mestrado — Breno Braga Galvão**  
+Python • Google Colab • Sensoriamento remoto • GeoPandas • Aprendizado de máquina
 
-> **Status:** metodologia em desenvolvimento, resultados preliminares. Este repositório mantém **somente o código atual, documentação e diagrama metodológico**. Os dados geoespaciais volumosos permanecem no Google Drive.
+> **Situação (29/10/2026):** o notebook principal é a versão original fornecida pelo autor, restaurada no GitHub com **116 células (85 de código e 31 de texto)**. A execução integral atual da imagem real ainda precisa ser confirmada. Este README descreve o **código realmente presente** no repositório, e não a antiga versão simplificada.
 
-## Objetivos da pesquisa
+## Comece pelo notebook
 
-**Proposta 1 — Identificar e caracterizar árvores urbanas.** Segmentar imagens de alta resolução, identificar objetos vegetados e distinguir **árvores de gramíneas** usando **NDVI, brilho HSV e bordas de Canny**, com **K-Means** e **Random Forest**. Preservar polígonos para calcular a área projetada das copas.
+- [**Abrir `Segmentacao_area_completa.ipynb` no Google Colab](https://colab.research.google.com/github/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa.ipynb)
+- [Consultar o notebook no GitHub](Segmentacao_area_completa.ipynb)
+- [Original completo no Google Drive](https://drive.google.com/file/d/1TIgMWSOGHENy9nkiaG5b1BcFKA5f5d_i/view) — preserva também as imagens e saídas ricas das execuções anteriores. A cópia do GitHub preserva todas as células de código e texto e as saídas textuais, mas não as imagens/HTML históricos incorporados.
 
-**Proposta 2 — Analisar a proximidade das árvores com a infraestrutura elétrica.** Selecionar árvores por uma **estimativa empírica de altura** e calcular sua proximidade com **postes** em 1 m, 3 m e 5 m. A avaliação de proximidade com **linhas/cabos de energia** é uma etapa futura, pois o conjunto Area1 atual não contém essas geometrias.
+**Importante:** abrir o notebook pelo link do GitHub carrega uma cópia no Colab. Executar ou editar células não envia automaticamente alterações ou resultados de volta ao GitHub.
 
-## Comece por aqui
+## Objetivos
 
-| Arquivo | Finalidade |
-|---|---|
-| **[`Segmentacao_area_completa.ipynb`](Segmentacao_area_completa.ipynb)** | **Notebook principal e único**, preparado para Google Colab |
-| [`data/README.md`](data/README.md) | Arquivos geoespaciais exigidos, estrutura da pasta `Area1` e CRS |
-| [`docs/experimento_area_completa_2026-10-29.md`](docs/experimento_area_completa_2026-10-29.md) | Registro da rodada de outubro: parâmetros, resultados e limitações |
-| [`docs/allometria.md`](docs/allometria.md) | Fundamentação e limites da estimativa experimental da altura |
-| [`docs/pipeline_17_etapas.png`](docs/pipeline_17_etapas.png) | Diagrama conceitual das 17 etapas, **não** imagem da área antiga |
-| [`requirements-colab.txt`](requirements-colab.txt) | Bibliotecas necessárias |
-| `.gitignore` | Evita a publicação de rasters, GeoPackages, saídas e arquivos temporários |
+1. **Identificar árvores e gramíneas:** segmentar a imagem RGB em objetos, utilizar características espectrais e de textura e classificar os segmentos com Random Forest.
+2. **Estudar a proximidade com postes:** estimar experimentalmente uma medida de altura a partir da área projetada dos polígonos e analisar distâncias planimétricas de 1, 3 e 5 metros até os postes.
 
-O notebook anterior foi retirado da árvore atual de arquivos para evitar confusão. **Seu histórico continua recuperável pelos commits antigos do Git.**
+A base atual **contém postes, não geometrias de cabos/linhas de energia**. A proximidade calculada não equivale à interferência comprovada na rede elétrica.
 
-## Como executar no Google Colab
+## Dados e execução no Colab
 
-1. Abra o **[notebook principal](Segmentacao_area_completa.ipynb)** no Google Colab.
-2. Tenha no seu Google Drive a pasta `Area1`, com os arquivos do [Drive do projeto](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf), ou extraia nela o ZIP recebido. Um link compartilhado isolado **não monta automaticamente os arquivos no Colab**: adicione um atalho para a pasta no *Meu Drive* ou copie os arquivos para sua estrutura.
-3. Por padrão, o notebook espera os dados no seguinte caminho (altere a variável `DATA_DIR` se necessário):
-
-   ```text
-   MyDrive/Projetos/Segmentacao_Breno/
-   ├── Area1/
-   │   ├── AOI_RGB_NEW.tif
-   │   ├── AOI_NEW_MULTI.tif
-   │   ├── AOI_new.shp
-   │   ├── AOI_new.shx
-   │   ├── AOI_new.dbf
-   │   ├── AOI_new.prj
-   │   ├── AOI_new.cpg
-   │   ├── Arvores.gpkg
-   │   ├── Grama.gpkg
-   │   └── postes.gpkg
-   └── outputs/
-   ```
-
-4. Execute as células **na ordem**. Prefira um ambiente com **RAM alta**: a imagem integral tem cerca de **50,6 milhões de pixels** e a segmentação Quickshift pode consumir muitos recursos.
-5. Verifique os arquivos na pasta `outputs/`: `features_stack.tif`, `matriz_confusao.png`, `metricas_classificacao.json`, `arvores_estimadas_maiores_7m.gpkg`, `resumo_proximidade_postes.csv` e GeoPackages de proximidade quando houver resultados.
-
-**Verificações realizadas:** teste técnico com recorte real de **1.024 × 1.024 pixels** para Quickshift, K-Means, rótulos, NDVI, brilho, Canny e Random Forest. **Ainda não foi executado o notebook completo na imagem integral**; não se afirma que toda a rotina terminou no Colab. O notebook já trata alguns casos de resultados vazios e processa as características em blocos para economizar memória.
-
-## Fluxo metodológico (17 etapas)
-
-![Diagrama conceitual do fluxo de 17 etapas](docs/pipeline_17_etapas.png)
-
-O diagrama é uma **visão metodológica geral**. Eventuais referências a linhas de energia representam o objetivo amplo da pesquisa; o **experimento Area1 implementa apenas a análise espacial de postes**.
-
-| Etapas | Procedimentos |
-|---|---|
-| 1–3 | Ler RGB, multiespectral e área de interesse; aplicar Quickshift; gerar polígonos |
-| 4–6 | Extrair estatísticas RGB/NIR por objeto, aplicar K-Means de seis clusters e selecionar candidatos à vegetação |
-| 7–10 | Associar rótulos de árvores e gramíneas, preparar NDVI, brilho HSV e bordas Canny |
-| 11–12 | Treinar Random Forest (500 árvores), validar e classificar os segmentos |
-| 13–15 | Calcular a área das copas, estimar empiricamente a altura e selecionar objetos acima de 7 m |
-| 16–17 | Sobrepor árvores selecionadas e postes e avaliar proximidades de 1, 3 e 5 metros |
-
-### Ajustes na versão principal
-
-- Cálculo de NDVI, brilho e bordas em **blocos**, reduzindo o pico de memória na etapa de características.
-- Deduplicação de amostras: **um rótulo por segmento**, descartando segmentos com rótulos conflitantes. Isso evita a repetição de um mesmo objeto nos conjuntos de treino e teste.
-- Separação treino/teste **estratificada por classe** (80%/20%, `random_state=42`).
-- A etapa espacial recebe **somente segmentos previstos como árvore**.
-- Resultados e visualizações são salvos no **Drive**, não enviados ao repositório.
-- O código não tenta analisar linhas de transmissão/distribuição ausentes dos dados.
-
-A escolha do **cluster 3** como candidato à vegetação foi preservada do experimento original. Esse número é circunstancial e exige inspeção a cada nova base; o rótulo de um cluster não tem significado fixo.
-
-## Resultados preliminares documentados
-
-Os valores a seguir vieram das **saídas salvas no notebook fornecido em outubro de 2026**, antes dos ajustes de deduplicação e processamento da versão atual. **Não são os resultados de uma nova execução do notebook publicado agora.**
-
-| Métrica | Experimento inicial | Experimento com área maior (arquivo recebido) |
-|---|---:|---:|
-| Registros rotulados (pares objeto–rótulo) | 133 | **458** |
-| Amostras de treinamento | 106 | **366** |
-| Amostras de teste | 27 | **92** |
-| Acurácia arredondada | 0,81 | **0,87** |
-| F1 da classe árvore | 0,80 | **0,85** |
-| F1 da classe gramínea | 0,83 | **0,88** |
-
-**Cautela na interpretação:** os conjuntos de teste diferem; portanto, esses resultados **não demonstram, por si só, um ganho estatisticamente comprovado**. O experimento original contou pares objeto–rótulo, que podem se repetir para um mesmo segmento. Como o notebook principal atual deduplica os objetos e usa divisão estratificada, as métricas obtidas na próxima execução podem diferir das apresentadas acima.
-
-## Alometria e proximidade
-
-A relação usada para estimar altura é a configuração **C3**:
+Os dados reais **não estão no GitHub**. Estão no [Google Drive, pasta `Area1`](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6) e o código original utiliza caminhos **absolutos**, no formato:
 
 ```text
-altura_estimada_m = 2.5 * area_m2 ** 0.4
+/content/drive/MyDrive/Projetos/Segmentacao_Breno/
+├── Area1/
+│   ├── AOI_RGB_NEW.tif
+│   ├── AOI_NEW_MULTI.tif
+│   ├── AOI_new.shp
+│   ├── AOI_new.shx
+│   ├── AOI_new.dbf
+│   ├── AOI_new.prj
+│   ├── AOI_new.cpg
+│   ├── Arvores.gpkg
+│   ├── Grama.gpkg
+│   └── postes.gpkg
+└── outputs/                 # criada para organização; não usada automaticamente pelo código
 ```
 
-Selecionam-se objetos classificados como **árvore** com altura estimada **maior que 7 m** para a análise de proximidade espacial.
+Para executar:
 
-Essa equação é **uma adaptação empírica experimental do projeto** inspirada na literatura de relações entre altura e dimensão da copa. **Não** é uma fórmula publicada literalmente na fonte referenciada e **não** foi validada com alturas medidas em campo. Veja [`docs/allometria.md`](docs/allometria.md).
+1. Abra o [notebook do GitHub no Colab](https://colab.research.google.com/github/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa.ipynb).
+2. Conecte seu Google Drive com a célula já existente `drive.mount('/content/drive')`.
+3. Verifique as bibliotecas necessárias em [`requirements-colab.txt`](requirements-colab.txt); o notebook instala `rasterio` na primeira célula e usa também `seaborn` para alguns gráficos. O arquivo de requisitos é uma referência e **não é instalado automaticamente** quando o notebook é aberto pelo GitHub.
+4. Execute as células na ordem. A imagem inteira tem cerca de 50,6 milhões de pixels; a segmentação Quickshift e a criação de arrays completos podem exigir **RAM alta**.
 
-A distância entre a copa e o **poste** é calculada em **2D**, no CRS métrico das imagens (**EPSG:31982**). Isso **não** prova interferência em cabos nem classifica risco elétrico operacional.
+**Onde ficam as saídas?** O notebook original escreve `polygons.json`, `polygons_arvores.json`, `features_stack.tif` e `arvores_segmentadas.json` usando **caminhos relativos**. Assim, eles vão para o diretório de trabalho da sessão Colab (normalmente `/content`), **não automaticamente** para `Segmentacao_Breno/outputs`. Arquivos locais do ambiente Colab podem desaparecer ao encerrar a sessão. O notebook apresenta gráficos e relatórios na própria saída das células.
 
-## Dados e boas práticas
+Veja [`data/README.md`](data/README.md) para descrição dos arquivos e dos sistemas de coordenadas.
 
-O conjunto `Area1` contém rasters RGB e RGB+NIR, os componentes de `AOI_new.shp`, pontos rotulados em `Arvores.gpkg` e `Grama.gpkg` e a camada `postes.gpkg`. Não contém `Linhas.shp`. Os vetores de árvores, gramíneas e postes estão em **EPSG:4674** na origem e são reprojetados para **EPSG:31982** nas etapas métricas.
+## Etapas efetivamente presentes no código
 
-Os rasters de entrada têm **0,5 m/pixel**. As origens das grades RGB e multiespectral diferem ligeiramente; aplicações que exijam grande precisão devem verificar o alinhamento antes de interpretar valores por objeto.
+1. Abrir imagem RGB e AOI; segmentar com **Quickshift** (`kernel_size=3`, `max_dist=5`, `ratio=0.04`) e criar polígonos.
+2. Extrair médias e desvios-padrão das bandas RGB/NIR para os polígonos; executar **K-Means de 6 grupos** (`random_state=42`, `n_init=10`) e prosseguir com o **cluster 3**. O número do cluster é específico da execução e requer inspeção antes de generalizar.
+3. Associar rótulos de `Arvores.gpkg` e `Grama.gpkg` por interseção espacial; extrair **NDVI, brilho HSV e bordas Canny**.
+4. Dividir as amostras em **80% treino / 20% teste**, `random_state=42`, **sem estratificação e sem etapa explícita de deduplicação**; treinar **Random Forest de 500 árvores** e apresentar relatório de classificação e matriz de confusão.
+5. Classificar os segmentos candidatos, calcular suas áreas e experimentar **seis configurações (C1–C6)** de modelos potencial e linear para a estimativa de altura.
+6. Usar a configuração potencial **C3: `2.5 * area ** 0.4`**, selecionar objetos com valor estimado **acima de 7 m**, carregar os postes e realizar junções de proximidade a **1, 3 e 5 m**.
 
-**Não subir ao GitHub:** arquivos `.tif`, `.gpkg`, `.shp`, ZIP dos dados ou produtos pesados. Eles continuam no [Google Drive](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf), respeitando o controle de acesso dos respectivos proprietários.
+**Atenção metodológica:** no código original, o filtro espacial por C3 e 7 m **não inclui** a condição `predicted_classe == 'arvore'`. Portanto, objetos que receberam previsão `grama` podem passar para a análise de proximidade. Também **não há** processamento em blocos: as imagens são trabalhadas integralmente em memória. Estas características estão documentadas aqui, **sem alteração do notebook**.
 
-## Testes automatizados
+O [diagrama das 17 etapas](docs/pipeline_17_etapas.png) é **conceitual**; não deve ser tratado como garantia de correspondência literal com todas as células do notebook original.
 
-O repositório inclui [`tests/test_pipeline.py`](tests/test_pipeline.py) e [GitHub Actions](.github/workflows/testes.yml). A cada alteração relevante, a rotina verifica:
+## Resultados anteriores e limites de interpretação
 
-1. Integridade JSON, sintaxe Python das células do notebook e referências dos documentos;
-2. Segmentação Quickshift, conversão para polígonos e K-Means em imagem **sintética**;
-3. NDVI, brilho, Canny e extração de pixels de raster **sintético**;
-4. Unicidade dos rótulos de treinamento, Random Forest, acurácia e matriz de confusão;
-5. Cálculo experimental de altura e distâncias vetoriais de 1, 3 e 5 metros a postes.
+| Indicador | Execução antiga | Saída histórica do notebook fornecido |
+|---|---:|---:|
+| Registros rotulados (pares objeto–rótulo) | 133 | 458 |
+| Treino | 106 | 366 |
+| Teste | 27 | 92 |
+| Acurácia arredondada | 0,81 | 0,87 |
+| F1 árvore | 0,80 | 0,85 |
+| F1 gramínea | 0,83 | 0,88 |
 
-**Última validação verificada:** 5 testes aprovados na [execução automatizada de 29/10/2026](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/actions/runs/40910365482).
+Os números da última coluna foram **extraídos de saídas históricas já salvas** no arquivo fornecido; **não representam a execução que está acontecendo agora no Colab**. A união espacial de segmentos com rótulos pode produzir múltiplos registros do mesmo objeto, e os conjuntos de avaliação das duas rodadas são diferentes. Não se deve interpretar a diferença de acurácia como ganho experimental comprovado.
 
-**Limite da homologação:** os testes passam com dados sintéticos e verificam a sintaxe do notebook, mas **não executam a imagem Area1 completa**. Para validar o experimento real, ainda é necessário montar a pasta `Area1` no Colab, executar integralmente todas as células, conferir a matriz de confusão, os produtos geoespaciais e o consumo de memória. Não atribua o resultado histórico de 87% à versão corrigida antes dessa execução.
+A relação de altura **C3 é empírica e ainda não validada com medições reais**. Veja [`docs/allometria.md`](docs/allometria.md) e o [registro do experimento de 29/10/2026](docs/experimento_area_completa_2026-10-29.md). A análise de distância é bidimensional em CRS métrico e não demonstra risco elétrico.
 
-## Próximas etapas científicas
+## Documentação e versionamento
 
-Ampliar o número de experimentos e bases reais, comparar métodos (por exemplo SVM e outros classificadores), realizar testes de ablação das três características, adotar validação espacial independente e verificar a estimativa de altura com medições reais (MAE, RMSE e R²). Fortalecer a revisão de literatura para explicitar quais lacunas a abordagem busca preencher.
+| Item | Função |
+|---|---|
+| [`Segmentacao_area_completa.ipynb`](Segmentacao_area_completa.ipynb) | Notebook original de 116 células, usado para execução |
+| [`data/README.md`](data/README.md) | Dados necessários, CRS e localização |
+| [`docs/allometria.md`](docs/allometria.md) | Discussão e limitações da estimativa experimental de altura |
+| [`docs/experimento_area_completa_2026-10-29.md`](docs/experimento_area_completa_2026-10-29.md) | Registro metodológico e resultados históricos |
+| [`docs/pipeline_17_etapas.png`](docs/pipeline_17_etapas.png) | Diagrama conceitual |
+| [`requirements-colab.txt`](requirements-colab.txt) | Bibliotecas utilizadas |
+| [`.gitignore`](.gitignore) | Exclui do versionamento dados geoespaciais grandes, resultados e temporários |
 
----
+Os diretórios de testes sintéticos e do GitHub Actions **foram removidos**; não há testes automáticos configurados no estado atual do repositório. A aprovação histórica desses testes de uma versão anterior **não valida** o notebook original nem a execução integral da imagem atual.
+
+Os arquivos `.tif`, `.gpkg`, `.shp` e outros produtos grandes devem continuar no Google Drive, não no GitHub.
 
 **Autor:** Breno Braga Galvão • Pesquisa acadêmica em desenvolvimento.

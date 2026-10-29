@@ -1,83 +1,83 @@
-# Experimento com a área completa — 29/10/2026
+# Registro do experimento — área completa (29/10/2026)
 
-## Origem e escopo
+## Origem e versão de referência
 
-Registro do notebook **`Segmentação_breno_imagem_completa(1).ipynb`** fornecido pelo autor em 29/10/2026, com dados geoespaciais da pasta `Area1` (também disponibilizados por [Google Drive](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf)).
+O autor forneceu o notebook `Segmentação_breno_imagem_completa.ipynb` e os dados geoespaciais `Area1`.
 
-O projeto tem **duas propostas**:
+O arquivo [`Segmentacao_area_completa.ipynb`](../Segmentacao_area_completa.ipynb) publicado atualmente no GitHub **restaura as 116 células originais** (85 de código, 31 de Markdown), com o conteúdo das células preservado. A versão simplificada de 9 células que esteve no repositório anteriormente **não é o notebook principal atual**.
 
-1. Classificação orientada a objetos de **árvores versus gramíneas**, pela combinação de NDVI, brilho HSV e bordas de Canny, com agrupamento K-Means e classificador Random Forest.
-2. Identificação de objetos arbóreos próximos à infraestrutura elétrica. **O arquivo de dados recebido nesta rodada contém geometrias de postes, mas não de cabos/linhas de energia**; logo, o experimento espacial implementa proximidade a *postes*, e não a cabos energizados.
+A cópia publicada no GitHub conserva as saídas textuais anteriores, mas não os arquivos incorporados de imagem/HTML; o [notebook completo no Drive](https://drive.google.com/file/d/1TIgMWSOGHENy9nkiaG5b1BcFKA5f5d_i/view) conserva também essas saídas ricas.
 
-## Parâmetros do notebook recebido
+**Situação de verificação:** os resultados apresentados a seguir são **históricos**, extraídos do notebook fornecido. Não comprovam uma nova execução integral, e a execução atual no Colab não é acompanhada automaticamente por este repositório.
 
-| Etapa | Configuração observada |
+## Objetivos da pesquisa
+
+1. Segmentar imagens de alta resolução e classificar segmentos de árvores e gramíneas com NDVI, brilho HSV, bordas Canny, K-Means e Random Forest.
+2. Avaliar a proximidade planimétrica de objetos selecionados com postes. Os dados `Area1` **não incluem cabos/linhas de energia**, portanto não suportam validação de interferência com fios.
+
+## Parâmetros observados no notebook original
+
+| Etapa | Código efetivamente publicado |
 |---|---|
-| Segmentação RGB | Quickshift: `kernel_size=3`, `max_dist=5`, `ratio=0.04` |
-| Características espectrais | Médias e desvios-padrão RGB + NIR por polígono |
-| Agrupamento | K-Means, 6 clusters, `random_state=42`, `n_init=10` |
-| Pré-seleção da vegetação | Cluster de índice **3**, dependente do ajuste do K-Means |
-| Características do classificador | Média de brilho HSV, média de bordas Canny, média do NDVI |
-| Classificador | Random Forest, 500 árvores, `random_state=42` |
-| Divisão treino/teste | `test_size=0.2`, `random_state=42` |
-| Altura estimada (exploratória) | `2.5 * area ** 0.4` (configuração C3) |
-| Filtro de altura | Estimativa **maior que 7 metros** |
-| Análise espacial | Vizinhança de postes a **1 m, 3 m, 5 m** |
+| RGB e segmentação | `quickshift(im, kernel_size=3, max_dist=5, ratio=0.04)` |
+| Extração inicial | Médias e desvios-padrão RGB/NIR por objeto |
+| Agrupamento | `KMeans(n_clusters=6, random_state=42, n_init=10)` |
+| Seleção de candidatos | Segmentos do `kmeans_cluster == 3` |
+| Rótulos | Interseção espacial (`sjoin`) com `Arvores.gpkg` e `Grama.gpkg` |
+| Atributos para Random Forest | Médias de brilho HSV, bordas Canny e NDVI |
+| Treino/teste | `train_test_split(..., test_size=0.2, random_state=42)`, **sem `stratify`** |
+| Classificador | `RandomForestClassifier(n_estimators=500, random_state=42)` |
+| Tratamento de rótulos | **Sem etapa explícita de deduplicação** de segmentos |
+| Estimativas de altura | C1–C6, versões potencial e linear; seleção final com C3 potencial |
+| Seleção da etapa espacial | `Power_tree_size_C3 > 7`, **sem condição de classe prevista árvore** |
+| Proximidade de postes | `gpd.sjoin_nearest` em 1 m, 3 m e 5 m |
+| Memória e exportação | Matrizes/imagens processadas integralmente; saídas em caminhos relativos no Colab |
 
-## Resultados reportados na execução anexada
+A escolha do cluster 3 é uma decisão exploratória do código e o identificador do cluster não tem significado universal.
 
-| Indicador | Resultado |
+## Resultados históricos do notebook recebido
+
+| Indicador | Valor histórico |
 |---|---:|
-| Linhas na tabela de treinamento (pares objeto–rótulo) | **458** |
-| Registros de treinamento | **366** |
-| Registros de teste | **92** |
-| Acurácia global arredondada | **0,87** |
-| Precisão / recall / F1 da classe árvore | 0,80 / 0,92 / 0,85 |
-| Precisão / recall / F1 da classe gramínea | 0,94 / 0,83 / 0,88 |
+| Linhas rotuladas (pares objeto–rótulo) | **458** |
+| Treino | **366** |
+| Teste | **92** |
+| Acurácia arredondada | **0,87** |
+| Precisão / recall / F1 para árvore | 0,80 / 0,92 / 0,85 |
+| Precisão / recall / F1 para gramínea | 0,94 / 0,83 / 0,88 |
 
-Os números foram **extraídos das saídas salvas no notebook fornecido**. Não representam uma reexecução independente no ambiente deste repositório. É importante distinguir **458 registros rotulados** de 458 árvores distintas; a união espacial (`sjoin`) pode produzir múltiplos pares para o mesmo objeto.
+Esses valores foram lidos de saídas salvas no notebook original, **não reprocessados de forma independente nesta revisão documental**. Um registro objeto–rótulo não é necessariamente um objeto arbóreo distinto: a associação espacial pode criar mais de um registro para o mesmo segmento.
 
-O experimento anterior do repositório apresentava **133 registros rotulados, 27 de teste e acurácia 0,81**; mantemos esses números para comparação histórica. Não é adequado interpretar a diferença de acurácia como ganho comprovado: os conjuntos de teste são diferentes.
+Uma rodada anterior do projeto apresentava 133 registros rotulados, 106 de treino, 27 de teste e acurácia de 0,81. Como os conjuntos são diferentes, a diferença de acurácia **não demonstra ganho estatisticamente comprovado**.
 
-## Dados do lote Area1
+## Dados e sistema de coordenadas
 
-| Arquivo | Finalidade |
+| Dados | Finalidade |
 |---|---|
-| `AOI_RGB_NEW.tif` | Raster RGB de referência para Quickshift |
-| `AOI_NEW_MULTI.tif` | Raster com quatro bandas RGB + NIR |
+| `AOI_RGB_NEW.tif` | Imagem RGB para segmentação |
+| `AOI_NEW_MULTI.tif` | RGB + NIR para características |
 | `AOI_new.shp/.shx/.dbf/.prj/.cpg` | Área de interesse |
-| `Arvores.gpkg` | Rótulos de árvores |
-| `Grama.gpkg` | Rótulos de gramíneas |
-| `postes.gpkg` | Pontos de postes |
+| `Arvores.gpkg` e `Grama.gpkg` | Rótulos de referência |
+| `postes.gpkg` | Localização de postes |
 
-Os rasters têm **6.942 × 7.294 pixels**, resolução de **0,5 m/pixel** e CRS **EPSG:31982**; os vetores de rótulo e postes são originariamente **EPSG:4674** e precisam ser reprojetados antes de operações métricas. Os arquivos raster estão ligeiramente deslocados entre si, o que requer cuidado ao utilizar bandas de diferentes produtos.
+Os rasters têm **6.942 × 7.294 pixels**, pixel de aproximadamente **0,5 metro** e CRS **EPSG:31982**. Os vetores de árvores, gramíneas e postes têm como CRS de origem **EPSG:4674**; operações espaciais métricas devem usar CRS projetado. As grades das imagens RGB e multiespectral têm leve diferença de origem, relevante à interpretação por objeto.
 
-**O ZIP não possui geometria de linhas de energia.** Não se deve afirmar validação da distância às linhas com esses arquivos.
+[Localização atual dos dados no Google Drive](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6)
 
-## Correção de interpretação da etapa espacial
+## Saídas e execução
 
-No código anexado, os segmentos do cluster 3 seguem para o cálculo de área e altura mesmo quando `predicted_classe == 'grama'`. A versão limpa disponível no repositório aplica o filtro `predicted_classe == 'arvore'` antes da análise de altura e proximidade. A alteração é metodologicamente necessária, mas **os quantitativos espaciais devem ser recalculados**.
+Os arquivos `polygons.json`, `polygons_arvores.json`, `features_stack.tif` e `arvores_segmentadas.json` são gravados no **diretório corrente do Colab**, normalmente `/content`. O notebook original não aponta automaticamente para a pasta `outputs/` do Drive nem gera os arquivos `metricas_classificacao.json` ou `resumo_proximidade_postes.csv` mencionados na antiga documentação.
 
-## Revisão do notebook principal — 29/10/2026
+A imagem integral pode exigir RAM alta. **Não há validação registrada de que a execução atual terminou com sucesso.** Os antigos testes sintéticos e o workflow de GitHub Actions foram removidos da árvore atual; resultados históricos de testes anteriores não equivalem à validação da execução real.
 
-A versão principal [`Segmentacao_area_completa.ipynb`](../Segmentacao_area_completa.ipynb) foi consolidada nesta organização do repositório. O notebook original da rodada foi substituído por um fluxo simplificado e documentado:
+## Limitações e próximos passos científicos
 
-- Geração de características em **blocos** para limitar o uso de memória.
-- Remoção de pares redundantes entre um segmento e vários pontos rotulados. Segmentos que receberam rótulos incompatíveis são descartados do treinamento.
-- Separação treino/teste **estratificada**, após atribuição de apenas uma classe a cada segmento.
-- O filtro de `predicted_classe == 'arvore'` é aplicado antes da estimativa alométrica e da proximidade com postes.
-- Exportação do relatório de classificação, matriz de confusão e resumo de distâncias para `outputs/` no Drive.
-- Teste de integração **em um recorte real de 1024 × 1024 pixels**: segmentação Quickshift, K-Means, associação de rótulos, extração NDVI/brilho/bordas e ajuste do Random Forest foram executados com sucesso. **A imagem completa ainda não foi executada integralmente no Colab.**
+- Verificar resultados e erros da execução integral, inclusive consumo de memória.
+- Revisar potenciais duplicações e vazamento de informação na separação de treino/teste.
+- Analisar a influência da escolha do cluster e testar generalização em outras áreas.
+- Avaliar o filtro de classe na seleção espacial; no código original ele não é aplicado.
+- Validar a estimativa C3 com alturas reais: **estimativa de porte não é medição de altura**.
+- Distinguir proximidade bidimensional a **postes** de distância a **cabos** e de diagnóstico de risco operacional.
+- Explorar, em experimentos futuros explicitamente separados, ablação de atributos, modelos comparativos, validação espacial e incerteza das métricas.
 
-**Os números de 458 pares/92 testes/acurácia 0,87 são históricos do notebook fornecido e não devem ser considerados métricas produzidas pela versão revisada.** Uma nova execução é necessária para publicar resultados atualizados e comparáveis.
-
-## Pendências científicas
-
-- Ampliar a validação por área geográfica e por objetos independentes para evitar vazamento espacial/duplicações no treino e teste.
-- Comparar com baselines simples e técnicas alternativas (SVM, outros classificadores e técnicas de detecção/segmentação quando comparáveis).
-- Executar estudo de ablação de NDVI, brilho e bordas; avaliar métricas por classe e intervalos de confiança.
-- Identificar na revisão bibliográfica os gaps que a abordagem se propõe a preencher.
-- Validar a estimativa de altura com medições reais; a configuração C3 é **empírica**, não uma equação publicada literalmente pela referência alométrica.
-- Validar a análise de proximidade com geometrias reais das linhas, se disponíveis, e não confundir proximidade bidimensional com risco operacional comprovado.
-
-**Situação:** registro documental concluído; resultados de execução do notebook recebido, não experimento independente repetido.
+Este documento descreve e contextualiza a versão **original**; nenhuma alteração metodológica é proposta como se já estivesse implementada.

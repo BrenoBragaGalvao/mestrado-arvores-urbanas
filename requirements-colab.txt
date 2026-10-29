@@ -6,3 +6,4 @@ rasterio
 scikit-image
 scikit-learn
 shapely
+seaborn

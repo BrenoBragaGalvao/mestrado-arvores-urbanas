@@ -1,57 +1,47 @@
-# Dados geoespaciais — experimento Area1 (29/10/2026)
+# Dados geoespaciais — experimento Area1
 
-Este repositório **não armazena** os arquivos raster e GeoPackage, devido ao tamanho e ao versionamento. O material foi fornecido pelo autor em um ZIP e na seguinte [pasta compartilhada no Google Drive](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf).
+Esta pasta `data/` no **GitHub contém somente documentação**. Os dez arquivos reais utilizados pelo notebook estão no [Google Drive — `Projetos/Segmentacao_Breno/Area1`](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6).
 
-## Arquivos presentes no ZIP
-
-| Arquivo | Papel no processamento |
-|---|---|
-| `Area1/AOI_RGB_NEW.tif` | Imagem RGB para segmentação Quickshift |
-| `Area1/AOI_NEW_MULTI.tif` | Imagem multiespectral RGB + NIR para características |
-| `Area1/AOI_new.shp` | Polígono da área de interesse |
-| `Area1/AOI_new.shx` | Índice das geometrias do shapefile |
-| `Area1/AOI_new.dbf` | Atributos do shapefile |
-| `Area1/AOI_new.prj` | Referência espacial do shapefile |
-| `Area1/AOI_new.cpg` | Codificação do shapefile |
-| `Area1/Arvores.gpkg` | Polígonos rotulados como árvores |
-| `Area1/Grama.gpkg` | Polígonos rotulados como gramíneas |
-| `Area1/postes.gpkg` | Camada de postes para análise de proximidade |
-
-**Não há no ZIP arquivo de geometria das linhas/cabos de energia.**
-
-## Requisitos espaciais verificados
-
-- Rasters: **6.942 × 7.294 pixels**, pixel de **0,5 m**, CRS **EPSG:31982**.
-- `AOI_new.shp`: **EPSG:31982**.
-- `Arvores.gpkg`, `Grama.gpkg` e `postes.gpkg`: **EPSG:4674**, reprojetados no notebook para **EPSG:31982**.
-- Raster RGB e multiespectral possuem pequena diferença de origem; para análises de precisão, examine o alinhamento entre grades.
-
-## Preparação no Google Colab
-
-O notebook atualizado [`Segmentacao_area_completa.ipynb`](../Segmentacao_area_completa.ipynb) utiliza por padrão:
+O notebook atual [`Segmentacao_area_completa.ipynb`](../Segmentacao_area_completa.ipynb), restaurado do original de 116 células, lê **caminhos absolutos** com prefixo:
 
 ```text
-MyDrive/
-└── Projetos/
-    └── Segmentacao_Breno/
-        ├── Area1/
-        │   ├── AOI_RGB_NEW.tif
-        │   ├── AOI_NEW_MULTI.tif
-        │   ├── AOI_new.shp
-        │   ├── AOI_new.shx
-        │   ├── AOI_new.dbf
-        │   ├── AOI_new.prj
-        │   ├── AOI_new.cpg
-        │   ├── Arvores.gpkg
-        │   ├── Grama.gpkg
-        │   └── postes.gpkg
-        └── outputs/
+/content/drive/MyDrive/Projetos/Segmentacao_Breno/Area1/
 ```
 
-Se a pasta estiver em outro lugar, **altere `DATA_DIR`** na primeira célula. O notebook salva a pilha de características e GeoPackages em `outputs/`. Esses produtos também não devem ser enviados ao GitHub.
+## Arquivos necessários
 
-O processamento da área completa requer bastante memória; execução no Colab com RAM alta é recomendada. Não se deve interpretar altura estimada como altura observada nem proximidade bidimensional ao poste como prova de interferência com cabos energizados.
+| Arquivo | Uso no notebook |
+|---|---|
+| `AOI_RGB_NEW.tif` | Imagem RGB para Quickshift |
+| `AOI_NEW_MULTI.tif` | Bandas RGB + infravermelho próximo (NIR) |
+| `AOI_new.shp` | Geometria da área de interesse |
+| `AOI_new.shx` | Índice geométrico do shapefile |
+| `AOI_new.dbf` | Tabela de atributos do shapefile |
+| `AOI_new.prj` | Referência espacial do shapefile |
+| `AOI_new.cpg` | Codificação de texto do shapefile |
+| `Arvores.gpkg` | Rótulos de árvores |
+| `Grama.gpkg` | Rótulos de gramíneas |
+| `postes.gpkg` | Pontos de postes para proximidade |
 
-## Histórico
+O lote `Area1` não contém uma camada de linhas/cabos de energia.
 
-O experimento inicial utilizava outros nomes de arquivos (`AOI.tif`, `AOI_MULTI.tif`, `Postes.shp`, etc.). **Esses nomes não correspondem ao lote Area1 recebido em 29/10/2026.** O notebook inicial foi mantido no histórico de versionamento; para a nova rodada, use os nomes acima.
+## Características espaciais observadas
+
+- Imagens raster: **6.942 × 7.294 pixels**, aproximadamente **0,5 m/pixel**, CRS **EPSG:31982**.
+- `AOI_new.shp`: **EPSG:31982**.
+- `Arvores.gpkg`, `Grama.gpkg` e `postes.gpkg`: CRS original **EPSG:4674**. O código converte camadas vetoriais para o CRS de análise antes de certas operações espaciais.
+- As grades RGB e multiespectral têm uma pequena diferença de origem. Isso exige atenção ao analisar valores espectrais em conjunto.
+
+## Organização e saída
+
+```text
+Meu Drive/
+└── Projetos/
+    └── Segmentacao_Breno/
+        ├── Area1/                   # dez arquivos de entrada
+        └── outputs/                 # pasta de organização, não referenciada automaticamente
+```
+
+No notebook original **não existe variável `DATA_DIR`**. Os caminhos de entrada aparecem diretamente nas células. Os arquivos `polygons.json`, `polygons_arvores.json`, `features_stack.tif` e `arvores_segmentadas.json` são gravados com **nomes relativos** e ficam no diretório corrente do Colab, normalmente `/content`, a menos que o ambiente tenha sido configurado de outra forma.
+
+O processamento integral pode consumir bastante memória. Distância 2D a postes não mede proximidade a fios/cabos, e a altura estimada é experimental, não observada.
