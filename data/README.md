@@ -28,7 +28,7 @@ Este repositório **não armazena** os arquivos raster e GeoPackage, devido ao t
 
 ## Preparação no Google Colab
 
-O notebook atualizado [`Segmentacao_area_completa_2026.ipynb`](../Segmentacao_area_completa_2026.ipynb) utiliza por padrão:
+O notebook atualizado [`Segmentacao_area_completa.ipynb`](../Segmentacao_area_completa.ipynb) utiliza por padrão:
 
 ```text
 MyDrive/
