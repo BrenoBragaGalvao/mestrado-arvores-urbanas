@@ -114,6 +114,20 @@ Os rasters de entrada têm **0,5 m/pixel**. As origens das grades RGB e multiesp
 
 **Não subir ao GitHub:** arquivos `.tif`, `.gpkg`, `.shp`, ZIP dos dados ou produtos pesados. Eles continuam no [Google Drive](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf), respeitando o controle de acesso dos respectivos proprietários.
 
+## Testes automatizados
+
+O repositório inclui [`tests/test_pipeline.py`](tests/test_pipeline.py) e [GitHub Actions](.github/workflows/testes.yml). A cada alteração relevante, a rotina verifica:
+
+1. Integridade JSON, sintaxe Python das células do notebook e referências dos documentos;
+2. Segmentação Quickshift, conversão para polígonos e K-Means em imagem **sintética**;
+3. NDVI, brilho, Canny e extração de pixels de raster **sintético**;
+4. Unicidade dos rótulos de treinamento, Random Forest, acurácia e matriz de confusão;
+5. Cálculo experimental de altura e distâncias vetoriais de 1, 3 e 5 metros a postes.
+
+**Última validação verificada:** 5 testes aprovados na [execução automatizada de 29/10/2026](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/actions/runs/40910365482).
+
+**Limite da homologação:** os testes passam com dados sintéticos e verificam a sintaxe do notebook, mas **não executam a imagem Area1 completa**. Para validar o experimento real, ainda é necessário montar a pasta `Area1` no Colab, executar integralmente todas as células, conferir a matriz de confusão, os produtos geoespaciais e o consumo de memória. Não atribua o resultado histórico de 87% à versão corrigida antes dessa execução.
+
 ## Próximas etapas científicas
 
 Ampliar o número de experimentos e bases reais, comparar métodos (por exemplo SVM e outros classificadores), realizar testes de ablação das três características, adotar validação espacial independente e verificar a estimativa de altura com medições reais (MAE, RMSE e R²). Fortalecer a revisão de literatura para explicitar quais lacunas a abordagem busca preencher.
