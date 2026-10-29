@@ -58,6 +58,19 @@ Os rasters têm **6.942 × 7.294 pixels**, resolução de **0,5 m/pixel** e CRS 
 
 No código anexado, os segmentos do cluster 3 seguem para o cálculo de área e altura mesmo quando `predicted_classe == 'grama'`. A versão limpa disponível no repositório aplica o filtro `predicted_classe == 'arvore'` antes da análise de altura e proximidade. A alteração é metodologicamente necessária, mas **os quantitativos espaciais devem ser recalculados**.
 
+## Revisão do notebook principal — 29/10/2026
+
+A versão principal [`Segmentacao_area_completa_2026.ipynb`](../Segmentacao_area_completa_2026.ipynb) foi consolidada nesta organização do repositório. O notebook original da rodada foi substituído por um fluxo simplificado e documentado:
+
+- Geração de características em **blocos** para limitar o uso de memória.
+- Remoção de pares redundantes entre um segmento e vários pontos rotulados. Segmentos que receberam rótulos incompatíveis são descartados do treinamento.
+- Separação treino/teste **estratificada**, após atribuição de apenas uma classe a cada segmento.
+- O filtro de `predicted_classe == 'arvore'` é aplicado antes da estimativa alométrica e da proximidade com postes.
+- Exportação do relatório de classificação, matriz de confusão e resumo de distâncias para `outputs/` no Drive.
+- Teste de integração **em um recorte real de 1024 × 1024 pixels**: segmentação Quickshift, K-Means, associação de rótulos, extração NDVI/brilho/bordas e ajuste do Random Forest foram executados com sucesso. **A imagem completa ainda não foi executada integralmente no Colab.**
+
+**Os números de 458 pares/92 testes/acurácia 0,87 são históricos do notebook fornecido e não devem ser considerados métricas produzidas pela versão revisada.** Uma nova execução é necessária para publicar resultados atualizados e comparáveis.
+
 ## Pendências científicas
 
 - Ampliar a validação por área geográfica e por objetos independentes para evitar vazamento espacial/duplicações no treino e teste.
