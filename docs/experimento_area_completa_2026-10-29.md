@@ -60,7 +60,7 @@ No código anexado, os segmentos do cluster 3 seguem para o cálculo de área e 
 
 ## Revisão do notebook principal — 29/10/2026
 
-A versão principal [`Segmentacao_area_completa_2026.ipynb`](../Segmentacao_area_completa_2026.ipynb) foi consolidada nesta organização do repositório. O notebook original da rodada foi substituído por um fluxo simplificado e documentado:
+A versão principal [`Segmentacao_area_completa.ipynb`](../Segmentacao_area_completa.ipynb) foi consolidada nesta organização do repositório. O notebook original da rodada foi substituído por um fluxo simplificado e documentado:
 
 - Geração de características em **blocos** para limitar o uso de memória.
 - Remoção de pares redundantes entre um segmento e vários pontos rotulados. Segmentos que receberam rótulos incompatíveis são descartados do treinamento.
