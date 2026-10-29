@@ -9,6 +9,32 @@
 ![Geospatial Analysis](https://img.shields.io/badge/Geospatial_Analysis-orientada_a_objetos-2A6F97?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Em_desenvolvimento-E9A23B?style=flat-square)
 
+## Atualização — experimento da área completa (29/10/2026)
+
+O experimento foi ampliado para uma **área maior da imagem**, mantendo as duas propostas de pesquisa: (1) discriminar árvores e gramíneas por **NDVI + brilho HSV + bordas**, após Quickshift/K-Means; e (2) localizar árvores próximas à infraestrutura elétrica.
+
+**Resultados registrados no notebook recebido (antes da correção do filtro espacial):**
+
+| Indicador | Área completa (29/10/2026) | Experimento inicial |
+|---|---:|---:|
+| Registros rotulados (pares objeto–rótulo) | **458** | 133 |
+| Treinamento | **366** | 106 |
+| Teste | **92** | 27 |
+| Acurácia global (arredondada) | **0,87** | 0,81 |
+| F1 da classe árvore | **0,85** | 0,80 |
+| F1 da classe gramínea | **0,88** | 0,83 |
+
+**Esses valores vieram das saídas salvas no notebook fornecido; não foram reexecutados neste commit.** Os conjuntos de teste são distintos e não permitem concluir que o desempenho melhorou de forma estatisticamente comprovada. A coleção de 458 *pares objeto–rótulo* pode incluir múltiplas interseções com um mesmo segmento.
+
+**Arquivos para reprodução:**
+
+- [Notebook organizado da área completa — 2026](Segmentacao_area_completa_2026.ipynb) — use este para os novos experimentos; execução em Google Colab com RAM alta.
+- [Registro metodológico e resultados (29/10/2026)](docs/experimento_area_completa_2026-10-29.md).
+- [Dados e nomes exatos do lote Area1](data/README.md) — rasters e vetores mantidos no [Google Drive](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf).
+- [Notebook anterior](Segmentacao_classificacao.ipynb) — preservado como registro da etapa inicial.
+
+**Limites da proposta 2:** a versão de dados recebida contém **postes**, mas não linhas/cabos; portanto, a análise efetivamente implementada é de *proximidade a postes* em 1, 3 e 5 metros. O notebook organizado corrige o filtro para levar à alometria **somente segmentos classificados como árvore**; os quantitativos de proximidade exigem reexecução após a correção. A relação área–altura C3 permanece **empírica, sem validação de campo**.
+
 ## Visão geral
 
 A proximidade entre vegetação arbórea e redes de distribuição de energia pode favorecer interferências na infraestrutura, interrupções do fornecimento e riscos à segurança. O acompanhamento dessas áreas é, portanto, relevante para orientar inspeções, manejo e planejamento preventivo.
@@ -140,8 +166,8 @@ O limiar de **7 m** funciona como um **critério operacional de seleção** dent
 
 As árvores selecionadas são sobrepostas aos dados vetoriais da infraestrutura elétrica:
 
-- `Linhas.shp` — linhas de energia;
-- `Postes.shp` — referência cartográfica dos postes.
+- `Linhas.shp` — linhas de energia, **não incluídas no lote Area1 de 29/10/2026**;
+- `postes.gpkg` — geometria dos postes **efetivamente utilizada no experimento atual**.
 
 A análise espacial considera:
 
@@ -152,7 +178,7 @@ A análise espacial considera:
 
 A análise é realizada em **duas dimensões**, considerando a geometria projetada dos objetos.
 
-## Resultados atuais
+## Resultados do experimento inicial (histórico)
 
 > **Resultados do experimento inicial atualmente documentado.**
 
@@ -172,7 +198,7 @@ A análise é realizada em **duas dimensões**, considerando a geometria projeta
 | Árvores | 0,83 | 0,77 | 0,80 |
 | Gramíneas | 0,80 | 0,86 | 0,83 |
 
-A segmentação inicial produziu **15.633 objetos**, dos quais **3.002** foram selecionados como candidatos à vegetação.
+A segmentação inicial (não a da área completa de 29/10/2026) produziu **15.633 objetos**, dos quais **3.002** foram selecionados como candidatos à vegetação.
 
 O conjunto rotulado utilizado no experimento inicial possui **133 objetos**, sendo **106 destinados ao treinamento** e **27 ao teste**.
 
@@ -218,9 +244,11 @@ As dependências do ambiente estão registradas em [`requirements-colab.txt`](re
 
 | Item | Finalidade |
 | --- | --- |
-| 📓 `Segmentacao_classificacao.ipynb` | Notebook principal da metodologia |
+| 📓 `Segmentacao_area_completa_2026.ipynb` | **Notebook atualizado** para reproduzir o experimento com a área completa |
+| 📓 `Segmentacao_classificacao.ipynb` | Notebook anterior, mantido para histórico |
 | 🖼️ `docs/pipeline_17_etapas.png` | Fluxo visual detalhado das 17 etapas |
 | 📐 `docs/allometria.md` | Fundamentação, adaptação e configurações da relação alométrica |
+| 📊 `docs/experimento_area_completa_2026-10-29.md` | Métricas, parâmetros e limites do experimento atualizado |
 | 📦 `requirements-colab.txt` | Dependências do ambiente |
 | 📘 `README.md` | Documentação principal |
 | 🚫 `.gitignore` | Arquivos não versionados |
@@ -230,50 +258,18 @@ O **GitHub** concentra o código e a documentação versionados, enquanto o **Go
 
 ## Dados e armazenamento
 
-Estrutura esperada no Google Drive:
+Os rasters e arquivos vetoriais do lote **Area1** não são versionados devido ao tamanho. Eles estão na pasta do [Google Drive fornecido pelo autor](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf), além do ZIP encaminhado em 29/10/2026. Consulte [`data/README.md`](data/README.md) para lista e instruções.
 
-```text
-MyDrive/
-└── mestrado-arvores-urbanas/
-    ├── data/
-    │   ├── raw/
-    │   └── interim/
-    └── outputs/
-```
+### Como executar o notebook atualizado no Colab
 
-| Diretório | Finalidade |
-| --- | --- |
-| 📥 `data/raw/` | Dados originais |
-| ⚙️ `data/interim/` | Produtos intermediários |
-| 📤 `outputs/` | Resultados finais |
+1. Obtenha a pasta `Area1` no Drive ou extraia o ZIP enviado (mantendo os 10 arquivos na mesma pasta).
+2. No Google Drive da sessão do Colab, mantenha-a em `MyDrive/Projetos/Segmentacao_Breno/Area1/` ou ajuste a variável `DATA_DIR` no notebook.
+3. Abra [`Segmentacao_area_completa_2026.ipynb`](Segmentacao_area_completa_2026.ipynb) no Google Colab e autorize a montagem do Drive.
+4. Execute as células na ordem. Prefira uma sessão com RAM alta; o processamento da área inteira pode ser demorado.
+5. Consulte os relatórios de classificação impressos e os arquivos criados em `MyDrive/Projetos/Segmentacao_Breno/outputs/`.
+6. Registre os novos resultados após a correção do filtro espacial e compare-os com os valores históricos, considerando as limitações científicas descritas.
 
-### Dados de entrada
-
-| Arquivo | Função |
-| --- | --- |
-| `AOI.tif` | Imagem RGB |
-| `AOI_MULTI.tif` | Imagem multiespectral RGB + NIR |
-| `AOI.shp` | Área de interesse |
-| `Arvores.shp` | Amostras de árvores |
-| `Grama.shp` | Amostras de gramíneas |
-| `Linhas.shp` | Linhas de energia |
-| `Postes.shp` | Referência cartográfica dos postes |
-
-> **Nota:** cada Shapefile depende de arquivos auxiliares, como `.shx`, `.dbf`, `.prj` e `.cpg`. Quando disponíveis, mantenha todos os componentes junto ao respectivo arquivo `.shp` em `data/raw/`.
-
-## Como executar
-
-1. Organize os dados no Google Drive conforme a estrutura indicada acima.
-2. Abra [`Segmentacao_classificacao.ipynb`](Segmentacao_classificacao.ipynb), a partir do GitHub, no Google Colab.
-3. Monte o Google Drive na sessão do Colab.
-4. Instale as dependências:
-
-```bash
-pip install -r requirements-colab.txt
-```
-
-5. Execute as células do notebook na ordem apresentada.
-6. Verifique os produtos gerados em `data/interim/` e `outputs/`.
+**Importante:** as áreas (m²) e distâncias (m) pressupõem um CRS projetado métrico (neste lote, EPSG:31982). A imagem RGB e a multiespectral têm pequeno deslocamento entre transformações; revise o alinhamento em análises de alta precisão.
 
 ## Status do projeto
 
