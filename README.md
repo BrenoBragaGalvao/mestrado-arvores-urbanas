@@ -14,7 +14,7 @@
 
 | Arquivo | Finalidade |
 |---|---|
-| **[`Segmentacao_area_completa_2026.ipynb`](Segmentacao_area_completa_2026.ipynb)** | **Notebook principal e único**, preparado para Google Colab |
+| **[`Segmentacao_area_completa.ipynb`](Segmentacao_area_completa.ipynb)** | **Notebook principal e único**, preparado para Google Colab |
 | [`data/README.md`](data/README.md) | Arquivos geoespaciais exigidos, estrutura da pasta `Area1` e CRS |
 | [`docs/experimento_area_completa_2026-10-29.md`](docs/experimento_area_completa_2026-10-29.md) | Registro da rodada de outubro: parâmetros, resultados e limitações |
 | [`docs/allometria.md`](docs/allometria.md) | Fundamentação e limites da estimativa experimental da altura |
@@ -26,7 +26,7 @@ O notebook anterior foi retirado da árvore atual de arquivos para evitar confus
 
 ## Como executar no Google Colab
 
-1. Abra o **[notebook principal](Segmentacao_area_completa_2026.ipynb)** no Google Colab.
+1. Abra o **[notebook principal](Segmentacao_area_completa.ipynb)** no Google Colab.
 2. Tenha no seu Google Drive a pasta `Area1`, com os arquivos do [Drive do projeto](https://drive.google.com/drive/folders/1hvCcpETqIPc37aNp3oJLVFTss3nejCdf), ou extraia nela o ZIP recebido. Um link compartilhado isolado **não monta automaticamente os arquivos no Colab**: adicione um atalho para a pasta no *Meu Drive* ou copie os arquivos para sua estrutura.
 3. Por padrão, o notebook espera os dados no seguinte caminho (altere a variável `DATA_DIR` se necessário):
 
