@@ -5,5 +5,4 @@ pandas
 rasterio
 scikit-image
 scikit-learn
-seaborn
 shapely
