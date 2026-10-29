@@ -148,11 +148,25 @@ O número de pares objeto–rótulo não representa necessariamente a quantidade
 
 ### Estimativa empírica de altura
 
-O notebook explora seis configurações de estimativa de porte (**C1–C6**), nas formas potencial e linear. Na etapa de análise espacial, utiliza-se a configuração **potencial C3** para selecionar objetos com maior porte estimado, conforme um limiar experimental.
+O notebook explora seis configurações de estimativa de porte (**C1–C6**), nas formas potencial e linear. A relação potencial adotada como hipótese experimental é:
 
-Essa relação é uma **estimativa experimental**, inspirada na literatura sobre dimensões da copa e altura, e **não representa uma medição real de altura em campo**.
+$$
+\widehat{H} = a \cdot A^b
+$$
 
-Para conhecer a fundamentação científica, os parâmetros utilizados e as limitações do método, consulte [a documentação de alometria](docs/allometria.md).
+Em que **\(A\)** representa a área projetada do polígono da copa (m²), **\(\widehat{H}\)** representa a altura estimada e **\(a\)** e **\(b\)** são parâmetros experimentais.
+
+Para selecionar os objetos que seguem para a análise de proximidade com postes, utiliza-se a **configuração potencial C3**:
+
+$$
+\boxed{\widehat{H}_{C3} = 2{,}5 \cdot A^{0{,}4}}
+$$
+
+A seleção considera os objetos com **altura estimada superior a 7 metros**. Esse valor é um critério experimental de seleção, **não uma medição direta de altura**.
+
+**Limitação científica:** a expressão acima é uma adaptação empírica usada nesta pesquisa, inspirada na literatura sobre dimensões de copa e altura. Os coeficientes **2,5** e **0,4** não foram obtidos de uma calibração local com alturas medidas em campo. Portanto, a estimativa ainda precisa de validação antes de ser interpretada como altura real.
+
+Para conhecer a fundamentação científica e as demais configurações, consulte [a documentação de alometria](docs/allometria.md).
 
 ## Tecnologias e bibliotecas
 
