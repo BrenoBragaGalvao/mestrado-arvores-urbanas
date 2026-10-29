@@ -1,147 +1,237 @@
-# Árvores urbanas: segmentação, classificação e proximidade com a rede elétrica
+# Combinação de Características de Brilho, Bordas e NDVI para Detecção de Árvores Urbanas e Avaliação de Proximidade com Linhas de Energia
 
-**Pesquisa de mestrado — Breno Braga Galvão**  
-Python • Google Colab • Sensoriamento remoto • GeoPandas • Machine Learning
+**Abordagem orientada a objetos para identificação de árvores urbanas em imagens multiespectrais de alta resolução e análise espacial de proximidade com a infraestrutura elétrica.**
 
-> **Sobre o projeto:** pesquisa em desenvolvimento para identificar árvores urbanas em imagens de alta resolução e analisar sua proximidade com a infraestrutura elétrica. O notebook principal mantém o código original da pesquisa, com 116 células.
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)
+![Google Colab](https://img.shields.io/badge/Google_Colab-compat%C3%ADvel-F9AB00?style=flat-square&logo=googlecolab&logoColor=white)
+![Machine Learning](https://img.shields.io/badge/Machine_Learning-Random_Forest-4C72B0?style=flat-square)
+![Remote Sensing](https://img.shields.io/badge/Remote_Sensing-multiespectral-5B8C5A?style=flat-square)
+![Geospatial Analysis](https://img.shields.io/badge/Geospatial_Analysis-orientada_a_objetos-2A6F97?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Em_desenvolvimento-E9A23B?style=flat-square)
 
-## Objetivos da pesquisa
+## Visão geral
 
-### Proposta 1 – Identificação de árvores e gramíneas
+A vegetação arbórea é parte essencial da infraestrutura verde das cidades, mas sua localização e seu porte também são relevantes para o planejamento e a manutenção das redes elétricas. Identificar árvores em imagens aéreas e representar suas copas como objetos georreferenciados permite investigar a distribuição da vegetação e sua proximidade com elementos da infraestrutura urbana.
 
-Identificar e caracterizar a vegetação urbana em imagens de sensoriamento remoto, distinguindo **árvores e gramíneas** por meio de uma abordagem de análise orientada a objetos.
+Esta pesquisa combina **segmentação de imagens**, **características espectrais e de textura**, **aprendizado de máquina** e **análise espacial**. O trabalho está organizado em duas propostas complementares: reconhecer árvores e gramíneas e, em seguida, investigar a proximidade espacial de objetos selecionados em relação à rede elétrica.
 
-O processamento combina:
+> **Escopo dos dados atuais:** a área de estudo contém a geometria dos **postes**, mas não dos cabos ou linhas de energia. Assim, a segunda proposta é investigada atualmente por meio da **proximidade com postes**, sem afirmar interferência efetiva nos fios.
 
-- **Quickshift**, para segmentar a imagem em objetos;
-- características espectrais das bandas **RGB e infravermelho próximo (NIR)**;
-- **K-Means**, para agrupamento inicial dos segmentos;
-- **NDVI, brilho HSV e bordas de Canny**, como características de classificação;
-- **Random Forest**, para diferenciar árvores e gramíneas;
-- polígonos georreferenciados, para calcular a área projetada dos segmentos.
+## Propostas de pesquisa
 
-### Proposta 2 – Proximidade com a rede elétrica
+### 🌳 Proposta 1 – Identificação de árvores e gramíneas
 
-Investigar a proximidade entre os objetos arbóreos identificados e a infraestrutura elétrica urbana, com foco no apoio a análises espaciais e ao planejamento.
+**Pergunta de pesquisa:** como distinguir árvores e gramíneas em imagens de alta resolução utilizando a combinação de NDVI, brilho e bordas em objetos segmentados?
 
-O experimento atual utiliza **localizações de postes** e avalia distâncias de **1 m, 3 m e 5 m**. Também explora uma **estimativa empírica de altura** obtida a partir da área dos polígonos.
+A imagem RGB é dividida em regiões espacialmente coerentes pelo **Quickshift**. Para cada região, o código extrai estatísticas das bandas RGB e NIR e aplica **K-Means** para selecionar candidatos. Depois, utiliza amostras identificadas como árvores e gramíneas para treinar um **Random Forest** com três características complementares:
 
-**Delimitação:** a base utilizada contém postes, mas não a geometria dos cabos/linhas de energia. Portanto, os resultados representam **proximidade espacial com postes**, não uma medição da distância aos fios nem uma comprovação de risco elétrico.
+| Característica | O que representa | Por que utilizar |
+|---|---|---|
+| 🌿 **NDVI** | Resposta espectral relacionada à vegetação | Diferenciar padrões de cobertura vegetal |
+| 💡 **Brilho (HSV)** | Intensidade luminosa observada na imagem | Representar diferenças radiométricas dos objetos |
+| ◻️ **Bordas (Canny)** | Variações locais e contornos | Descrever aspectos estruturais e de textura |
 
-## Fluxo metodológico
+**Desenho do processo de identificação**
 
-A imagem a seguir apresenta uma **visão geral das 17 etapas do processo de pesquisa**, das imagens de entrada até a análise espacial.
+```mermaid
+flowchart TD
+    A["🛰️ Imagens RGB e multiespectral"] --> B["🧩 Segmentação Quickshift"]
+    B --> C["🗺️ Polígonos dos objetos"]
+    C --> D["📊 Estatísticas RGB + NIR"]
+    D --> E["🔎 K-Means: 6 agrupamentos"]
+    E --> F["🌱 Candidatos à vegetação: cluster 3"]
+    F --> G["🏷️ Amostras de árvores e gramíneas"]
+    G --> H["Extração das características"]
+    H --> I["🌿 NDVI"]
+    H --> J["💡 Brilho HSV"]
+    H --> K["◻️ Bordas Canny"]
+    I --> L["📋 Atributos por objeto"]
+    J --> L
+    K --> L
+    L --> M["🌲 Random Forest"]
+    M --> N["🌳 Árvores ou 🌱 gramíneas"]
+    N --> O["📈 Avaliação e matriz de confusão"]
 
-![Fluxo metodológico da pesquisa — 17 etapas](docs/pipeline_17_etapas.png)
+    classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
+    classDef destaque fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
+    classDef recurso fill:#fff2de,stroke:#dcab68,color:#6b4714,stroke-width:1px;
+    class A,B,C,D,G,H,L,N,O entrada;
+    class E,F,M destaque;
+    class I,J,K recurso;
+```
 
-| Etapas | Procedimentos principais |
+A abordagem é **orientada a objetos**: em vez de tratar apenas pixels isolados, utiliza as propriedades dos segmentos, mantendo suas geometrias para a etapa espacial.
+
+### ⚡ Proposta 2 – Proximidade com a rede elétrica
+
+**Pergunta de pesquisa:** como utilizar os objetos identificados em imagens aéreas para apoiar a identificação de áreas de atenção próximas à infraestrutura elétrica urbana?
+
+A pesquisa investiga a área projetada dos objetos e utiliza uma **estimativa empírica de altura**, calculada a partir dessa área, para selecionar candidatos a uma análise espacial. Em seguida, avalia a proximidade com os **postes**, em distâncias de **1, 3 e 5 metros**.
+
+**Desenho do processo de análise espacial**
+
+```mermaid
+flowchart TD
+    A["🗺️ Segmentos candidatos classificados"] --> B["📐 Área projetada dos polígonos"]
+    B --> C["🌳 Modelos exploratórios de porte: C1 a C6"]
+    C --> D["📏 Configuração potencial C3"]
+    D --> E{"Altura estimada > 7 m?"}
+    E -->|Sim| F["📍 Objetos selecionados"]
+    E -->|Não| G["Fora do filtro espacial"]
+    H["⚡ Base de postes"] --> I["🗺️ Análise geoespacial"]
+    F --> I
+    I --> J["1 m"]
+    I --> K["3 m"]
+    I --> L["5 m"]
+    J --> M["📊 Objetos próximos a postes"]
+    K --> M
+    L --> M
+
+    classDef etapa fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
+    classDef principal fill:#fff0d9,stroke:#d9a25d,color:#6b4714,stroke-width:2px;
+    classDef saida fill:#e0f2e5,stroke:#7daf8b,color:#1e5135,stroke-width:2px;
+    class A,B,C,F,G,H,I,J,K,L etapa;
+    class D,E principal;
+    class M saida;
+```
+
+**Limites importantes:** a fórmula utilizada estima um possível porte a partir da área e **não mede diretamente a altura real da árvore**. No código atual, o filtro `C3 > 7` **não exige** que `predicted_classe == 'arvore'`; por isso, também podem passar objetos classificados como gramínea. A distância é medida em duas dimensões em relação aos postes, não aos cabos energizados.
+
+## Contribuições metodológicas investigadas
+
+A proposta reúne três elementos:
+
+1. **Combinação de características complementares:** NDVI (espectral), brilho HSV (radiométrica) e bordas de Canny (estrutura e textura).
+2. **Estratégia híbrida de agrupamento e classificação:** K-Means para pré-seleção dos candidatos e Random Forest para distinguir árvores e gramíneas.
+3. **Preservação da geometria dos objetos:** manutenção dos polígonos para cálculo de área e análise de proximidade.
+
+Essas são características da abordagem estudada; sua superioridade em relação a métodos alternativos **ainda precisa ser demonstrada por validação experimental**.
+
+## Fluxo metodológico completo — 17 etapas
+
+O diagrama ilustrado apresenta a visão geral do percurso da pesquisa, desde as imagens de entrada até a análise espacial.
+
+<p align="center">
+  <img src="docs/pipeline_17_etapas.png" alt="Diagrama ilustrado das 17 etapas do processamento, segmentação, classificação e proximidade" width="100%">
+</p>
+
+<details>
+<summary><strong>Ver resumo das etapas</strong></summary>
+
+| Etapas | O que acontece |
 |---|---|
-| **1–3** | Leitura das imagens, definição da área de interesse e segmentação Quickshift |
-| **4–6** | Construção de polígonos, extração de atributos espectrais e agrupamento K-Means |
-| **7–10** | Associação dos rótulos de árvores e gramíneas; extração de NDVI, brilho HSV e Canny |
-| **11–12** | Treinamento, avaliação e aplicação do classificador Random Forest |
-| **13–15** | Cálculo de áreas, exploração de modelos de altura e seleção por limiar |
-| **16–17** | Análise de proximidade dos objetos selecionados com postes, em 1 m, 3 m e 5 m |
+| **1–3** | Preparação dos rasters, área de interesse e segmentação Quickshift |
+| **4–6** | Criação de polígonos, estatísticas espectrais e K-Means |
+| **7–10** | Associação de amostras e extração de NDVI, brilho HSV e bordas Canny |
+| **11–12** | Treinamento e aplicação do Random Forest |
+| **13–15** | Área dos objetos, configurações exploratórias de porte e filtro C3 |
+| **16–17** | Proximidade espacial com postes a 1 m, 3 m e 5 m |
 
-*O diagrama sintetiza a metodologia de pesquisa. As operações efetivamente implementadas devem ser verificadas no notebook; as etapas relativas à rede elétrica são limitadas aos dados de postes disponíveis.*
+</details>
 
-## Comece por aqui
-
-| Arquivo ou pasta | Finalidade |
-|---|---|
-| **[`Segmentacao_area_completa.ipynb`](Segmentacao_area_completa.ipynb)** | **Notebook principal**, com 116 células do código original |
-| [`data/README.md`](data/README.md) | Dados de entrada, formato dos arquivos e sistemas de coordenadas |
-| [`docs/experimento_area_completa_2026-10-29.md`](docs/experimento_area_completa_2026-10-29.md) | Registro técnico do experimento, resultados anteriores e limitações |
-| [`docs/allometria.md`](docs/allometria.md) | Fundamentação e limitações da estimativa de altura |
-| [`docs/pipeline_17_etapas.png`](docs/pipeline_17_etapas.png) | Diagrama do fluxo metodológico |
-| [`requirements-colab.txt`](requirements-colab.txt) | Bibliotecas Python utilizadas |
-| [`.gitignore`](.gitignore) | Impede o versionamento acidental de dados pesados e arquivos temporários |
-
-## Como executar no Google Colab
-
-1. Abra o **[notebook do GitHub no Google Colab](https://colab.research.google.com/github/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa.ipynb)**.
-2. Execute a célula existente que conecta o Google Drive: `drive.mount('/content/drive')`.
-3. Confira se os arquivos de entrada estão na pasta [**Area1 — Google Drive**](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6), no caminho esperado pelo código:
-
-   ```text
-   /content/drive/MyDrive/Projetos/Segmentacao_Breno/
-   ├── Area1/
-   │   ├── AOI_RGB_NEW.tif
-   │   ├── AOI_NEW_MULTI.tif
-   │   ├── AOI_new.shp
-   │   ├── AOI_new.shx
-   │   ├── AOI_new.dbf
-   │   ├── AOI_new.prj
-   │   ├── AOI_new.cpg
-   │   ├── Arvores.gpkg
-   │   ├── Grama.gpkg
-   │   └── postes.gpkg
-   └── outputs/
-   ```
-
-4. Execute as células **na ordem**. A primeira célula instala `rasterio`; as demais bibliotecas utilizadas constam de [`requirements-colab.txt`](requirements-colab.txt), que não é instalado automaticamente pelo notebook. A área completa tem aproximadamente **50,6 milhões de pixels**, de modo que algumas etapas podem exigir **RAM alta**.
-
-**Arquivos de saída:** o código original grava `polygons.json`, `polygons_arvores.json`, `features_stack.tif` e `arvores_segmentadas.json` com **caminhos relativos**. Eles são criados no diretório de trabalho do Colab (normalmente `/content`), **não automaticamente** na pasta `outputs` do Google Drive. Gráficos e relatórios também aparecem nas saídas das células. O Colab não envia automaticamente resultados ou modificações ao GitHub.
-
-## Parâmetros utilizados
-
-| Procedimento | Configuração do notebook |
-|---|---|
-| Segmentação | Quickshift: `kernel_size=3`, `max_dist=5`, `ratio=0.04` |
-| Agrupamento | K-Means: 6 grupos, `random_state=42`, `n_init=10` |
-| Seleção inicial | Segmentos do cluster 3 |
-| Atributos da classificação | Médias de NDVI, brilho HSV e bordas Canny |
-| Divisão treino/teste | 80% / 20%, `random_state=42` |
-| Classificação | Random Forest: 500 árvores, `random_state=42` |
-| Estimativa de altura | Configurações exploratórias C1–C6, nas formas potencial e linear |
-| Seleção para proximidade | Estimativa potencial C3 acima de 7 m |
-| Análise espacial | Proximidade com postes em 1 m, 3 m e 5 m |
-
-**Observações metodológicas:** a divisão de treino e teste no notebook **não utiliza estratificação** e não há uma etapa explícita de deduplicação dos objetos rotulados. O filtro espacial por C3 e 7 m **não exige** que a classe prevista seja `arvore`. As imagens são processadas integralmente em memória, sem processamento em blocos. Esses pontos devem ser considerados na interpretação dos resultados, sem confundi-los com ajustes já implementados.
+*O diagrama é uma representação conceitual da metodologia. A base utilizada nesta execução inclui postes, mas não linhas ou cabos de energia.*
 
 ## Resultados preliminares
 
-Os valores abaixo são **resultados históricos registrados nas saídas do notebook**, e não uma confirmação da execução atual no Colab.
+Os resultados abaixo são **históricos**, registrados em execuções anteriores. Não representam uma validação da execução atualmente em andamento no Colab.
 
-| Indicador | Experimento inicial | Experimento com área ampliada |
+| Indicador | Experimento inicial | Experimento com área maior |
 |---|---:|---:|
 | Registros rotulados (pares objeto–rótulo) | 133 | **458** |
-| Registros de treinamento | 106 | **366** |
-| Registros de teste | 27 | **92** |
-| Acurácia arredondada | 0,81 | **0,87** |
-| F1 da classe árvore | 0,80 | **0,85** |
-| F1 da classe gramínea | 0,83 | **0,88** |
+| Amostras de treinamento | 106 | **366** |
+| Amostras de teste | 27 | **92** |
+| Acurácia global | 0,81 | **0,87** |
+| F1-score — árvores | 0,80 | **0,85** |
+| F1-score — gramíneas | 0,83 | **0,88** |
 
-A quantidade de registros rotulados **não corresponde necessariamente à quantidade de árvores distintas**, pois a associação espacial pode gerar múltiplos pares para um mesmo objeto. Como os conjuntos de teste diferem, a variação de acurácia não comprova, isoladamente, melhoria de desempenho. A execução integral com os dados atuais ainda precisa ser conferida.
+O número de pares objeto–rótulo não representa necessariamente a quantidade de objetos distintos. A comparação entre experimentos com conjuntos de teste diferentes não comprova, por si só, melhoria de desempenho.
 
-## Estimativa de altura e proximidade
+### Estimativa empírica da altura
 
-O notebook calcula diferentes configurações experimentais de estimativa de altura e utiliza a configuração potencial **C3** na etapa espacial:
+O notebook explora **seis configurações (C1–C6)**, nas formas potencial e linear. Para o filtro espacial utiliza a configuração potencial C3:
 
 ```python
 tree_polys['Power_tree_size_C3'] = 2.5 * (tree_polys['area'] ** 0.4)
 filter_tree = tree_polys[tree_polys['Power_tree_size_C3'] > 7]
 ```
 
-Essa relação é uma **adaptação empírica**, inspirada em estudos de relações entre copa e altura. **Não é uma altura medida em campo nem uma equação validada para essa área de estudo.** Veja [a documentação de alometria](docs/allometria.md).
+A relação é uma **adaptação experimental**, inspirada na literatura sobre relações entre dimensões da copa e altura, mas não foi validada com medições reais da área de estudo. A fundamentação e suas limitações estão em [`docs/allometria.md`](docs/allometria.md).
 
-As distâncias aos postes são calculadas em um sistema de coordenadas métrico. A proximidade bidimensional não demonstra interferência em cabos nem estabelece um diagnóstico de risco elétrico.
+## Tecnologias e bibliotecas
 
-## Dados e boas práticas
+| Finalidade | Tecnologias |
+|---|---|
+| Linguagem e ambiente | Python, Google Colab, Google Drive |
+| Rasters e geoprocessamento | Rasterio, GeoPandas, Shapely |
+| Dados e cálculo numérico | NumPy, Pandas |
+| Processamento de imagens | scikit-image |
+| Aprendizado de máquina | scikit-learn (K-Means e Random Forest) |
+| Visualizações | Matplotlib, Seaborn |
+| Versionamento | GitHub |
 
-- As imagens têm resolução espacial de aproximadamente **0,5 metro por pixel** e CRS **EPSG:31982**.
-- Os arquivos `Arvores.gpkg`, `Grama.gpkg` e `postes.gpkg` têm CRS original **EPSG:4674** e precisam de reprojeção para operações métricas.
-- Há uma pequena diferença entre as origens das grades RGB e multiespectral, que deve ser considerada ao interpretar valores por objeto.
-- Dados geoespaciais volumosos e produtos gerados devem permanecer no **Google Drive**, não no repositório GitHub.
+As bibliotecas utilizadas estão listadas em [`requirements-colab.txt`](requirements-colab.txt).
+
+## Estrutura do repositório
+
+```text
+mestrado-arvores-urbanas/
+├── 📓 Segmentacao_area_completa.ipynb
+├── 📘 README.md
+├── 📦 requirements-colab.txt
+├── 🚫 .gitignore
+├── 📂 data/
+│   └── README.md
+└── 📂 docs/
+    ├── allometria.md
+    ├── experimento_area_completa_2026-10-29.md
+    └── pipeline_17_etapas.png
+```
+
+O **GitHub** contém o código e a documentação. Os dados geoespaciais, devido ao tamanho, permanecem no **Google Drive**.
+
+## Dados e armazenamento
+
+Os dez arquivos necessários já estão organizados na [pasta `Area1` no Google Drive](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6), no seguinte caminho usado pelo notebook:
+
+```text
+/content/drive/MyDrive/Projetos/Segmentacao_Breno/
+├── Area1/
+│   ├── AOI_RGB_NEW.tif
+│   ├── AOI_NEW_MULTI.tif
+│   ├── AOI_new.shp
+│   ├── AOI_new.shx
+│   ├── AOI_new.dbf
+│   ├── AOI_new.prj
+│   ├── AOI_new.cpg
+│   ├── Arvores.gpkg
+│   ├── Grama.gpkg
+│   └── postes.gpkg
+└── outputs/
+```
+
+As imagens de entrada têm resolução espacial aproximada de **0,5 m/pixel**. Os rasters utilizam **EPSG:31982** e as camadas de árvores, gramíneas e postes têm **EPSG:4674** na origem, sendo reprojetadas para operações métricas. Veja [o detalhamento dos dados](data/README.md).
+
+## Como executar no Google Colab
+
+1. Abra o **[notebook principal diretamente do GitHub no Colab](https://colab.research.google.com/github/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa.ipynb)**.
+2. Execute a célula que monta o Google Drive: `drive.mount('/content/drive')`.
+3. Confirme que os arquivos estão na pasta `Area1`, conforme a estrutura acima.
+4. Execute as **116 células** na ordem. O processamento da imagem inteira pode exigir **RAM alta**.
+5. Confira as saídas das células, gráficos e relatórios de classificação. Os resultados só poderão ser considerados reproduzidos depois de concluída a execução sem erros.
+
+**Onde os arquivos gerados ficam salvos?** O código original usa nomes relativos para `polygons.json`, `polygons_arvores.json`, `features_stack.tif` e `arvores_segmentadas.json`; normalmente eles ficam no diretório corrente do Colab, **não automaticamente** em `outputs/` no Drive. Alterações realizadas no Colab também não são enviadas automaticamente ao GitHub.
+
+**Sobre o notebook:** `Segmentacao_area_completa.ipynb` contém o código original com **116 células**. A cópia publicada no GitHub preserva as células de código e texto e as saídas textuais; imagens históricas incorporadas permanecem no arquivo original conservado no Google Drive. O código não utiliza divisão treino/teste estratificada nem processamento de imagens em blocos.
 
 ## Próximas etapas científicas
 
-- Validar a execução integral e os resultados obtidos com a área completa.
-- Avaliar independência e qualidade das amostras de treinamento e teste.
-- Comparar classificadores e investigar a contribuição de NDVI, brilho e Canny.
-- Validar a estimativa de altura com medições reais e métricas de erro.
-- Ampliar a análise da infraestrutura elétrica quando houver geometrias de cabos/linhas disponíveis.
+- Confirmar a execução integral com os dados reais e documentar os resultados obtidos.
+- Verificar a qualidade e a independência das amostras usadas em treino e teste.
+- Comparar classificadores e realizar ablação das características NDVI, brilho e Canny.
+- Validar a relação entre área de copa e altura com medições reais.
+- Ampliar a análise para geometrias de cabos/linhas de energia, quando disponíveis.
 
 ---
 
-**Autor:** Breno Braga Galvão • Pesquisa acadêmica em desenvolvimento.
+**Autor:** Breno Braga Galvão  
+**Situação:** pesquisa de mestrado em desenvolvimento.
