@@ -146,16 +146,13 @@ Os resultados abaixo são **históricos**, registrados em execuções anteriores
 
 O número de pares objeto–rótulo não representa necessariamente a quantidade de objetos distintos. A comparação entre experimentos com conjuntos de teste diferentes não comprova, por si só, melhoria de desempenho.
 
-### Estimativa empírica da altura
+### Estimativa empírica de altura
 
-O notebook explora **seis configurações (C1–C6)**, nas formas potencial e linear. Para o filtro espacial utiliza a configuração potencial C3:
+O notebook explora seis configurações de estimativa de porte (**C1–C6**), nas formas potencial e linear. Na etapa de análise espacial, utiliza-se a configuração **potencial C3** para selecionar objetos com maior porte estimado, conforme um limiar experimental.
 
-```python
-tree_polys['Power_tree_size_C3'] = 2.5 * (tree_polys['area'] ** 0.4)
-filter_tree = tree_polys[tree_polys['Power_tree_size_C3'] > 7]
-```
+Essa relação é uma **estimativa experimental**, inspirada na literatura sobre dimensões da copa e altura, e **não representa uma medição real de altura em campo**.
 
-A relação é uma **adaptação experimental**, inspirada na literatura sobre relações entre dimensões da copa e altura, mas não foi validada com medições reais da área de estudo. A fundamentação e suas limitações estão em [`docs/allometria.md`](docs/allometria.md).
+Para conhecer a fundamentação científica, os parâmetros utilizados e as limitações do método, consulte [a documentação de alometria](docs/allometria.md).
 
 ## Tecnologias e bibliotecas
 
