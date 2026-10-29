@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'Segmentacao_area_completa.ipynb'
+      - 'Segmentacao_area_completa_2026.ipynb'
+      - 'Segmentacao_classificacao.ipynb'
       - 'tests/**'
       - 'requirements-colab.txt'
       - 'README.md'
