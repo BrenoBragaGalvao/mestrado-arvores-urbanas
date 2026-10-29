@@ -202,6 +202,23 @@ O **GitHub** contém o código e a documentação. Os dados geoespaciais, devido
 
 ## Dados e armazenamento
 
+### Área de estudo e origem das imagens
+
+A pesquisa utiliza imagens de satélite de alta resolução para analisar a vegetação urbana de **Caxias do Sul, no Rio Grande do Sul**.
+
+| Característica | Informação |
+|---|---|
+| **Área de estudo** | Caxias do Sul — RS, Brasil |
+| **Satélite** | **JL1KF01B** |
+| **Disponibilização das imagens** | **CPFL — Companhia Paulista de Força e Luz** |
+| **Dados espectrais** | **RGB + infravermelho próximo (NIR)** |
+| **Resolução espacial dos rasters utilizados** | Aproximadamente **0,5 m/pixel** |
+| **Sistema de referência dos rasters** | **EPSG:31982** |
+
+O sensor **JL1KF01B** é a origem das imagens indicada na apresentação da pesquisa. As bandas RGB e NIR sustentam tanto a segmentação da imagem quanto a extração das características espectrais utilizadas na identificação de árvores e gramíneas.
+
+*A identificação do satélite, a localização da área de estudo e a disponibilização pela CPFL são informações constantes da documentação da pesquisa. A data de aquisição das imagens não está especificada nessa documentação.*
+
 Os dez arquivos necessários já estão organizados na [pasta `Area1` no Google Drive](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6), no seguinte caminho usado pelo notebook:
 
 ```text
