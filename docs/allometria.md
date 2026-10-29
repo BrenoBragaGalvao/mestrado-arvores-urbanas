@@ -32,7 +32,7 @@ Portanto, **a forma funcional potencial é inspirada na literatura**, enquanto a
 
 ## Configurações históricas exploradas
 
-Na etapa anterior da pesquisa, foram exploradas versões potencial e linear para diferentes pares de coeficientes. A **versão principal atual**, `Segmentacao_area_completa_2026.ipynb`, mantém somente a configuração **C3 na forma potencial**, para evitar confusão entre testes exploratórios anteriores e a execução principal:
+Na etapa anterior da pesquisa, foram exploradas versões potencial e linear para diferentes pares de coeficientes. A **versão principal atual**, `Segmentacao_area_completa.ipynb`, mantém somente a configuração **C3 na forma potencial**, para evitar confusão entre testes exploratórios anteriores e a execução principal:
 
 | Configuração | a | b |
 | --- | ---: | ---: |
