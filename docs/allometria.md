@@ -30,9 +30,9 @@ em que:
 
 Portanto, **a forma funcional potencial é inspirada na literatura**, enquanto a substituição de largura de copa por área e os coeficientes usados neste projeto constituem uma **adaptação experimental**.
 
-## Configurações exploradas no notebook
+## Configurações históricas exploradas
 
-O notebook testa versões potencial e linear para diferentes pares de coeficientes:
+Na etapa anterior da pesquisa, foram exploradas versões potencial e linear para diferentes pares de coeficientes. A **versão principal atual**, `Segmentacao_area_completa_2026.ipynb`, mantém somente a configuração **C3 na forma potencial**, para evitar confusão entre testes exploratórios anteriores e a execução principal:
 
 | Configuração | a | b |
 | --- | ---: | ---: |
@@ -43,7 +43,7 @@ O notebook testa versões potencial e linear para diferentes pares de coeficient
 | C5 | 0,4 | 0,9 |
 | C6 | 1,35 | 0,72 |
 
-Na configuração atualmente adotada no fluxo, utiliza-se **C3** na forma potencial:
+Na configuração atualmente adotada no notebook principal, utiliza-se **C3** na forma potencial:
 
 $$
 \widehat{H}=2{,}5A^{0{,}4}
