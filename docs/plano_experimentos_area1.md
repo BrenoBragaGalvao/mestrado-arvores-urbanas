@@ -16,7 +16,7 @@
 | E2 | **Código implementado na V2; não executado** | Validar independência espacial na mesma AOI | Blocos de 250/500 m, faixa de exclusão de 25 m, até 10 partições por escala, F1 e acurácia balanceada |
 | E3 | **Código implementado na V2; não executado** | Comparar classificadores sobre mesmas partições | RF (500 árvores), SVM RBF com padronização, regressão logística e Dummy majoritário; mesmas partições espaciais 250/500 m, embargo 25 m, 3 atributos, acurácia balanceada/F1 |
 | E4 | **Código implementado na V2; não executado** | Verificar contribuição de atributos | 7 combinações não vazias de brilho HSV, bordas Canny e NDVI; RF, SVM, regressão logística e Dummy majoritário; partições E2/E3 de 250/500 m com exclusão 25 m; diferenças pareadas de F1-macro, acurácia balanceada e recall |
-| E5 | Pendente | Avaliar sensibilidade de parâmetros | Variar K-Means / segmentação Quickshift no mesmo raster; registrar custo e memória |
+| E5 | **Código implementado na V2; não executado** | Avaliar sensibilidade de parâmetros | Quickshift: 5 configurações em até 4 janelas fixas de 256×256 px; K-Means: K=4/6/8 na mesma amostra de até 1.500 segmentos originais com 8 atributos RGB/NIR; tempo, distribuição, ARI, silhouette, memória de arrays |
 | E6 | Pendente | Testar análise de proximidade a postes | 1, 3 e 5 m; resultados com/sem filtro `predicted_classe == 'arvore'`, contando objetos únicos |
 | E7 | Pendente | Analisar sensibilidade da alometria | Comparar C1–C6 e limiares de porte; **sem** alegar acurácia de altura |
 | E8 | Pendente | Consolidar resultados e discussão dos gaps | Tabelas, limitações e relação com métodos da literatura |
@@ -69,4 +69,17 @@ O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objet
 
 **Estado E4:** notebook atualizado e publicado; **não foram executados** os dados reais no Colab nesta etapa, portanto não existem métricas novas verificadas. Essa comparação continua sendo uma validação espacial interna de classificação árvore/gramínea, não uma comprovação da acurácia de altura ou do risco elétrico.
 
-**Próxima etapa planejada:** E5 — sensibilidade dos parâmetros de K-Means e Quickshift. É preciso planejar custo de processamento da imagem completa e controlar a comparabilidade das amostras ao alterar a segmentação.
+**Etapa seguinte implementada:** E5 — testes exploratórios de sensibilidade do Quickshift e do K-Means, sem reprocessamento completo da imagem para cada configuração.
+
+## Como executar E5 no Colab
+
+1. Abra a [V2 experimental](../Segmentacao_area_completa_v2_experimentos.ipynb) e execute a sequência do notebook original com os arquivos já existentes de `Area1` no Drive.
+2. Execute **E5a**, que seleciona de forma determinística até quatro janelas de `256 × 256` pixels perto das referências existentes de árvores/gramíneas, aplicando `(kernel_size,max_dist,ratio)` em cinco configurações: `(2,5,0.04)`, `(3,3,0.04)`, **`(3,5,0.04)` original**, `(3,8,0.04)` e `(4,5,0.04)`. Registra número/tamanho de segmentos, fração de segmentos de menos de 10 pixels, duração e bytes dos arrays retidos.
+3. Execute **E5b**, que obtém até 1.500 polígonos fixos da segmentação original; extrai médias e desvios-padrão de quatro bandas da imagem multiespectral original; compara `KMeans(n_clusters=4|6|8, random_state=42, n_init=10)` na **mesma amostra**. Registra inércia, silhouette amostral, ARI com a partição de seis clusters, tempo e tabulação exploratória frente a rótulos existentes.
+4. Registre a quantidade real de janelas e segmentos utilizáveis, mensagens de erro e valores somente **após executar** o Colab; os testes não geram novas medidas de altura nem classes anotadas.
+
+**Interpretação e limites:** os resultados de Quickshift nas janelas **não** validam a segmentação da imagem completa; mudar a segmentação modifica a identidade dos objetos e exigiria refazer extração de atributos e associação com rótulos para medir F1/accuracy diretamente. Os números dos clusters K-Means são arbitrários; ARI/silhouette medem estrutura do agrupamento e não acurácia de detecção. Amostras rotuladas que se intersectam podem não ser independentes. Os tempos dependem do ambiente e os bytes dos arrays não são medida exaustiva de RAM/pico de memória.
+
+**Estado E5:** **código preparado, sem nova execução integral ou métricas verificadas com `Area1`**. A comparação está condicionada à execução das células no Colab.
+
+**Próxima etapa planejada:** E6 — auditar a proximidade a postes em 1, 3 e 5 m, com e sem o filtro de classificação árvore, contando objetos únicos e respeitando a limitação de não haver geometria de cabos.
