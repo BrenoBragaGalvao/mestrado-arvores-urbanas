@@ -17,7 +17,7 @@
 | E3 | **Código implementado na V2; não executado** | Comparar classificadores sobre mesmas partições | RF (500 árvores), SVM RBF com padronização, regressão logística e Dummy majoritário; mesmas partições espaciais 250/500 m, embargo 25 m, 3 atributos, acurácia balanceada/F1 |
 | E4 | **Código implementado na V2; não executado** | Verificar contribuição de atributos | 7 combinações não vazias de brilho HSV, bordas Canny e NDVI; RF, SVM, regressão logística e Dummy majoritário; partições E2/E3 de 250/500 m com exclusão 25 m; diferenças pareadas de F1-macro, acurácia balanceada e recall |
 | E5 | **Código implementado na V2; não executado** | Avaliar sensibilidade de parâmetros | Quickshift: 5 configurações em até 4 janelas fixas de 256×256 px; K-Means: K=4/6/8 na mesma amostra de até 1.500 segmentos originais com 8 atributos RGB/NIR; tempo, distribuição, ARI, silhouette, memória de arrays |
-| E6 | Pendente | Testar análise de proximidade a postes | 1, 3 e 5 m; resultados com/sem filtro `predicted_classe == 'arvore'`, contando objetos únicos |
+| E6 | **Código implementado na V2; não executado** | Auditar a proximidade planimétrica a postes | 1, 3 e 5 m; candidatos C3>7 sem filtro de classe, candidatos árvore e gramínea; `sjoin_nearest` nos dois sentidos para contar polígonos e postes distintos; gráfico comparativo |
 | E7 | Pendente | Analisar sensibilidade da alometria | Comparar C1–C6 e limiares de porte; **sem** alegar acurácia de altura |
 | E8 | Pendente | Consolidar resultados e discussão dos gaps | Tabelas, limitações e relação com métodos da literatura |
 
@@ -82,4 +82,18 @@ O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objet
 
 **Estado E5:** **código preparado, sem nova execução integral ou métricas verificadas com `Area1`**. A comparação está condicionada à execução das células no Colab.
 
-**Próxima etapa planejada:** E6 — auditar a proximidade a postes em 1, 3 e 5 m, com e sem o filtro de classificação árvore, contando objetos únicos e respeitando a limitação de não haver geometria de cabos.
+**Etapa seguinte implementada:** E6 — auditoria da proximidade a postes nas distâncias de 1, 3 e 5 m, com e sem o filtro `predicted_classe == 'arvore'`, contando localizações e segmentos distintos.
+
+## Como executar E6 no Colab
+
+1. Abra a [V2 experimental](../Segmentacao_area_completa_v2_experimentos.ipynb) e execute o fluxo original com a pasta `Area1` já existente, até criar `tree_polys`, `filter_tree` e `Postes` após reprojeção e recorte para a área de interesse.
+2. Execute **E6a**, que copia a seleção de segmentos C3 > 7, distingue as previsões `arvore` e `grama` e realiza `gpd.sjoin_nearest` nos dois sentidos (polígono→poste e poste→polígono), com raio máximo de 5 metros.
+3. Confira a quantidade de segmentos com C3 > 7, distribuição das classes do RF e quantidade de pontos distintos de postes. Coordenadas iguais de postes são contadas como **uma localização**, evitando inflar os totais.
+4. Execute **E6b**, que prepara a tabela de comparação entre seleção histórica e seleção filtrada por árvore, calcula as diferenças em segmentos/postes e produz gráficos para 1, 3 e 5 metros. As contagens são de IDs únicos e devem ser não decrescentes conforme aumenta o raio.
+5. Anote os números resultantes **somente após executar** o notebook com os arquivos reais. A E6 independe de E1–E5 e não modifica `filter_tree` nem o Random Forest histórico.
+
+**Interpretação:** `Power_tree_size_C3 > 7` é um limiar de estimativa empírica de porte, e não uma medida de altura real. `predicted_classe == 'arvore'` representa uma previsão do classificador, não confirmação de campo. As distâncias são de polígonos a **pontos de postes**, não de copas aos cabos energizados; não se pode afirmar risco elétrico operacional a partir delas. Postes próximos de ambas as classes podem ser contabilizados em ambos os subconjuntos e, portanto, seus totais não devem ser somados para reproduzir a categoria geral.
+
+**Estado E6:** **código publicado, sem nova execução integral ou resultados reais verificados**. O experimento só utiliza os dados da `Area1`, já existentes no projeto.
+
+**Próxima etapa planejada:** E7 — sensibilidade das configurações alométricas C1–C6 e dos limiares de porte, explicitando que não há alturas reais disponíveis para calcular erro de estimação.
