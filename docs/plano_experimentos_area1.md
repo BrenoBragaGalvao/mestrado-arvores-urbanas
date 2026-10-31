@@ -15,7 +15,7 @@
 | E1 | Código preparado; **não executado** | Verificar segmentos repetidos, rótulos conflitantes e compartilhamento entre treino/teste; reavaliar RF | `df` e `gdf_arvore_seg_filter` do notebook; 5 sementes, F1, acurácia balanceada |
 | E2 | **Código implementado na V2; não executado** | Validar independência espacial na mesma AOI | Blocos de 250/500 m, faixa de exclusão de 25 m, até 10 partições por escala, F1 e acurácia balanceada |
 | E3 | **Código implementado na V2; não executado** | Comparar classificadores sobre mesmas partições | RF (500 árvores), SVM RBF com padronização, regressão logística e Dummy majoritário; mesmas partições espaciais 250/500 m, embargo 25 m, 3 atributos, acurácia balanceada/F1 |
-| E4 | Pendente | Verificar contribuição de atributos | 7 combinações não vazias de NDVI, HSV e Canny, mesmas partições e modelos |
+| E4 | **Código implementado na V2; não executado** | Verificar contribuição de atributos | 7 combinações não vazias de brilho HSV, bordas Canny e NDVI; RF, SVM, regressão logística e Dummy majoritário; partições E2/E3 de 250/500 m com exclusão 25 m; diferenças pareadas de F1-macro, acurácia balanceada e recall |
 | E5 | Pendente | Avaliar sensibilidade de parâmetros | Variar K-Means / segmentação Quickshift no mesmo raster; registrar custo e memória |
 | E6 | Pendente | Testar análise de proximidade a postes | 1, 3 e 5 m; resultados com/sem filtro `predicted_classe == 'arvore'`, contando objetos únicos |
 | E7 | Pendente | Analisar sensibilidade da alometria | Comparar C1–C6 e limiares de porte; **sem** alegar acurácia de altura |
@@ -57,4 +57,16 @@ O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objet
 
 **Estado E3:** código publicado, ainda **não há execução confirmada com os arquivos originais de `Area1` nem resultados novos verificados**. As partições de teste são internas à mesma área e podem se repetir, de modo que as médias e os desvios-padrão apresentados são exploratórios, não provas de generalização externa nem testes de significância independentes.
 
-**Próxima etapa após executar/avaliar E3:** E4, ablação das características NDVI, brilho HSV e bordas Canny. Deve manter os mesmos dados, particionamentos espaciais e métricas, sem modificar o notebook original ou o README.
+**Etapa seguinte implementada:** E4, ablação de NDVI, brilho HSV e bordas Canny, preservando dados, particionamentos espaciais e modelos de referência.
+
+## Como executar E4 no Colab
+
+1. Abra a [V2 experimental](../Segmentacao_area_completa_v2_experimentos.ipynb) no Google Colab, monte o Drive e execute as células do fluxo original sobre os **arquivos já existentes** da pasta `Area1`.
+2. Execute **E2a**, responsável pela construção de `base_e2` com geometrias projetadas e segmentos únicos. As execuções de E2b e E3 são opcionais para E4; se E3 estiver executada, haverá uma checagem de igualdade das métricas do conjunto com três características.
+3. Execute **E4a**: sete subconjuntos não vazios de `mean_intensity` (brilho HSV), `mean_edges` (bordas Canny) e `mean_ndvi` (NDVI), com **Random Forest, SVM RBF, regressão logística e Dummy majoritário**. O Dummy é ajustado uma única vez por partição, pois sua previsão não depende dos atributos.
+4. Execute **E4b** para calcular diferenças de F1-macro por partição em relação à combinação completa, a variação ao retirar cada atributo e gráficos para blocos de 250 e 500 metros.
+5. Registre a quantidade de partições válidas e descartadas, além da média e desvio-padrão *descritivos* das métricas por modelo e subconjunto de atributos.
+
+**Estado E4:** notebook atualizado e publicado; **não foram executados** os dados reais no Colab nesta etapa, portanto não existem métricas novas verificadas. Essa comparação continua sendo uma validação espacial interna de classificação árvore/gramínea, não uma comprovação da acurácia de altura ou do risco elétrico.
+
+**Próxima etapa planejada:** E5 — sensibilidade dos parâmetros de K-Means e Quickshift. É preciso planejar custo de processamento da imagem completa e controlar a comparabilidade das amostras ao alterar a segmentação.
