@@ -13,7 +13,7 @@
 |---|---|---|---|
 | 0 | Concluído | Preservar notebook original e cópia V2 | Comparação dos blobs na criação |
 | E1 | Código preparado; **não executado** | Verificar segmentos repetidos, rótulos conflitantes e compartilhamento entre treino/teste; reavaliar RF | `df` e `gdf_arvore_seg_filter` do notebook; 5 sementes, F1, acurácia balanceada |
-| E2 | Pendente | Validar independência espacial na mesma AOI | Separação por blocos espaciais, evitando vizinhanças entre treino e teste; reportar classes por bloco |
+| E2 | **Código implementado na V2; não executado** | Validar independência espacial na mesma AOI | Blocos de 250/500 m, faixa de exclusão de 25 m, até 10 partições por escala, F1 e acurácia balanceada |
 | E3 | Pendente | Comparar classificadores sobre mesmas partições | RF atual vs SVM e modelo simples; mesmas 3 características e métricas |
 | E4 | Pendente | Verificar contribuição de atributos | 7 combinações não vazias de NDVI, HSV e Canny, mesmas partições e modelos |
 | E5 | Pendente | Avaliar sensibilidade de parâmetros | Variar K-Means / segmentação Quickshift no mesmo raster; registrar custo e memória |
@@ -37,3 +37,12 @@ Após terminar as células originais da **V2** (com o Drive já montado e usando
 ```
 
 O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objetos `df` e `gdf_arvore_seg_filter` produzidos pelo notebook e imprime os resultados no Colab. Esses resultados **ainda não foram executados ou confirmados**.
+
+## Como executar E2 no Colab
+
+1. Abra [`Segmentacao_area_completa_v2_experimentos.ipynb`](../Segmentacao_area_completa_v2_experimentos.ipynb) no Colab.
+2. Monte o Drive existente e execute as células originais para produzir `df` e `gdf_arvore_seg_filter` com os mesmos arquivos de `Area1`.
+3. Execute as **duas últimas células de código E2**, começando em **E2a** (preparação dos segmentos e geometrias) e terminando em **E2b** (separações espaciais).
+4. Registre quantas partições foram válidas, blocos, tamanhos de treino/teste, amostras excluídas pela faixa de 25 m e as métricas. Caso alguma partição não contenha as duas classes, reporte-a como descartada.
+
+**Estado atual:** a implementação foi publicada, mas nenhuma execução completa ou métrica E2 foi verificada. As células usam somente os dados originais já disponíveis e não solicitam novos dados. A validação por blocos dentro de `Area1` é uma análise espacial interna, não substitui uma validação em localidade externa.
