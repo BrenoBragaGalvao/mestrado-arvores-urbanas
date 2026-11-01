@@ -431,3 +431,24 @@ A análise derivada de proximidade a postes também produziu um alerta: **7.421 
 **Reprodutibilidade:** os pacotes de evidências das baterias derivadas reúnem scripts, tabelas CSV, gráficos, logs e manifestos de integridade. O processamento integral sequencial da V2 precisa ser executado e documentado separadamente para que seus resultados possam ser declarados validados. Os gráficos adicionados a esta seção são de **baterias derivadas**, não saídas monolíticas da V2.
 
 **Arquivos novos nesta atualização:** imagens de [comparação E3c](docs/resultados_e3c_f1_por_escala_2026-11-01.svg) e [auditoria E6c](docs/resultados_e6c_extrapolacao_2026-11-01.svg). O fluxograma anterior de 17 etapas, suas imagens e todo o restante do README permanecem preservados.
+
+
+---
+
+## Harmonização metodológica — resultados antigos e novos
+
+**Por que a acurácia histórica de 0,87 não é igual ao F1-macro atual?** Os experimentos históricos e a bateria derivada E3c utilizam amostras, segmentação, divisões de treino/teste e métricas diferentes. Comparar os valores diretamente seria metodologicamente incorreto.
+
+Foi executada uma **nova comparação controlada**, usando **a mesma base derivada de 505 segmentos** para os oito classificadores, calculando tanto **acurácia** quanto **F1-macro**, com os mesmos objetos de teste dentro de cada protocolo.
+
+| Protocolo (média de 5 divisões) | RF: acurácia | RF: F1-macro | SVM: F1-macro |
+|---|---:|---:|---:|
+| Aleatório 80/20 | 0,8832 | 0,8827 | 0,8945 |
+| Espacial 250 m e embargo 25 m | 0,8697 | 0,8656 | 0,8987 |
+| Espacial 500 m e embargo 25 m | 0,8591 | 0,8530 | 0,8668 |
+
+A **regra histórica do Random Forest** (500 árvores, divisão aleatória 80/20, semente 42) aplicada à **nova base de 505 segmentos** produziu acurácia **0,9010** e F1-macro **0,9009**, com 404 objetos de treino e 101 de teste. **Não é reprodução da acurácia antiga de 0,87**, que utilizou 458 registros.
+
+Foram **40 novos ajustes aleatórios**; as **240 avaliações espaciais** vieram da bateria E3c anterior e foram auditadas, com seis verificações pontuais por recálculo. As diferenças entre protocolos não isolam o efeito causal da divisão, pois os objetos de teste podem variar. A pesquisa continua sem validação externa e sem equivalência comprovada à segmentação monolítica.
+
+Para conferir o desenho dos experimentos, as métricas e as limitações, consulte a [harmonização metodológica documentada](docs/harmonizacao_protocolos_2026-11-01.md) e a seção **E8h** do [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb).
