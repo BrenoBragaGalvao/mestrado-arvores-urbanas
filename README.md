@@ -54,17 +54,6 @@ A pesquisa utiliza **dois arquivos de imagem raster** da região de **Caxias do 
 
 **Os dois arquivos têm a mesma quantidade de linhas e colunas e se referem essencialmente à mesma área**, mas suas grades têm uma pequena diferença de origem. Assim, não se deve presumir correspondência perfeita entre pixels apenas por terem o mesmo tamanho; isso precisa ser considerado ao relacionar segmentos e atributos.
 
-### Diferença entre a imagem completa e a área de interesse (AOI)
-
-Os dois arquivos raster utilizados na pesquisa cobrem uma extensão retangular de aproximadamente **12,66 km²**. Entretanto, a área efetiva de interesse, delimitada pelo arquivo `AOI_new.shp`, corresponde a aproximadamente **12,14 km²**.
-
-Assim, é importante distinguir:
-
-- **12,66 km²:** extensão retangular completa das imagens.
-- **12,14 km²:** área delimitada pelo polígono de estudo (AOI).
-
-Essa distinção é relevante porque os experimentos podem processar toda a extensão raster ou apenas regiões selecionadas, conforme a metodologia empregada.
-
 **Dados vetoriais e referências do mesmo conjunto `Area1`:**
 
 | Arquivo | Conteúdo | Uso no trabalho |
