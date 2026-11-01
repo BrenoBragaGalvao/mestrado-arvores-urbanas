@@ -253,6 +253,18 @@ A seguir, detalhamos **três comparações centrais**: classificadores, formas d
 
 Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisionadas diferentes**, conforme a segmentação e a seleção de objetos.
 
+**A imagem inteira tem 6.942 × 7.294 pixels. Então por que os testes usam 512 × 512 ou 256 × 256 pixels?** Porque esses valores indicam o **tamanho de cada recorte (janela) usado no processamento**, e não o tamanho original do arquivo. Os pixels desses recortes vêm das mesmas imagens RGB e RGB + NIR da Area1.
+
+| Processamento | Quanto da imagem foi utilizado? | O que significa o tamanho citado? |
+|---|---|---|
+| **Método original** | Quickshift aplicado ao raster RGB inteiro | **6.942 × 7.294 pixels**: imagem completa |
+| **Comparação de classificadores na V2** | A extensão retangular inteira foi percorrida em **812 quadrantes**, inclusive fora da AOI | **Até 256 × 256 pixels por quadrante**: cada execução do Quickshift processou um pedaço separado |
+| **Comparação da escala de segmentação na V2** | Apenas **119 regiões de até 512 × 512 pixels com referências de árvores/gramíneas** | **512 × 512 pixels** por região ou os **mesmos pixels divididos em quatro quadrantes de 256 × 256 pixels** |
+
+Com a resolução aproximada de **0,5 m por pixel**, um recorte de **512 × 512 pixels** representa cerca de **256 × 256 m** no terreno; um quadrante de **256 × 256 pixels** representa **128 × 128 m**. Portanto, **quatro quadrantes de 256 × 256 pixels juntos ocupam a mesma janela de 512 × 512 pixels**. Não são quatro novas áreas.
+
+**Atenção:** os **119 recortes não cobrem necessariamente toda a Area1**; foram escolhidos por conterem pontos de referência. Também não se deve somar a área dos recortes para calcular automaticamente a cobertura única da AOI, pois eles podem ter recortes de borda e sobreposições.
+
 ```mermaid
 flowchart TD
     A["Area1<br/>510 pontos"] --> B["Original<br/>Quickshift global"]
@@ -372,24 +384,33 @@ Também repetimos a **regra histórica** do Random Forest (500 árvores, divisã
 
 ### 6.4. Comparação da segmentação — recortes contínuos de 512 versus quadrantes de 256 pixels
 
-**Pergunta:** mantendo os **mesmos pontos, modelos e divisões**, segmentar um recorte contínuo de **512 × 512 pixels** dá resultados diferentes de dividi-lo em **quatro quadrantes de 256 × 256 pixels**?
+**Pergunta:** mantendo os **mesmos pontos, modelos e divisões**, segmentar **cada um dos mesmos 119 recortes** de até **512 × 512 pixels** de uma só vez dá resultados diferentes de segmentar **esse mesmo recorte em quatro quadrantes de 256 × 256 pixels**?
+
+A comparação abaixo **não usa quatro imagens distintas**: cada lado recebe **os mesmos pixels**, mas o Quickshift é executado de duas maneiras.
 
 ```mermaid
 flowchart TD
-    A["119 regiões<br/>com referências"] --> B["Quickshift<br/>512 contínuo"]
-    A --> C["Quickshift<br/>4 × 256"]
-    B --> D["Mesmos 505<br/>pontos comuns"]
-    C --> D
-    D --> E["Mesmos testes<br/>e 8 modelos"]
-    E --> F["Comparar F1<br/>das duas versões"]
+    A["Imagem Area1<br/>6942 × 7294 px"] --> B["119 recortes<br/>com referências"]
+    B --> C["Cada recorte<br/>até 512 × 512"]
+    C --> D["Método A<br/>Quickshift 512"]
+    C --> E["Método B<br/>4 quadrantes"]
+    E --> F["Quickshift em<br/>4 × 256 px"]
+    D --> G["Referências<br/>comuns"]
+    F --> G
+    G --> H["Mesmos testes<br/>e 8 modelos"]
+    H --> I["Comparar F1"]
 
     classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
     classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
     classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
-    class A,D,E dados;
-    class B,C metodo;
-    class F resultado;
+    class A,B,C,G,H dados;
+    class D,E,F metodo;
+    class I resultado;
 ```
+
+**Exemplo de uma janela completa:** a opção A processa **512 × 512 = 262.144 pixels** de uma só vez. Na opção B, esse mesmo conjunto de pixels é separado em **quatro janelas de 256 × 256 = 65.536 pixels cada**, e o Quickshift roda independentemente em cada uma delas. **Não estamos reduzindo a resolução da imagem nem criando dados novos; estamos mudando os limites de cada execução da segmentação.**
+
+**Não confundir:** os **250 m e 500 m** mostrados nas tabelas abaixo são **tamanhos de blocos geográficos usados para separar treino e teste**. Eles não são os recortes de 250 ou 500 pixels usados no Quickshift.
 
 **O que é mantido igual:** os rasters e recortes originais, os **505 pontos de referência compartilhados**, os mapas de **NDVI, brilho HSV e Canny**, os modelos e as divisões de teste dentro da comparação de segmentações. **O que muda:** a forma como o Quickshift divide cada recorte em segmentos. Portanto, as **médias dos atributos por segmento podem mudar**.
 
