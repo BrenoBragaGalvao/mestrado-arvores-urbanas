@@ -16,7 +16,7 @@
 | E2 | **Código implementado na V2; não executado** | Validar independência espacial na mesma AOI | Blocos de 250/500 m, faixa de exclusão de 25 m, até 10 partições por escala, F1 e acurácia balanceada |
 | E3 | **Código implementado na V2; não executado** | Comparar classificadores sobre mesmas partições | RF (500 árvores), SVM RBF com padronização, regressão logística e Dummy majoritário; mesmas partições espaciais 250/500 m, embargo 25 m, 3 atributos, acurácia balanceada/F1 |
 | E4 | **Código implementado na V2; não executado** | Verificar contribuição de atributos | 7 combinações não vazias de brilho HSV, bordas Canny e NDVI; RF, SVM, regressão logística e Dummy majoritário; partições E2/E3 de 250/500 m com exclusão 25 m; diferenças pareadas de F1-macro, acurácia balanceada e recall |
-| E5 | **Código implementado na V2; não executado** | Avaliar sensibilidade de parâmetros | Quickshift: 5 configurações em até 4 janelas fixas de 256×256 px; K-Means: K=4/6/8 na mesma amostra de até 1.500 segmentos originais com 8 atributos RGB/NIR; tempo, distribuição, ARI, silhouette, memória de arrays |
+| E5 | **Pilotos parciais executados com Area1 (4 recortes); E5 integral pendente** | Avaliar sensibilidade de parâmetros | Quickshift: 5 configurações em até 4 janelas fixas de 256×256 px; K-Means: K=4/6/8 na mesma amostra de até 1.500 segmentos originais com 8 atributos RGB/NIR; tempo, distribuição, ARI, silhouette, memória de arrays |
 | E6 | **Código implementado na V2; não executado** | Auditar a proximidade planimétrica a postes | 1, 3 e 5 m; candidatos C3>7 sem filtro de classe, candidatos árvore e gramínea; `sjoin_nearest` nos dois sentidos para contar polígonos e postes distintos; gráfico comparativo |
 | E7 | **Código implementado na V2; não executado** | Analisar sensibilidade da alometria | Recalcular e conferir 12 expressões históricas (C1–C6, potencial/linear); limiares 5/7/9 de índice; filtros com/sem classe árvore; 1/3/5 m de postes; Jaccard e contagens únicas; gráficos |
 | E8 | Pendente | Consolidar resultados e discussão dos gaps | Tabelas, limitações e relação com métodos da literatura |
@@ -80,7 +80,7 @@ O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objet
 
 **Interpretação e limites:** os resultados de Quickshift nas janelas **não** validam a segmentação da imagem completa; mudar a segmentação modifica a identidade dos objetos e exigiria refazer extração de atributos e associação com rótulos para medir F1/accuracy diretamente. Os números dos clusters K-Means são arbitrários; ARI/silhouette medem estrutura do agrupamento e não acurácia de detecção. Amostras rotuladas que se intersectam podem não ser independentes. Os tempos dependem do ambiente e os bytes dos arrays não são medida exaustiva de RAM/pico de memória.
 
-**Estado E5:** **código preparado, sem nova execução integral ou métricas verificadas com `Area1`**. A comparação está condicionada à execução das células no Colab.
+**Estado E5 (31/10/2026):** pilotos locais com os dados reais executados em quatro janelas (20 execuções Quickshift) e com 779 segmentos para K-Means. Os dados e as limitações estão em [resultados_piloto_area1_2026-10-31.md](resultados_piloto_area1_2026-10-31.md). **Esses resultados não substituem a execução integral da E5 da V2 nem produzem resultados para E1–E4 ou E6–E7.**
 
 **Etapa seguinte implementada:** E6 — auditoria da proximidade a postes nas distâncias de 1, 3 e 5 m, com e sem o filtro `predicted_classe == 'arvore'`, contando localizações e segmentos distintos.
 
@@ -111,3 +111,9 @@ O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objet
 **Limites científicos:** `C1–C6` são **estimativas empíricas não calibradas**, e os limiares 5/7/9 são critérios numéricos para sensibilidade — **não alturas observadas em metros**. Nenhuma contagem, Jaccard ou distância a poste permite inferir erro da estimativa de altura ou interferência com cabos. Para essa dissertação, não apresentar MAE/RMSE/R² de altura com esses dados, pois não há alturas reais documentadas.
 
 **Próxima etapa:** E8 — consolidação científica dos resultados **depois da execução** das etapas preparadas. A publicação de código, sozinha, não responde à exigência do orientador de apresentar resultados de testes em dados reais. Antes de redigir conclusões de desempenho, executar E1–E7 com `Area1`, verificar erros, salvar métricas e registrar limitações.
+
+## Registro de execução parcial em 31/10/2026
+
+Foram conferidos os dez arquivos já existentes em `Area1` no Google Drive. Com eles, foram executadas e documentadas **20 combinações janela × Quickshift** (4 recortes de 256×256 pixels × 5 parâmetros) e a análise K-Means de **779 segmentos** extraídos dos mesmos recortes (K=4,6,8). As métricas confirmadas e as ressalvas constam do [relatório de resultados preliminares](resultados_piloto_area1_2026-10-31.md).
+
+**E1–E4, E6–E7 continuam com código preparado e aguardando execução integral.** A etapa E8 deverá usar somente métricas reais verificadas, nunca confundir a média de segmentos, silhouette ou ARI dos recortes com acurácia de classificação da imagem completa. É necessário executar a V2 no Colab com `Area1` antes de declarar concluída a validação experimental solicitada pelo orientador.
