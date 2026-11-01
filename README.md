@@ -350,7 +350,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["🗂️ Dados da Area1<br/>e segmentos<br/>derivados"]
-    A --> B["🌿 E4: ablação<br/>de características"]
+    A --> B["🌿 E4: ablação<br/>de<br/>características"]
     A --> C["🧩 E5:<br/>sensibilidade<br/>do K-Means"]
     A --> D["🌳 E7:<br/>sensibilidade<br/>de porte"]
     B --> E["💡 Brilho,<br/>bordas e NDVI:<br/>sete<br/>combinações"]
@@ -382,10 +382,10 @@ Os exemplos usados para treinar os classificadores possuem somente as classes **
 flowchart TD
     A["🏷️ 505 segmentos<br/>de referência:<br/>árvores e grama"] --> B["📊 Atributos:<br/>brilho HSV,<br/>bordas e NDVI"]
     B --> C["📦 Envelopes<br/>dos atributos<br/>rotulados"]
-    C --> D["🧩 Comparação com<br/>168.133 segmentos"]
+    C --> D["🧩 Comparação com<br/>168.133<br/>segmentos"]
     D --> E["📉 Mínimo–máximo:<br/>57,13% fora"]
-    D --> F["📉 Percentis<br/>1–99: 76,47% fora"]
-    D --> G["📉 Percentis<br/>5–95: 88,70% fora"]
+    D --> F["📉 Percentis<br/>1–99:<br/>76,47% fora"]
+    D --> G["📉 Percentis<br/>5–95:<br/>88,70% fora"]
     E --> H["🔎 Diagnóstico de<br/>extrapolação"]
     F --> H
     G --> H
