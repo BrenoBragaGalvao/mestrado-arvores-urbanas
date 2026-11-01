@@ -288,6 +288,40 @@ O [notebook V2 de experimentos](Segmentacao_area_completa_v2_experimentos.ipynb)
 
 A bateria derivada anterior documentou **220 avaliações**, envolvendo quatro técnicas/baselines e sete subconjuntos de atributos em dez partições espaciais. A nova bateria **E3c executou 240 ajustes de oito classificadores** em 30 protocolos válidos: blocos geográficos de 250 e 500 metros, cinco divisões por escala (semente 2026) e embargos geométricos de 0, 25 e 50 metros.
 
+**Fluxograma da bateria comparativa E3c** — gerado pelo próprio GitHub com Mermaid, seguindo o padrão dos diagramas da metodologia original.
+
+```mermaid
+flowchart TD
+    A["🛰️ Imagens RGB + NIR da Area1"] --> B["🧩 Quickshift em 812 quadrantes independentes"]
+    B --> C["🏷️ 505 segmentos com rótulo único"]
+    C --> D["📐 Partições espaciais: 250 m e 500 m"]
+    D --> E["🚧 Embargos geométricos: 0 m, 25 m e 50 m"]
+    E --> F["🧪 30 protocolos válidos"]
+    F --> G["🤖 Comparação de oito classificadores"]
+    G --> H["🌲 Random Forest e Extra Trees"]
+    G --> I["🔵 SVM RBF e regressão logística"]
+    G --> J["📍 KNN e HistGradientBoosting"]
+    G --> K["🔬 Gaussian Naive Bayes e Dummy"]
+    H --> L["📊 F1-macro, acurácia balanceada e MCC"]
+    I --> L
+    J --> L
+    K --> L
+    L --> M["✅ 240 ajustes executados"]
+    M --> N["📈 SVM: maior F1-macro médio neste protocolo"]
+
+    classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
+    classDef etapa fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
+    classDef tecnica fill:#fff2de,stroke:#dcab68,color:#6b4714,stroke-width:1px;
+    classDef resultado fill:#e0f2e5,stroke:#7daf8b,color:#1e5135,stroke-width:2px;
+    class A,B,C,L entrada;
+    class D,E,F,G etapa;
+    class H,I,J,K tecnica;
+    class M,N resultado;
+```
+
+*Os testes usaram as mesmas divisões espaciais por protocolo. Essa execução derivada não equivale ao Quickshift monolítico.*
+
+
 | Técnica | F1-macro médio, 250 m | F1-macro médio, 500 m |
 |---|---:|---:|
 | **SVM (RBF)** | **0,8987** | **0,8668** |
@@ -311,9 +345,63 @@ A bateria derivada anterior documentou **220 avaliações**, envolvendo quatro t
 - **E5:** em 131.786 segmentos com oito atributos RGB/NIR válidos, a silhouette amostral do K-Means foi 0,3853 para K=4; 0,3417 para K=6; e 0,2939 para K=8. Silhouette **não mede acurácia de identificação de árvores**.
 - **E7:** foram documentados 216 cenários de sensibilidade das configurações C1–C6, em formas potencial/linear, limiares e distâncias a postes. Sem alturas observadas, trata-se de **índices empíricos de porte**, não de medidas de altura validadas.
 
+**Fluxograma das análises complementares E4, E5 e E7**
+
+```mermaid
+flowchart TD
+    A["🗂️ Dados da Area1 e segmentos derivados"]
+    A --> B["🌿 E4: ablação de características"]
+    A --> C["🧩 E5: sensibilidade do K-Means"]
+    A --> D["🌳 E7: sensibilidade de porte"]
+    B --> E["💡 Brilho, bordas e NDVI: sete combinações"]
+    C --> F["🔎 K = 4, 6 e 8: análise da silhouette"]
+    D --> G["📐 C1 a C6: 216 cenários empíricos"]
+    E --> H["📋 Comparação e interpretação científica"]
+    F --> H
+    G --> H
+    H --> I["⚠️ Sem validação de altura real ou generalização externa"]
+
+    classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
+    classDef experimento fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
+    classDef parametro fill:#fff2de,stroke:#dcab68,color:#6b4714,stroke-width:1px;
+    class A,H entrada;
+    class B,C,D experimento;
+    class E,F,G,I parametro;
+```
+
+*O indicador de silhouette avalia agrupamento, não acurácia de classificação; os índices C1–C6 não são alturas medidas.*
+
+
 ### Diagnóstico de extrapolação — E6c
 
 Os exemplos usados para treinar os classificadores possuem somente as classes **árvore** e **grama**, mas os segmentos da imagem incluem superfícies urbanas não rotuladas. A auditoria E6c comparou os atributos dos **168.133 segmentos** com os envelopes marginais obtidos a partir dos **505 segmentos de referência**:
+
+**Fluxograma da auditoria de extrapolação E6c**
+
+```mermaid
+flowchart TD
+    A["🏷️ 505 segmentos de referência: árvores e grama"] --> B["📊 Atributos: brilho HSV, bordas e NDVI"]
+    B --> C["📦 Envelopes dos atributos rotulados"]
+    C --> D["🧩 Comparação com 168.133 segmentos"]
+    D --> E["📉 Mínimo–máximo: 57,13% fora"]
+    D --> F["📉 Percentis 1–99: 76,47% fora"]
+    D --> G["📉 Percentis 5–95: 88,70% fora"]
+    E --> H["🔎 Diagnóstico de extrapolação"]
+    F --> H
+    G --> H
+    H --> I["⚠️ Fora da faixa não significa falso positivo"]
+    I --> J["⚡ Não comprova risco elétrico"]
+
+    classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
+    classDef processo fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
+    classDef resultado fill:#fff2de,stroke:#dcab68,color:#6b4714,stroke-width:1px;
+    class A,B,D entrada;
+    class C,H processo;
+    class E,F,G,I,J resultado;
+```
+
+*Os valores representam a extensão retangular do raster, incluindo áreas fora da AOI. Não se trata de taxa de falsos positivos.*
+
 
 | Faixa dos atributos no conjunto rotulado | Segmentos fora | Percentual fora |
 |---|---:|---:|
