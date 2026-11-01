@@ -200,9 +200,24 @@ Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi prepar
 
 ## 6. Comparação científica — o que foi testado e o que os resultados significam
 
-**Por que fizemos tantos testes?** Para investigar se os resultados dependem do **classificador**, dos **atributos**, da **separação entre treino e teste** ou da **forma de segmentar a imagem**. Isso responde à exigência de comparar técnicas usando dados reais, mas cada experimento responde a **uma pergunta diferente**.
+### Qual é a finalidade desta seção?
 
-> **Regra principal:** os estudos utilizam os **mesmos arquivos de origem da Area1**, mas não necessariamente os **mesmos objetos, registros, divisões de teste ou métricas**. Para afirmar que um método é melhor que outro, precisamos controlar o que muda entre eles.
+A seção 6 **não serve apenas para comparar o Random Forest original com algoritmos novos**. Seu objetivo é **avaliar cientificamente a metodologia desenvolvida**: descobrir quais escolhas influenciam o desempenho, se os resultados permanecem consistentes sob diferentes avaliações e o que ainda precisamos demonstrar.
+
+As quatro perguntas principais são:
+
+| O que avaliamos | Pergunta que queremos responder |
+|---|---|
+| **1. Algoritmos de classificação** | Random Forest, SVM, regressão logística e outros: **qual apresenta melhor desempenho quando os testes são equivalentes?** |
+| **2. Características da imagem** | **NDVI, brilho HSV e bordas Canny juntos** funcionam melhor do que atributos isolados ou combinações menores? |
+| **3. Forma de avaliar** | O desempenho **continua bom quando treino e teste estão geograficamente separados**, em vez de apenas sorteados? |
+| **4. Forma de segmentar** | Segmentar um recorte contínuo de **512 × 512 pixels** produz resultados diferentes de usar **quatro quadrantes de 256 × 256 pixels**? |
+
+Os experimentos complementares também examinam **a qualidade dos rótulos, a seleção de objetos próximos a postes, a extrapolação dos atributos e a sensibilidade dos indicadores empíricos de porte**. São verificações importantes, mas **não constituem uma medição validada de altura ou risco elétrico**.
+
+**E a comparação com o Random Forest original, que obteve 0,87 de acurácia?** Essa é uma **questão adicional ainda não respondida de forma definitiva**. Os experimentos novos permitem comparações válidas **dentro dos próprios protocolos**, mas **ainda não demonstram que a metodologia completa da V2 supera o método original**, porque as bases, os segmentos e os testes não foram mantidos idênticos.
+
+> **Regra principal:** utilizar os **mesmos arquivos da Area1** não significa utilizar os **mesmos objetos, registros, divisões de teste ou métricas**. Para afirmar que houve melhoria, é necessário controlar essas diferenças.
 
 ### Guia dos experimentos: nomes e objetivos
 
