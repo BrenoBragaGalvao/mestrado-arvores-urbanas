@@ -1,4 +1,4 @@
-# Detecção de árvores urbanas com NDVI, brilho e bordas
+# Projeto de mestrado para detecção de árvores urbanas e avaliação de proximidade com linhas de energia utilizando brilho, bordas, NDVI e imagens aéreas.
 
 **Pesquisa de mestrado — Breno Braga Galvão | Em desenvolvimento**
 
@@ -156,7 +156,13 @@ Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos obje
 
 A ilustração horizontal abaixo apresenta as **17 etapas do código original**, com a **Proposta 1** (classificação) e a **Proposta 2** (índice de porte e proximidade com postes) identificadas. Os resultados exibidos na etapa 12 são os valores **históricos da rodada maior**: acurácia **0,87** e F1 de árvores **0,85**.
 
-![Infográfico horizontal de 17 etapas do código original, organizado em três linhas, com as duas propostas identificadas](docs/fluxo_17_etapas_horizontal.svg)
+<p align="center">
+  <a href="docs/fluxo_17_etapas_horizontal.svg">
+    <img src="docs/fluxo_17_etapas_horizontal.svg" alt="Infográfico horizontal em 17 quadros, com as duas propostas de pesquisa" width="1774">
+  </a>
+</p>
+
+**Para ler todos os detalhes:** clique no infográfico para abrir em tamanho original. No README, ele ocupa a largura disponível da página.
 
 [**Abrir o infográfico horizontal ampliado (17 etapas)**](docs/fluxo_17_etapas_horizontal.svg)
 
