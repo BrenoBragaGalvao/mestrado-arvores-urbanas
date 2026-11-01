@@ -1,141 +1,205 @@
-# Detecção de árvores urbanas: NDVI, brilho e bordas
+# Detecção de árvores urbanas com NDVI, brilho e bordas
 
-**Breno Braga Galvão | Pesquisa de mestrado em desenvolvimento**
+**Pesquisa de mestrado — Breno Braga Galvão | Em desenvolvimento**
 
-Este projeto possui **dois objetivos**: (1) identificar **árvores e gramíneas** em imagens de satélite; (2) investigar, de forma **exploratória**, a proximidade dos objetos selecionados com **postes**. A base atual não permite afirmar contato com cabos ou risco elétrico real.
+Esta pesquisa investiga duas propostas complementares a partir de **uma única área de estudo (Area1)** em Caxias do Sul (RS):
 
-**Organização deste README:** dados → método original → resultados → análise espacial → arquivos. **A comparação entre todos os experimentos antigos e novos está concentrada na última seção.**
-
-## 1. Dados utilizados
-
-A **Area1 é uma única região em Caxias do Sul (RS)**, representada por **dois arquivos raster complementares**. Não são duas áreas de estudo.
-
-| Arquivo | Conteúdo | Uso |
+| Proposta | Pergunta central | Resultado buscado |
 |---|---|---|
-| `AOI_RGB_NEW.tif` | **RGB (3 bandas)**: vermelho, verde, azul | O Quickshift cria os **segmentos**. |
-| `AOI_NEW_MULTI.tif` | **RGB + NIR (4 bandas)**: RGB e infravermelho próximo | O código extrai estatísticas, NDVI, brilho HSV e bordas Canny. |
+| **🌳 Proposta 1 — Identificação da vegetação** | Como distinguir **árvores e gramíneas** por características de imagens de satélite? | Objetos classificados como árvore ou gramínea. |
+| **⚡ Proposta 2 — Porte e proximidade de postes** | Quais objetos candidatos apresentam **indicador empírico de porte** acima do limiar e ficam próximos de postes? | Seleção exploratória e distâncias 2D a postes, **sem comprovação de risco elétrico**. |
 
-As imagens cobrem essencialmente a mesma região, mas suas grades apresentam um pequeno deslocamento de origem. Segundo a documentação da pesquisa, foram disponibilizadas pela **CPFL** e atribuídas ao satélite **JL1KF01B**; a data de aquisição não está informada.
+**Roteiro de leitura:** dados → **Proposta 1** → resultados históricos → **Proposta 2** → imagem completa das 17 etapas → documentação. **Todas as comparações dos experimentos novos aparecem no final do README.**
+
+## 1. Área de estudo e dados utilizados
+
+A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma região**, e não duas áreas de estudo:
+
+| Arquivo raster | Bandas | O que o código faz com ele |
+|---|---|---|
+| `AOI_RGB_NEW.tif` | **RGB — 3 bandas** (vermelho, verde, azul) | Alimenta o **Quickshift** para criar regiões/polígonos. |
+| `AOI_NEW_MULTI.tif` | **RGB + NIR — 4 bandas** | Fornece estatísticas RGB/NIR, NDVI, brilho HSV e bordas Canny. |
+
+**Os arquivos têm papéis diferentes:** o RGB é usado para a segmentação; o RGB + NIR fornece atributos que descrevem os segmentos. As grades possuem um pequeno deslocamento entre suas origens, relevante para o alinhamento espacial.
 
 | Característica | Valor |
 |---|---|
 | Dimensão de **cada raster** | **6.942 colunas × 7.294 linhas** |
-| Total de pixels por raster | **50.634.948** |
-| Resolução | Aproximadamente **0,5 m/pixel** |
-| Área retangular coberta pelas imagens | Aproximadamente **12,66 km²** |
-| Área do polígono efetivo (AOI) | **12,1372 km²**, aproximadamente **12,14 km²** |
-| Sistema de coordenadas | **EPSG:31982** |
+| Pixels por raster | **50.634.948** |
+| Resolução espacial aproximada | **0,5 m/pixel** |
+| Cobertura retangular das imagens | **12,66 km²** |
+| Polígono efetivo de interesse (**AOI**) | **12,1372 km²**, ou aproximadamente **12,14 km²** |
+| Referência espacial dos rasters | **EPSG:31982** |
 
-**12,66 km²** é o retângulo das imagens; **12,14 km²** é a área de interesse delimitada por `AOI_new.shp`.
+Os **12,66 km²** representam o retângulo raster; a AOI de **12,14 km²** é delimitada por `AOI_new.shp`. A documentação indica imagens fornecidas pela **CPFL**, atribuídas ao satélite **JL1KF01B**, sem data de aquisição especificada.
 
-| Arquivo de apoio | Função |
+**Arquivos vetoriais de apoio:**
+
+| Arquivo | Finalidade |
 |---|---|
-| `AOI_new.shp` e auxiliares | Limite da área de interesse |
-| `Arvores.gpkg` | **257 pontos** de referência de árvores |
-| `Grama.gpkg` | **253 pontos** de referência de gramíneas |
+| `AOI_new.shp` e auxiliares | Polígono da área de interesse |
+| `Arvores.gpkg` | **257 pontos de referência de árvores** |
+| `Grama.gpkg` | **253 pontos de referência de gramíneas** |
 | `postes.gpkg` | Localização dos postes |
 
-Há **510 pontos de referência disponíveis** (257 + 253). **Ponto não é sinônimo de segmento ou de registro de treinamento.** O Quickshift cria segmentos; depois, o código associa os pontos a esses objetos para construir exemplos de treinamento.
+Portanto, existem **510 pontos de referência**. Isso **não significa 510 objetos ou 510 registros de treinamento**: o Quickshift cria segmentos, que depois são associados aos pontos conhecidos.
 
-Os dez arquivos da Area1 estão no [Google Drive](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6). Mais detalhes: [dados e coordenadas](data/README.md).
+Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6). Veja o [detalhamento dos arquivos e coordenadas](data/README.md).
 
-## 2. Como funciona o método original?
+---
 
-O [notebook original](Segmentacao_area_completa.ipynb) segmenta a imagem RGB completa com Quickshift, agrupa objetos por K-Means e treina um Random Forest.
+## 2. 🌳 Proposta 1 — Identificação de árvores e gramíneas
+
+**Objetivo:** classificar objetos vegetados em **árvore** ou **gramínea**, combinando NDVI, brilho HSV e bordas Canny.
+
+### Como o código original realiza essa proposta
 
 ```mermaid
 flowchart TD
-    A["Area1<br/>mesma região"] --> B["RGB<br/>3 bandas"]
-    A --> C["RGB + NIR<br/>4 bandas"]
-    B --> D["Quickshift<br/>segmentos"]
-    D --> E["Estatísticas<br/>RGB e NIR"]
+    A["🛰️ Area1<br/>mesma região"] --> B["📷 RGB<br/>3 bandas"]
+    A --> C["🗂️ RGB + NIR<br/>4 bandas"]
+    B --> D["🧩 Quickshift<br/>polígonos"]
+    D --> E["📊 Estatísticas<br/>RGB / NIR"]
     C --> E
-    E --> F["K-Means<br/>6 grupos"]
-    F --> G["Selecionar<br/>cluster 3"]
-    G --> H["Associar pontos<br/>rotulados"]
-    C --> I["NDVI, HSV<br/>e Canny"]
-    H --> J["Três atributos<br/>por segmento"]
-    I --> J
-    J --> K["Random Forest<br/>500 árvores"]
-    K --> L["Árvore<br/>ou gramínea"]
+    E --> F["🔎 K-Means<br/>6 grupos"]
+    F --> G["🌿 Seleção<br/>cluster 3"]
+    G --> H["🏷️ Associar<br/>referências"]
+    P["🌳 Pontos árvore<br/>🌱 pontos grama"] --> H
+    C --> I["🌿 NDVI<br/>💡 HSV / Canny"]
+    I --> J["📋 Três médias<br/>por segmento"]
+    H --> J
+    J --> K["🌳 Random Forest<br/>500 árvores"]
+    K --> L["✅ Prever<br/>árvore / grama"]
+    K --> M["📈 Avaliar<br/>acurácia / F1"]
+
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
+    classDef processamento fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
+    classDef resultados fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
+    class A,B,C,D,E,P,H,I,J dados;
+    class F,G,K processamento;
+    class L,M resultados;
 ```
 
-**Em palavras simples:** Quickshift transforma pixels em segmentos; K-Means seleciona candidatos usando estatísticas RGB/NIR; os pontos conhecidos fornecem os rótulos; e Random Forest aprende com **três atributos médios por segmento**: **NDVI, brilho HSV e bordas Canny**. Os aproximadamente 50,6 milhões de pixels **não são 50,6 milhões de exemplos independentes para o RF**.
+**O que está acontecendo:** o Quickshift divide a imagem RGB em segmentos; o K-Means utiliza **quatro médias e quatro desvios-padrão RGB/NIR** e seleciona os objetos do **cluster 3**. Os pontos conhecidos identificam exemplos de árvores e gramíneas. O Random Forest recebe **três valores médios por objeto** — **brilho HSV, bordas Canny e NDVI** — para aprender a distinguir as duas classes.
 
-| Parâmetro histórico | Configuração |
+**Parâmetros do método original:**
+
+| Etapa | Configuração |
 |---|---|
-| Quickshift | `kernel_size=3`, `max_dist=5`, `ratio=0.04` |
-| K-Means | 6 grupos, `random_state=42`, `n_init=10`, escolha do **cluster 3** |
+| Quickshift sobre o RGB completo | `kernel_size=3`, `max_dist=5`, `ratio=0.04` |
+| K-Means | **6 clusters**, `random_state=42`, `n_init=10`; escolha do **cluster 3** |
 | Random Forest | **500 árvores**, `random_state=42` |
 | Treino/teste | Aleatório **80%/20%**, `random_state=42`, sem estratificação |
 
-O original **não tinha separação espacial** de treino/teste nem uma etapa explícita de deduplicação. [Detalhes técnicos do método](docs/experimento_area_completa_2026-10-29.md).
+O método **não utiliza 50 milhões de pixels como 50 milhões de registros independentes**. Também não havia deduplicação explícita nem separação espacial entre treino e teste.
 
-## 3. Resultados históricos
+### Resultados históricos da Proposta 1
 
-Resultados **salvos em execuções anteriores**, ainda sem uma nova reprodução integral comprovada.
+Os valores abaixo foram **registrados em execuções anteriores**, não recalculados por uma nova execução integral comprovada.
 
-| Indicador | Rodada inicial | Rodada com área maior |
+| Indicador | Experimento inicial | Experimento com área maior |
 |---|---:|---:|
 | Pares objeto–rótulo | **133** | **458** |
-| Treino | 106 | 366 |
+| Treinamento | 106 | 366 |
 | Teste | 27 | 92 |
 | **Acurácia** | **0,81** | **0,87** |
 | F1 — árvores | 0,80 | 0,85 |
 | F1 — gramíneas | 0,83 | 0,88 |
 
-**Por que 510 pontos viraram 458 registros na rodada maior?** O código seleciona segmentos do **cluster 3** e associa esses objetos aos pontos conhecidos, produzindo **pares segmento–rótulo**. Pode haver pontos sem um segmento candidato e mais de uma associação com o mesmo objeto. **Não podemos dizer que 52 pontos foram descartados** sem auditar a execução histórica.
+**Por que são 510 pontos de referência, mas 458 registros na rodada maior?** O código mantém apenas objetos do **cluster 3** e os associa espacialmente aos pontos conhecidos. O resultado é uma tabela de **pares objeto–rótulo**: um ponto pode não ter candidato e um segmento pode gerar mais de uma associação. Portanto, **não podemos concluir que 52 pontos foram descartados** sem auditar a execução histórica.
 
-A acurácia de **0,87** veio dos **92 registros de teste**, e não dos 510 pontos disponíveis. A rodada inicial de **133 registros** usou outros exemplos e testes; portanto, **0,81 → 0,87 é uma mudança histórica observada**, não prova causal de ganho por aumento da área. Também é necessário conferir se associações repetidas ocorreram nos dois conjuntos históricos.
-
-## 4. Segundo objetivo: área dos objetos e postes
-
-O notebook explora seis configurações empíricas de porte (**C1–C6**, potenciais e lineares). A configuração **C3** usada no filtro espacial é:
-
-\[
-\widehat{H}_{C3} = 2{,}5 \cdot A^{0{,}4}
-\]
-
-O código seleciona objetos com `Power_tree_size_C3 > 7` e pesquisa proximidade **horizontal a postes** a **1, 3 e 5 metros**.
-
-**Limitações:** C3 não é altura medida; o filtro não exige explicitamente `predicted_classe == 'arvore'`; e não existem geometrias de cabos ou alturas reais na Area1. Portanto, **não há validação de risco elétrico**. Veja [fundamentação da estimativa](docs/allometria.md).
-
-## 5. Notebooks e documentação
-
-| Material | Conteúdo |
-|---|---|
-| [Notebook original](Segmentacao_area_completa.ipynb) | Código original: Quickshift global, K-Means, RF e postes |
-| [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) | Ampliações experimentais E1–E9 |
-| [Dados Area1](data/README.md) | Arquivos, coordenadas e execução |
-| [Experimento histórico](docs/experimento_area_completa_2026-10-29.md) | Parâmetros originais e limites |
-| [Comparação de modelos E3c/E8h](docs/harmonizacao_protocolos_2026-11-01.md) | Protocolos e resultados completos |
-| [Comparação de segmentações E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) | Métodos, métricas e evidências |
-| [Fluxo ilustrado de 17 etapas](docs/pipeline_17_etapas.png) | Visão ampliada do processamento original |
-
-**Execução:** os dados grandes permanecem no Drive, sob `/content/drive/MyDrive/Projetos/Segmentacao_Breno/Area1/`; o notebook original foi preparado para **Google Colab**. O Quickshift global exige RAM elevada, e **a execução integral atual não foi novamente comprovada**. Os resultados das baterias derivadas também **não estão todos gravados nas próprias células da V2**, mas têm documentação separada.
+Os **458 registros** geraram **366 exemplos de treinamento e 92 de teste**. A acurácia de **0,87** corresponde a esse conjunto de 92 testes. A primeira rodada de **133 registros** utilizou outras amostras; o aumento de **0,81 para 0,87** é descritivo e não comprova, sozinho, um ganho causado pelo tamanho da área.
 
 ---
 
-## 6. Comparação entre os experimentos antigos e os novos
+## 3. ⚡ Proposta 2 — Indicador de porte e proximidade com postes
 
-Esta é a parte central para **responder ao orientador**. Os testes usam a **mesma Area1**, mas **nem sempre os mesmos segmentos, registros ou testes**.
+**Objetivo:** calcular um indicador experimental de porte dos objetos e verificar sua **proximidade horizontal** aos postes da Area1.
 
-### 6.1. O que foi usado em cada experiência?
+### Como o código original realiza essa proposta
 
-| Experimento | Como os segmentos foram produzidos | Base de classificação | Teste |
+```mermaid
+flowchart TD
+    A["🌳 Objetos candidatos<br/>do cluster 3"] --> B["📐 Área em m²<br/>dos polígonos"]
+    B --> C["🌲 Modelos C1–C6<br/>indicadores de porte"]
+    C --> D["📏 Configuração C3<br/>2,5 × área^0,4"]
+    D --> E{"Índice C3<br/>maior que 7?"}
+    E -->|Sim| F["📍 Objetos<br/>selecionados"]
+    E -->|Não| G["Fora do<br/>filtro"]
+    H["⚡ Base de postes<br/>postes.gpkg"] --> I["🗺️ Proximidade<br/>espacial 2D"]
+    F --> I
+    I --> J["📊 Resultados<br/>1, 3 e 5 m"]
+
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
+    classDef alerta fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:2px;
+    class A,B,C,F,G,H dados;
+    class D,E alerta;
+    class I,J metodo;
+```
+
+O código calcula a área dos polígonos, testa **seis configurações empíricas (C1–C6)** nas formas potencial e linear e usa o índice potencial **C3** na seleção:
+
+\[
+\widehat H_{C3} = 2{,}5 \cdot A^{0{,}4}
+\]
+
+Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos objetos selecionados a **1, 3 e 5 metros dos pontos dos postes**, usando `sjoin_nearest`.
+
+**Ponto importante para a banca:** a Proposta 2 usa os **candidatos do cluster 3**, e o código histórico **não exige `predicted_classe == 'arvore'`** nesse filtro. Portanto, os objetos selecionados **não são necessariamente apenas árvores previstas pelo Random Forest**.
+
+**Limites científicos:** o índice C3 **não é altura real validada**, as distâncias são **2D até postes** e a Area1 **não possui a geometria dos cabos**. Não se pode interpretar esse resultado como **interferência em fios ou risco elétrico comprovado**. [Ver as fórmulas C1–C6 e suas limitações](docs/allometria.md).
+
+---
+
+## 4. Imagem completa — as 17 etapas do código original
+
+A ilustração abaixo reúne as duas propostas e mostra **onde a Proposta 2 se conecta aos candidatos da Proposta 1**, sem confundir classificação de árvore com medição de altura.
+
+![Diagrama corrigido e colorido de 17 etapas, com Proposta 1 e Proposta 2 separadas](docs/fluxo_17_etapas_corrigido.svg)
+
+[**Abrir o diagrama ampliado e corrigido das 17 etapas**](docs/fluxo_17_etapas_corrigido.svg)
+
+Este esquema representa o **notebook original**. Os experimentos posteriores da V2, com segmentação em quadrantes, têm protocolos próprios e estão explicados **na última seção**.
+
+## 5. Código e documentação técnica
+
+| Material | Conteúdo |
+|---|---|
+| [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
+| [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) | Experimentos adicionais E1–E9 |
+| [Dados Area1](data/README.md) | Arquivos, coordenadas e estrutura do Drive |
+| [Registro do método original](docs/experimento_area_completa_2026-10-29.md) | Parâmetros, resultados históricos e limitações |
+| [Harmonização E3c/E8h](docs/harmonizacao_protocolos_2026-11-01.md) | Comparações de modelos e validação espacial |
+| [Comparação E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) | Comparação pareada da segmentação |
+| [Estimativas C1–C6](docs/allometria.md) | Fórmulas exploratórias de porte |
+
+Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi preparado para **Google Colab**. O processamento global consome muita memória; **uma nova execução completa e bem-sucedida não está comprovada**. As baterias da V2 têm evidências documentadas separadamente, mas nem todas as saídas estão salvas no próprio notebook publicado.
+
+---
+
+## 6. Comparação científica — original versus novos experimentos
+
+**Esta seção responde ao que foi comparado, com quais dados e quais conclusões são válidas.** Todos os experimentos derivam da **mesma Area1**, mas **não necessariamente dos mesmos segmentos ou conjuntos de teste**.
+
+### 6.1. Qual dataset e qual avaliação foram usados?
+
+| Experimento | Construção dos segmentos | Amostras supervisionadas | Avaliação |
 |---|---|---|---|
-| **Original inicial** | Rodada histórica; recorte não inteiramente reconstruído | **133 pares** | Aleatório: 27 registros |
-| **Original ampliado** | Quickshift global + K-Means **cluster 3** | **458 pares** | Aleatório: 92 registros |
-| **V2 — E3c/E8h** | Quickshift em **812 quadrantes de até 256 px** | **505 segmentos únicos** | Modelos nos mesmos testes por protocolo; aleatório e espacial |
-| **V2 — E9** | **119 regiões**: contínuo 512 px × quatro quadrantes 256 px | **505 referências comuns na E9** | Mesmo teste nos dois tipos de segmentação |
+| **Original inicial** | Método histórico; recorte inicial não totalmente reconstituído | **133 pares** | Aleatória, 27 registros de teste |
+| **Original ampliado** | Quickshift **global** + K-Means **cluster 3** | **458 pares** | Aleatória, 92 registros de teste |
+| **V2 — E3c/E8h** | Quickshift em **812 quadrantes** de até **256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Oito classificadores, divisões aleatórias e espaciais |
+| **V2 — E9** | **119 regiões**: Quickshift contínuo **512 px** versus quatro quadrantes **256 px** | **505 referências comuns dentro da E9** | Oito classificadores, testes espaciais pareados |
 
-A E3c gerou **168.133 segmentos** na extensão retangular do raster, incluindo partes fora da AOI; foram usados **505 segmentos rotulados** (257 árvores e 248 gramíneas). A E9 trabalhou com **recortes que contêm referências**, não com toda a imagem. Ter **505** nas duas baterias **não garante geometrias idênticas entre elas**.
+A E3c criou **168.133 segmentos** na extensão retangular do raster (inclusive fora da AOI), mas a classificação supervisionada usou **505 segmentos rotulados**. A E9 segmentou **recortes locais com referências**, não a imagem inteira. A igualdade numérica dos **505** na E3c e E9 **não garante geometrias idênticas**.
 
-### 6.2. E3c: Random Forest versus outros classificadores
+### 6.2. E3c — Random Forest versus outros classificadores
 
-**Pergunta:** mantendo os **mesmos exemplos de treino/teste por protocolo**, algum dos oito classificadores obtém melhores notas? A tabela mostra o **F1-macro médio** de cinco divisões espaciais, com **embargo de 25 m das geometrias de teste**.
+Nos mesmos **505 segmentos derivados** e nas mesmas divisões de treino/teste **dentro de cada protocolo**, foram avaliados **oito classificadores**.
 
-| Modelo | Blocos 250 m | Blocos 500 m |
+**F1-macro médio** (cinco divisões espaciais, embargo de **25 m das geometrias de teste**):
+
+| Classificador | Blocos 250 m | Blocos 500 m |
 |---|---:|---:|
 | **SVM RBF** | **0,8987** | **0,8668** |
 | Regressão logística | 0,8928 | 0,8664 |
@@ -146,55 +210,55 @@ A E3c gerou **168.133 segmentos** na extensão retangular do raster, incluindo p
 | Gaussian Naive Bayes | 0,8555 | 0,8398 |
 | Dummy | 0,2980 | 0,2799 |
 
-**Conclusão:** o SVM teve a maior **média nesses protocolos**, sem prova de superioridade universal. A **E4** comparou combinações de atributos e encontrou maior F1 médio usando **NDVI + brilho + Canny juntos**. A **E5** investigou parâmetros do Quickshift e K-Means; o índice *silhouette* **não equivale à acurácia**.
+**O que significa:** o SVM teve maior F1-macro médio **nesse protocolo**, não superioridade estatística geral. Na **E4**, as três características **NDVI + brilho + Canny** juntas tiveram maior F1 médio nas condições estudadas. A **E5** explorou parâmetros do Quickshift/K-Means; *silhouette* não é acurácia.
 
-### 6.3. E8h: aleatório versus espacial na base nova
+### 6.3. E8h — comparação da avaliação aleatória com a espacial
 
-O Random Forest, sobre os **mesmos 505 segmentos derivados**, apresentou:
+Com a **mesma base derivada de 505 segmentos**, o Random Forest apresentou:
 
-| Avaliação | Acurácia média | F1-macro médio |
+| Protocolo | Acurácia média | F1-macro médio |
 |---|---:|---:|
-| Aleatória 80/20 | **0,8832** | **0,8827** |
+| Aleatório 80/20 | **0,8832** | **0,8827** |
 | Espacial 250 m, embargo 25 m | 0,8697 | 0,8656 |
 | Espacial 500 m, embargo 25 m | 0,8591 | 0,8530 |
 
-**Interpretação:** os resultados observados variam com o protocolo, mas **os testes mudam entre protocolos**. Não atribuímos as diferenças exclusivamente ao embargo. A harmonização fez **40 ajustes aleatórios novos**, reaproveitando com verificações os **240 ajustes espaciais E3c**.
+Os protocolos usam **conjuntos de teste diferentes**: essa comparação é **descritiva**, e não uma prova de que o embargo por si só causou toda a diferença. A E8h fez **40 ajustes aleatórios novos** e reutilizou **240 ajustes espaciais E3c** com verificações.
 
-Na divisão aleatória de semente **42** aplicada à **base nova**, o RF obteve **404 treino/101 teste**, acurácia **0,9010** e F1-macro **0,9009**. **Isso não reproduz o resultado histórico de 0,87 com 458 pares.**
+Usando a **regra antiga do RF com semente 42 na base nova**, foram **404 registros de treino e 101 de teste**, com acurácia **0,9010** e F1-macro **0,9009**. Esse experimento **não reproduz** o histórico de **0,87** com 458 pares.
 
-### 6.4. E9: segmentação 512 versus 256 pixels
+### 6.4. E9 — segmentação contínua de 512 versus quadrantes de 256
 
-**Pergunta:** nos **mesmos 119 recortes**, com **505 referências comuns** e testes pareados, segmentar a região inteira de 512 px difere de segmentá-la em quatro quadrantes de 256 px? Foram feitas **320 avaliações**.
+Na E9, as **119 regiões** foram segmentadas das duas maneiras, mantendo os **mesmos 505 pontos de referência, as mesmas divisões e os mesmos modelos dentro da experiência**. Foram **320 avaliações**.
 
-**F1-macro médio**, exclusão de treino a até **25 m entre pontos**:
+**F1-macro médio**, com embargo de **25 m entre pontos de referência**:
 
-| Blocos | Modelo | Contínuo 512 | Quatro 256 |
+| Blocos | Modelo | Contínuo 512 px | Quatro 256 px |
 |---|---|---:|---:|
-| 250 m | RF | **0,8906** | 0,8835 |
-| 250 m | SVM | 0,9157 | **0,9341** |
-| 500 m | RF | **0,8657** | 0,8566 |
-| 500 m | SVM | 0,8518 | **0,8641** |
+| 250 m | Random Forest | **0,8906** | 0,8835 |
+| 250 m | SVM RBF | 0,9157 | **0,9341** |
+| 500 m | Random Forest | **0,8657** | 0,8566 |
+| 500 m | SVM RBF | 0,8518 | **0,8641** |
 
-**Conclusão:** o RF teve média ligeiramente maior com 512 contínuo; o SVM, com quadrantes. **Contínuo 512 é um recorte, não o Quickshift global da imagem inteira**, e a E9 **não reproduz o filtro global do cluster 3**.
+**O que significa:** RF teve média ligeiramente maior com 512 contínuo; SVM, com quadrantes. O efeito não foi uniforme em todas as divisões. **512 contínuo é um recorte de 512 px, não o Quickshift global da imagem inteira**. A E9 também não reproduz o K-Means global e seu cluster 3.
 
-### 6.5. Afinal, o que podemos comparar?
+### 6.5. Afinal, o que podemos comparar com rigor?
 
-| Comparação | Interpretação correta |
+| Comparação | É válida como prova de melhoria? |
 |---|---|
-| **Original 0,81 × 0,87** | **Descritiva:** amostras e testes diferentes. |
-| **Original 0,87 × métricas da V2** | **Não comprova melhora/piora do pipeline:** segmentos, filtros e testes mudaram. |
-| **RF × SVM e outros na E3c** | **Sim, dentro de cada protocolo:** mesmos testes para os modelos. |
-| **512 contínuo × quatro 256 na E9** | **Sim, nesses recortes:** mesmas referências e divisões. |
-| **E3c × E9; original completo × V2 completa** | **Não são comparações ponta a ponta controladas.** |
+| Original **0,81 × 0,87** | **Não.** Apenas descrição de rodadas com testes diferentes. |
+| Original **0,87 × resultados da V2** | **Não diretamente.** Mudaram segmentos, seleção de candidatos, amostras e testes; às vezes a métrica também mudou. |
+| **RF × SVM × outros na E3c** | **Sim, dentro de cada protocolo**, com os mesmos dados e divisões. |
+| **512 contínuo × quatro 256 na E9** | **Sim, nos recortes da E9**, com referências e testes pareados. |
+| **Pipeline completo original × pipeline completo V2** | **Ainda não foi demonstrado** por uma reprodução ponta a ponta controlada. |
 
-**Acurácia** = proporção de previsões corretas. **F1-macro** = média do F1 de árvores e gramíneas. **Acurácia 0,87 não pode ser subtraída de F1-macro 0,8656** como se fossem a mesma métrica.
+**Acurácia** é a proporção de classificações corretas. **F1-macro** é a média do F1 de árvores e gramíneas, com mesmo peso para cada classe. Portanto, **acurácia 0,87 não é diretamente comparável ao F1-macro 0,8656**.
 
-### 6.6. Situação científica e próxima comparação necessária
+### 6.6. O que já foi feito e o que falta?
 
-Já há experimentos documentados de **classificadores (E3c)**, **ablação de atributos (E4)**, **segmentação/K-Means (E5)**, **proximidade com postes e extrapolação (E6/E6c)**, **cenários empíricos de porte (E7)**, **harmonização de avaliações (E8h)** e **segmentação pareada em recortes (E9)**.
+Além dos testes detalhados, a V2 documenta **E6/E6c** (proximidade de postes e extrapolação dos atributos) e **E7** (cenários empíricos de porte), **sem validação de risco ou altura real**.
 
-**Ainda não demonstramos que o pipeline completo da V2 supera o original.** Para isso, precisamos **reexecutar Quickshift global e seleção do cluster 3**, mapear as mesmas referências para as alternativas, usar **as mesmas divisões de teste e métricas** e separar **cobertura de candidatos** de **qualidade da classificação**.
+**Para comparar o método completo original com a alternativa**, ainda é necessário reproduzir o **Quickshift global, K-Means e cluster 3** sobre os dados originais, usar referências e divisões de teste equivalentes, e medir separadamente **cobertura dos candidatos** e **qualidade da classificação**. A nova execução global integral **não está comprovada**.
 
-Os dados atuais **não possuem altura real, geometria dos cabos nem rótulos de fundo urbano**. Portanto, não validam altura de árvores, risco elétrico ou falsos positivos em todas as superfícies.
+A Area1 não tem **alturas reais medidas, geometrias de cabos ou rótulos para todo o fundo urbano**. Assim, os resultados não demonstram risco elétrico real nem generalização para outras cidades.
 
-**Síntese:** as comparações **entre classificadores dentro da E3c** e **entre segmentações dentro da E9** são úteis e controladas. O **0,87 histórico** continua como referência descritiva, **não como resultado comprovadamente superado pela V2**.
+**Conclusão científica:** temos comparações controladas **entre classificadores (E3c)** e **entre estratégias locais de segmentação (E9)**. O resultado histórico do Random Forest (**0,87**) permanece uma referência descritiva; **não foi demonstrado que a V2 completa o supera**.
