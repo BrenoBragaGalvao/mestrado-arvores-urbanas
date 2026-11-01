@@ -46,12 +46,27 @@ A pesquisa utiliza **dois arquivos de imagem raster** da região de **Caxias do 
 | **Total de pixels por raster** | **50.634.948** | Aproximadamente 50,6 milhões de posições da grade |
 | **Resolução espacial** | **aproximadamente 0,5 m/pixel** | Cada pixel corresponde a cerca de meio metro no terreno |
 | **Extensão retangular aproximada** | **3.471 m × 3.647 m** | Largura e altura da cobertura raster, estimadas pela resolução nominal |
-| **Área do retângulo raster** | **aproximadamente 12,66 km²** | **Não** é a área efetiva do polígono de estudo (AOI) |
+| **Área do retângulo raster** | **aproximadamente 12,66 km²** | Extensão completa coberta pela grade das imagens, inclusive partes fora da AOI |
+| **Área efetiva da AOI (Area1)** | **12,1372 km² (aproximadamente 12,14 km²)** | Área do polígono `AOI_new.shp`, calculada diretamente em **EPSG:31982** |
 | **Sistema de coordenadas dos rasters** | **EPSG:31982** | Referencial projetado usado nas operações métricas |
 | **Raster de segmentação** | `AOI_RGB_NEW.tif` — **3 bandas** | RGB utilizado pelo Quickshift |
 | **Raster de atributos** | `AOI_NEW_MULTI.tif` — **4 bandas** | RGB + NIR utilizados para descrever os segmentos |
 
 **Os dois arquivos têm a mesma quantidade de linhas e colunas e se referem essencialmente à mesma área**, mas suas grades têm uma pequena diferença de origem. Assim, não se deve presumir correspondência perfeita entre pixels apenas por terem o mesmo tamanho; isso precisa ser considerado ao relacionar segmentos e atributos.
+
+### Diferença entre a imagem inteira e a área realmente estudada (AOI)
+
+**A imagem cobre um retângulo de aproximadamente 12,66 km². Dentro desse retângulo, o arquivo `AOI_new.shp` delimita a área de interesse da pesquisa: aproximadamente 12,14 km² (12,1372 km², medidos a partir do polígono no sistema projetado EPSG:31982).** Ou seja, o polígono corresponde a cerca de **95,9%** da extensão retangular das imagens; o restante, aproximadamente **0,52 km²**, fica fora da AOI.
+
+**Como essa distinção se aplica a cada experimento?**
+
+| Experimento | Região processada | Como interpretar a área |
+|---|---|---|
+| **Random Forest original** | Quickshift aplicado ao **raster inteiro**, seguido de recorte dos polígonos pela **AOI** e seleção do cluster 3 do K-Means | O processamento inicial percorre o retângulo da imagem (**12,66 km²**); a seleção de objetos do estudo considera a AOI (**12,14 km²**), além dos demais filtros |
+| **V2 — bateria derivada E3c** | Quickshift executado nos **812 quadrantes** que cobrem a extensão retangular da imagem | Os **168.133 segmentos extraídos** incluem partes **fora** da AOI. As amostras de árvores e gramíneas são referências da área de estudo; não confundir a cobertura dos quadrantes com a área efetiva da AOI |
+| **V2 — comparação E9** | **119 regiões selecionadas** por conter pontos de referência, comparando recortes contínuos de 512 px com quadrantes de 256 px | Estuda **recortes locais**, não a cobertura integral de 12,66 km² nem a totalidade do polígono de 12,14 km² |
+
+**Em resumo:** quando falamos da **dimensão da imagem**, usamos **12,66 km²**; quando falamos da **área de interesse delimitada pela Area1**, usamos **12,14 km²**. Já os números de amostras e segmentos variam conforme o processamento e os filtros de cada experimento.
 
 **Dados vetoriais e referências do mesmo conjunto `Area1`:**
 
@@ -477,7 +492,7 @@ O arquivo [`Segmentacao_area_completa_v2_experimentos.ipynb`](Segmentacao_area_c
 
 **No original**, Quickshift era aplicado à imagem inteira e depois o K-Means global selecionava o **cluster 3**.
 
-**Na bateria derivada E3c**, a imagem foi processada em **812 quadrantes independentes de até 256 × 256 pixels**, gerando **168.133 segmentos** na extensão retangular. Foram obtidos **505 segmentos rotulados únicos** (257 árvores e 248 gramíneas), a partir dos 510 pontos. O **filtro global do cluster 3 não foi reproduzido** nesse protocolo.
+**Na bateria derivada E3c**, a imagem foi processada em **812 quadrantes independentes de até 256 × 256 pixels**, cobrindo o retângulo raster de aproximadamente **12,66 km²** (inclusive partes fora da AOI de **12,14 km²**) e gerando **168.133 segmentos** na extensão retangular. Foram obtidos **505 segmentos rotulados únicos** (257 árvores e 248 gramíneas), a partir dos 510 pontos. O **filtro global do cluster 3 não foi reproduzido** nesse protocolo.
 
 Imagine uma copa atravessando a borda entre dois quadrantes: ela pode ficar inteira em um segmento no processo contínuo e ser cortada em dois no processo por quadrantes. Mesmo usando os mesmos pixels de origem, a **média dos três atributos por objeto pode mudar**.
 
