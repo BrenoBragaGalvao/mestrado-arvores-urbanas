@@ -55,23 +55,23 @@ Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.g
 ### Como o código original realiza essa proposta
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 72, "padding": 26}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 60, "rankSpacing": 66}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["&emsp;&emsp;🛰️ Area1&emsp;&emsp;<br/>&emsp;&emsp;mesma região&emsp;&emsp;"] --> B["&emsp;&emsp;📷 RGB&emsp;&emsp;<br/>&emsp;&emsp;3 bandas&emsp;&emsp;"]
-    A --> C["&emsp;&emsp;🗂️ RGB + NIR&emsp;&emsp;<br/>&emsp;&emsp;4 bandas&emsp;&emsp;"]
-    B --> D["&emsp;&emsp;🧩 Quickshift&emsp;&emsp;<br/>&emsp;&emsp;polígonos&emsp;&emsp;"]
-    D --> E["&emsp;&emsp;📊 Estatísticas&emsp;&emsp;<br/>&emsp;&emsp;RGB / NIR&emsp;&emsp;"]
+    A["🛰️ Area1<br/>mesma região"] --> B["📷 RGB<br/>3 bandas"]
+    A --> C["🗂️ RGB + NIR<br/>4 bandas"]
+    B --> D["🧩 Quickshift<br/>polígonos"]
+    D --> E["📊 Estatísticas<br/>RGB / NIR"]
     C --> E
-    E --> F["&emsp;&emsp;🔎 K-Means&emsp;&emsp;<br/>&emsp;&emsp;6 grupos&emsp;&emsp;"]
-    F --> G["&emsp;&emsp;🌿 Seleção&emsp;&emsp;<br/>&emsp;&emsp;cluster 3&emsp;&emsp;"]
-    G --> H["&emsp;&emsp;🏷️ Associar&emsp;&emsp;<br/>&emsp;&emsp;referências&emsp;&emsp;"]
-    P["&emsp;&emsp;🌳 Pontos árvore&emsp;&emsp;<br/>&emsp;&emsp;🌱 pontos grama&emsp;&emsp;"] --> H
-    C --> I["&emsp;&emsp;🌿 NDVI&emsp;&emsp;<br/>&emsp;&emsp;💡 HSV / Canny&emsp;&emsp;"]
-    I --> J["&emsp;&emsp;📋 Três médias&emsp;&emsp;<br/>&emsp;&emsp;por segmento&emsp;&emsp;"]
+    E --> F["🔎 K-Means<br/>6 grupos"]
+    F --> G["🌿 Seleção<br/>cluster 3"]
+    G --> H["🏷️ Associar<br/>referências"]
+    P["🌳 Pontos de<br/>árvore<br/>🌱 pontos de<br/>grama"] --> H
+    C --> I["🌿 NDVI<br/>💡 Brilho HSV<br/>◻️ Bordas Canny"]
+    I --> J["📋 Três médias<br/>por segmento"]
     H --> J
-    J --> K["&emsp;&emsp;🌳 Random Forest&emsp;&emsp;<br/>&emsp;&emsp;500 árvores&emsp;&emsp;"]
-    K --> L["&emsp;&emsp;✅ Prever&emsp;&emsp;<br/>&emsp;&emsp;árvore / grama&emsp;&emsp;"]
-    K --> M["&emsp;&emsp;📈 Avaliar&emsp;&emsp;<br/>&emsp;&emsp;acurácia / F1&emsp;&emsp;"]
+    J --> K["🌳 Random<br/>Forest<br/>500 árvores"]
+    K --> L["✅ Prever<br/>árvore / grama"]
+    K --> M["📈 Avaliar<br/>acurácia / F1"]
 
     classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
     classDef processamento fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
@@ -122,17 +122,17 @@ Os **458 registros** geraram **366 exemplos de treinamento e 92 de teste**. A ac
 ### Como o código original realiza essa proposta
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 72, "padding": 26}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 60, "rankSpacing": 66}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["&emsp;&emsp;🌳 Objetos candidatos&emsp;&emsp;<br/>&emsp;&emsp;do cluster 3&emsp;&emsp;"] --> B["&emsp;&emsp;📐 Área em m²&emsp;&emsp;<br/>&emsp;&emsp;dos polígonos&emsp;&emsp;"]
-    B --> C["&emsp;&emsp;🌲 Modelos C1–C6&emsp;&emsp;<br/>&emsp;&emsp;indicadores de porte&emsp;&emsp;"]
-    C --> D["&emsp;&emsp;📏 Configuração C3&emsp;&emsp;<br/>&emsp;&emsp;2,5 × área^0,4&emsp;&emsp;"]
-    D --> E{"&emsp;Índice C3&emsp;<br/>&emsp;maior que 7?&emsp;"}
-    E -->|Sim| F["&emsp;&emsp;📍 Objetos&emsp;&emsp;<br/>&emsp;&emsp;selecionados&emsp;&emsp;"]
-    E -->|Não| G["&emsp;&emsp;Fora do&emsp;&emsp;<br/>&emsp;&emsp;filtro&emsp;&emsp;"]
-    H["&emsp;&emsp;⚡ Base de postes&emsp;&emsp;<br/>&emsp;&emsp;postes.gpkg&emsp;&emsp;"] --> I["&emsp;&emsp;🗺️ Proximidade&emsp;&emsp;<br/>&emsp;&emsp;espacial 2D&emsp;&emsp;"]
+    A["🌳 Objetos<br/>candidatos<br/>do cluster 3"] --> B["📐 Área em m²<br/>dos polígonos"]
+    B --> C["🌲 Modelos<br/>C1–C6<br/>indicadores<br/>de porte"]
+    C --> D["📏 Configuração<br/>potencial C3<br/>2,5 × A^0,4"]
+    D --> E{"Índice C3<br/>maior que 7?"}
+    E -->|Sim| F["📍 Objetos<br/>selecionados"]
+    E -->|Não| G["Fora do<br/>filtro"]
+    H["⚡ Base de<br/>postes<br/>postes.gpkg"] --> I["🗺️ Proximidade<br/>espacial 2D"]
     F --> I
-    I --> J["&emsp;&emsp;📊 Resultados&emsp;&emsp;<br/>&emsp;&emsp;1, 3 e 5 m&emsp;&emsp;"]
+    I --> J["📊 Resultados<br/>1, 3 e 5 m"]
 
     classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
     classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
