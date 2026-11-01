@@ -63,7 +63,7 @@ Além dos dois arquivos raster, utilizamos **510 pontos de referência identific
 | 🌱 **`Grama.gpkg`** | Contém **253 pontos** identificados como gramíneas. |
 | ⚡ **`postes.gpkg`** | Fornece a localização dos postes para a **análise espacial de proximidade**. |
 
-> **Para interpretar os resultados:** 510 é o total de **pontos de referência**, não necessariamente de segmentos diferentes criados pelo Quickshift. Os dados atuais não contêm a geometria dos cabos elétricos nem medições reais da altura das árvores.
+> **Atenção:** os **510** são pontos dos arquivos de referência. Os **458** da tabela histórica são **registros objeto–rótulo construídos após a segmentação e seleção dos candidatos** — portanto, não são a mesma contagem. A explicação detalhada aparece logo abaixo da tabela de resultados. Os dados não incluem geometrias de cabos elétricos nem alturas reais medidas.
 
 Os detalhes sobre sistemas de coordenadas, reprojeção e alinhamento dos rasters estão na [documentação dos dados](data/README.md).
 
@@ -253,7 +253,53 @@ Os resultados abaixo são **históricos**, registrados em execuções anteriores
 | F1-score — árvores | 0,80 | **0,85** |
 | F1-score — gramíneas | 0,83 | **0,88** |
 
-O número de pares objeto–rótulo não representa necessariamente a quantidade de objetos distintos. A comparação entre experimentos com conjuntos de teste diferentes não comprova, por si só, melhoria de desempenho.
+### Por que os arquivos têm 510 pontos e o Random Forest original utilizou 458 registros?
+
+**Porque estamos contando coisas diferentes.** Os arquivos de referência contêm **257 pontos de árvores e 253 pontos de gramíneas (510 pontos ao todo)**. Esses pontos são usados para associar uma classe conhecida aos objetos criados a partir da imagem — mas não entram automaticamente como 510 linhas no Random Forest.
+
+O código original constrói os exemplos para o modelo nesta ordem:
+
+```mermaid
+flowchart TD
+    A["Raster RGB:<br/>Quickshift"] --> B["Segmentos<br/>da imagem"]
+    B --> C["K-Means:<br/>6 grupos"]
+    C --> D["Selecionar<br/>cluster 3"]
+    E["510 pontos<br/>de referência"] --> F["Interseção<br/>espacial"]
+    D --> F
+    F --> G["Linhas de<br/>objeto e rótulo"]
+    G --> H["Rodada histórica:<br/>458 registros"]
+    H --> I["366 no treino<br/>92 no teste"]
+    I --> J["Random Forest<br/>500 árvores"]
+
+    classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
+    classDef processo fill:#dcefe3,stroke:#6ca58b,color:#164b35;
+    classDef resultado fill:#fff2de,stroke:#dcab68,color:#6b4714;
+    class A,B,E entrada;
+    class C,D,F,G processo;
+    class H,I,J resultado;
+```
+
+| Quantidade | O que foi contado | De qual etapa? |
+|---|---|---|
+| **510** | Pontos de referência disponíveis: 257 árvores e 253 gramíneas | Arquivos `Arvores.gpkg` e `Grama.gpkg` |
+| **458** | **Pares segmento–rótulo** usados na rodada histórica maior | Após selecionar o cluster 3 e associar segmentos aos pontos |
+| **366 + 92** | Registros para **treinamento** e **teste** | Divisão aleatória 80%/20% dos 458 registros |
+| **133** | Pares segmento–rótulo em uma **rodada histórica anterior** | 106 para treino e 27 para teste |
+| **505** | **Segmentos rotulados únicos** na bateria **E3c da V2** | Nova segmentação por quadrantes, com deduplicação |
+
+**Por que não são exatamente 510 registros no experimento original?** O código original seleciona somente os segmentos do **cluster 3 do K-Means** e usa uma **interseção espacial** com os pontos rotulados. Alguns pontos podem não encontrar segmentos candidatos, e um segmento pode ser associado a mais de uma referência. Como não existe **deduplicação explícita** no procedimento histórico, o total de linhas geradas não equivale obrigatoriamente ao número de pontos ou de segmentos distintos.
+
+**Importante para a banca:** não é correto dizer que **52 pontos foram descartados**, apenas porque 510 − 458 = 52. Para explicar a diferença exata, seria necessário auditar individualmente os identificadores e as interseções daquela execução. **Essa auditoria histórica ainda não está documentada.**
+
+**Por que antes eram 133 registros?** A primeira rodada utilizou outro conjunto de exemplos; a composição precisa e a dimensão de seu recorte não foram integralmente reconstruídas. Portanto, não podemos atribuir o crescimento de 133 para 458 somente ao tamanho da área.
+
+**E os 87% de acurácia?** Esse resultado veio do **teste histórico de 92 registros**, não da classificação de todos os 510 pontos originais. O treinamento e o teste foram separados aleatoriamente por `train_test_split(test_size=0.2, random_state=42)`, **sem separação geográfica e sem uma etapa anterior explícita de deduplicação**. Precisamos verificar se associações do mesmo segmento acabaram aparecendo nos dois conjuntos; **o código por si só não comprova que isso ocorreu**.
+
+**Resumo para explicar ao professor:** *“Havia 510 pontos de referência disponíveis. O processamento original selecionou segmentos candidatos com Quickshift e K-Means e associou esses segmentos às referências. Isso produziu 458 registros de objeto–rótulo na rodada maior, dos quais 366 foram usados no treinamento e 92 no teste. A primeira rodada tinha 133 registros. Na V2, os 505 representam segmentos rotulados únicos de outra segmentação e não devem ser confundidos com os 458 históricos.”*
+
+Para os parâmetros e limitações do método original, consulte o [registro do experimento histórico](docs/experimento_area_completa_2026-10-29.md).
+
+
 
 ### Estimativa empírica de altura
 
