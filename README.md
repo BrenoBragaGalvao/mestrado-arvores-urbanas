@@ -52,18 +52,20 @@ A pesquisa utiliza **dois arquivos de imagem raster** da região de **Caxias do 
 | **Raster de segmentação** | `AOI_RGB_NEW.tif` — **3 bandas** | RGB utilizado pelo Quickshift |
 | **Raster de atributos** | `AOI_NEW_MULTI.tif` — **4 bandas** | RGB + NIR utilizados para descrever os segmentos |
 
-**Os dois arquivos têm a mesma quantidade de linhas e colunas e se referem essencialmente à mesma área**, mas suas grades têm uma pequena diferença de origem. Assim, não se deve presumir correspondência perfeita entre pixels apenas por terem o mesmo tamanho; isso precisa ser considerado ao relacionar segmentos e atributos.
+### Referências geográficas e amostras
 
-**Dados vetoriais e referências do mesmo conjunto `Area1`:**
+Além dos dois arquivos raster, utilizamos **510 pontos de referência identificados**: **257 árvores** e **253 gramíneas**. Esses pontos servem para construir os exemplos usados no treinamento e na avaliação da classificação.
 
-| Arquivo | Conteúdo | Uso no trabalho |
-|---|---|---|
-| `AOI_new.shp` e auxiliares | Polígono da área de interesse | Delimita a área analisada |
-| `Arvores.gpkg` | **257 pontos** de referência de árvores | Exemplos identificados para classificação |
-| `Grama.gpkg` | **253 pontos** de referência de gramíneas | Exemplos identificados para classificação |
-| `postes.gpkg` | Localização geográfica dos postes | Análise exploratória de proximidade |
+| Arquivo | Papel na pesquisa |
+|:--|:--|
+| 📍 **`AOI_new.shp`** | Delimita o polígono da **área de interesse (AOI)**. |
+| 🌳 **`Arvores.gpkg`** | Contém **257 pontos** identificados como árvores. |
+| 🌱 **`Grama.gpkg`** | Contém **253 pontos** identificados como gramíneas. |
+| ⚡ **`postes.gpkg`** | Fornece a localização dos postes para a **análise espacial de proximidade**. |
 
-São **510 pontos de referência originais** somando árvores e gramíneas. Os vetores de referência de árvores, gramíneas e postes possuem **EPSG:4674** como CRS de origem, sendo transformados para um sistema projetado nas operações métricas. Não há geometrias de cabos elétricos nem medidas reais de altura de árvores nesse conjunto.
+> **Para interpretar os resultados:** 510 é o total de **pontos de referência**, não necessariamente de segmentos diferentes criados pelo Quickshift. Os dados atuais não contêm a geometria dos cabos elétricos nem medições reais da altura das árvores.
+
+Os detalhes sobre sistemas de coordenadas, reprojeção e alinhamento dos rasters estão na [documentação dos dados](data/README.md).
 
 ### Como os pixels se transformam em amostras?
 
