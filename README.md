@@ -258,7 +258,7 @@ flowchart TD
 | **V2 — classificadores e validação espacial** | Quickshift independente em **812 blocos de até 256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Divisões **aleatórias e espaciais** |
 | **V2 — comparação da segmentação** | **119 regiões**, cada uma segmentada em **512 contínuo** ou **quatro blocos 256** | **505 referências comuns às duas alternativas de segmentação** | Testes **espaciais pareados** |
 
-**Por que 458 e 505 não são a mesma base?** No original, eram contados **pares segmento–rótulo após a seleção do cluster 3**, sem deduplicação explícita. Na comparação de classificadores, foram obtidos **segmentos rotulados únicos** de outra segmentação. Na comparação de segmentações, são **referências identificadas nos dois braços de um experimento local**. Ter 505 em comparação de classificadores e comparação de segmentações também **não significa ter as mesmas geometrias**.
+**Por que 458 e 505 não são a mesma base?** No original, eram contados **pares segmento–rótulo após a seleção do cluster 3**, sem deduplicação explícita. Na comparação de classificadores, foram obtidos **segmentos rotulados únicos** de outra segmentação. Na comparação das estratégias de segmentação, os **505 são referências compartilhadas entre as duas formas de processar os mesmos recortes**. A coincidência numérica de 505 nas duas comparações novas **não significa que elas tenham as mesmas geometrias**.
 
 Na comparação de classificadores, os 812 blocos produziram **168.133 segmentos** em toda a extensão retangular do raster, incluindo partes fora da AOI. Somente os **505 rotulados** entraram nos testes supervisionados. A comparação de segmentações trabalha com **recortes locais selecionados**, não com toda a imagem.
 
@@ -340,7 +340,7 @@ flowchart TD
 | Espacial 250 m, embargo 25 m | 0,8697 | 0,8656 |
 | Espacial 500 m, embargo 25 m | 0,8591 | 0,8530 |
 
-Foram **40 ajustes aleatórios novos** (oito modelos × cinco divisões) e **240 resultados espaciais comparação de classificadores reutilizados com verificações**, não 280 ajustes inteiramente novos.
+Foram **40 ajustes aleatórios novos** (oito modelos × cinco divisões) e **240 resultados espaciais da comparação de classificadores, reutilizados com verificações**, não 280 ajustes inteiramente novos.
 
 **Cuidado importante:** as divisões aleatórias e espaciais **não testam exatamente os mesmos objetos**. Portanto, as diferenças das médias são **descritivas**: não podemos dizer que toda a diferença foi causada somente pelo embargo.
 
