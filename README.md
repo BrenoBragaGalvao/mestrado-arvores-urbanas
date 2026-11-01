@@ -154,11 +154,11 @@ Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos obje
 
 ## 4. Imagem completa — as 17 etapas do código original
 
-A ilustração abaixo reúne as duas propostas e mostra **onde a Proposta 2 se conecta aos candidatos da Proposta 1**, sem confundir classificação de árvore com medição de altura.
+A ilustração horizontal abaixo apresenta as **17 etapas do código original**, com a **Proposta 1** (classificação) e a **Proposta 2** (índice de porte e proximidade com postes) identificadas. Os resultados exibidos na etapa 12 são os valores **históricos da rodada maior**: acurácia **0,87** e F1 de árvores **0,85**.
 
-![Diagrama corrigido e colorido de 17 etapas, com Proposta 1 e Proposta 2 separadas](docs/fluxo_17_etapas_corrigido.svg)
+![Infográfico horizontal de 17 etapas do código original, organizado em três linhas, com as duas propostas identificadas](docs/fluxo_17_etapas_horizontal.svg)
 
-[**Abrir o diagrama ampliado e corrigido das 17 etapas**](docs/fluxo_17_etapas_corrigido.svg)
+[**Abrir o infográfico horizontal ampliado (17 etapas)**](docs/fluxo_17_etapas_horizontal.svg)
 
 Este esquema representa o **notebook original**. Os experimentos posteriores da V2, com segmentação em quadrantes, têm protocolos próprios e estão explicados **na última seção**.
 
