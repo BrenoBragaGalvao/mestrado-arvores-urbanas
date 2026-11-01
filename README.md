@@ -88,8 +88,8 @@ O processamento começa com **uma única região de estudo**, representada por d
 
 ```mermaid
 flowchart TD
-    S["🛰️ Área de estudo<br/>RGB + NIR"] --> A["📷 Raster RGB<br/>3 bandas"]
-    S --> P["🗂️ Raster RGB + NIR<br/>4 bandas"]
+    S["🛰️ Área de estudo<br/>RGB + NIR"] --> A["📷 RGB<br/>3 bandas"]
+    S --> P["🗂️ RGB + NIR<br/>4 bandas"]
     A --> B["🧩 Quickshift"]
     B --> C["🗺️ Segmentos<br/>e polígonos"]
     C --> D["📊 Estatísticas<br/>RGB e NIR"]
