@@ -157,14 +157,14 @@ Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos obje
 A ilustração horizontal abaixo apresenta as **17 etapas do código original**, com a **Proposta 1** (classificação) e a **Proposta 2** (índice de porte e proximidade com postes) identificadas. Os resultados exibidos na etapa 12 são os valores **históricos da rodada maior**: acurácia **0,87** e F1 de árvores **0,85**.
 
 <p align="center">
-  <a href="docs/fluxo_17_etapas_horizontal.svg">
-    <img src="docs/fluxo_17_etapas_horizontal.svg" alt="Infográfico horizontal em 17 quadros, com as duas propostas de pesquisa" width="1774">
+  <a href="docs/fluxo_17_etapas_horizontal_corrigido.png">
+    <img src="docs/fluxo_17_etapas_horizontal_corrigido.png" alt="Infográfico horizontal em 17 quadros, com as duas propostas de pesquisa" width="1774">
   </a>
 </p>
 
-**Para ler todos os detalhes:** clique no infográfico para abrir em tamanho original. No README, ele ocupa a largura disponível da página.
+**Para visualizar a imagem ampliada:** clique no infográfico para abrir em tamanho original. No README, ele ocupa a largura disponível da página.
 
-[**Abrir o infográfico horizontal ampliado (17 etapas)**](docs/fluxo_17_etapas_horizontal.svg)
+[**Abrir o infográfico horizontal ampliado (17 etapas)**](docs/fluxo_17_etapas_horizontal_corrigido.png)
 
 Este esquema representa o **notebook original**. Os experimentos posteriores da V2, com segmentação em quadrantes, têm protocolos próprios e estão explicados **na última seção**.
 
