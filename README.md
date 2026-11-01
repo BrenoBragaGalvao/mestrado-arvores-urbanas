@@ -54,31 +54,13 @@ Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.g
 
 ### Como o código original realiza essa proposta
 
-```mermaid
-flowchart TD
-    A["🛰️ Area1<br/>mesma região"] --> B["📷 RGB<br/>3 bandas"]
-    A --> C["🗂️ RGB + NIR<br/>4 bandas"]
-    B --> D["🧩 Quickshift<br/>polígonos"]
-    D --> E["📊 Estatísticas<br/>RGB / NIR"]
-    C --> E
-    E --> F["🔎 K-Means<br/>6 grupos"]
-    F --> G["🌿 Seleção<br/>cluster 3"]
-    G --> H["🏷️ Associar<br/>referências"]
-    P["🌳 Pontos árvore<br/>🌱 pontos grama"] --> H
-    C --> I["🌿 NDVI<br/>💡 HSV / Canny"]
-    I --> J["📋 Três médias<br/>por segmento"]
-    H --> J
-    J --> K["🌳 Random Forest<br/>500 árvores"]
-    K --> L["✅ Prever<br/>árvore / grama"]
-    K --> M["📈 Avaliar<br/>acurácia / F1"]
+<p align="center">
+  <a href="docs/fluxograma_proposta_1_legivel.svg">
+    <img src="docs/fluxograma_proposta_1_legivel.svg" alt="Proposta 1: imagens RGB e NIR, Quickshift, K-Means, referências e Random Forest" width="900">
+  </a>
+</p>
 
-    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
-    classDef processamento fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
-    classDef resultados fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
-    class A,B,C,D,E,P,H,I,J dados;
-    class F,G,K processamento;
-    class L,M resultados;
-```
+[**Ver fluxograma da Proposta 1 em tamanho maior**](docs/fluxograma_proposta_1_legivel.svg)
 
 **O que está acontecendo:** o Quickshift divide a imagem RGB em segmentos; o K-Means utiliza **quatro médias e quatro desvios-padrão RGB/NIR** e seleciona os objetos do **cluster 3**. Os pontos conhecidos identificam exemplos de árvores e gramíneas. O Random Forest recebe **três valores médios por objeto** — **brilho HSV, bordas Canny e NDVI** — para aprender a distinguir as duas classes.
 
@@ -118,39 +100,33 @@ Os **458 registros** geraram **366 exemplos de treinamento e 92 de teste**. A ac
 
 ### Como o código original realiza essa proposta
 
-```mermaid
-flowchart TD
-    A["🌳 Objetos candidatos<br/>do cluster 3"] --> B["📐 Área em m²<br/>dos polígonos"]
-    B --> C["🌲 Modelos C1–C6<br/>indicadores de porte"]
-    C --> D["📏 Configuração C3<br/>2,5 × área^0,4"]
-    D --> E{"Índice C3<br/>maior que 7?"}
-    E -->|Sim| F["📍 Objetos<br/>selecionados"]
-    E -->|Não| G["Fora do<br/>filtro"]
-    H["⚡ Postes"] --> I["🗺️ Proximidade<br/>espacial 2D"]
-    F --> I
-    I --> J["📊 Resultados<br/>1, 3 e 5 m"]
+<p align="center">
+  <a href="docs/fluxograma_proposta_2_legivel.svg">
+    <img src="docs/fluxograma_proposta_2_legivel.svg" alt="Proposta 2: candidatos, área dos polígonos, modelos C1 a C6, filtro C3 e postes" width="900">
+  </a>
+</p>
 
-    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
-    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
-    classDef alerta fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:2px;
-    class A,B,C,F,G,H dados;
-    class D,E alerta;
-    class I,J metodo;
-```
+[**Ver fluxograma da Proposta 2 em tamanho maior**](docs/fluxograma_proposta_2_legivel.svg)
 
-**No fluxograma, a caixa “Postes” representa o arquivo `postes.gpkg`, uma entrada independente para a análise espacial.**
+**No fluxograma, “Postes” corresponde ao arquivo `postes.gpkg`.** O nome completo fica no texto para manter o diagrama legível.
 
 O código calcula a área dos polígonos, testa **seis configurações empíricas (C1–C6)** nas formas potencial e linear e usa o índice potencial **C3** na seleção:
 
-\[
-\widehat H_{C3} = 2{,}5 \cdot A^{0{,}4}
-\]
+$$
+\widehat{H}_{C3} = 2{,}5 \cdot A^{0{,}4}
+$$
+
+Nessa expressão, **A** é a área projetada do polígono, em **m²**. No código, o cálculo é escrito como `2.5 * (area ** 0.4)`.
 
 Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos objetos selecionados a **1, 3 e 5 metros dos pontos dos postes**, usando `sjoin_nearest`.
 
 **Ponto importante para a banca:** a Proposta 2 usa os **candidatos do cluster 3**, e o código histórico **não exige `predicted_classe == 'arvore'`** nesse filtro. Portanto, os objetos selecionados **não são necessariamente apenas árvores previstas pelo Random Forest**.
 
 **Limites científicos:** o índice C3 **não é altura real validada**, as distâncias são **2D até postes** e a Area1 **não possui a geometria dos cabos**. Não se pode interpretar esse resultado como **interferência em fios ou risco elétrico comprovado**. [Ver as fórmulas C1–C6 e suas limitações](docs/allometria.md).
+
+---
+
+**Sobre os fluxogramas:** os rótulos foram resumidos dentro de caixas vetoriais com largura fixa; os parâmetros e detalhes do código estão descritos nos parágrafos. As figuras representam o método original, enquanto as comparações da V2 estão ao final do README.
 
 ---
 
