@@ -452,3 +452,55 @@ A **regra histórica do Random Forest** (500 árvores, divisão aleatória 80/20
 Foram **40 novos ajustes aleatórios**; as **240 avaliações espaciais** vieram da bateria E3c anterior e foram auditadas, com seis verificações pontuais por recálculo. As diferenças entre protocolos não isolam o efeito causal da divisão, pois os objetos de teste podem variar. A pesquisa continua sem validação externa e sem equivalência comprovada à segmentação monolítica.
 
 Para conferir o desenho dos experimentos, as métricas e as limitações, consulte a [harmonização metodológica documentada](docs/harmonizacao_protocolos_2026-11-01.md) e a seção **E8h** do [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb).
+
+
+### Como interpretar a harmonização — fluxograma dos protocolos
+
+O diagrama abaixo diferencia **referência histórica**, **avaliação aleatória sobre a nova base** e **avaliação espacial sobre a mesma base derivada**. Assim, fica explícito quais resultados podem ser comparados diretamente.
+
+```mermaid
+flowchart TD
+    A["📚 Referência histórica<br/>458 registros rotulados"] --> B["🌲 Random Forest<br/>divisão aleatória 80/20"]
+    B --> C["📊 Acurácia histórica:<br/>0,87"]
+    D["🛰️ Nova base derivada<br/>Quickshift por quadrantes"] --> E["🏷️ 505 segmentos<br/>rotulados únicos"]
+    E --> F["🧪 Protocolo A<br/>aleatório 80/20"]
+    E --> G["📐 Protocolo B<br/>blocos 250 e 500 m"]
+    G --> H["🚧 Embargo espacial<br/>0, 25 e 50 m"]
+    F --> I["🤖 Oito classificadores<br/>mesmo teste por rodada"]
+    H --> J["🤖 Oito classificadores<br/>mesmo teste por rodada"]
+    I --> K["📊 Acurácia e F1-macro<br/>comparáveis dentro de A"]
+    J --> L["📊 Acurácia e F1-macro<br/>comparáveis dentro de B"]
+    C -.-> M["⚠️ História ≠ base nova<br/>não subtrair métricas"]
+    K --> N["📝 Discussão científica<br/>mesma base de 505 objetos"]
+    L --> N
+    M --> N
+
+    classDef origem fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
+    classDef controle fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
+    classDef alerta fill:#fff2de,stroke:#dcab68,color:#6b4714,stroke-width:1px;
+    class A,D,E,B origem;
+    class F,G,H,I,J,K,L,N controle;
+    class C,M alerta;
+```
+
+**Leitura correta:** dentro de A ou B, cada modelo usa as **mesmas amostras de teste** na respectiva rodada, o que permite comparação pareada de algoritmos. Entre A, B e o experimento histórico, os conjuntos de teste e/ou os segmentos mudam; logo, as diferenças numéricas **não isolam o efeito causal** da divisão ou da segmentação.
+
+### Resumo completo dos oito modelos com a mesma métrica
+
+O quadro a seguir usa somente **F1-macro médio** e a **mesma base derivada de 505 segmentos**. Cada coluna corresponde a um protocolo com cinco divisões, mas as amostras testadas podem variar entre colunas.
+
+| Algoritmo | Aleatório 80/20 | Espacial 250 m, embargo 25 m | Espacial 500 m, embargo 25 m |
+|---|---:|---:|---:|
+| **SVM (RBF)** | **0,8945** | **0,8987** | **0,8668** |
+| Regressão logística | 0,8887 | 0,8928 | 0,8664 |
+| KNN (7) | 0,8905 | 0,8874 | 0,8502 |
+| Extra Trees | 0,8824 | 0,8790 | 0,8629 |
+| Random Forest | 0,8827 | 0,8656 | 0,8530 |
+| HistGradientBoosting | 0,8609 | 0,8556 | 0,8524 |
+| Gaussian Naive Bayes | 0,8608 | 0,8555 | 0,8398 |
+| Dummy (maioria) | 0,3229 | 0,2980 | 0,2799 |
+
+**Como foram obtidos os números:** a etapa de harmonização executou **40 novos ajustes aleatórios** (oito modelos × cinco divisões) e reutilizou os **240 ajustes espaciais E3c já realizados**, com auditoria das divisões e seis verificações pontuais por recálculo. A nova célula E8h no notebook V2 disponibiliza o procedimento para execução sobre a base presente na sessão. A V2 publicada no GitHub ainda não contém os resultados salvos das suas próprias células.
+
+**O que continua pendente:** a reprodução exata do ensaio histórico sobre os mesmos 458 registros, com seus segmentos e partições originais, e a comprovação do processamento monolítico da V2. Esses limites não invalidam as comparações pareadas da bateria derivada, mas impedem afirmar que ela superou o experimento histórico de 0,87.
+
