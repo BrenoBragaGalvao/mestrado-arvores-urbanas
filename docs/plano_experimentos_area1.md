@@ -117,3 +117,11 @@ O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objet
 Foram conferidos os dez arquivos já existentes em `Area1` no Google Drive. Com eles, foram executadas e documentadas **20 combinações janela × Quickshift** (4 recortes de 256×256 pixels × 5 parâmetros) e a análise K-Means de **779 segmentos** extraídos dos mesmos recortes (K=4,6,8). As métricas confirmadas e as ressalvas constam do [relatório de resultados preliminares](resultados_piloto_area1_2026-10-31.md).
 
 **E1–E4, E6–E7 continuam com código preparado e aguardando execução integral.** A etapa E8 deverá usar somente métricas reais verificadas, nunca confundir a média de segmentos, silhouette ou ARI dos recortes com acurácia de classificação da imagem completa. É necessário executar a V2 no Colab com `Area1` antes de declarar concluída a validação experimental solicitada pelo orientador.
+
+## Execução sequencial derivada (31/10/2026)
+
+Foram realizados **experimentos adicionais derivados por 223 recortes de 256×256 px**, cobrindo os **510 pontos de referência existentes** na `Area1`, sem novos dados. Essa bateria inclui auditoria de duplicados E1 (505 objetos rotulados únicos), dez partições espaciais E2, classificadores E3 (RF/SVM/LogReg/Dummy), sete ablações E4, sensibilidade K-Means E5, proximidade E6 e 216 cenários alométricos E7. Os resultados estão em [execucao_sequencial_derivada_area1_2026-10-31.md](execucao_sequencial_derivada_area1_2026-10-31.md), e scripts/CSV/gráficos foram entregues em pacote reproduzível na conversa.
+
+**Distinção obrigatória:** esta foi uma implementação **derivada**, com Quickshift aplicado separadamente por recorte e sem a pré-seleção histórica do cluster 3 nos testes de classificação. Portanto, **não significa que o notebook V2 foi executado integralmente**, e não autoriza comparação direta com seus 0,87 históricos. O estado de E1–E7 na tabela acima continua descrevendo a **V2, cujo código está preparado e cuja execução integral permanece pendente**.
+
+**Próxima tarefa científica:** executar no ambiente Colab, com memória suficiente e sem novos dados, o notebook V2 integral sobre a `Area1`; conferir os registros e comparar resultados sob protocolos correspondentes. Não reivindicar validação de altura nem risco elétrico sem dados que os suportem.
