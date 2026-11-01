@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 600" role="img" aria-labelledby="title desc">
+<title id="title">Diagnóstico de extrapolação dos atributos da Area1</title>
+<desc id="desc">Em 168133 segmentos extraídos por quadrantes, 57,13 por cento estão fora do intervalo mínimo máximo dos atributos observados nas amostras rotuladas; isso não representa taxa de falso positivo.</desc>
+<rect x="0" y="0" width="1260" height="600" fill="#ffffff" rx="0"/>
+<text x="55" y="67" fill="#111827" font-size="32" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="start">Extrapolação dos atributos — auditoria E6c</text>
+<text x="55" y="100" fill="#4b5563" font-size="18" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">168.133 segmentos na extensão retangular do raster · 505 segmentos rotulados como referência</text>
+<rect x="55" y="139" width="20" height="15" fill="#9bb0bd" rx="3"/>
+<text x="84" y="153" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">Dentro do envelope marginal</text>
+<rect x="360" y="139" width="20" height="15" fill="#526b80" rx="3"/>
+<text x="390" y="153" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">Fora do envelope marginal</text>
+<text x="55" y="226" fill="#1f2937" font-size="18" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">Mínimo–máximo (0%–100%)</text>
+<rect x="335" y="199" width="800" height="37" fill="#f0f4f6" rx="4"/>
+<rect x="335" y="199" width="342.94278933939205" height="37" fill="#9bb0bd" rx="4"/>
+<rect x="677.942789339392" y="199" width="457.05721066060795" height="37" fill="#526b80" rx="4"/>
+<text x="506.471394669696" y="224" fill="#142b3a" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="middle">42,87%</text>
+<text x="906.471394669696" y="224" fill="#ffffff" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="middle">57,13%</text>
+<text x="335" y="259" fill="#505a66" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">72.075 dentro · 96.058 fora</text>
+<text x="55" y="328" fill="#1f2937" font-size="18" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">Percentis 1%–99%</text>
+<rect x="335" y="301" width="800" height="37" fill="#f0f4f6" rx="4"/>
+<rect x="335" y="301" width="188.2224191562632" height="37" fill="#9bb0bd" rx="4"/>
+<rect x="523.2224191562632" y="301" width="611.7775808437368" height="37" fill="#526b80" rx="4"/>
+<text x="429.1112095781316" y="326" fill="#142b3a" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="middle">23,53%</text>
+<text x="829.1112095781316" y="326" fill="#ffffff" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="middle">76,47%</text>
+<text x="335" y="361" fill="#505a66" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">39.558 dentro · 128.575 fora</text>
+<text x="55" y="430" fill="#1f2937" font-size="18" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">Percentis 5%–95%</text>
+<rect x="335" y="403" width="800" height="37" fill="#f0f4f6" rx="4"/>
+<rect x="335" y="403" width="90.41889456561175" height="37" fill="#9bb0bd" rx="4"/>
+<rect x="425.41889456561177" y="403" width="709.5811054343883" height="37" fill="#526b80" rx="4"/>
+<text x="380.20944728280585" y="428" fill="#142b3a" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="middle">11,30%</text>
+<text x="780.209447282806" y="428" fill="#ffffff" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="middle">88,70%</text>
+<text x="335" y="463" fill="#505a66" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">19.003 dentro · 149.130 fora</text>
+<text x="55" y="527" fill="#5b2631" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="start">ATENÇÃO: fora do envelope não significa falso positivo; dentro dele não confirma ser árvore.</text>
+<text x="55" y="556" fill="#4b5563" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">Sem classe de fundo urbano, não é possível calcular a taxa operacional de falsos positivos.</text>
+</svg>
