@@ -266,3 +266,80 @@ As imagens de entrada têm resolução espacial aproximada de **0,5 m/pixel**. O
 
 **Autor:** Breno Braga Galvão  
 **Situação:** pesquisa de mestrado em desenvolvimento.
+
+
+---
+
+## Atualização experimental — novembro de 2026 (notebook V2)
+
+> **Atualização aditiva:** as seções anteriores preservam a descrição e os resultados históricos do notebook original. Esta seção documenta novos experimentos, resultados exploratórios e limitações. Métricas obtidas sob protocolos diferentes não devem ser comparadas diretamente.
+
+### Notebook ampliado e cobertura dos dados
+
+O [notebook V2 de experimentos](Segmentacao_area_completa_v2_experimentos.ipynb) acrescenta as etapas E1–E8: auditoria de amostras, validação espacial, comparação de modelos, ablação de atributos, sensibilidade de parâmetros, proximidade com postes, análise alométrica e consolidação científica.
+
+- **Dados usados:** os dez arquivos já existentes na pasta Area1, sem novas referências rotuladas.
+- **Imagem:** 7.294 × 6.942 pixels (aproximadamente 50,6 milhões de pixels).
+- **Bateria derivada:** Quickshift executado **independentemente em 812/812 quadrantes de 256 × 256 pixels**, com **168.133 segmentos** extraídos na extensão retangular da imagem, inclusive fora do polígono da AOI.
+- **Amostras:** 510 associações ponto–segmento preexistentes, reduzidas a **505 segmentos rotulados únicos** (257 árvores e 248 gramíneas), sem conflitos de classes.
+- **Limite de execução:** cobertura por quadrantes **não equivale** à segmentação monolítica do Quickshift nem comprova a execução sequencial integral da V2; o notebook publicado não contém saídas de execução salvas.
+
+### Comparação de classificadores — E3/E3c
+
+A bateria derivada anterior documentou **220 avaliações**, envolvendo quatro técnicas/baselines e sete subconjuntos de atributos em dez partições espaciais. A nova bateria **E3c executou 240 ajustes de oito classificadores** em 30 protocolos válidos: blocos geográficos de 250 e 500 metros, cinco divisões por escala (semente 2026) e embargos geométricos de 0, 25 e 50 metros.
+
+| Técnica | F1-macro médio, 250 m | F1-macro médio, 500 m |
+|---|---:|---:|
+| **SVM (RBF)** | **0,8987** | **0,8668** |
+| Regressão logística | 0,8928 | 0,8664 |
+| KNN (7) | 0,8874 | 0,8502 |
+| Extra Trees | 0,8790 | 0,8629 |
+| Random Forest | 0,8656 | 0,8530 |
+| HistGradientBoosting | 0,8556 | 0,8524 |
+| Gaussian Naive Bayes | 0,8555 | 0,8398 |
+| Dummy (maioria) | 0,2980 | 0,2799 |
+
+*Condição da tabela: embargo de 25 m e cinco divisões por escala. Foram medidas também acurácia, acurácia balanceada, F1/precisão/recall da classe árvore e MCC.*
+
+![Comparação gráfica do F1-macro dos oito modelos em blocos de 250 e 500 metros](docs/resultados_e3c_f1_por_escala_2026-11-01.svg)
+
+**Interpretação:** SVM apresentou o maior F1-macro médio nas duas escalas, dentro deste protocolo. Isso **não comprova superioridade estatística geral**, porque as divisões reutilizam exemplos de uma única área. Esses resultados não podem ser diretamente comparados à acurácia histórica de 0,87 nem à V2 monolítica.
+
+### Ablação, agrupamento e análise alométrica — E4/E5/E7
+
+- **E4:** a combinação completa dos atributos NDVI, brilho HSV e bordas Canny obteve o maior F1-macro médio nas seis comparações de ablação documentadas (três classificadores × duas escalas), entre sete combinações examinadas.
+- **E5:** em 131.786 segmentos com oito atributos RGB/NIR válidos, a silhouette amostral do K-Means foi 0,3853 para K=4; 0,3417 para K=6; e 0,2939 para K=8. Silhouette **não mede acurácia de identificação de árvores**.
+- **E7:** foram documentados 216 cenários de sensibilidade das configurações C1–C6, em formas potencial/linear, limiares e distâncias a postes. Sem alturas observadas, trata-se de **índices empíricos de porte**, não de medidas de altura validadas.
+
+### Diagnóstico de extrapolação — E6c
+
+Os exemplos usados para treinar os classificadores possuem somente as classes **árvore** e **grama**, mas os segmentos da imagem incluem superfícies urbanas não rotuladas. A auditoria E6c comparou os atributos dos **168.133 segmentos** com os envelopes marginais obtidos a partir dos **505 segmentos de referência**:
+
+| Faixa dos atributos no conjunto rotulado | Segmentos fora | Percentual fora |
+|---|---:|---:|
+| Mínimo–máximo | 96.058 | **57,13%** |
+| Percentis 1%–99% | 128.575 | **76,47%** |
+| Percentis 5%–95% | 149.130 | **88,70%** |
+
+![Proporção de segmentos dentro e fora das faixas de atributos das amostras rotuladas](docs/resultados_e6c_extrapolacao_2026-11-01.svg)
+
+**Alerta metodológico:** fora do envelope **não significa falso positivo**, e dentro do envelope **não confirma ser árvore**. Sem rótulos para o fundo urbano, a taxa operacional de falsos positivos não é estimável. Os valores foram calculados na extensão retangular dos rasters, não exclusivamente na AOI.
+
+A análise derivada de proximidade a postes também produziu um alerta: **7.421 dos 7.594 postes** na AOI (97,7%) apareceram a até 1 m de um segmento previsto como árvore sob o filtro considerado. Essa saturação **não representa 7.421 árvores verificadas nem postes com risco elétrico confirmado**; indica que a seleção de candidatos precisa de validação. Além disso, os IDs de clusters do K-Means não devem ser transferidos entre ajustes ou quadrantes.
+
+### Atendimento às recomendações científicas e pontos ainda abertos
+
+| Recomendação | Evidência disponível / situação |
+|---|---|
+| Mais testes reais e comparação entre técnicas | 220 avaliações anteriores documentadas + 240 novos ajustes E3c executados na bateria derivada |
+| Verificar robustez e independência das amostras | Deduplicação, divisões espaciais, comparação pareada e sensibilidade de embargos |
+| Entender a contribuição das características | Ablação de NDVI, brilho HSV e bordas Canny |
+| Fundamentar as lacunas da literatura | Matriz de estudos, diferenças de dados e discussão científica acrescentadas no notebook V2 |
+| Investigar fontes alternativas de dados | Levantamento de bases públicas documentado na V2, sem incorporar novas bases ao experimento atual |
+| Validar a V2 integral e as estimativas operacionais | **Ainda não comprovado**: execução monolítica, generalização externa, classe de fundo, alturas reais e geometria dos cabos |
+
+**Contribuição delimitada:** integração auditável de segmentação orientada a objetos, comparação de classificadores com validação espacial interna e análise **exploratória** de proximidade com postes. Não há evidência suficiente para afirmar detecção operacional de conflitos com cabos ou superioridade sobre técnicas não comparadas diretamente, como YOLO e LiDAR.
+
+**Reprodutibilidade:** os pacotes de evidências das baterias derivadas reúnem scripts, tabelas CSV, gráficos, logs e manifestos de integridade. O processamento integral sequencial da V2 precisa ser executado e documentado separadamente para que seus resultados possam ser declarados validados. Os gráficos adicionados a esta seção são de **baterias derivadas**, não saídas monolíticas da V2.
+
+**Arquivos novos nesta atualização:** imagens de [comparação E3c](docs/resultados_e3c_f1_por_escala_2026-11-01.svg) e [auditoria E6c](docs/resultados_e6c_extrapolacao_2026-11-01.svg). O fluxograma anterior de 17 etapas, suas imagens e todo o restante do README permanecem preservados.
