@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 760" role="img" aria-labelledby="title desc">
+<title id="title">Comparação de classificadores pelo F1-macro médio</title>
+<desc id="desc">Oito classificadores comparados em blocos espaciais de 250 e 500 metros com embargo de 25 metros, cinco divisões por bloco. SVM teve o maior F1 médio nas duas escalas neste protocolo derivado.</desc>
+<rect x="0" y="0" width="1260" height="760" fill="#ffffff" rx="0"/>
+<text x="55" y="70" fill="#111827" font-size="33" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="start">Comparação de classificadores — F1-macro</text>
+<text x="55" y="102" fill="#4b5563" font-size="19" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">Bateria derivada Area1 · 5 divisões por escala · embargo geométrico de 25 m</text>
+<text x="275" y="161" fill="#202b39" font-size="23" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="start">Blocos 250 m</text>
+<text x="750" y="161" fill="#202b39" font-size="23" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="start">Blocos 500 m</text>
+<rect x="275" y="178" width="21" height="10" fill="#445e74" rx="2"/>
+<text x="303" y="189" fill="#374151" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">F1-macro médio (250 m)</text>
+<rect x="750" y="178" width="21" height="10" fill="#95abb9" rx="2"/>
+<text x="777" y="189" fill="#374151" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">F1-macro médio (500 m)</text>
+<text x="257" y="247" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">SVM (RBF)</text>
+<rect x="277" y="229" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="229" width="319.02074999999996" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="246" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8986</text>
+<rect x="754" y="229" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="229" width="307.70335" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="246" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8668</text>
+<text x="257" y="300" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">Regressão logística</text>
+<rect x="277" y="282" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="282" width="316.93334999999996" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="299" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8928</text>
+<rect x="754" y="282" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="282" width="307.5578" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="299" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8664</text>
+<text x="257" y="353" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">KNN (7)</text>
+<rect x="277" y="335" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="335" width="315.02345" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="352" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8874</text>
+<rect x="754" y="335" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="335" width="301.83165" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="352" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8502</text>
+<text x="257" y="406" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">Extra Trees</text>
+<rect x="277" y="388" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="388" width="312.05565" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="405" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8790</text>
+<rect x="754" y="388" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="388" width="306.3224" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="405" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8629</text>
+<text x="257" y="459" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">Random Forest</text>
+<rect x="277" y="441" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="441" width="307.2738" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="458" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8656</text>
+<rect x="754" y="441" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="441" width="302.80435" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="458" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8530</text>
+<text x="257" y="512" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">HistGradientBoosting</text>
+<rect x="277" y="494" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="494" width="303.7309" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="511" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8556</text>
+<rect x="754" y="494" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="494" width="302.61975" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="511" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8525</text>
+<text x="257" y="565" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">Gaussian Naive Bayes</text>
+<rect x="277" y="547" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="547" width="303.70605" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="564" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8555</text>
+<rect x="754" y="547" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="547" width="298.1361" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="564" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,8398</text>
+<text x="257" y="618" fill="#1f2937" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="500" text-anchor="end">Dummy (maioria)</text>
+<rect x="277" y="600" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="277" y="600" width="105.80065" height="20" fill="#445e74" rx="4"/>
+<text x="648" y="617" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,2980</text>
+<rect x="754" y="600" width="355" height="20" fill="#edf1f5" rx="4"/>
+<rect x="754" y="600" width="99.37515" height="20" fill="#95abb9" rx="4"/>
+<text x="1125" y="617" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="600" text-anchor="start">0,2799</text>
+<text x="55" y="694" fill="#374151" font-size="17" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">Escala visual de 0 a 1; valores exibidos junto às barras.</text>
+<text x="55" y="720" fill="#667085" font-size="16" font-family="Arial,Helvetica,sans-serif" font-weight="400" text-anchor="start">Resultados exploratórios de uma única AOI; não provam superioridade geral nem equivalem ao fluxo monolítico.</text>
+</svg>
