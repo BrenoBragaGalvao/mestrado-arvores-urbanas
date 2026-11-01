@@ -58,7 +58,20 @@ Além dos rasters, o estudo usa **510 pontos de referência** com classes conhec
 | **`Grama.gpkg`** | Identificar **253 pontos de gramíneas** |
 | **`postes.gpkg`** | Localizar os postes na **análise de proximidade** |
 
-**Atenção:** os **510 pontos originais** não se tornam automaticamente **510 registros de treinamento**. O Quickshift cria segmentos, o K-Means seleciona candidatos e a associação espacial produz pares **segmento–rótulo**. Por isso, a rodada histórica teve **458 registros**, enquanto a bateria posterior E3c tem **505 segmentos únicos**. A explicação detalhada de cada número está em [Resultados preliminares](#resultados-preliminares).
+**Atenção:** os **510 pontos originais** não são automaticamente **510 registros de treinamento**. No método original, os pontos são associados aos segmentos selecionados pelo Quickshift e pelo K-Means, formando pares **segmento–rótulo**. Por isso, a rodada histórica registrou **458 pares**, enquanto a bateria posterior E3c utilizou **505 segmentos rotulados únicos**.
+
+<details>
+<summary><strong>Entenda a diferença entre 510, 458 e 505</strong></summary>
+
+| Número | O que significa |
+|---|---|
+| **510** | Pontos de referência disponíveis: **257 árvores + 253 gramíneas**. |
+| **458** | Pares **segmento–rótulo** formados no experimento histórico maior, após a seleção dos segmentos candidatos. |
+| **505** | Segmentos rotulados **únicos** da nova bateria E3c, que usa outra forma de segmentação e deduplicação. |
+
+**Por que os números são diferentes?** A seleção do cluster 3 e a associação espacial podem alterar a quantidade de registros. Um mesmo segmento pode estar associado a mais de um ponto. Portanto, **não podemos dizer que 52 pontos foram descartados** apenas calculando 510 − 458; isso exigiria auditar as associações da execução original.
+
+</details>
 
 Os arquivos disponíveis **não incluem a geometria dos cabos nem medições reais da altura das árvores**. Os detalhes de reprojeção e alinhamento estão em [Dados geoespaciais](data/README.md).
 
