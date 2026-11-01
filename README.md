@@ -130,7 +130,7 @@ flowchart TD
     D --> E{"&emsp;Índice C3&emsp;<br/>&emsp;maior que 7?&emsp;"}
     E -->|Sim| F["&emsp;&emsp;📍 Objetos&emsp;&emsp;<br/>&emsp;&emsp;selecionados&emsp;&emsp;"]
     E -->|Não| G["&emsp;&emsp;Fora do&emsp;&emsp;<br/>&emsp;&emsp;filtro&emsp;&emsp;"]
-    H["&emsp;&emsp;⚡ Postes&emsp;&emsp;"] --> I["&emsp;&emsp;🗺️ Proximidade&emsp;&emsp;<br/>&emsp;&emsp;espacial 2D&emsp;&emsp;"]
+    H["&emsp;&emsp;⚡ Base de postes&emsp;&emsp;<br/>&emsp;&emsp;postes.gpkg&emsp;&emsp;"] --> I["&emsp;&emsp;🗺️ Proximidade&emsp;&emsp;<br/>&emsp;&emsp;espacial 2D&emsp;&emsp;"]
     F --> I
     I --> J["&emsp;&emsp;📊 Resultados&emsp;&emsp;<br/>&emsp;&emsp;1, 3 e 5 m&emsp;&emsp;"]
 
@@ -144,7 +144,7 @@ flowchart TD
 
 **Leitura do fluxo:** o índice **C3** é calculado a partir da área dos candidatos; apenas quem passa pelo limiar entra na análise de **distâncias aos postes**. A fórmula e os detalhes do filtro aparecem abaixo.
 
-**No fluxograma, “Postes” corresponde ao arquivo `postes.gpkg`.** O nome completo fica no texto para manter o diagrama legível.
+**No fluxograma, a “Base de postes” é o arquivo `postes.gpkg`**, utilizado como entrada independente para calcular a proximidade dos objetos selecionados.
 
 O código calcula a área dos polígonos, testa **seis configurações empíricas (C1–C6)** nas formas potencial e linear e usa o índice potencial **C3** na seleção:
 
