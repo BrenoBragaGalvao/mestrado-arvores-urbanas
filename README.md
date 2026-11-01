@@ -54,13 +54,36 @@ Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.g
 
 ### Como o código original realiza essa proposta
 
-<p align="center">
-  <a href="docs/fluxograma_proposta_1_legivel.svg">
-    <img src="docs/fluxograma_proposta_1_legivel.svg" alt="Proposta 1: imagens RGB e NIR, Quickshift, K-Means, referências e Random Forest" width="900">
-  </a>
-</p>
+```mermaid
+flowchart TD
+    A["Area1"] --> B["RGB: 3 bandas"]
+    A --> C["RGB + NIR"]
+    B --> D["Quickshift"]
+    D --> E["Polígonos"]
+    E --> F["Estatísticas"]
+    C --> F
+    F --> G["K-Means: 6"]
+    G --> H["Cluster 3"]
+    H --> I["Associar rótulos"]
+    P["Árvore / grama"] --> I
+    C --> X["NDVI, HSV, Canny"]
+    E --> Y["Médias do objeto"]
+    X --> Y
+    I --> T["Treino / teste"]
+    Y --> T
+    T --> R["RF: 500 árvores"]
+    R --> S["Previsões"]
+    R --> U["Acurácia e F1"]
 
-[**Ver fluxograma da Proposta 1 em tamanho maior**](docs/fluxograma_proposta_1_legivel.svg)
+    classDef entrada fill:#eaf4ff,stroke:#60a5fa,color:#163b5d,stroke-width:2px;
+    classDef metodo fill:#dcfce7,stroke:#4ade80,color:#14532d,stroke-width:2px;
+    classDef resultado fill:#fef3c7,stroke:#f59e0b,color:#78350f,stroke-width:2px;
+    class A,B,C,D,E,F,P,X,Y,I,T entrada;
+    class G,H,R metodo;
+    class S,U resultado;
+```
+
+**Leitura do fluxo:** o **RGB** produz os polígonos; o **RGB + NIR** fornece os atributos; as referências identificam os exemplos; o **Random Forest** gera as previsões e as métricas.
 
 **O que está acontecendo:** o Quickshift divide a imagem RGB em segmentos; o K-Means utiliza **quatro médias e quatro desvios-padrão RGB/NIR** e seleciona os objetos do **cluster 3**. Os pontos conhecidos identificam exemplos de árvores e gramíneas. O Random Forest recebe **três valores médios por objeto** — **brilho HSV, bordas Canny e NDVI** — para aprender a distinguir as duas classes.
 
@@ -100,13 +123,27 @@ Os **458 registros** geraram **366 exemplos de treinamento e 92 de teste**. A ac
 
 ### Como o código original realiza essa proposta
 
-<p align="center">
-  <a href="docs/fluxograma_proposta_2_legivel.svg">
-    <img src="docs/fluxograma_proposta_2_legivel.svg" alt="Proposta 2: candidatos, área dos polígonos, modelos C1 a C6, filtro C3 e postes" width="900">
-  </a>
-</p>
+```mermaid
+flowchart TD
+    A["Cluster 3"] --> B["Área em m²"]
+    B --> C["Modelos C1–C6"]
+    C --> D["Índice C3"]
+    D --> E{"C3 > 7?"}
+    E -->|Sim| F["Selecionados"]
+    E -->|Não| G["Fora do filtro"]
+    H["Postes"] --> I["Distância 2D"]
+    F --> I
+    I --> J["1, 3 e 5 m"]
 
-[**Ver fluxograma da Proposta 2 em tamanho maior**](docs/fluxograma_proposta_2_legivel.svg)
+    classDef dados fill:#eaf4ff,stroke:#60a5fa,color:#163b5d,stroke-width:2px;
+    classDef metodo fill:#dcfce7,stroke:#4ade80,color:#14532d,stroke-width:2px;
+    classDef alerta fill:#fef3c7,stroke:#f59e0b,color:#78350f,stroke-width:2px;
+    class A,B,C,F,G,H dados;
+    class D,E alerta;
+    class I,J metodo;
+```
+
+**Leitura do fluxo:** o índice **C3** é calculado a partir da área dos candidatos; apenas quem passa pelo limiar entra na análise de **distâncias aos postes**. A fórmula e os detalhes do filtro aparecem abaixo.
 
 **No fluxograma, “Postes” corresponde ao arquivo `postes.gpkg`.** O nome completo fica no texto para manter o diagrama legível.
 
@@ -126,7 +163,7 @@ Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos obje
 
 ---
 
-**Sobre os fluxogramas:** os rótulos foram resumidos dentro de caixas vetoriais com largura fixa; os parâmetros e detalhes do código estão descritos nos parágrafos. As figuras representam o método original, enquanto as comparações da V2 estão ao final do README.
+**Sobre os fluxogramas:** ambos estão escritos em **código Mermaid**, diretamente no README, com caixas curtas e cores para facilitar a leitura. Eles representam o método original; as comparações da V2 estão ao final do documento.
 
 ---
 
