@@ -187,22 +187,43 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 | Material | Conteúdo |
 |---|---|
 | [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
-| [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) | Experimentos adicionais E1–E9 |
+| [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) | Auditoria de amostras, comparação de modelos, validação espacial, atributos, segmentação, porte e proximidade com postes |
 | [Dados Area1](data/README.md) | Arquivos, coordenadas e estrutura do Drive |
 | [Registro do método original](docs/experimento_area_completa_2026-10-29.md) | Parâmetros, resultados históricos e limitações |
-| [Harmonização E3c/E8h](docs/harmonizacao_protocolos_2026-11-01.md) | Comparações de modelos e validação espacial |
-| [Comparação E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) | Comparação pareada da segmentação |
+| [Classificadores e protocolos de avaliação](docs/harmonizacao_protocolos_2026-11-01.md) | Comparações de modelos e validação espacial |
+| [Comparação das segmentações de 512 e 256 pixels](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) | Comparação pareada da segmentação |
 | [Estimativas C1–C6](docs/allometria.md) | Fórmulas exploratórias de porte |
 
 Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi preparado para **Google Colab**. O processamento global consome muita memória; **uma nova execução completa e bem-sucedida não está comprovada**. As baterias da V2 têm evidências documentadas separadamente, mas nem todas as saídas estão salvas no próprio notebook publicado.
 
 ---
 
-## 6. Comparação científica — original versus novos experimentos
+## 6. Comparação científica — o que foi testado e o que os resultados significam
 
 **Por que fizemos tantos testes?** Para investigar se os resultados dependem do **classificador**, dos **atributos**, da **separação entre treino e teste** ou da **forma de segmentar a imagem**. Isso responde à exigência de comparar técnicas usando dados reais, mas cada experimento responde a **uma pergunta diferente**.
 
 > **Regra principal:** os estudos utilizam os **mesmos arquivos de origem da Area1**, mas não necessariamente os **mesmos objetos, registros, divisões de teste ou métricas**. Para afirmar que um método é melhor que outro, precisamos controlar o que muda entre eles.
+
+### Guia dos experimentos: nomes e objetivos
+
+Os códigos **E1, E2, E3c, E8h, E9** e semelhantes são apenas **identificadores de seções do notebook**. Eles **não são resultados, métricas nem nomes dos algoritmos**. Por isso, apresentamos primeiro o **nome do que foi investigado**; o código fica somente como referência para localizar as células.
+
+| Nome da investigação | Código no notebook |
+|---|---|
+| **Auditoria das amostras e rótulos:** conferir duplicações, conflitos e sobreposições entre treino e teste | E1 |
+| **Validação espacial:** separar treino e teste por regiões geográficas | E2 |
+| **Comparação de classificadores:** testar Random Forest, SVM, regressão logística e outros modelos nas mesmas divisões | E3 / E3c |
+| **Contribuição dos atributos:** testar NDVI, brilho HSV e bordas Canny isolados e combinados | E4 |
+| **Sensibilidade da segmentação:** variar parâmetros de Quickshift e K-Means | E5 |
+| **Análise da proximidade a postes:** comparar critérios de seleção com e sem filtro de classe | E6 |
+| **Extrapolação dos atributos:** identificar candidatos fora das faixas de características conhecidas | E6c |
+| **Sensibilidade dos modelos de porte:** comparar configurações C1–C6 e limiares | E7 |
+| **Consolidação científica e revisão da literatura:** documentar evidências, execução e limitações | E8 |
+| **Harmonização das avaliações:** comparar avaliação aleatória e espacial com as mesmas métricas na base derivada | E8h |
+| **Comparação das escalas de segmentação:** recortes contínuos de 512 pixels versus quadrantes de 256 pixels | E9 |
+
+A seguir, detalhamos **três comparações centrais**: classificadores, formas de validação e estratégias de segmentação.
+
 
 ### 6.1. Primeiro entenda: quais dados entram em cada teste?
 
@@ -214,11 +235,11 @@ flowchart TD
     B --> C["K-Means<br/>cluster 3"]
     C --> D["458 pares<br/>92 testes"]
 
-    A --> E["V2 / E3c<br/>812 blocos"]
+    A --> E["V2: 812<br/>blocos"]
     E --> F["Quickshift<br/>256 px"]
     F --> G["505 objetos<br/>únicos"]
 
-    A --> H["V2 / E9<br/>119 regiões"]
+    A --> H["V2: 119<br/>regiões"]
     H --> I["512 px ou<br/>4 × 256 px"]
     I --> J["505 referências<br/>comuns"]
 
@@ -234,14 +255,14 @@ flowchart TD
 |---|---|---|---|
 | **Original inicial** | Primeira rodada histórica; recorte não reconstruído integralmente | **133 pares** objeto–rótulo | **27 testes** aleatórios |
 | **Original ampliado** | Quickshift **global** + K-Means **cluster 3** | **458 pares** objeto–rótulo | **92 testes** aleatórios |
-| **V2 — E3c/E8h** | Quickshift independente em **812 blocos de até 256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Divisões **aleatórias e espaciais** |
-| **V2 — E9** | **119 regiões**, cada uma segmentada em **512 contínuo** ou **quatro blocos 256** | **505 referências comuns às duas alternativas da E9** | Testes **espaciais pareados** |
+| **V2 — classificadores e validação espacial** | Quickshift independente em **812 blocos de até 256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Divisões **aleatórias e espaciais** |
+| **V2 — comparação da segmentação** | **119 regiões**, cada uma segmentada em **512 contínuo** ou **quatro blocos 256** | **505 referências comuns às duas alternativas de segmentação** | Testes **espaciais pareados** |
 
-**Por que 458 e 505 não são a mesma base?** No original, eram contados **pares segmento–rótulo após a seleção do cluster 3**, sem deduplicação explícita. Na E3c, foram obtidos **segmentos rotulados únicos** de outra segmentação. Na E9, são **referências identificadas nos dois braços de um experimento local**. Ter 505 em E3c e E9 também **não significa ter as mesmas geometrias**.
+**Por que 458 e 505 não são a mesma base?** No original, eram contados **pares segmento–rótulo após a seleção do cluster 3**, sem deduplicação explícita. Na comparação de classificadores, foram obtidos **segmentos rotulados únicos** de outra segmentação. Na comparação de segmentações, são **referências identificadas nos dois braços de um experimento local**. Ter 505 em comparação de classificadores e comparação de segmentações também **não significa ter as mesmas geometrias**.
 
-Na E3c, os 812 blocos produziram **168.133 segmentos** em toda a extensão retangular do raster, incluindo partes fora da AOI. Somente os **505 rotulados** entraram nos testes supervisionados. A E9 trabalha com **recortes locais selecionados**, não com toda a imagem.
+Na comparação de classificadores, os 812 blocos produziram **168.133 segmentos** em toda a extensão retangular do raster, incluindo partes fora da AOI. Somente os **505 rotulados** entraram nos testes supervisionados. A comparação de segmentações trabalha com **recortes locais selecionados**, não com toda a imagem.
 
-### 6.2. Experimento E3c — qual classificador funciona melhor?
+### 6.2. Comparação de oito classificadores — Random Forest, SVM e alternativas
 
 **Pergunta:** se os dados e a divisão de teste forem iguais, **Random Forest, SVM ou outro algoritmo** classifica melhor os objetos?
 
@@ -285,9 +306,9 @@ A tabela mostra **F1-macro médio** de cinco divisões espaciais com embargo de 
 
 **Exemplo:** no protocolo de blocos **250 m / embargo 25 m**, SVM obteve média **0,8987**, e Random Forest **0,8656**. O **SVM teve maior média nessas condições**, sem comprovar que seria superior em qualquer área ou que a diferença seja estatisticamente significativa.
 
-A **E4** também comparou combinações das características e encontrou maior F1 médio com **NDVI + brilho HSV + Canny juntos** nas condições estudadas. A **E5** avaliou parâmetros de Quickshift/K-Means; a medida *silhouette* do K-Means **não é acurácia de classificação**.
+A **análise da contribuição das características** também comparou combinações das características e encontrou maior F1 médio com **NDVI + brilho HSV + Canny juntos** nas condições estudadas. A **análise de sensibilidade da segmentação** avaliou parâmetros de Quickshift/K-Means; a medida *silhouette* do K-Means **não é acurácia de classificação**.
 
-### 6.3. Experimento E8h — por que comparar teste aleatório e espacial?
+### 6.3. Avaliação aleatória versus avaliação espacial — por que testar as duas?
 
 **Pergunta:** o desempenho estimado muda quando o modelo é testado com objetos sorteados aleatoriamente ou com **regiões geograficamente separadas**?
 
@@ -319,13 +340,13 @@ flowchart TD
 | Espacial 250 m, embargo 25 m | 0,8697 | 0,8656 |
 | Espacial 500 m, embargo 25 m | 0,8591 | 0,8530 |
 
-Foram **40 ajustes aleatórios novos** (oito modelos × cinco divisões) e **240 resultados espaciais E3c reutilizados com verificações**, não 280 ajustes inteiramente novos.
+Foram **40 ajustes aleatórios novos** (oito modelos × cinco divisões) e **240 resultados espaciais comparação de classificadores reutilizados com verificações**, não 280 ajustes inteiramente novos.
 
 **Cuidado importante:** as divisões aleatórias e espaciais **não testam exatamente os mesmos objetos**. Portanto, as diferenças das médias são **descritivas**: não podemos dizer que toda a diferença foi causada somente pelo embargo.
 
 Também repetimos a **regra histórica** do Random Forest (500 árvores, divisão aleatória 80/20, semente 42), **mas usando a base nova**: **404 treino, 101 teste, acurácia 0,9010 e F1-macro 0,9009**. **Não é reprodução do 0,87 histórico**, porque a base original possuía 458 pares, não 505 segmentos novos.
 
-### 6.4. Experimento E9 — o tamanho da segmentação faz diferença?
+### 6.4. Comparação da segmentação — recortes contínuos de 512 versus quadrantes de 256 pixels
 
 **Pergunta:** mantendo os **mesmos pontos, modelos e divisões**, segmentar um recorte contínuo de **512 × 512 pixels** dá resultados diferentes de dividi-lo em **quatro quadrantes de 256 × 256 pixels**?
 
@@ -346,11 +367,11 @@ flowchart TD
     class F resultado;
 ```
 
-**O que é mantido igual:** os rasters e recortes originais, os **505 pontos de referência compartilhados**, os mapas de **NDVI, brilho HSV e Canny**, os modelos e as divisões de teste dentro da E9. **O que muda:** a forma como o Quickshift divide cada recorte em segmentos. Portanto, as **médias dos atributos por segmento podem mudar**.
+**O que é mantido igual:** os rasters e recortes originais, os **505 pontos de referência compartilhados**, os mapas de **NDVI, brilho HSV e Canny**, os modelos e as divisões de teste dentro da comparação de segmentações. **O que muda:** a forma como o Quickshift divide cada recorte em segmentos. Portanto, as **médias dos atributos por segmento podem mudar**.
 
-O protocolo usa cinco divisões por escala (250 e 500 m) e, no quadro abaixo, embargo de **25 m entre pontos de referência** — diferente do embargo **entre geometrias completas** utilizado na E3c. Foram **320 avaliações** no total.
+O protocolo usa cinco divisões por escala (250 e 500 m) e, no quadro abaixo, embargo de **25 m entre pontos de referência** — diferente do embargo **entre geometrias completas** utilizado na comparação de classificadores. Foram **320 avaliações** no total.
 
-**F1-macro médio nos testes pareados da E9:**
+**F1-macro médio nos testes pareados da comparação de segmentações:**
 
 | Blocos | Modelo | 512 contínuo | Quatro 256 |
 |---|---|---:|---:|
@@ -361,7 +382,7 @@ O protocolo usa cinco divisões por escala (250 e 500 m) e, no quadro abaixo, em
 
 **Exemplo:** com blocos de 250 m, o Random Forest apresentou média maior no **512 contínuo**, mas o SVM teve média maior nos **quatro quadrantes 256**. O efeito **depende do classificador** e não foi igual em todas as divisões.
 
-**Atenção:** “512 contínuo” é **um recorte local de 512 pixels**. **Não equivale ao Quickshift global aplicado à imagem inteira**, e a E9 não reproduz o filtro original do K-Means **cluster 3**.
+**Atenção:** “512 contínuo” é **um recorte local de 512 pixels**. **Não equivale ao Quickshift global aplicado à imagem inteira**, e a comparação de segmentações não reproduz o filtro original do K-Means **cluster 3**.
 
 ### 6.5. Como saber se uma comparação é cientificamente válida?
 
@@ -372,15 +393,15 @@ Antes de comparar duas notas, devemos perguntar: **mesmos exemplos de teste? mes
 | Original **0,81 × 0,87** | **Não causalmente** | As rodadas tinham exemplos e testes diferentes. |
 | Original **0,87 × V2 RF 0,8656** | **Não** | **Acurácia × F1-macro**, além de dados e divisões diferentes. |
 | Original **0,87 × V2 acurácia 0,8697** | **Não diretamente** | A métrica é igual, mas os segmentos e testes são outros. |
-| **RF × SVM na E3c**, mesmo protocolo | **Sim, internamente** | Mesmos exemplos, atributos, divisões e métricas. |
-| **512 contínuo × quatro 256 na E9** | **Sim, nesses recortes** | Mesmas referências, modelos e divisões em cada par. |
+| **RF × SVM na comparação de classificadores**, mesmo protocolo | **Sim, internamente** | Mesmos exemplos, atributos, divisões e métricas. |
+| **512 contínuo × quatro 256 na comparação de segmentações** | **Sim, nesses recortes** | Mesmas referências, modelos e divisões em cada par. |
 | **Pipeline completo original × V2 completa** | **Ainda não demonstrado** | Não houve reprodução integral controlada nas mesmas condições. |
 
 **Entenda as métricas:** **acurácia** = proporção de previsões corretas. **F1-macro** = média do F1 de árvores e gramíneas, com o mesmo peso para as duas classes. **Uma acurácia de 0,87 não é a mesma medida que um F1-macro de 0,8656.**
 
 ### 6.6. O que já fizemos e o que falta para responder ao orientador?
 
-**Já feito e documentado:** comparar oito classificadores (E3c), testar combinações dos atributos (E4), investigar parâmetros de Quickshift/K-Means (E5), analisar proximidade com postes e extrapolação de atributos (E6/E6c), estudar cenários empíricos de porte (E7), comparar avaliações aleatórias e espaciais (E8h) e comparar duas segmentações em recortes equivalentes (E9).
+**Já feito e documentado:** comparação de oito classificadores, testes de combinações de NDVI/brilho HSV/Canny, sensibilidade do Quickshift/K-Means, análise da proximidade com postes e extrapolação dos atributos, estudo de indicadores empíricos de porte, harmonização das avaliações aleatórias e espaciais e comparação de segmentações em recortes equivalentes.
 
 **Ainda falta uma comparação ponta a ponta:** reexecutar o **Quickshift global**, o **K-Means com seis grupos** e a **seleção do cluster 3** do método original; registrar quais referências entram nos dois métodos; usar **divisões comuns e as mesmas métricas**; e separar **cobertura de candidatos** de **qualidade da classificação**. A execução global atual sobre os aproximadamente **50,6 milhões de pixels** **não está novamente comprovada**.
 
@@ -390,4 +411,4 @@ Antes de comparar duas notas, devemos perguntar: **mesmos exemplos de teste? mes
 
 > “O método original registrou 0,87 de acurácia em 92 testes, mas utilizou uma base diferente da V2. Nos experimentos novos, comparei oito classificadores em divisões equivalentes e comparei duas formas de segmentação nos mesmos recortes. Esses testes são válidos dentro dos respectivos protocolos. Ainda não posso afirmar que o pipeline novo supera o original, porque falta executar uma comparação integral sob as mesmas condições.”
 
-Para os detalhes e a reprodução dos protocolos, consulte [Harmonização E3c/E8h](docs/harmonizacao_protocolos_2026-11-01.md) e [Comparação pareada E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md).
+Para os detalhes e a reprodução dos protocolos, consulte [Comparação de classificadores e avaliação aleatória/espacial](docs/harmonizacao_protocolos_2026-11-01.md) e [Comparação pareada das segmentações em 512 e 256 pixels](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md).
