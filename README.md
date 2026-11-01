@@ -38,22 +38,22 @@ A imagem RGB é dividida em regiões espacialmente coerentes pelo **Quickshift**
 
 ```mermaid
 flowchart TD
-    A["🛰️ Imagens RGB e multiespectral"] --> B["🧩 Segmentação Quickshift"]
-    B --> C["🗺️ Polígonos dos objetos"]
-    C --> D["📊 Estatísticas RGB + NIR"]
-    D --> E["🔎 K-Means: 6 agrupamentos"]
-    E --> F["🌱 Candidatos à vegetação: cluster 3"]
-    F --> G["🏷️ Amostras de árvores e gramíneas"]
-    G --> H["Extração das características"]
+    A["🛰️ Imagens RGB<br/>e multiespectral"] --> B["🧩 Segmentação<br/>Quickshift"]
+    B --> C["🗺️ Polígonos<br/>dos objetos"]
+    C --> D["📊 Estatísticas<br/>RGB + NIR"]
+    D --> E["🔎 K-Means:<br/>6 agrupamentos"]
+    E --> F["🌱 Candidatos à<br/>vegetação:<br/>cluster 3"]
+    F --> G["🏷️ Amostras de<br/>árvores e<br/>gramíneas"]
+    G --> H["Extração das<br/>características"]
     H --> I["🌿 NDVI"]
     H --> J["💡 Brilho HSV"]
     H --> K["◻️ Bordas Canny"]
-    I --> L["📋 Atributos por objeto"]
+    I --> L["📋 Atributos<br/>por objeto"]
     J --> L
     K --> L
-    L --> M["🌲 Random Forest"]
-    M --> N["🌳 Árvores ou 🌱 gramíneas"]
-    N --> O["📈 Avaliação e matriz de confusão"]
+    L --> M["🌲 Random<br/>Forest"]
+    M --> N["🌳 Árvores ou<br/>🌱 gramíneas"]
+    N --> O["📈 Avaliação e<br/>matriz de<br/>confusão"]
 
     classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
     classDef destaque fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
@@ -75,18 +75,18 @@ A pesquisa investiga a área projetada dos objetos e utiliza uma **estimativa em
 
 ```mermaid
 flowchart TD
-    A["🗺️ Segmentos candidatos classificados"] --> B["📐 Área projetada dos polígonos"]
-    B --> C["🌳 Modelos exploratórios de porte: C1 a C6"]
-    C --> D["📏 Configuração potencial C3"]
-    D --> E{"Altura estimada > 7 m?"}
-    E -->|Sim| F["📍 Objetos selecionados"]
-    E -->|Não| G["Fora do filtro espacial"]
-    H["⚡ Base de postes"] --> I["🗺️ Análise geoespacial"]
+    A["🗺️ Segmentos<br/>candidatos<br/>classificados"] --> B["📐 Área projetada<br/>dos polígonos"]
+    B --> C["🌳 Modelos<br/>exploratórios<br/>de porte:<br/>C1 a C6"]
+    C --> D["📏 Configuração<br/>potencial C3"]
+    D --> E{"Altura estimada<br/>maior que 7 m?"}
+    E -->|Sim| F["📍 Objetos<br/>selecionados"]
+    E -->|Não| G["Fora do filtro<br/>espacial"]
+    H["⚡ Base de postes"] --> I["🗺️ Análise<br/>geoespacial"]
     F --> I
     I --> J["1 m"]
     I --> K["3 m"]
     I --> L["5 m"]
-    J --> M["📊 Objetos próximos a postes"]
+    J --> M["📊 Objetos<br/>próximos a<br/>postes"]
     K --> M
     L --> M
 
@@ -292,22 +292,22 @@ A bateria derivada anterior documentou **220 avaliações**, envolvendo quatro t
 
 ```mermaid
 flowchart TD
-    A["🛰️ Imagens RGB + NIR da Area1"] --> B["🧩 Quickshift em 812 quadrantes independentes"]
-    B --> C["🏷️ 505 segmentos com rótulo único"]
-    C --> D["📐 Partições espaciais: 250 m e 500 m"]
-    D --> E["🚧 Embargos geométricos: 0 m, 25 m e 50 m"]
-    E --> F["🧪 30 protocolos válidos"]
-    F --> G["🤖 Comparação de oito classificadores"]
-    G --> H["🌲 Random Forest e Extra Trees"]
-    G --> I["🔵 SVM RBF e regressão logística"]
-    G --> J["📍 KNN e HistGradientBoosting"]
-    G --> K["🔬 Gaussian Naive Bayes e Dummy"]
-    H --> L["📊 F1-macro, acurácia balanceada e MCC"]
+    A["🛰️ Imagens<br/>RGB + NIR<br/>da Area1"] --> B["🧩 Quickshift em<br/>812 quadrantes<br/>independentes"]
+    B --> C["🏷️ 505 segmentos<br/>com rótulo único"]
+    C --> D["📐 Partições<br/>espaciais:<br/>250 m e 500 m"]
+    D --> E["🚧 Embargos<br/>geométricos:<br/>0 m, 25 m<br/>e 50 m"]
+    E --> F["🧪 30 protocolos<br/>válidos"]
+    F --> G["🤖 Comparação de<br/>oito<br/>classificadores"]
+    G --> H["🌲 Random<br/>Forest e<br/>Extra Trees"]
+    G --> I["🔵 SVM RBF e<br/>regressão<br/>logística"]
+    G --> J["📍 KNN e<br/>HistGradient<br/>Boosting"]
+    G --> K["🔬 Gaussian<br/>Naive Bayes<br/>e Dummy"]
+    H --> L["📊 F1-macro,<br/>acurácia<br/>balanceada<br/>e MCC"]
     I --> L
     J --> L
     K --> L
-    L --> M["✅ 240 ajustes executados"]
-    M --> N["📈 SVM: maior F1-macro médio neste protocolo"]
+    L --> M["✅ 240 ajustes<br/>executados"]
+    M --> N["📈 SVM: maior<br/>F1-macro médio<br/>neste protocolo"]
 
     classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
     classDef etapa fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
@@ -349,17 +349,17 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["🗂️ Dados da Area1 e segmentos derivados"]
-    A --> B["🌿 E4: ablação de características"]
-    A --> C["🧩 E5: sensibilidade do K-Means"]
-    A --> D["🌳 E7: sensibilidade de porte"]
-    B --> E["💡 Brilho, bordas e NDVI: sete combinações"]
-    C --> F["🔎 K = 4, 6 e 8: análise da silhouette"]
-    D --> G["📐 C1 a C6: 216 cenários empíricos"]
-    E --> H["📋 Comparação e interpretação científica"]
+    A["🗂️ Dados da Area1<br/>e segmentos<br/>derivados"]
+    A --> B["🌿 E4: ablação<br/>de características"]
+    A --> C["🧩 E5:<br/>sensibilidade<br/>do K-Means"]
+    A --> D["🌳 E7:<br/>sensibilidade<br/>de porte"]
+    B --> E["💡 Brilho,<br/>bordas e NDVI:<br/>sete<br/>combinações"]
+    C --> F["🔎 K = 4, 6 e 8:<br/>análise da<br/>silhouette"]
+    D --> G["📐 C1 a C6:<br/>216 cenários<br/>empíricos"]
+    E --> H["📋 Comparação e<br/>interpretação<br/>científica"]
     F --> H
     G --> H
-    H --> I["⚠️ Sem validação de altura real ou generalização externa"]
+    H --> I["⚠️ Sem validação<br/>de altura real<br/>ou generalização<br/>externa"]
 
     classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
     classDef experimento fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
@@ -380,17 +380,17 @@ Os exemplos usados para treinar os classificadores possuem somente as classes **
 
 ```mermaid
 flowchart TD
-    A["🏷️ 505 segmentos de referência: árvores e grama"] --> B["📊 Atributos: brilho HSV, bordas e NDVI"]
-    B --> C["📦 Envelopes dos atributos rotulados"]
-    C --> D["🧩 Comparação com 168.133 segmentos"]
-    D --> E["📉 Mínimo–máximo: 57,13% fora"]
-    D --> F["📉 Percentis 1–99: 76,47% fora"]
-    D --> G["📉 Percentis 5–95: 88,70% fora"]
-    E --> H["🔎 Diagnóstico de extrapolação"]
+    A["🏷️ 505 segmentos<br/>de referência:<br/>árvores e grama"] --> B["📊 Atributos:<br/>brilho HSV,<br/>bordas e NDVI"]
+    B --> C["📦 Envelopes<br/>dos atributos<br/>rotulados"]
+    C --> D["🧩 Comparação com<br/>168.133 segmentos"]
+    D --> E["📉 Mínimo–máximo:<br/>57,13% fora"]
+    D --> F["📉 Percentis<br/>1–99: 76,47% fora"]
+    D --> G["📉 Percentis<br/>5–95: 88,70% fora"]
+    E --> H["🔎 Diagnóstico de<br/>extrapolação"]
     F --> H
     G --> H
-    H --> I["⚠️ Fora da faixa não significa falso positivo"]
-    I --> J["⚡ Não comprova risco elétrico"]
+    H --> I["⚠️ Fora da faixa<br/>não significa<br/>falso positivo"]
+    I --> J["⚡ Não comprova<br/>risco elétrico"]
 
     classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
     classDef processo fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
