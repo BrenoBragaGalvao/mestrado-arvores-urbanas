@@ -136,6 +136,56 @@ O diagrama ilustrado apresenta a visão geral do percurso da pesquisa, desde as 
 
 ## Resultados preliminares
 
+### Características das imagens e dos dados utilizados
+
+Antes de analisar a acurácia e os valores de F1-score, é importante conhecer **quais dados foram utilizados para produzir as previsões**.
+
+A pesquisa utiliza imagens de satélite de alta resolução da região de **Caxias do Sul (RS)**, disponibilizadas pela **CPFL**. A documentação do projeto identifica o satélite **JL1KF01B** como origem das imagens; **a data de aquisição não está informada**.
+
+**Dimensões e características dos rasters da pasta `Area1`:**
+
+| Característica | Valor | O que significa |
+|---|---|---|
+| **Largura** | **6.942 pixels** | Quantidade de colunas da imagem |
+| **Altura** | **7.294 pixels** | Quantidade de linhas da imagem |
+| **Total de pixels por raster** | **50.634.948** | Aproximadamente 50,6 milhões de posições da grade |
+| **Resolução espacial** | **aproximadamente 0,5 m/pixel** | Cada pixel corresponde a cerca de meio metro no terreno |
+| **Extensão retangular aproximada** | **3.471 m × 3.647 m** | Largura e altura da cobertura raster, estimadas pela resolução nominal |
+| **Área do retângulo raster** | **aproximadamente 12,66 km²** | **Não** é a área efetiva do polígono de estudo (AOI) |
+| **Sistema de coordenadas dos rasters** | **EPSG:31982** | Referencial projetado usado nas operações métricas |
+| **Imagem RGB** | `AOI_RGB_NEW.tif` — **3 bandas** | Vermelho, verde e azul, utilizadas na segmentação |
+| **Imagem multiespectral** | `AOI_NEW_MULTI.tif` — **4 bandas** | Vermelho, verde, azul e infravermelho próximo (NIR), usados nas características espectrais |
+
+**A imagem RGB e a multiespectral têm a mesma quantidade de linhas e colunas, mas apresentam uma pequena diferença na origem de suas grades.** Isso requer cuidado ao relacionar pixels e atributos das duas imagens.
+
+**Dados vetoriais e referências do mesmo conjunto `Area1`:**
+
+| Arquivo | Conteúdo | Uso no trabalho |
+|---|---|---|
+| `AOI_new.shp` e auxiliares | Polígono da área de interesse | Delimita a área analisada |
+| `Arvores.gpkg` | **257 pontos** de referência de árvores | Exemplos identificados para classificação |
+| `Grama.gpkg` | **253 pontos** de referência de gramíneas | Exemplos identificados para classificação |
+| `postes.gpkg` | Localização geográfica dos postes | Análise exploratória de proximidade |
+
+São **510 pontos de referência originais** somando árvores e gramíneas. Os vetores de referência de árvores, gramíneas e postes possuem **EPSG:4674** como CRS de origem, sendo transformados para um sistema projetado nas operações métricas. Não há geometrias de cabos elétricos nem medidas reais de altura de árvores nesse conjunto.
+
+#### Como a imagem se transforma em amostras para o Random Forest?
+
+A imagem possui **milhões de pixels**, mas o Random Forest original **não foi treinado com 50 milhões de linhas**. Primeiro, o **Quickshift** divide a imagem em **segmentos** (regiões/polígonos). Depois, o **K-Means** separa os segmentos em seis agrupamentos, e o código original seleciona os candidatos do **cluster 3**. Por fim, os pontos conhecidos de árvores e gramíneas são relacionados a esses segmentos.
+
+Cada registro que chega ao Random Forest traz **três números calculados para o segmento** — média do **brilho HSV**, média das **bordas Canny** e média do **NDVI** — e o rótulo **árvore** ou **grama**.
+
+Assim, é importante não confundir:
+
+- **Pixel:** uma posição da imagem raster.
+- **Segmento:** uma região da imagem criada pelo Quickshift, que pode conter vários pixels.
+- **Ponto de referência:** uma localização com identificação conhecida de árvore ou gramínea.
+- **Par objeto–rótulo:** associação entre um segmento e um rótulo de referência; um mesmo segmento pode aparecer mais de uma vez.
+
+**Na tabela histórica abaixo**, os **133** e **458** são **registros rotulados (pares objeto–rótulo)**, não quantidade de pixels ou necessariamente de segmentos únicos. A rodada maior usa o processamento documentado da imagem integral; **as dimensões exatas do recorte da rodada inicial com 133 registros não foram confirmadas**. Por isso, não se deve afirmar que ela usou um raster de tamanho conhecido apenas olhando essa tabela.
+
+Para detalhes sobre os arquivos e seus sistemas de coordenadas, consulte a [documentação do dataset](data/README.md).
+
 Os resultados abaixo são **históricos**, registrados em execuções anteriores. Não representam uma validação da execução atualmente em andamento no Colab.
 
 | Indicador | Experimento inicial | Experimento com área maior |
