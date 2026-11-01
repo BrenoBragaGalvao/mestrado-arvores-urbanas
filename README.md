@@ -126,7 +126,7 @@ flowchart TD
     D --> E{"Índice C3<br/>maior que 7?"}
     E -->|Sim| F["📍 Objetos<br/>selecionados"]
     E -->|Não| G["Fora do<br/>filtro"]
-    H["⚡ Base de postes<br/>postes.gpkg"] --> I["🗺️ Proximidade<br/>espacial 2D"]
+    H["⚡ Postes"] --> I["🗺️ Proximidade<br/>espacial 2D"]
     F --> I
     I --> J["📊 Resultados<br/>1, 3 e 5 m"]
 
@@ -137,6 +137,8 @@ flowchart TD
     class D,E alerta;
     class I,J metodo;
 ```
+
+**No fluxograma, a caixa “Postes” representa o arquivo `postes.gpkg`, uma entrada independente para a análise espacial.**
 
 O código calcula a área dos polígonos, testa **seis configurações empíricas (C1–C6)** nas formas potencial e linear e usa o índice potencial **C3** na seleção:
 
