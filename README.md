@@ -22,21 +22,25 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 
 **Os arquivos têm papéis diferentes:** o RGB é usado para a segmentação; o RGB + NIR fornece atributos que descrevem os segmentos. As grades possuem um pequeno deslocamento entre suas origens, relevante para o alinhamento espacial.
 
+### Dimensões e cobertura — imagem completa × área de estudo (AOI)
+
+| Área / arquivo | Largura × altura da grade (pixels) | Pixels incluídos | Área no terreno |
+|---|---|---:|---:|
+| **Imagem RGB completa** (`AOI_RGB_NEW.tif`) | **6.942 × 7.294** | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
+| **Imagem RGB + NIR completa** (`AOI_NEW_MULTI.tif`) | **6.942 × 7.294** | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
+| **Polígono AOI sobre o RGB** (área efetiva de estudo) | **6.942 × 7.294** na grade que contém o polígono; **não é um retângulo preenchido** | **48.548.811** | **≈ 12,1372 km²** (≈ 12,14 km²) |
+| **Polígono AOI sobre o RGB + NIR** (mesma área de estudo) | **6.942 × 7.294** na grade que contém o polígono; **não é um retângulo preenchido** | **48.548.645** | **≈ 12,1372 km²** (≈ 12,14 km²) |
+
+### Resolução espacial e referência geográfica
+
 | Característica | Valor |
 |---|---|
-| **Imagem RGB — largura × altura** | **6.942 × 7.294 pixels** (colunas × linhas) |
-| **Imagem RGB + NIR — largura × altura** | **6.942 × 7.294 pixels** (colunas × linhas) |
-| **Total de pixels por imagem** | **50.634.948** na grade retangular completa |
-| **Dimensão de cada pixel no terreno** | **0,50 m × 0,50 m** (50 cm × 50 cm) |
+| **Dimensão de cada pixel no terreno** | **0,50 × 0,50 m** (50 × 50 cm) |
 | **Área representada por pixel** | **0,25 m²** |
-| **Dimensões da imagem no terreno** | **3.471 m de largura × 3.647 m de altura** |
-| **Área da imagem retangular completa** | **12,658737 km²** (aproximadamente **12,66 km²**) |
-| **Pixels dentro da AOI — raster RGB** | **48.548.811 pixels** |
-| **Pixels dentro da AOI — raster RGB + NIR** | **48.548.645 pixels** |
-| **Área do polígono de estudo (AOI)** | **12,1372 km²** (aproximadamente **12,14 km²**) |
+| **Dimensões do retângulo raster no terreno** | **3.471 m de largura × 3.647 m de altura** |
 | **Sistema de coordenadas dos rasters** | **EPSG:31982** |
 
-**Qual é a diferença entre a imagem inteira e o recorte da Area1?** Cada arquivo raster contém uma **grade retangular de 6.942 × 7.294 pixels**. O arquivo `AOI_new.shp` delimita, dentro dessa grade, um **polígono irregular**. Assim, a área efetiva do estudo possui aproximadamente **48,55 milhões de pixels**, mas não tem um segundo par de dimensões retangulares em pixels que represente exatamente seu formato.
+**Como interpretar as dimensões do recorte AOI?** O valor **6.942 × 7.294 pixels**, também indicado nas linhas da AOI, é o tamanho da **grade raster que contém o polígono**. O arquivo `AOI_new.shp` delimita uma **área irregular dentro dessa grade**: parte dos pixels está fora do polígono e, portanto, não pertence à AOI. Assim, **não é correto apresentar 48.548.811 pixels como uma multiplicação exata de largura × altura de uma imagem retangular menor**. A contagem de pixels dentro do polígono, juntamente com a área em km², é a forma adequada de quantificar esse recorte. A mesma área é representada nas duas grades com uma pequena diferença no número de pixels selecionados.
 
 As duas contagens da AOI foram **calculadas diretamente sobre os rasters originais**, contabilizando os pixels **cujo centro cai dentro do polígono**. A diferença de **166 pixels** entre RGB e RGB + NIR decorre do pequeno deslocamento entre as grades. Trata-se da **cobertura geométrica do polígono**, não do número de exemplos usados para treinar o Random Forest nem de uma medida de pixels espectrais válidos.
 
