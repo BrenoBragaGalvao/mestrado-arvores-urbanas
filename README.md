@@ -412,6 +412,20 @@ flowchart TD
 
 **Não confundir:** os **250 m e 500 m** mostrados nas tabelas abaixo são **tamanhos de blocos geográficos usados para separar treino e teste**. Eles não são os recortes de 250 ou 500 pixels usados no Quickshift.
 
+#### Visualização com a imagem RGB real da Area1
+
+A figura a seguir utiliza **a imagem RGB original da Area1** para mostrar que os diferentes experimentos não processaram necessariamente a mesma extensão de uma só vez. As marcações amarelas indicam os **119 recortes selecionados por conter referências de árvores ou gramíneas**. As regiões sem marcação **não entraram nessa comparação local de segmentação**; isso não significa que não tenham sido percorridas no experimento de cobertura por quadrantes. As partes escuras já aparecem no raster original.
+
+<p align="center">
+  <a href="docs/area1_real_recortes_legendas_corrigidas.png">
+    <img src="docs/area1_real_recortes_legendas_corrigidas.png" alt="Imagem RGB real da Area1: imagem completa, 812 quadrantes de 256 pixels, 119 recortes selecionados e comparação entre segmentação de 512 pixels e quatro quadrantes de 256 pixels" width="100%">
+  </a>
+</p>
+
+[**Abrir a imagem real ampliada, com legendas completas**](docs/area1_real_recortes_legendas_corrigidas.png)
+
+**Como interpretar:** a imagem original tem **6.942 × 7.294 pixels**. No experimento de cobertura, o Quickshift percorreu sua extensão retangular por meio de **812 quadrantes de até 256 × 256 pixels**. Já na comparação da escala de segmentação, foram analisadas **119 regiões selecionadas de até 512 × 512 pixels**, cada uma processada de duas maneiras: **512 pixels continuamente** ou **quatro quadrantes de 256 pixels**. **Os 119 recortes não representam toda a Area1**, e a resolução espacial original **não foi reduzida**.
+
 **O que é mantido igual:** os rasters e recortes originais, os **505 pontos de referência compartilhados**, os mapas de **NDVI, brilho HSV e Canny**, os modelos e as divisões de teste dentro da comparação de segmentações. **O que muda:** a forma como o Quickshift divide cada recorte em segmentos. Portanto, as **médias dos atributos por segmento podem mudar**.
 
 O protocolo usa cinco divisões por escala (250 e 500 m) e, no quadro abaixo, embargo de **25 m entre pontos de referência** — diferente do embargo **entre geometrias completas** utilizado na comparação de classificadores. Foram **320 avaliações** no total.
