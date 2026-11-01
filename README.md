@@ -266,12 +266,14 @@ Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisi
 Na **figura abaixo**, a grade de 812 quadrantes representa esse processamento da imagem inteira. Já os **contornos amarelos do painel “Recortes selecionados” indicam somente as 119 regiões utilizadas em outro experimento**, que compara duas estratégias de segmentação. **A ausência de contorno amarelo não indica uma falha nem um trecho não processado na bateria de 812 quadrantes**. As regiões pretas fazem parte da visualização do raster e não significam, por si só, recortes omitidos.
 
 <p align="center">
-  <a href="docs/area1_real_recortes_legendas_corrigidas.png">
-    <img src="docs/area1_real_recortes_legendas_corrigidas.png" alt="Imagem RGB real da Area1: grade dos 812 quadrantes que percorrem toda a extensão retangular e 119 recortes locais selecionados para comparar 512 com 256 pixels" width="100%">
+  <a href="docs/infografico_area1_cobertura_e_recortes_satelitais.png">
+    <img src="docs/infografico_area1_cobertura_e_recortes_satelitais.png" alt="Infográfico da Area1: imagem original de 6942 por 7294 pixels, cobertura integral dos 812 quadrantes de 256 pixels e 119 recortes locais de 512 pixels para comparação" width="100%">
   </a>
 </p>
 
-[**Abrir a imagem real da Area1 em tamanho ampliado**](docs/area1_real_recortes_legendas_corrigidas.png)
+[**Abrir o infográfico ampliado**](docs/infografico_area1_cobertura_e_recortes_satelitais.png)
+
+*Nota metodológica: o infográfico facilita a compreensão dos procedimentos. As grades e marcações apresentadas são ilustrativas; para identificar os limites exatos dos 119 recortes, devem ser consultados os registros do experimento, não apenas esta figura.*
 
 **Como interpretar os três painéis:** (1) **imagem RGB original**; (2) **cobertura integral em 812 quadrantes**, inclusive nas bordas; (3) **119 recortes selecionados** por conter pontos de referência, utilizados apenas na comparação local entre Quickshift contínuo em 512 pixels e Quickshift em quatro partes de 256 pixels.
 
