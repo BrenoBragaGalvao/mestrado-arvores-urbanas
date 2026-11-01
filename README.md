@@ -24,14 +24,23 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 
 | Característica | Valor |
 |---|---|
-| Dimensão de **cada raster** | **6.942 colunas × 7.294 linhas** |
-| Pixels por raster | **50.634.948** |
-| Resolução espacial aproximada | **0,5 m/pixel** |
-| Cobertura retangular das imagens | **12,66 km²** |
-| Polígono efetivo de interesse (**AOI**) | **12,1372 km²**, ou aproximadamente **12,14 km²** |
-| Referência espacial dos rasters | **EPSG:31982** |
+| **Imagem RGB — largura × altura** | **6.942 × 7.294 pixels** (colunas × linhas) |
+| **Imagem RGB + NIR — largura × altura** | **6.942 × 7.294 pixels** (colunas × linhas) |
+| **Total de pixels por imagem** | **50.634.948** na grade retangular completa |
+| **Dimensão de cada pixel no terreno** | **0,50 m × 0,50 m** (50 cm × 50 cm) |
+| **Área representada por pixel** | **0,25 m²** |
+| **Dimensões da imagem no terreno** | **3.471 m de largura × 3.647 m de altura** |
+| **Área da imagem retangular completa** | **12,658737 km²** (aproximadamente **12,66 km²**) |
+| **Pixels dentro da AOI — raster RGB** | **48.548.811 pixels** |
+| **Pixels dentro da AOI — raster RGB + NIR** | **48.548.645 pixels** |
+| **Área do polígono de estudo (AOI)** | **12,1372 km²** (aproximadamente **12,14 km²**) |
+| **Sistema de coordenadas dos rasters** | **EPSG:31982** |
 
-Os **12,66 km²** representam o retângulo raster; a AOI de **12,14 km²** é delimitada por `AOI_new.shp`. A documentação indica imagens fornecidas pela **CPFL**, atribuídas ao satélite **JL1KF01B**, sem data de aquisição especificada.
+**Qual é a diferença entre a imagem inteira e o recorte da Area1?** Cada arquivo raster contém uma **grade retangular de 6.942 × 7.294 pixels**. O arquivo `AOI_new.shp` delimita, dentro dessa grade, um **polígono irregular**. Assim, a área efetiva do estudo possui aproximadamente **48,55 milhões de pixels**, mas não tem um segundo par de dimensões retangulares em pixels que represente exatamente seu formato.
+
+As duas contagens da AOI foram **calculadas diretamente sobre os rasters originais**, contabilizando os pixels **cujo centro cai dentro do polígono**. A diferença de **166 pixels** entre RGB e RGB + NIR decorre do pequeno deslocamento entre as grades. Trata-se da **cobertura geométrica do polígono**, não do número de exemplos usados para treinar o Random Forest nem de uma medida de pixels espectrais válidos.
+
+Os **12,66 km²** correspondem à extensão retangular dos rasters, enquanto **12,14 km²** correspondem ao polígono AOI. A documentação indica imagens fornecidas pela **CPFL**, atribuídas ao satélite **JL1KF01B**, sem data de aquisição especificada.
 
 **Arquivos vetoriais de apoio:**
 
