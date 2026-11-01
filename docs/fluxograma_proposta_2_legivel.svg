@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="975" viewBox="0 0 1000 975" role="img" aria-label="PROPOSTA 2 — Porte e proximidade dos postes">
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M1 1 L9 5 L1 9" stroke="#64748b" stroke-width="1.7" fill="none"/></marker></defs>
+<rect width="1000" height="975" rx="22" fill="#f8fafc"/>
+<text x="500" y="41" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="26" font-weight="700" fill="#0f3c81">PROPOSTA 2 — Porte e proximidade dos postes</text>
+<text x="500" y="70" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="15" fill="#475569">Indicador C3 empírico • distância plana aos postes, não aos cabos</text>
+<rect x="320" y="100" width="360" height="71" rx="12" fill="#eaf4ff" stroke="#60a5fa" stroke-width="2"/>
+<text x="500" y="141.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="650" fill="#17324f">Candidatos do cluster 3</text>
+<rect x="320" y="210" width="360" height="71" rx="12" fill="#eaf4ff" stroke="#60a5fa" stroke-width="2"/>
+<text x="500" y="239.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="650" fill="#17324f">Área dos polígonos</text>
+<text x="500" y="263.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="450" fill="#17324f">Medida em m²</text>
+<path d="M500 171 V206" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="320" y="320" width="360" height="71" rx="12" fill="#eaf4ff" stroke="#60a5fa" stroke-width="2"/>
+<text x="500" y="349.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="650" fill="#17324f">Modelos exploratórios</text>
+<text x="500" y="373.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="450" fill="#17324f">C1 a C6</text>
+<path d="M500 281 V316" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="320" y="430" width="360" height="71" rx="12" fill="#fef3c7" stroke="#fbbf24" stroke-width="2"/>
+<text x="500" y="459.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="650" fill="#17324f">Modelo potencial C3</text>
+<text x="500" y="483.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="450" fill="#17324f">2,5 × A^0,4</text>
+<path d="M500 391 V426" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="500,541 670,620 500,700 330,620" fill="#fff1db" stroke="#d97706" stroke-width="2.4"/>
+<text x="500" y="615" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="22" font-weight="700" fill="#78350f">C3 maior que 7?</text>
+<path d="M500 501 V536" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="128" y="734" width="288" height="65" rx="12" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+<text x="272" y="772.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="650" fill="#17324f">Selecionados</text>
+<rect x="584" y="734" width="288" height="65" rx="12" fill="#fee2e2" stroke="#f87171" stroke-width="2"/>
+<text x="728" y="772.5" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="650" fill="#17324f">Fora do filtro</text>
+<path d="M405 664 V716 H272 V730" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M595 664 V716 H728 V730" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="286" y="711" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" fill="#15803d" font-weight="700">Sim</text>
+<text x="721" y="711" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" fill="#b91c1c" font-weight="700">Não</text>
+<rect x="40" y="846" width="259" height="62" rx="12" fill="#ede9fe" stroke="#a78bfa" stroke-width="2"/>
+<text x="169.5" y="871" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" font-weight="650" fill="#17324f">Postes</text>
+<text x="169.5" y="895" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" font-weight="450" fill="#17324f">postes.gpkg</text>
+<rect x="348" y="839" width="327" height="70" rx="12" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+<text x="511.5" y="868" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="650" fill="#17324f">Proximidade espacial</text>
+<text x="511.5" y="892" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="450" fill="#17324f">1, 3 e 5 metros</text>
+<path d="M272 799 V827 H490 V835" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M299 876 H344" stroke="#64748b" stroke-width="2.3" fill="none" marker-end="url(#a)" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="500" y="946" text-anchor="middle" font-family="DejaVu Sans,Arial,sans-serif" font-size="15" fill="#64748b">C3 não é altura medida • Não há geometria de cabos • Não comprova risco elétrico.</text>
+</svg>
