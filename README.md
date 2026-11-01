@@ -56,7 +56,7 @@ Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.g
 
 ```mermaid
 flowchart TD
-    A["Area1"] --> B["RGB: 3 bandas"]
+    A["Area1"] --> B["RGB"]
     A --> C["RGB + NIR"]
     B --> D["Quickshift"]
     D --> E["Polígonos"]
@@ -64,16 +64,16 @@ flowchart TD
     C --> F
     F --> G["K-Means: 6"]
     G --> H["Cluster 3"]
-    H --> I["Associar rótulos"]
-    P["Árvore / grama"] --> I
-    C --> X["NDVI, HSV, Canny"]
-    E --> Y["Médias do objeto"]
+    H --> I["Rotular"]
+    P["Referências"] --> I
+    C --> X["3 mapas"]
+    E --> Y["3 médias"]
     X --> Y
-    I --> T["Treino / teste"]
+    I --> T["Treino/teste"]
     Y --> T
-    T --> R["RF: 500 árvores"]
+    T --> R["RF: 500"]
     R --> S["Previsões"]
-    R --> U["Acurácia e F1"]
+    R --> U["Métricas"]
 
     classDef entrada fill:#eaf4ff,stroke:#60a5fa,color:#163b5d,stroke-width:2px;
     classDef metodo fill:#dcfce7,stroke:#4ade80,color:#14532d,stroke-width:2px;
@@ -126,11 +126,11 @@ Os **458 registros** geraram **366 exemplos de treinamento e 92 de teste**. A ac
 ```mermaid
 flowchart TD
     A["Cluster 3"] --> B["Área em m²"]
-    B --> C["Modelos C1–C6"]
+    B --> C["C1 a C6"]
     C --> D["Índice C3"]
     D --> E{"C3 > 7?"}
     E -->|Sim| F["Selecionados"]
-    E -->|Não| G["Fora do filtro"]
+    E -->|Não| G["Não passa"]
     H["Postes"] --> I["Distância 2D"]
     F --> I
     I --> J["1, 3 e 5 m"]
