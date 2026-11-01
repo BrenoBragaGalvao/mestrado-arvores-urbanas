@@ -261,6 +261,21 @@ Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisi
 | **Comparação de classificadores na V2** | A extensão retangular inteira foi percorrida em **812 quadrantes**, inclusive fora da AOI | **Até 256 × 256 pixels por quadrante**: cada execução do Quickshift processou um pedaço separado |
 | **Comparação da escala de segmentação na V2** | Apenas **119 regiões de até 512 × 512 pixels com referências de árvores/gramíneas** | **512 × 512 pixels** por região ou os **mesmos pixels divididos em quatro quadrantes de 256 × 256 pixels** |
 
+**Por que a grade de 256 × 256 pixels parece incompleta na imagem?** Na verdade, **o processamento em 812 quadrantes cobriu todo o retângulo do raster**. Isso ocorre porque a largura de 6.942 pixels exige **28 colunas de quadrantes** e a altura de 7.294 pixels exige **29 linhas**: **28 × 29 = 812**. Os quadrantes das bordas são menores (última coluna com **30 pixels** de largura; última linha com **126 pixels** de altura).
+
+Na **figura abaixo**, a grade de 812 quadrantes representa esse processamento da imagem inteira. Já os **contornos amarelos do painel “Recortes selecionados” indicam somente as 119 regiões utilizadas em outro experimento**, que compara duas estratégias de segmentação. **A ausência de contorno amarelo não indica uma falha nem um trecho não processado na bateria de 812 quadrantes**. As regiões pretas fazem parte da visualização do raster e não significam, por si só, recortes omitidos.
+
+<p align="center">
+  <a href="docs/area1_real_recortes_legendas_corrigidas.png">
+    <img src="docs/area1_real_recortes_legendas_corrigidas.png" alt="Imagem RGB real da Area1: grade dos 812 quadrantes que percorrem toda a extensão retangular e 119 recortes locais selecionados para comparar 512 com 256 pixels" width="100%">
+  </a>
+</p>
+
+[**Abrir a imagem real da Area1 em tamanho ampliado**](docs/area1_real_recortes_legendas_corrigidas.png)
+
+**Como interpretar os três painéis:** (1) **imagem RGB original**; (2) **cobertura integral em 812 quadrantes**, inclusive nas bordas; (3) **119 recortes selecionados** por conter pontos de referência, utilizados apenas na comparação local entre Quickshift contínuo em 512 pixels e Quickshift em quatro partes de 256 pixels.
+
+
 Com a resolução aproximada de **0,5 m por pixel**, um recorte de **512 × 512 pixels** representa cerca de **256 × 256 m** no terreno; um quadrante de **256 × 256 pixels** representa **128 × 128 m**. Portanto, **quatro quadrantes de 256 × 256 pixels juntos ocupam a mesma janela de 512 × 512 pixels**. Não são quatro novas áreas.
 
 **Atenção:** os **119 recortes não cobrem necessariamente toda a Area1**; foram escolhidos por conterem pontos de referência. Também não se deve somar a área dos recortes para calcular automaticamente a cobertura única da AOI, pois eles podem ter recortes de borda e sobreposições.
@@ -408,23 +423,11 @@ flowchart TD
     class I resultado;
 ```
 
+**A imagem real com os 812 quadrantes e os 119 recortes está na [seção 6.1](#61-primeiro-entenda-quais-dados-entram-em-cada-teste).** A comparação desta subseção usa apenas os 119 recortes selecionados, não a imagem inteira.
+
 **Exemplo de uma janela completa:** a opção A processa **512 × 512 = 262.144 pixels** de uma só vez. Na opção B, esse mesmo conjunto de pixels é separado em **quatro janelas de 256 × 256 = 65.536 pixels cada**, e o Quickshift roda independentemente em cada uma delas. **Não estamos reduzindo a resolução da imagem nem criando dados novos; estamos mudando os limites de cada execução da segmentação.**
 
 **Não confundir:** os **250 m e 500 m** mostrados nas tabelas abaixo são **tamanhos de blocos geográficos usados para separar treino e teste**. Eles não são os recortes de 250 ou 500 pixels usados no Quickshift.
-
-#### Visualização com a imagem RGB real da Area1
-
-A figura a seguir utiliza **a imagem RGB original da Area1** para mostrar que os diferentes experimentos não processaram necessariamente a mesma extensão de uma só vez. As marcações amarelas indicam os **119 recortes selecionados por conter referências de árvores ou gramíneas**. As regiões sem marcação **não entraram nessa comparação local de segmentação**; isso não significa que não tenham sido percorridas no experimento de cobertura por quadrantes. As partes escuras já aparecem no raster original.
-
-<p align="center">
-  <a href="docs/area1_real_recortes_legendas_corrigidas.png">
-    <img src="docs/area1_real_recortes_legendas_corrigidas.png" alt="Imagem RGB real da Area1: imagem completa, 812 quadrantes de 256 pixels, 119 recortes selecionados e comparação entre segmentação de 512 pixels e quatro quadrantes de 256 pixels" width="100%">
-  </a>
-</p>
-
-[**Abrir a imagem real ampliada, com legendas completas**](docs/area1_real_recortes_legendas_corrigidas.png)
-
-**Como interpretar:** a imagem original tem **6.942 × 7.294 pixels**. No experimento de cobertura, o Quickshift percorreu sua extensão retangular por meio de **812 quadrantes de até 256 × 256 pixels**. Já na comparação da escala de segmentação, foram analisadas **119 regiões selecionadas de até 512 × 512 pixels**, cada uma processada de duas maneiras: **512 pixels continuamente** ou **quatro quadrantes de 256 pixels**. **Os 119 recortes não representam toda a Area1**, e a resolução espacial original **não foi reduzida**.
 
 **O que é mantido igual:** os rasters e recortes originais, os **505 pontos de referência compartilhados**, os mapas de **NDVI, brilho HSV e Canny**, os modelos e as divisões de teste dentro da comparação de segmentações. **O que muda:** a forma como o Quickshift divide cada recorte em segmentos. Portanto, as **médias dos atributos por segmento podem mudar**.
 
