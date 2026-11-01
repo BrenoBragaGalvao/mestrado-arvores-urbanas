@@ -200,26 +200,79 @@ Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi prepar
 
 ## 6. Comparação científica — original versus novos experimentos
 
-**Esta seção responde ao que foi comparado, com quais dados e quais conclusões são válidas.** Todos os experimentos derivam da **mesma Area1**, mas **não necessariamente dos mesmos segmentos ou conjuntos de teste**.
+**Por que fizemos tantos testes?** Para investigar se os resultados dependem do **classificador**, dos **atributos**, da **separação entre treino e teste** ou da **forma de segmentar a imagem**. Isso responde à exigência de comparar técnicas usando dados reais, mas cada experimento responde a **uma pergunta diferente**.
 
-### 6.1. Qual dataset e qual avaliação foram usados?
+> **Regra principal:** os estudos utilizam os **mesmos arquivos de origem da Area1**, mas não necessariamente os **mesmos objetos, registros, divisões de teste ou métricas**. Para afirmar que um método é melhor que outro, precisamos controlar o que muda entre eles.
 
-| Experimento | Construção dos segmentos | Amostras supervisionadas | Avaliação |
+### 6.1. Primeiro entenda: quais dados entram em cada teste?
+
+Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisionadas diferentes**, conforme a segmentação e a seleção de objetos.
+
+```mermaid
+flowchart TD
+    A["Area1<br/>510 pontos"] --> B["Original<br/>Quickshift global"]
+    B --> C["K-Means<br/>cluster 3"]
+    C --> D["458 pares<br/>92 testes"]
+
+    A --> E["V2 / E3c<br/>812 blocos"]
+    E --> F["Quickshift<br/>256 px"]
+    F --> G["505 objetos<br/>únicos"]
+
+    A --> H["V2 / E9<br/>119 regiões"]
+    H --> I["512 px ou<br/>4 × 256 px"]
+    I --> J["505 referências<br/>comuns"]
+
+    classDef origem fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
+    classDef historico fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
+    classDef novo fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:1.5px;
+    class A origem;
+    class B,C,D historico;
+    class E,F,G,H,I,J novo;
+```
+
+| Experimento | Como formou a base | Quantidade usada | Como avaliou |
 |---|---|---|---|
-| **Original inicial** | Método histórico; recorte inicial não totalmente reconstituído | **133 pares** | Aleatória, 27 registros de teste |
-| **Original ampliado** | Quickshift **global** + K-Means **cluster 3** | **458 pares** | Aleatória, 92 registros de teste |
-| **V2 — E3c/E8h** | Quickshift em **812 quadrantes** de até **256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Oito classificadores, divisões aleatórias e espaciais |
-| **V2 — E9** | **119 regiões**: Quickshift contínuo **512 px** versus quatro quadrantes **256 px** | **505 referências comuns dentro da E9** | Oito classificadores, testes espaciais pareados |
+| **Original inicial** | Primeira rodada histórica; recorte não reconstruído integralmente | **133 pares** objeto–rótulo | **27 testes** aleatórios |
+| **Original ampliado** | Quickshift **global** + K-Means **cluster 3** | **458 pares** objeto–rótulo | **92 testes** aleatórios |
+| **V2 — E3c/E8h** | Quickshift independente em **812 blocos de até 256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Divisões **aleatórias e espaciais** |
+| **V2 — E9** | **119 regiões**, cada uma segmentada em **512 contínuo** ou **quatro blocos 256** | **505 referências comuns às duas alternativas da E9** | Testes **espaciais pareados** |
 
-A E3c criou **168.133 segmentos** na extensão retangular do raster (inclusive fora da AOI), mas a classificação supervisionada usou **505 segmentos rotulados**. A E9 segmentou **recortes locais com referências**, não a imagem inteira. A igualdade numérica dos **505** na E3c e E9 **não garante geometrias idênticas**.
+**Por que 458 e 505 não são a mesma base?** No original, eram contados **pares segmento–rótulo após a seleção do cluster 3**, sem deduplicação explícita. Na E3c, foram obtidos **segmentos rotulados únicos** de outra segmentação. Na E9, são **referências identificadas nos dois braços de um experimento local**. Ter 505 em E3c e E9 também **não significa ter as mesmas geometrias**.
 
-### 6.2. E3c — Random Forest versus outros classificadores
+Na E3c, os 812 blocos produziram **168.133 segmentos** em toda a extensão retangular do raster, incluindo partes fora da AOI. Somente os **505 rotulados** entraram nos testes supervisionados. A E9 trabalha com **recortes locais selecionados**, não com toda a imagem.
 
-Nos mesmos **505 segmentos derivados** e nas mesmas divisões de treino/teste **dentro de cada protocolo**, foram avaliados **oito classificadores**.
+### 6.2. Experimento E3c — qual classificador funciona melhor?
 
-**F1-macro médio** (cinco divisões espaciais, embargo de **25 m das geometrias de teste**):
+**Pergunta:** se os dados e a divisão de teste forem iguais, **Random Forest, SVM ou outro algoritmo** classifica melhor os objetos?
 
-| Classificador | Blocos 250 m | Blocos 500 m |
+```mermaid
+flowchart TD
+    A["505 segmentos<br/>rotulados"] --> B["Mesmos atributos<br/>HSV / Canny / NDVI"]
+    B --> C["Mesma divisão<br/>treino e teste"]
+    C --> D["Random Forest"]
+    C --> E["SVM RBF"]
+    C --> F["Outros 6<br/>classificadores"]
+    D --> G["Comparar<br/>F1-macro"]
+    E --> G
+    F --> G
+
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
+    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
+    class A,B,C dados;
+    class D,E,F metodo;
+    class G resultado;
+```
+
+**Como a comparação funciona:**
+
+1. Partimos dos **mesmos 505 segmentos únicos** da base derivada.
+2. Para cada modelo, utilizamos **as mesmas três características** e **a mesma divisão de treino/teste** dentro de cada rodada.
+3. Mudamos **o classificador** e calculamos as **mesmas métricas**. Assim, a comparação entre algoritmos **é válida dentro daquele protocolo**.
+
+A tabela mostra **F1-macro médio** de cinco divisões espaciais com embargo de **25 m das geometrias de teste**:
+
+| Modelo | Blocos de 250 m | Blocos de 500 m |
 |---|---:|---:|
 | **SVM RBF** | **0,8987** | **0,8668** |
 | Regressão logística | 0,8928 | 0,8664 |
@@ -228,57 +281,113 @@ Nos mesmos **505 segmentos derivados** e nas mesmas divisões de treino/teste **
 | **Random Forest** | **0,8656** | **0,8530** |
 | HistGradientBoosting | 0,8556 | 0,8524 |
 | Gaussian Naive Bayes | 0,8555 | 0,8398 |
-| Dummy | 0,2980 | 0,2799 |
+| Dummy (referência simples) | 0,2980 | 0,2799 |
 
-**O que significa:** o SVM teve maior F1-macro médio **nesse protocolo**, não superioridade estatística geral. Na **E4**, as três características **NDVI + brilho + Canny** juntas tiveram maior F1 médio nas condições estudadas. A **E5** explorou parâmetros do Quickshift/K-Means; *silhouette* não é acurácia.
+**Exemplo:** no protocolo de blocos **250 m / embargo 25 m**, SVM obteve média **0,8987**, e Random Forest **0,8656**. O **SVM teve maior média nessas condições**, sem comprovar que seria superior em qualquer área ou que a diferença seja estatisticamente significativa.
 
-### 6.3. E8h — comparação da avaliação aleatória com a espacial
+A **E4** também comparou combinações das características e encontrou maior F1 médio com **NDVI + brilho HSV + Canny juntos** nas condições estudadas. A **E5** avaliou parâmetros de Quickshift/K-Means; a medida *silhouette* do K-Means **não é acurácia de classificação**.
 
-Com a **mesma base derivada de 505 segmentos**, o Random Forest apresentou:
+### 6.3. Experimento E8h — por que comparar teste aleatório e espacial?
 
-| Protocolo | Acurácia média | F1-macro médio |
+**Pergunta:** o desempenho estimado muda quando o modelo é testado com objetos sorteados aleatoriamente ou com **regiões geograficamente separadas**?
+
+```mermaid
+flowchart TD
+    A["Mesmos 505<br/>segmentos"] --> B["Teste aleatório<br/>80 / 20"]
+    A --> C["Teste espacial<br/>250 ou 500 m"]
+    C --> D["Embargo<br/>25 m"]
+    B --> E["Treinar e medir<br/>Random Forest"]
+    D --> F["Treinar e medir<br/>Random Forest"]
+    E --> G["Comparar médias<br/>com cautela"]
+    F --> G
+
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
+    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
+    class A,B,C,D dados;
+    class E,F metodo;
+    class G resultado;
+```
+
+**Entenda a diferença:** no **teste aleatório 80/20**, alguns objetos de treinamento podem ficar muito próximos dos objetos testados. No **teste espacial**, usamos blocos geográficos e afastamos objetos de treinamento das **geometrias de teste** por um embargo de 25 m. O objetivo é investigar se o desempenho se mantém quando os testes são espacialmente mais separados.
+
+**Random Forest sobre a base nova de 505 segmentos:**
+
+| Avaliação | Acurácia média | F1-macro médio |
 |---|---:|---:|
-| Aleatório 80/20 | **0,8832** | **0,8827** |
+| Aleatória 80/20 | **0,8832** | **0,8827** |
 | Espacial 250 m, embargo 25 m | 0,8697 | 0,8656 |
 | Espacial 500 m, embargo 25 m | 0,8591 | 0,8530 |
 
-Os protocolos usam **conjuntos de teste diferentes**: essa comparação é **descritiva**, e não uma prova de que o embargo por si só causou toda a diferença. A E8h fez **40 ajustes aleatórios novos** e reutilizou **240 ajustes espaciais E3c** com verificações.
+Foram **40 ajustes aleatórios novos** (oito modelos × cinco divisões) e **240 resultados espaciais E3c reutilizados com verificações**, não 280 ajustes inteiramente novos.
 
-Usando a **regra antiga do RF com semente 42 na base nova**, foram **404 registros de treino e 101 de teste**, com acurácia **0,9010** e F1-macro **0,9009**. Esse experimento **não reproduz** o histórico de **0,87** com 458 pares.
+**Cuidado importante:** as divisões aleatórias e espaciais **não testam exatamente os mesmos objetos**. Portanto, as diferenças das médias são **descritivas**: não podemos dizer que toda a diferença foi causada somente pelo embargo.
 
-### 6.4. E9 — segmentação contínua de 512 versus quadrantes de 256
+Também repetimos a **regra histórica** do Random Forest (500 árvores, divisão aleatória 80/20, semente 42), **mas usando a base nova**: **404 treino, 101 teste, acurácia 0,9010 e F1-macro 0,9009**. **Não é reprodução do 0,87 histórico**, porque a base original possuía 458 pares, não 505 segmentos novos.
 
-Na E9, as **119 regiões** foram segmentadas das duas maneiras, mantendo os **mesmos 505 pontos de referência, as mesmas divisões e os mesmos modelos dentro da experiência**. Foram **320 avaliações**.
+### 6.4. Experimento E9 — o tamanho da segmentação faz diferença?
 
-**F1-macro médio**, com embargo de **25 m entre pontos de referência**:
+**Pergunta:** mantendo os **mesmos pontos, modelos e divisões**, segmentar um recorte contínuo de **512 × 512 pixels** dá resultados diferentes de dividi-lo em **quatro quadrantes de 256 × 256 pixels**?
 
-| Blocos | Modelo | Contínuo 512 px | Quatro 256 px |
+```mermaid
+flowchart TD
+    A["119 regiões<br/>com referências"] --> B["Quickshift<br/>512 contínuo"]
+    A --> C["Quickshift<br/>4 × 256"]
+    B --> D["Mesmos 505<br/>pontos comuns"]
+    C --> D
+    D --> E["Mesmos testes<br/>e 8 modelos"]
+    E --> F["Comparar F1<br/>das duas versões"]
+
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
+    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
+    class A,D,E dados;
+    class B,C metodo;
+    class F resultado;
+```
+
+**O que é mantido igual:** os rasters e recortes originais, os **505 pontos de referência compartilhados**, os mapas de **NDVI, brilho HSV e Canny**, os modelos e as divisões de teste dentro da E9. **O que muda:** a forma como o Quickshift divide cada recorte em segmentos. Portanto, as **médias dos atributos por segmento podem mudar**.
+
+O protocolo usa cinco divisões por escala (250 e 500 m) e, no quadro abaixo, embargo de **25 m entre pontos de referência** — diferente do embargo **entre geometrias completas** utilizado na E3c. Foram **320 avaliações** no total.
+
+**F1-macro médio nos testes pareados da E9:**
+
+| Blocos | Modelo | 512 contínuo | Quatro 256 |
 |---|---|---:|---:|
 | 250 m | Random Forest | **0,8906** | 0,8835 |
 | 250 m | SVM RBF | 0,9157 | **0,9341** |
 | 500 m | Random Forest | **0,8657** | 0,8566 |
 | 500 m | SVM RBF | 0,8518 | **0,8641** |
 
-**O que significa:** RF teve média ligeiramente maior com 512 contínuo; SVM, com quadrantes. O efeito não foi uniforme em todas as divisões. **512 contínuo é um recorte de 512 px, não o Quickshift global da imagem inteira**. A E9 também não reproduz o K-Means global e seu cluster 3.
+**Exemplo:** com blocos de 250 m, o Random Forest apresentou média maior no **512 contínuo**, mas o SVM teve média maior nos **quatro quadrantes 256**. O efeito **depende do classificador** e não foi igual em todas as divisões.
 
-### 6.5. Afinal, o que podemos comparar com rigor?
+**Atenção:** “512 contínuo” é **um recorte local de 512 pixels**. **Não equivale ao Quickshift global aplicado à imagem inteira**, e a E9 não reproduz o filtro original do K-Means **cluster 3**.
 
-| Comparação | É válida como prova de melhoria? |
-|---|---|
-| Original **0,81 × 0,87** | **Não.** Apenas descrição de rodadas com testes diferentes. |
-| Original **0,87 × resultados da V2** | **Não diretamente.** Mudaram segmentos, seleção de candidatos, amostras e testes; às vezes a métrica também mudou. |
-| **RF × SVM × outros na E3c** | **Sim, dentro de cada protocolo**, com os mesmos dados e divisões. |
-| **512 contínuo × quatro 256 na E9** | **Sim, nos recortes da E9**, com referências e testes pareados. |
-| **Pipeline completo original × pipeline completo V2** | **Ainda não foi demonstrado** por uma reprodução ponta a ponta controlada. |
+### 6.5. Como saber se uma comparação é cientificamente válida?
 
-**Acurácia** é a proporção de classificações corretas. **F1-macro** é a média do F1 de árvores e gramíneas, com mesmo peso para cada classe. Portanto, **acurácia 0,87 não é diretamente comparável ao F1-macro 0,8656**.
+Antes de comparar duas notas, devemos perguntar: **mesmos exemplos de teste? mesmos atributos? mesma métrica? apenas uma condição foi alterada?**
 
-### 6.6. O que já foi feito e o que falta?
+| Comparação | Podemos interpretar como melhoria? | Motivo |
+|---|---|---|
+| Original **0,81 × 0,87** | **Não causalmente** | As rodadas tinham exemplos e testes diferentes. |
+| Original **0,87 × V2 RF 0,8656** | **Não** | **Acurácia × F1-macro**, além de dados e divisões diferentes. |
+| Original **0,87 × V2 acurácia 0,8697** | **Não diretamente** | A métrica é igual, mas os segmentos e testes são outros. |
+| **RF × SVM na E3c**, mesmo protocolo | **Sim, internamente** | Mesmos exemplos, atributos, divisões e métricas. |
+| **512 contínuo × quatro 256 na E9** | **Sim, nesses recortes** | Mesmas referências, modelos e divisões em cada par. |
+| **Pipeline completo original × V2 completa** | **Ainda não demonstrado** | Não houve reprodução integral controlada nas mesmas condições. |
 
-Além dos testes detalhados, a V2 documenta **E6/E6c** (proximidade de postes e extrapolação dos atributos) e **E7** (cenários empíricos de porte), **sem validação de risco ou altura real**.
+**Entenda as métricas:** **acurácia** = proporção de previsões corretas. **F1-macro** = média do F1 de árvores e gramíneas, com o mesmo peso para as duas classes. **Uma acurácia de 0,87 não é a mesma medida que um F1-macro de 0,8656.**
 
-**Para comparar o método completo original com a alternativa**, ainda é necessário reproduzir o **Quickshift global, K-Means e cluster 3** sobre os dados originais, usar referências e divisões de teste equivalentes, e medir separadamente **cobertura dos candidatos** e **qualidade da classificação**. A nova execução global integral **não está comprovada**.
+### 6.6. O que já fizemos e o que falta para responder ao orientador?
 
-A Area1 não tem **alturas reais medidas, geometrias de cabos ou rótulos para todo o fundo urbano**. Assim, os resultados não demonstram risco elétrico real nem generalização para outras cidades.
+**Já feito e documentado:** comparar oito classificadores (E3c), testar combinações dos atributos (E4), investigar parâmetros de Quickshift/K-Means (E5), analisar proximidade com postes e extrapolação de atributos (E6/E6c), estudar cenários empíricos de porte (E7), comparar avaliações aleatórias e espaciais (E8h) e comparar duas segmentações em recortes equivalentes (E9).
 
-**Conclusão científica:** temos comparações controladas **entre classificadores (E3c)** e **entre estratégias locais de segmentação (E9)**. O resultado histórico do Random Forest (**0,87**) permanece uma referência descritiva; **não foi demonstrado que a V2 completa o supera**.
+**Ainda falta uma comparação ponta a ponta:** reexecutar o **Quickshift global**, o **K-Means com seis grupos** e a **seleção do cluster 3** do método original; registrar quais referências entram nos dois métodos; usar **divisões comuns e as mesmas métricas**; e separar **cobertura de candidatos** de **qualidade da classificação**. A execução global atual sobre os aproximadamente **50,6 milhões de pixels** **não está novamente comprovada**.
+
+**Limitação dos dados:** a Area1 não contém **alturas reais medidas, geometrias dos cabos elétricos nem rótulos de fundo urbano completo**. Os resultados atuais, portanto, **não validam risco elétrico real, altura verdadeira ou generalização para outras cidades**.
+
+**Resposta resumida para a banca:**
+
+> “O método original registrou 0,87 de acurácia em 92 testes, mas utilizou uma base diferente da V2. Nos experimentos novos, comparei oito classificadores em divisões equivalentes e comparei duas formas de segmentação nos mesmos recortes. Esses testes são válidos dentro dos respectivos protocolos. Ainda não posso afirmar que o pipeline novo supera o original, porque falta executar uma comparação integral sob as mesmas condições.”
+
+Para os detalhes e a reprodução dos protocolos, consulte [Harmonização E3c/E8h](docs/harmonizacao_protocolos_2026-11-01.md) e [Comparação pareada E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md).
