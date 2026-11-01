@@ -18,7 +18,7 @@
 | E4 | **Código implementado na V2; não executado** | Verificar contribuição de atributos | 7 combinações não vazias de brilho HSV, bordas Canny e NDVI; RF, SVM, regressão logística e Dummy majoritário; partições E2/E3 de 250/500 m com exclusão 25 m; diferenças pareadas de F1-macro, acurácia balanceada e recall |
 | E5 | **Código implementado na V2; não executado** | Avaliar sensibilidade de parâmetros | Quickshift: 5 configurações em até 4 janelas fixas de 256×256 px; K-Means: K=4/6/8 na mesma amostra de até 1.500 segmentos originais com 8 atributos RGB/NIR; tempo, distribuição, ARI, silhouette, memória de arrays |
 | E6 | **Código implementado na V2; não executado** | Auditar a proximidade planimétrica a postes | 1, 3 e 5 m; candidatos C3>7 sem filtro de classe, candidatos árvore e gramínea; `sjoin_nearest` nos dois sentidos para contar polígonos e postes distintos; gráfico comparativo |
-| E7 | Pendente | Analisar sensibilidade da alometria | Comparar C1–C6 e limiares de porte; **sem** alegar acurácia de altura |
+| E7 | **Código implementado na V2; não executado** | Analisar sensibilidade da alometria | Recalcular e conferir 12 expressões históricas (C1–C6, potencial/linear); limiares 5/7/9 de índice; filtros com/sem classe árvore; 1/3/5 m de postes; Jaccard e contagens únicas; gráficos |
 | E8 | Pendente | Consolidar resultados e discussão dos gaps | Tabelas, limitações e relação com métodos da literatura |
 
 ## Limitações científicas
@@ -96,4 +96,18 @@ O `wget` baixa apenas **código**, não dados de pesquisa. O script usa os objet
 
 **Estado E6:** **código publicado, sem nova execução integral ou resultados reais verificados**. O experimento só utiliza os dados da `Area1`, já existentes no projeto.
 
-**Próxima etapa planejada:** E7 — sensibilidade das configurações alométricas C1–C6 e dos limiares de porte, explicitando que não há alturas reais disponíveis para calcular erro de estimação.
+**Etapa E7 implementada:** análise de sensibilidade das 12 expressões alométricas e dos limiares de índice, sem alegar medição ou validação de altura.
+
+## Como executar E7 no Colab
+
+1. Abra a [V2 experimental](../Segmentacao_area_completa_v2_experimentos.ipynb) e execute o fluxo histórico com os arquivos **já existentes** da pasta `Area1`, até criar `tree_polys` (com `area`, `predicted_classe` e C1–C6 nas formas potencial/linear) e `Postes` após reprojeção e recorte da AOI.
+2. Execute **E7a**: valida áreas geométricas e CRS, confirma os valores das **12 expressões originais**, deduplica localizações de postes e constrói uma única relação objeto–poste até 5 m usando interseção espacial com buffers seguida da distância geométrica exata.
+3. Execute **E7b**: compara limiares **5, 7 e 9** dos índices empíricos para as versões **C1–C6 × potencial/linear**; em cada cenário considera tanto todos os candidatos quanto apenas os previstos como árvores, contabilizando segmentos e postes distintos em **1, 3 e 5 m**. Compara conjuntos selecionados e suas diferenças com a **referência C3 potencial > 7** usando Jaccard. Se a E6 já tiver sido executada, confere possíveis divergências entre os resultados de referência.
+4. Execute **E7c**: visualize a quantidade de segmentos classificados como árvore próximos de postes por expressão (limiar 7, raio 5 m) e a sensibilidade do modelo C3 aos diferentes limiares.
+5. Registre os resultados de `tabela_e7` **somente após a execução real no Colab**. O código não altera `tree_polys`, `filter_tree`, `Postes` ou a classificação existente e não grava arquivos de entrada.
+
+**Estado E7:** notebook V2 publicado com E7a/E7b/E7c, **sem execução integral dos dados de `Area1` ou métricas verificadas até o momento**. A matriz contém 12 expressões × 3 limiares × 2 cenários de classe × 3 distâncias, isto é, **216 linhas previstas**, condicionadas a dados e geometrias válidos.
+
+**Limites científicos:** `C1–C6` são **estimativas empíricas não calibradas**, e os limiares 5/7/9 são critérios numéricos para sensibilidade — **não alturas observadas em metros**. Nenhuma contagem, Jaccard ou distância a poste permite inferir erro da estimativa de altura ou interferência com cabos. Para essa dissertação, não apresentar MAE/RMSE/R² de altura com esses dados, pois não há alturas reais documentadas.
+
+**Próxima etapa:** E8 — consolidação científica dos resultados **depois da execução** das etapas preparadas. A publicação de código, sozinha, não responde à exigência do orientador de apresentar resultados de testes em dados reais. Antes de redigir conclusões de desempenho, executar E1–E7 com `Area1`, verificar erros, salvar métricas e registrar limitações.
