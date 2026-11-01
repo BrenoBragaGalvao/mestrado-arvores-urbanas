@@ -504,3 +504,33 @@ O quadro a seguir usa somente **F1-macro médio** e a **mesma base derivada de 5
 
 **O que continua pendente:** a reprodução exata do ensaio histórico sobre os mesmos 458 registros, com seus segmentos e partições originais, e a comprovação do processamento monolítico da V2. Esses limites não invalidam as comparações pareadas da bateria derivada, mas impedem afirmar que ela superou o experimento histórico de 0,87.
 
+
+
+---
+
+## E9 — comparação controlada da escala de segmentação
+
+Para investigar se a mudança do processamento contínuo para quadrantes altera o resultado dos classificadores, foi realizado um **novo experimento pareado** nos mesmos locais e dados da `Area1`.
+
+- **Mesmos domínios:** 119 regiões de até 512 × 512 pixels contendo as referências originais.
+- **Mesmos pontos:** 510 referências identificadas, resultando em **505 referências únicas** (257 árvores, 248 gramíneas), após retirar repetições em qualquer braço.
+- **Duas segmentações:** Quickshift executado sobre a região 512 inteira **versus** Quickshift executado independentemente nos quatro quadrantes de 256 pixels dessa mesma região.
+- **Mesmas características:** NDVI, brilho HSV e bordas Canny, computados em mapas pixel a pixel comuns aos dois métodos.
+- **Mesmos testes:** grupos espaciais de 250/500 m, cinco divisões por escala, sem embargo ou com exclusão de treino a até 25 m dos **pontos** de teste; oito algoritmos idênticos.
+- **Execução:** 20 protocolos válidos e **320 avaliações**, sendo 160 por forma de segmentar.
+
+### Resultado pareado — F1-macro médio, embargo de 25 m
+
+| Algoritmo | Blocos 250 m: contínuo 512 | Blocos 250 m: quadrantes 256 | Blocos 500 m: contínuo 512 | Blocos 500 m: quadrantes 256 |
+|---|---:|---:|---:|---:|
+| Random Forest | **0,8906** | 0,8835 | **0,8657** | 0,8566 |
+| SVM (RBF) | 0,9157 | **0,9341** | 0,8518 | **0,8641** |
+| Regressão logística | 0,9153 | **0,9157** | 0,8484 | **0,8685** |
+| Extra Trees | **0,9064** | 0,8968 | **0,8747** | 0,8545 |
+
+**Interpretação:** a escala de segmentação apresentou efeitos distintos conforme o classificador. Por exemplo, Random Forest favoreceu discretamente a segmentação contínua, mas o SVM favoreceu os quadrantes nesses testes. As diferenças são descritivas; nenhuma técnica foi comprovada como superior universalmente.
+
+A [documentação detalhada do experimento E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) apresenta o fluxograma Mermaid, o protocolo, os oito classificadores e as limitações.
+
+**Não confundir com a reprodução do experimento histórico:** a comparação acima usa regiões **contínuas de 512 px**, não o Quickshift monolítico sobre todo o raster, e não aplica a seleção histórica global do cluster 3 do K-Means. Também não reconstrói os 458 pares do experimento original que reportou acurácia de **0,87**. O resultado antigo permanece preservado como referência histórica, e não como baseline diretamente comparável a E9.
+
