@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="1335" viewBox="0 0 1290 1335">
+<defs><marker id="arr" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M2 2 L10 6 L2 10" fill="none" stroke="#64748b" stroke-width="2.2"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="48" y="56" font-family="DejaVu Sans, Arial" font-size="30" font-weight="bold" fill="#0f172a">Fluxo do método original — 17 etapas</text>
+<text x="48" y="85" font-family="DejaVu Sans, Arial" font-size="18" fill="#475569">Base Area1 • duas propostas • representação da lógica do código histórico</text>
+<rect x="32" y="113" width="598" height="1108" rx="22" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+<rect x="656" y="113" width="602" height="1108" rx="22" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2"/>
+<rect x="47" y="128" width="567" height="66" rx="14" fill="#1d4ed8"/>
+<rect x="670" y="128" width="572" height="66" rx="14" fill="#15803d"/>
+<text x="65" y="155" font-family="DejaVu Sans, Arial" font-size="21" font-weight="bold" fill="#fff">PROPOSTA 1</text>
+<text x="65" y="179" font-family="DejaVu Sans, Arial" font-size="18" fill="#dbeafe">Identificar árvores e gramíneas</text>
+<text x="690" y="155" font-family="DejaVu Sans, Arial" font-size="21" font-weight="bold" fill="#fff">PROPOSTA 2</text>
+<text x="690" y="179" font-family="DejaVu Sans, Arial" font-size="18" fill="#dcfce7">Porte exploratório e proximidade com postes</text>
+<rect x="570" y="155" width="7" height="24" rx="2" fill="#9a5d30"/>
+<circle cx="573" cy="147" r="17" fill="#86efac"/>
+<circle cx="563" cy="153" r="11" fill="#4ade80"/>
+<rect x="1190" y="155" width="7" height="24" rx="2" fill="#9a5d30"/>
+<circle cx="1193" cy="147" r="17" fill="#86efac"/>
+<circle cx="1183" cy="153" r="11" fill="#4ade80"/>
+<rect x="49" y="210" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="224" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="249" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">01</text>
+<text x="113" y="237" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Abrir imagem RGB</text>
+<text x="113" y="259" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">AOI_RGB_NEW.tif • 3 bandas</text>
+<rect x="49" y="291" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="305" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="330" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">02</text>
+<text x="113" y="318" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Segmentar com Quickshift</text>
+<text x="113" y="340" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">kernel=3 • max_dist=5 • ratio=0,04</text>
+<rect x="49" y="372" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="386" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="411" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">03</text>
+<text x="113" y="399" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Gerar polígonos e recortar AOI</text>
+<text x="113" y="421" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Segmentos transformados em objetos</text>
+<rect x="49" y="453" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="467" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="492" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">04</text>
+<text x="113" y="480" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Extrair estatísticas RGB + NIR</text>
+<text x="113" y="502" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">4 médias e 4 desvios-padrão por objeto</text>
+<rect x="49" y="534" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="548" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="573" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">05</text>
+<text x="113" y="561" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Aplicar K-Means</text>
+<text x="113" y="583" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">6 agrupamentos • random_state=42</text>
+<rect x="49" y="615" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="629" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="654" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">06</text>
+<text x="113" y="642" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Selecionar candidatos</text>
+<text x="113" y="664" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Somente objetos do cluster 3</text>
+<rect x="49" y="696" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="710" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="735" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">07</text>
+<text x="113" y="723" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Associar referências</text>
+<text x="113" y="745" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Interseção com árvores e gramíneas</text>
+<rect x="49" y="777" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="791" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="816" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">08</text>
+<text x="113" y="804" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Calcular 3 mapas</text>
+<text x="113" y="826" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">NDVI • brilho HSV • bordas Canny</text>
+<rect x="49" y="858" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="872" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="897" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">09</text>
+<text x="113" y="885" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Resumir atributos por objeto</text>
+<text x="113" y="907" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Média de cada mapa no polígono</text>
+<rect x="49" y="939" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="953" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="978" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">10</text>
+<text x="113" y="966" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Separar treino e teste</text>
+<text x="113" y="988" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Aleatório 80% / 20% • seed 42</text>
+<rect x="49" y="1020" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="1034" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="1059" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">11</text>
+<text x="113" y="1047" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Treinar Random Forest</text>
+<text x="113" y="1069" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">500 árvores • seed 42</text>
+<rect x="49" y="1101" width="562" height="68" rx="12" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+<rect x="61" y="1115" width="38" height="38" rx="10" fill="#2563eb"/>
+<text x="80" y="1140" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">12</text>
+<text x="113" y="1128" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Avaliar e prever classes</text>
+<text x="113" y="1150" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Acurácia / F1; árvore ou gramínea</text>
+<rect x="673" y="258" width="568" height="86" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+<rect x="685" y="272" width="38" height="38" rx="10" fill="#15803d"/>
+<text x="704" y="297" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">13</text>
+<text x="737" y="285" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Calcular área dos candidatos</text>
+<text x="737" y="307" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Polígonos do cluster 3 • área em m²</text>
+<rect x="673" y="370" width="568" height="86" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+<rect x="685" y="384" width="38" height="38" rx="10" fill="#15803d"/>
+<text x="704" y="409" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">14</text>
+<text x="737" y="397" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Explorar indicadores de porte</text>
+<text x="737" y="419" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">Modelos empíricos C1–C6</text>
+<rect x="673" y="482" width="568" height="86" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+<rect x="685" y="496" width="38" height="38" rx="10" fill="#15803d"/>
+<text x="704" y="521" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">15</text>
+<text x="737" y="509" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Aplicar filtro potencial C3</text>
+<text x="737" y="531" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">2,5 × área^0,4 &gt; 7 • sem filtro de classe</text>
+<rect x="673" y="594" width="568" height="86" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+<rect x="685" y="608" width="38" height="38" rx="10" fill="#15803d"/>
+<text x="704" y="633" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">16</text>
+<text x="737" y="621" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Carregar e recortar postes</text>
+<text x="737" y="643" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">postes.gpkg • reprojeção e AOI</text>
+<rect x="673" y="706" width="568" height="86" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+<rect x="685" y="720" width="38" height="38" rx="10" fill="#15803d"/>
+<text x="704" y="745" font-family="DejaVu Sans, Arial" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">17</text>
+<text x="737" y="733" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#0f172a">Calcular proximidade 2D</text>
+<text x="737" y="755" font-family="DejaVu Sans, Arial" font-size="14" fill="#475569">sjoin_nearest: 1 m, 3 m e 5 m</text>
+<path d="M330 278 V289" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 359 V370" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 440 V451" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 521 V532" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 602 V613" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 683 V694" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 764 V775" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 845 V856" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 926 V937" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 1007 V1018" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M330 1088 V1099" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M954 344 V367" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M954 456 V479" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M954 568 V591" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M954 680 V703" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M611 649 H640 V302 H667" stroke="#eab308" stroke-width="3.5" fill="none" stroke-dasharray="9 6" marker-end="url(#arr)"/>
+<rect x="690" y="866" width="534" height="104" rx="13" fill="#fef9c3" stroke="#facc15"/>
+<text x="707" y="892" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#854d0e">ATENÇÃO AO CÓDIGO</text>
+<text x="707" y="920" font-family="DejaVu Sans, Arial" font-size="14" fill="#713f12">A Proposta 2 reutiliza os candidatos do cluster 3,</text>
+<text x="707" y="944" font-family="DejaVu Sans, Arial" font-size="14" fill="#713f12">não apenas os objetos previstos como árvore.</text>
+<rect x="690" y="994" width="534" height="125" rx="13" fill="#dcfce7" stroke="#86efac"/>
+<text x="707" y="1023" font-family="DejaVu Sans, Arial" font-size="17" font-weight="bold" fill="#14532d">LIMITES DE INTERPRETAÇÃO</text>
+<text x="707" y="1052" font-family="DejaVu Sans, Arial" font-size="14" fill="#166534">C3 é um índice empírico, não altura validada.</text>
+<text x="707" y="1075" font-family="DejaVu Sans, Arial" font-size="14" fill="#166534">A distância é 2D até postes, não até cabos.</text>
+<text x="707" y="1098" font-family="DejaVu Sans, Arial" font-size="14" fill="#166534">Não indica risco elétrico comprovado.</text>
+<text x="54" y="1254" font-family="DejaVu Sans, Arial" font-size="15" fill="#475569">Linha amarela tracejada: candidatos do cluster 3 usados na Proposta 2 (independentemente da classe prevista).</text>
+<text x="54" y="1285" font-family="DejaVu Sans, Arial" font-size="15" fill="#475569">Representação do notebook original; não inclui experimentos posteriores em quadrantes da V2.</text>
+</svg>
