@@ -22,13 +22,22 @@ Esta pesquisa combina **segmentação de imagens, características espectrais e 
 
 ## Dados utilizados — entenda a imagem antes do processamento
 
-### Características das imagens e dos arquivos de referência
+### Dois arquivos raster da mesma área de estudo e seus dados de referência
 
-Antes de acompanhar os fluxogramas e interpretar os resultados, conheça **as imagens, os pontos de referência e as informações que entram no código**.
+Antes de acompanhar os fluxogramas e interpretar os resultados, é importante saber que usamos **dois arquivos raster referentes à mesma área de estudo**. Eles não representam duas cidades nem dois conjuntos independentes de árvores; cada arquivo contém bandas e informações utilizadas em etapas diferentes do código.
 
-A pesquisa utiliza imagens de satélite de alta resolução da região de **Caxias do Sul (RS)**, disponibilizadas pela **CPFL**. A documentação do projeto identifica o satélite **JL1KF01B** como origem das imagens; **a data de aquisição não está informada**.
+A pesquisa utiliza **dois arquivos de imagem raster** da região de **Caxias do Sul (RS)**, disponibilizados pela **CPFL**. A documentação identifica o satélite **JL1KF01B** como origem das imagens, mas **não informa a data de aquisição**. Ambos cobrem essencialmente a mesma região, com uma pequena diferença no posicionamento de suas grades.
 
-**Dimensões e características dos rasters da pasta `Area1`:**
+**Quais são os dois arquivos raster e por que utilizamos ambos?**
+
+| Arquivo | Bandas | Função no código original |
+|---|---|---|
+| **`AOI_RGB_NEW.tif`** | **3 bandas:** vermelho (R), verde (G) e azul (B) | É a **entrada do Quickshift**, que divide a imagem em segmentos (objetos/polígonos). |
+| **`AOI_NEW_MULTI.tif`** | **4 bandas:** vermelho (R), verde (G), azul (B) e infravermelho próximo (NIR) | Fornece as estatísticas RGB/NIR ao K-Means e as bandas usadas para calcular **NDVI, brilho HSV e bordas Canny**. |
+
+**Em resumo: a primeira imagem define os objetos; a segunda fornece características para descrevê-los.** Não somamos as imagens para criar uma imagem de sete bandas: elas são lidas em etapas diferentes, e as características da segunda são associadas aos objetos produzidos a partir da primeira.
+
+**Dimensões e características dos dois rasters da pasta `Area1`:**
 
 | Característica | Valor | O que significa |
 |---|---|---|
@@ -39,10 +48,10 @@ A pesquisa utiliza imagens de satélite de alta resolução da região de **Caxi
 | **Extensão retangular aproximada** | **3.471 m × 3.647 m** | Largura e altura da cobertura raster, estimadas pela resolução nominal |
 | **Área do retângulo raster** | **aproximadamente 12,66 km²** | **Não** é a área efetiva do polígono de estudo (AOI) |
 | **Sistema de coordenadas dos rasters** | **EPSG:31982** | Referencial projetado usado nas operações métricas |
-| **Imagem RGB** | `AOI_RGB_NEW.tif` — **3 bandas** | Vermelho, verde e azul, utilizadas na segmentação |
-| **Imagem multiespectral** | `AOI_NEW_MULTI.tif` — **4 bandas** | Vermelho, verde, azul e infravermelho próximo (NIR), usados nas características espectrais |
+| **Raster de segmentação** | `AOI_RGB_NEW.tif` — **3 bandas** | RGB utilizado pelo Quickshift |
+| **Raster de atributos** | `AOI_NEW_MULTI.tif` — **4 bandas** | RGB + NIR utilizados para descrever os segmentos |
 
-**A imagem RGB e a multiespectral têm a mesma quantidade de linhas e colunas, mas apresentam uma pequena diferença na origem de suas grades.** Isso requer cuidado ao relacionar pixels e atributos das duas imagens.
+**Os dois arquivos têm a mesma quantidade de linhas e colunas e se referem essencialmente à mesma área**, mas suas grades têm uma pequena diferença de origem. Assim, não se deve presumir correspondência perfeita entre pixels apenas por terem o mesmo tamanho; isso precisa ser considerado ao relacionar segmentos e atributos.
 
 **Dados vetoriais e referências do mesmo conjunto `Area1`:**
 
@@ -57,7 +66,7 @@ São **510 pontos de referência originais** somando árvores e gramíneas. Os v
 
 ### Como os pixels se transformam em amostras?
 
-A imagem possui **milhões de pixels**, mas o Random Forest original **não foi treinado com 50 milhões de linhas**. Primeiro, o **Quickshift** divide a imagem em **segmentos** (regiões/polígonos). Depois, o **K-Means** separa os segmentos em seis agrupamentos, e o código original seleciona os candidatos do **cluster 3**. Por fim, os pontos conhecidos de árvores e gramíneas são relacionados a esses segmentos.
+Os dois arquivos raster possuem **milhões de pixels**, mas o Random Forest original **não foi treinado com 50 milhões de linhas**. Primeiro, o **Quickshift usa o raster RGB** para criar **segmentos** (regiões/polígonos). Em seguida, calculamos para esses segmentos estatísticas **RGB/NIR do raster multiespectral**; o **K-Means** separa os segmentos em seis agrupamentos, e o código original seleciona os candidatos do **cluster 3**. Por fim, os pontos conhecidos de árvores e gramíneas são relacionados a esses segmentos.
 
 Cada registro que chega ao Random Forest traz **três números calculados para o segmento** — média do **brilho HSV**, média das **bordas Canny** e média do **NDVI** — e o rótulo **árvore** ou **grama**.
 
@@ -76,8 +85,8 @@ Para detalhes sobre os arquivos e seus sistemas de coordenadas, consulte a [docu
 
 | Etapa | Entrada | Saída |
 |---|---|---|
-| **1. Segmentar** | Pixels da imagem RGB | Regiões chamadas **segmentos**, representadas por polígonos |
-| **2. Selecionar candidatos** | Polígonos e estatísticas RGB/NIR | Segmentos do **cluster 3** do K-Means original |
+| **1. Segmentar** | Pixels do arquivo **`AOI_RGB_NEW.tif`** | Regiões chamadas **segmentos**, representadas por polígonos |
+| **2. Selecionar candidatos** | Polígonos da imagem RGB e estatísticas do arquivo **`AOI_NEW_MULTI.tif`** | Segmentos do **cluster 3** do K-Means original |
 | **3. Aprender a distinguir** | Segmentos rotulados + médias de HSV, Canny e NDVI | Modelo Random Forest treinado para diferenciar **árvore** e **grama** |
 | **4. Analisar proximidade** | Objetos selecionados, área dos polígonos e localização dos postes | Indicadores exploratórios de proximidade a **1, 3 e 5 metros** |
 
@@ -91,7 +100,7 @@ Para detalhes sobre os arquivos e seus sistemas de coordenadas, consulte a [docu
 
 **Pergunta de pesquisa:** como distinguir árvores e gramíneas em imagens de alta resolução utilizando a combinação de NDVI, brilho e bordas em objetos segmentados?
 
-A imagem RGB é dividida em regiões espacialmente coerentes pelo **Quickshift**. Para cada região, o código extrai estatísticas das bandas RGB e NIR e aplica **K-Means** para selecionar candidatos. Depois, utiliza amostras identificadas como árvores e gramíneas para treinar um **Random Forest** com três características complementares:
+O arquivo **`AOI_RGB_NEW.tif` (RGB)** é dividido em regiões pelo **Quickshift**. O código usa o **outro arquivo, `AOI_NEW_MULTI.tif` (RGB + NIR)**, para extrair estatísticas de cada região e alimentar o **K-Means**, que seleciona os candidatos. Depois, associa amostras de árvores e gramíneas e treina um **Random Forest** com três características complementares calculadas a partir do raster multiespectral:
 
 | Característica | O que representa | Por que utilizar |
 |---|---|---|
@@ -103,7 +112,9 @@ A imagem RGB é dividida em regiões espacialmente coerentes pelo **Quickshift**
 
 ```mermaid
 flowchart TD
-    A["🛰️ Imagens RGB<br/>e multiespectral"] --> B["🧩 Segmentação<br/>Quickshift"]
+    A["🛰️ Raster RGB<br/>3 bandas"] --> B["🧩 Segmentação<br/>Quickshift"]
+    P["🛰️ Raster RGB+NIR<br/>4 bandas"] --> D
+    P --> H
     B --> C["🗺️ Polígonos<br/>dos objetos"]
     C --> D["📊 Estatísticas<br/>RGB + NIR"]
     D --> E["🔎 K-Means:<br/>6 agrupamentos"]
@@ -123,7 +134,7 @@ flowchart TD
     classDef entrada fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1px;
     classDef destaque fill:#dcefe3,stroke:#6ca58b,color:#164b35,stroke-width:2px;
     classDef recurso fill:#fff2de,stroke:#dcab68,color:#6b4714,stroke-width:1px;
-    class A,B,C,D,G,H,L,N,O entrada;
+    class A,B,C,D,G,H,L,N,O,P entrada;
     class E,F,M destaque;
     class I,J,K recurso;
 ```
@@ -132,10 +143,10 @@ flowchart TD
 
 | Caixas do desenho | O que o código efetivamente faz |
 |---|---|
-| **Imagens → Quickshift → Polígonos** | Abre a imagem **RGB**, aplica `quickshift(im, kernel_size=3, max_dist=5, ratio=0.04)` e transforma regiões em polígonos. O **NIR** vem do raster multiespectral na etapa de atributos. |
-| **Estatísticas RGB/NIR → K-Means** | Calcula **quatro médias e quatro desvios-padrão** (R, G, B, NIR), forma **seis grupos** com K-Means e seleciona o **cluster 3** no experimento original. |
+| **Raster RGB → Quickshift → Polígonos** | Abre **`AOI_RGB_NEW.tif`**, aplica `quickshift(im, kernel_size=3, max_dist=5, ratio=0.04)` e transforma regiões em polígonos. O Quickshift **não recebe o outro raster como entrada** neste código. |
+| **Raster RGB+NIR → Estatísticas → K-Means** | Lê **`AOI_NEW_MULTI.tif`** e calcula **quatro médias e quatro desvios-padrão** por objeto (R, G, B, NIR). Com essas estatísticas, o K-Means forma **seis grupos**; o original escolhe o **cluster 3**. |
 | **Amostras de árvores e gramíneas** | Relaciona pontos conhecidos dos arquivos `Arvores.gpkg` e `Grama.gpkg` aos polígonos candidatos. Os rótulos são necessários para **treinar** o modelo. |
-| **NDVI, brilho HSV e bordas Canny** | Cria três mapas e resume cada um pela **média dos pixels dentro do segmento**. São os **três atributos** usados no Random Forest; não são três imagens novas de treinamento. |
+| **Raster RGB+NIR → NDVI, brilho HSV e bordas Canny** | O código utiliza as bandas do raster multiespectral para construir três mapas e calcula a **média de cada atributo dentro do segmento**. São os **três números** usados pelo Random Forest; não são três arquivos de origem adicionais. |
 | **Random Forest → Árvores ou gramíneas** | Treina **500 árvores de decisão** sobre os registros rotulados, reservando 20% para teste; depois prevê uma das duas classes para os candidatos. |
 | **Avaliação e matriz de confusão** | Compara as previsões dos exemplos reservados com seus rótulos verdadeiros e apresenta acurácia e F1 por classe. |
 
@@ -299,7 +310,7 @@ O **GitHub** contém o código e a documentação. Os dados geoespaciais, devido
 
 ### Área de estudo e origem das imagens
 
-A pesquisa utiliza imagens de satélite de alta resolução para analisar a vegetação urbana de **Caxias do Sul, no Rio Grande do Sul**.
+A pesquisa utiliza **dois arquivos raster que representam essencialmente a mesma área geográfica** de **Caxias do Sul, no Rio Grande do Sul**: um RGB com 3 bandas para segmentação e outro RGB + NIR com 4 bandas para extração de características. Não são imagens de duas áreas de estudo diferentes.
 
 | Característica | Informação |
 |---|---|
@@ -310,7 +321,7 @@ A pesquisa utiliza imagens de satélite de alta resolução para analisar a vege
 | **Resolução espacial dos rasters utilizados** | Aproximadamente **0,5 m/pixel** |
 | **Sistema de referência dos rasters** | **EPSG:31982** |
 
-O sensor **JL1KF01B** é a origem das imagens indicada na apresentação da pesquisa. As bandas RGB e NIR sustentam tanto a segmentação da imagem quanto a extração das características espectrais utilizadas na identificação de árvores e gramíneas.
+O sensor **JL1KF01B** é a origem indicada na documentação. **O Quickshift utiliza o arquivo RGB de 3 bandas** para a segmentação; o raster multiespectral **RGB + NIR de 4 bandas** fornece estatísticas e atributos usados nas etapas posteriores de K-Means e classificação. Ambos cobrem essencialmente a mesma região.
 
 *A identificação do satélite, a localização da área de estudo e a disponibilização pela CPFL são informações constantes da documentação da pesquisa. A data de aquisição das imagens não está especificada nessa documentação.*
 
@@ -332,7 +343,7 @@ Os dez arquivos necessários já estão organizados na [pasta `Area1` no Google 
 └── outputs/
 ```
 
-As imagens de entrada têm resolução espacial aproximada de **0,5 m/pixel**. Os rasters utilizam **EPSG:31982** e as camadas de árvores, gramíneas e postes têm **EPSG:4674** na origem, sendo reprojetadas para operações métricas. Veja [o detalhamento dos dados](data/README.md).
+Os **dois rasters da mesma região** têm resolução espacial aproximada de **0,5 m/pixel** e utilizam **EPSG:31982**, com pequena diferença entre as origens de suas grades. As camadas de árvores, gramíneas e postes têm **EPSG:4674** na origem, sendo reprojetadas para operações métricas. Veja [o detalhamento dos dados](data/README.md).
 
 ## Como executar no Google Colab
 
