@@ -20,6 +20,71 @@ Esta pesquisa combina **segmentação de imagens, características espectrais e 
 
 > **Escopo dos dados atuais:** a área de estudo contém a geometria dos **postes**, mas não dos cabos ou linhas de energia. Assim, a segunda proposta é investigada atualmente por meio da **proximidade com postes**, sem afirmar interferência efetiva nos fios.
 
+## Dados utilizados — entenda a imagem antes do processamento
+
+### Características das imagens e dos arquivos de referência
+
+Antes de acompanhar os fluxogramas e interpretar os resultados, conheça **as imagens, os pontos de referência e as informações que entram no código**.
+
+A pesquisa utiliza imagens de satélite de alta resolução da região de **Caxias do Sul (RS)**, disponibilizadas pela **CPFL**. A documentação do projeto identifica o satélite **JL1KF01B** como origem das imagens; **a data de aquisição não está informada**.
+
+**Dimensões e características dos rasters da pasta `Area1`:**
+
+| Característica | Valor | O que significa |
+|---|---|---|
+| **Largura** | **6.942 pixels** | Quantidade de colunas da imagem |
+| **Altura** | **7.294 pixels** | Quantidade de linhas da imagem |
+| **Total de pixels por raster** | **50.634.948** | Aproximadamente 50,6 milhões de posições da grade |
+| **Resolução espacial** | **aproximadamente 0,5 m/pixel** | Cada pixel corresponde a cerca de meio metro no terreno |
+| **Extensão retangular aproximada** | **3.471 m × 3.647 m** | Largura e altura da cobertura raster, estimadas pela resolução nominal |
+| **Área do retângulo raster** | **aproximadamente 12,66 km²** | **Não** é a área efetiva do polígono de estudo (AOI) |
+| **Sistema de coordenadas dos rasters** | **EPSG:31982** | Referencial projetado usado nas operações métricas |
+| **Imagem RGB** | `AOI_RGB_NEW.tif` — **3 bandas** | Vermelho, verde e azul, utilizadas na segmentação |
+| **Imagem multiespectral** | `AOI_NEW_MULTI.tif` — **4 bandas** | Vermelho, verde, azul e infravermelho próximo (NIR), usados nas características espectrais |
+
+**A imagem RGB e a multiespectral têm a mesma quantidade de linhas e colunas, mas apresentam uma pequena diferença na origem de suas grades.** Isso requer cuidado ao relacionar pixels e atributos das duas imagens.
+
+**Dados vetoriais e referências do mesmo conjunto `Area1`:**
+
+| Arquivo | Conteúdo | Uso no trabalho |
+|---|---|---|
+| `AOI_new.shp` e auxiliares | Polígono da área de interesse | Delimita a área analisada |
+| `Arvores.gpkg` | **257 pontos** de referência de árvores | Exemplos identificados para classificação |
+| `Grama.gpkg` | **253 pontos** de referência de gramíneas | Exemplos identificados para classificação |
+| `postes.gpkg` | Localização geográfica dos postes | Análise exploratória de proximidade |
+
+São **510 pontos de referência originais** somando árvores e gramíneas. Os vetores de referência de árvores, gramíneas e postes possuem **EPSG:4674** como CRS de origem, sendo transformados para um sistema projetado nas operações métricas. Não há geometrias de cabos elétricos nem medidas reais de altura de árvores nesse conjunto.
+
+### Como os pixels se transformam em amostras?
+
+A imagem possui **milhões de pixels**, mas o Random Forest original **não foi treinado com 50 milhões de linhas**. Primeiro, o **Quickshift** divide a imagem em **segmentos** (regiões/polígonos). Depois, o **K-Means** separa os segmentos em seis agrupamentos, e o código original seleciona os candidatos do **cluster 3**. Por fim, os pontos conhecidos de árvores e gramíneas são relacionados a esses segmentos.
+
+Cada registro que chega ao Random Forest traz **três números calculados para o segmento** — média do **brilho HSV**, média das **bordas Canny** e média do **NDVI** — e o rótulo **árvore** ou **grama**.
+
+Assim, é importante não confundir:
+
+- **Pixel:** uma posição da imagem raster.
+- **Segmento:** uma região da imagem criada pelo Quickshift, que pode conter vários pixels.
+- **Ponto de referência:** uma localização com identificação conhecida de árvore ou gramínea.
+- **Par objeto–rótulo:** associação entre um segmento e um rótulo de referência; um mesmo segmento pode aparecer mais de uma vez.
+
+**Na seção de resultados preliminares**, os **133** e **458** são **registros rotulados (pares objeto–rótulo)**, não quantidade de pixels ou necessariamente de segmentos únicos. A rodada maior usa o processamento documentado da imagem integral; **as dimensões exatas do recorte da rodada inicial com 133 registros não foram confirmadas**. Por isso, não se deve afirmar que ela usou um raster de tamanho conhecido apenas olhando essa tabela.
+
+Para detalhes sobre os arquivos e seus sistemas de coordenadas, consulte a [documentação do dataset](data/README.md).
+
+### Antes de ver os diagramas: o que o código recebe e entrega?
+
+| Etapa | Entrada | Saída |
+|---|---|---|
+| **1. Segmentar** | Pixels da imagem RGB | Regiões chamadas **segmentos**, representadas por polígonos |
+| **2. Selecionar candidatos** | Polígonos e estatísticas RGB/NIR | Segmentos do **cluster 3** do K-Means original |
+| **3. Aprender a distinguir** | Segmentos rotulados + médias de HSV, Canny e NDVI | Modelo Random Forest treinado para diferenciar **árvore** e **grama** |
+| **4. Analisar proximidade** | Objetos selecionados, área dos polígonos e localização dos postes | Indicadores exploratórios de proximidade a **1, 3 e 5 metros** |
+
+**Como ler os fluxogramas abaixo:** cada **caixa** representa uma operação ou conjunto de dados; as **setas** mostram a ordem do processamento; o **losango** da segunda proposta indica uma condição de seleção. As cores servem apenas para organizar visualmente as etapas.
+
+---
+
 ## Propostas de pesquisa
 
 ### 🌳 Proposta 1 – Identificação de árvores e gramíneas
@@ -63,6 +128,19 @@ flowchart TD
     class I,J,K recurso;
 ```
 
+**Como ler este fluxograma — Proposta 1**
+
+| Caixas do desenho | O que o código efetivamente faz |
+|---|---|
+| **Imagens → Quickshift → Polígonos** | Abre a imagem **RGB**, aplica `quickshift(im, kernel_size=3, max_dist=5, ratio=0.04)` e transforma regiões em polígonos. O **NIR** vem do raster multiespectral na etapa de atributos. |
+| **Estatísticas RGB/NIR → K-Means** | Calcula **quatro médias e quatro desvios-padrão** (R, G, B, NIR), forma **seis grupos** com K-Means e seleciona o **cluster 3** no experimento original. |
+| **Amostras de árvores e gramíneas** | Relaciona pontos conhecidos dos arquivos `Arvores.gpkg` e `Grama.gpkg` aos polígonos candidatos. Os rótulos são necessários para **treinar** o modelo. |
+| **NDVI, brilho HSV e bordas Canny** | Cria três mapas e resume cada um pela **média dos pixels dentro do segmento**. São os **três atributos** usados no Random Forest; não são três imagens novas de treinamento. |
+| **Random Forest → Árvores ou gramíneas** | Treina **500 árvores de decisão** sobre os registros rotulados, reservando 20% para teste; depois prevê uma das duas classes para os candidatos. |
+| **Avaliação e matriz de confusão** | Compara as previsões dos exemplos reservados com seus rótulos verdadeiros e apresenta acurácia e F1 por classe. |
+
+**Atenção:** o gráfico resume as operações. O agrupamento **K-Means não é o classificador final**: ele seleciona candidatos; quem aprende a distinguir árvore e gramínea é o **Random Forest**.
+
 A abordagem é **orientada a objetos**: em vez de tratar apenas pixels isolados, utiliza as propriedades dos segmentos, mantendo suas geometrias para a etapa espacial.
 
 ### ⚡ Proposta 2 – Proximidade com a rede elétrica
@@ -75,13 +153,13 @@ A pesquisa investiga a área projetada dos objetos e utiliza uma **estimativa em
 
 ```mermaid
 flowchart TD
-    A["🗺️ Segmentos<br/>candidatos<br/>classificados"] --> B["📐 Área projetada<br/>dos polígonos"]
-    B --> C["🌳 Modelos<br/>exploratórios<br/>de porte:<br/>C1 a C6"]
-    C --> D["📏 Configuração<br/>potencial C3"]
-    D --> E{"Altura estimada<br/>maior que 7 m?"}
+    A["🗺️ Objetos<br/>candidatos<br/>classificados"] --> B["📐 Área<br/>projetada<br/>dos polígonos"]
+    B --> C["🌳 Modelos<br/>de porte:<br/>C1 a C6"]
+    C --> D["📏 Modelo<br/>potencial C3"]
+    D --> E{"Indicador C3<br/>maior que 7?"}
     E -->|Sim| F["📍 Objetos<br/>selecionados"]
     E -->|Não| G["Fora do filtro<br/>espacial"]
-    H["⚡ Base de postes"] --> I["🗺️ Análise<br/>geoespacial"]
+    H["⚡ Base<br/>de postes"] --> I["🗺️ Análise<br/>geoespacial"]
     F --> I
     I --> J["1 m"]
     I --> K["3 m"]
@@ -97,6 +175,18 @@ flowchart TD
     class D,E principal;
     class M saida;
 ```
+
+**Como ler este fluxograma — Proposta 2**
+
+| Caixas do desenho | O que o código efetivamente faz |
+|---|---|
+| **Objetos → Área projetada dos polígonos** | Trabalha com os **segmentos selecionados** e calcula a área de cada polígono em **m²** usando o sistema de coordenadas projetado. |
+| **Modelos C1 a C6 → Configuração C3** | Explora fórmulas empíricas que transformam a área da copa em **indicadores estimados de porte**. A configuração potencial **C3** foi usada no filtro final. |
+| **C3 maior que 7?** | Aplica o critério numérico `Power_tree_size_C3 > 7`; objetos que passam no filtro seguem para o teste espacial. **Isso não significa altura medida em campo.** |
+| **Base de postes** | Importa `postes.gpkg` como **uma entrada independente**, não como algo produzido pelo cálculo de porte. |
+| **Análise geoespacial → 1, 3 e 5 m** | Investiga quais objetos selecionados aparecem próximos dos **pontos dos postes** nas distâncias indicadas. Não mede distância aos cabos. |
+
+**Atenção:** no código original, o filtro **C3 maior que 7** não exige `predicted_classe == 'arvore'`. Portanto, objetos previstos como gramínea também podem passar. Não devemos chamar automaticamente todos os objetos selecionados de **árvores em risco**.
 
 **Limites importantes:** a fórmula utilizada estima um possível porte a partir da área e **não mede diretamente a altura real da árvore**. No código atual, o filtro `C3 > 7` **não exige** que `predicted_classe == 'arvore'`; por isso, também podem passar objetos classificados como gramínea. A distância é medida em duas dimensões em relação aos postes, não aos cabos energizados.
 
@@ -134,57 +224,9 @@ O diagrama ilustrado apresenta a visão geral do percurso da pesquisa, desde as 
 
 *O diagrama é uma representação conceitual da metodologia. A base utilizada nesta execução inclui postes, mas não linhas ou cabos de energia.*
 
+**Como relacionar a imagem de 17 etapas com o código:** as etapas **1–6** preparam a imagem e geram candidatos; **7–12** constroem os atributos, treinam e aplicam o Random Forest; **13–15** calculam a área e o indicador empírico C3; **16–17** analisam a proximidade com postes. **O fluxograma de 17 etapas representa o método histórico**, não a execução independente em quadrantes desenvolvida posteriormente na V2.
+
 ## Resultados preliminares
-
-### Características das imagens e dos dados utilizados
-
-Antes de analisar a acurácia e os valores de F1-score, é importante conhecer **quais dados foram utilizados para produzir as previsões**.
-
-A pesquisa utiliza imagens de satélite de alta resolução da região de **Caxias do Sul (RS)**, disponibilizadas pela **CPFL**. A documentação do projeto identifica o satélite **JL1KF01B** como origem das imagens; **a data de aquisição não está informada**.
-
-**Dimensões e características dos rasters da pasta `Area1`:**
-
-| Característica | Valor | O que significa |
-|---|---|---|
-| **Largura** | **6.942 pixels** | Quantidade de colunas da imagem |
-| **Altura** | **7.294 pixels** | Quantidade de linhas da imagem |
-| **Total de pixels por raster** | **50.634.948** | Aproximadamente 50,6 milhões de posições da grade |
-| **Resolução espacial** | **aproximadamente 0,5 m/pixel** | Cada pixel corresponde a cerca de meio metro no terreno |
-| **Extensão retangular aproximada** | **3.471 m × 3.647 m** | Largura e altura da cobertura raster, estimadas pela resolução nominal |
-| **Área do retângulo raster** | **aproximadamente 12,66 km²** | **Não** é a área efetiva do polígono de estudo (AOI) |
-| **Sistema de coordenadas dos rasters** | **EPSG:31982** | Referencial projetado usado nas operações métricas |
-| **Imagem RGB** | `AOI_RGB_NEW.tif` — **3 bandas** | Vermelho, verde e azul, utilizadas na segmentação |
-| **Imagem multiespectral** | `AOI_NEW_MULTI.tif` — **4 bandas** | Vermelho, verde, azul e infravermelho próximo (NIR), usados nas características espectrais |
-
-**A imagem RGB e a multiespectral têm a mesma quantidade de linhas e colunas, mas apresentam uma pequena diferença na origem de suas grades.** Isso requer cuidado ao relacionar pixels e atributos das duas imagens.
-
-**Dados vetoriais e referências do mesmo conjunto `Area1`:**
-
-| Arquivo | Conteúdo | Uso no trabalho |
-|---|---|---|
-| `AOI_new.shp` e auxiliares | Polígono da área de interesse | Delimita a área analisada |
-| `Arvores.gpkg` | **257 pontos** de referência de árvores | Exemplos identificados para classificação |
-| `Grama.gpkg` | **253 pontos** de referência de gramíneas | Exemplos identificados para classificação |
-| `postes.gpkg` | Localização geográfica dos postes | Análise exploratória de proximidade |
-
-São **510 pontos de referência originais** somando árvores e gramíneas. Os vetores de referência de árvores, gramíneas e postes possuem **EPSG:4674** como CRS de origem, sendo transformados para um sistema projetado nas operações métricas. Não há geometrias de cabos elétricos nem medidas reais de altura de árvores nesse conjunto.
-
-#### Como a imagem se transforma em amostras para o Random Forest?
-
-A imagem possui **milhões de pixels**, mas o Random Forest original **não foi treinado com 50 milhões de linhas**. Primeiro, o **Quickshift** divide a imagem em **segmentos** (regiões/polígonos). Depois, o **K-Means** separa os segmentos em seis agrupamentos, e o código original seleciona os candidatos do **cluster 3**. Por fim, os pontos conhecidos de árvores e gramíneas são relacionados a esses segmentos.
-
-Cada registro que chega ao Random Forest traz **três números calculados para o segmento** — média do **brilho HSV**, média das **bordas Canny** e média do **NDVI** — e o rótulo **árvore** ou **grama**.
-
-Assim, é importante não confundir:
-
-- **Pixel:** uma posição da imagem raster.
-- **Segmento:** uma região da imagem criada pelo Quickshift, que pode conter vários pixels.
-- **Ponto de referência:** uma localização com identificação conhecida de árvore ou gramínea.
-- **Par objeto–rótulo:** associação entre um segmento e um rótulo de referência; um mesmo segmento pode aparecer mais de uma vez.
-
-**Na tabela histórica abaixo**, os **133** e **458** são **registros rotulados (pares objeto–rótulo)**, não quantidade de pixels ou necessariamente de segmentos únicos. A rodada maior usa o processamento documentado da imagem integral; **as dimensões exatas do recorte da rodada inicial com 133 registros não foram confirmadas**. Por isso, não se deve afirmar que ela usou um raster de tamanho conhecido apenas olhando essa tabela.
-
-Para detalhes sobre os arquivos e seus sistemas de coordenadas, consulte a [documentação do dataset](data/README.md).
 
 Os resultados abaixo são **históricos**, registrados em execuções anteriores. Não representam uma validação da execução atualmente em andamento no Colab.
 
