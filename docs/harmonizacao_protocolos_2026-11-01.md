@@ -64,3 +64,16 @@ Dentro da mesma rodada espacial, o embargo altera o **conjunto de treinamento**,
 O pacote `harmonizacao_metodologica_2026-11-01.zip` contém o **script Python efetivamente executado**, as três entradas derivadas do pacote E3c, 280 linhas de métricas harmonizadas (40 novas e 240 reutilizadas), verificações dos protocolos, resultados pontualmente recalculados, resumo, gráfico e manifesto de hashes. Não contém os rasters pesados originais. O script usa somente dados previamente extraídos da `Area1`.
 
 **Nota de proveniência:** os números do pacote harmonizado e da bateria E3c foram produzidos por Quickshift independente em quadrantes de 256 × 256 pixels, e **não** pelo fluxo monolítico inteiro da V2. A discussão final da dissertação deve manter essa distinção.
+
+
+---
+
+## Complemento E9 — comparação pareada da escala de segmentação
+
+Foi executado posteriormente um experimento E9 que compara, **nos mesmos 505 pontos de referência e nas mesmas divisões de teste**, o Quickshift contínuo aplicado a 119 regiões de 512 × 512 px com Quickshift independente em quatro quadrantes de 256 × 256 px. Foram **320 avaliações** em 20 protocolos, envolvendo os mesmos oito classificadores.
+
+O Random Forest obteve F1-macro médio de **0,8906 vs. 0,8835** (blocos de 250 m) e **0,8657 vs. 0,8566** (blocos de 500 m), nas condições contínuo versus quadrantes, com embargo entre pontos de 25 m. Entretanto, o SVM apresentou desempenho maior com quadrantes, demonstrando que o efeito da escala de segmentação depende do classificador.
+
+**Limite mantido:** o teste E9 isola a escala em recortes de 512 px; não reproduz o Quickshift monolítico sobre todo o raster, o filtro global K-Means cluster 3 nem os 458 pares históricos. Por isso, **a acurácia 0,87 não se tornou diretamente comparável** com E9.
+
+Consulte a [documentação e o fluxograma completos do E9](comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md).
