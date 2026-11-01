@@ -54,19 +54,16 @@ A pesquisa utiliza **dois arquivos de imagem raster** da região de **Caxias do 
 
 **Os dois arquivos têm a mesma quantidade de linhas e colunas e se referem essencialmente à mesma área**, mas suas grades têm uma pequena diferença de origem. Assim, não se deve presumir correspondência perfeita entre pixels apenas por terem o mesmo tamanho; isso precisa ser considerado ao relacionar segmentos e atributos.
 
-### Diferença entre a imagem inteira e a área realmente estudada (AOI)
+### Diferença entre a imagem completa e a área de interesse (AOI)
 
-**A imagem cobre um retângulo de aproximadamente 12,66 km². Dentro desse retângulo, o arquivo `AOI_new.shp` delimita a área de interesse da pesquisa: aproximadamente 12,14 km² (12,1372 km², medidos a partir do polígono no sistema projetado EPSG:31982).** Ou seja, o polígono corresponde a cerca de **95,9%** da extensão retangular das imagens; o restante, aproximadamente **0,52 km²**, fica fora da AOI.
+Os dois arquivos raster utilizados na pesquisa cobrem uma extensão retangular de aproximadamente **12,66 km²**. Entretanto, a área efetiva de interesse, delimitada pelo arquivo `AOI_new.shp`, corresponde a aproximadamente **12,14 km²**.
 
-**Como essa distinção se aplica a cada experimento?**
+Assim, é importante distinguir:
 
-| Experimento | Região processada | Como interpretar a área |
-|---|---|---|
-| **Random Forest original** | Quickshift aplicado ao **raster inteiro**, seguido de recorte dos polígonos pela **AOI** e seleção do cluster 3 do K-Means | O processamento inicial percorre o retângulo da imagem (**12,66 km²**); a seleção de objetos do estudo considera a AOI (**12,14 km²**), além dos demais filtros |
-| **V2 — bateria derivada E3c** | Quickshift executado nos **812 quadrantes** que cobrem a extensão retangular da imagem | Os **168.133 segmentos extraídos** incluem partes **fora** da AOI. As amostras de árvores e gramíneas são referências da área de estudo; não confundir a cobertura dos quadrantes com a área efetiva da AOI |
-| **V2 — comparação E9** | **119 regiões selecionadas** por conter pontos de referência, comparando recortes contínuos de 512 px com quadrantes de 256 px | Estuda **recortes locais**, não a cobertura integral de 12,66 km² nem a totalidade do polígono de 12,14 km² |
+- **12,66 km²:** extensão retangular completa das imagens.
+- **12,14 km²:** área delimitada pelo polígono de estudo (AOI).
 
-**Em resumo:** quando falamos da **dimensão da imagem**, usamos **12,66 km²**; quando falamos da **área de interesse delimitada pela Area1**, usamos **12,14 km²**. Já os números de amostras e segmentos variam conforme o processamento e os filtros de cada experimento.
+Essa distinção é relevante porque os experimentos podem processar toda a extensão raster ou apenas regiões selecionadas, conforme a metodologia empregada.
 
 **Dados vetoriais e referências do mesmo conjunto `Area1`:**
 
