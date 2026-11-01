@@ -55,32 +55,30 @@ Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.g
 ### Como o código original realiza essa proposta
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 72, "padding": 26}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["Area1"] --> B["RGB"]
-    A --> C["RGB + NIR"]
-    B --> D["Quickshift"]
-    D --> E["Polígonos"]
-    E --> F["Estatísticas"]
-    C --> F
-    F --> G["K-Means: 6"]
-    G --> H["Cluster 3"]
-    H --> I["Rotular"]
-    P["Referências"] --> I
-    C --> X["3 mapas"]
-    E --> Y["3 médias"]
-    X --> Y
-    I --> T["Treino/teste"]
-    Y --> T
-    T --> R["RF: 500"]
-    R --> S["Previsões"]
-    R --> U["Métricas"]
+    A["&emsp;&emsp;🛰️ Area1&emsp;&emsp;<br/>&emsp;&emsp;mesma região&emsp;&emsp;"] --> B["&emsp;&emsp;📷 RGB&emsp;&emsp;<br/>&emsp;&emsp;3 bandas&emsp;&emsp;"]
+    A --> C["&emsp;&emsp;🗂️ RGB + NIR&emsp;&emsp;<br/>&emsp;&emsp;4 bandas&emsp;&emsp;"]
+    B --> D["&emsp;&emsp;🧩 Quickshift&emsp;&emsp;<br/>&emsp;&emsp;polígonos&emsp;&emsp;"]
+    D --> E["&emsp;&emsp;📊 Estatísticas&emsp;&emsp;<br/>&emsp;&emsp;RGB / NIR&emsp;&emsp;"]
+    C --> E
+    E --> F["&emsp;&emsp;🔎 K-Means&emsp;&emsp;<br/>&emsp;&emsp;6 grupos&emsp;&emsp;"]
+    F --> G["&emsp;&emsp;🌿 Seleção&emsp;&emsp;<br/>&emsp;&emsp;cluster 3&emsp;&emsp;"]
+    G --> H["&emsp;&emsp;🏷️ Associar&emsp;&emsp;<br/>&emsp;&emsp;referências&emsp;&emsp;"]
+    P["&emsp;&emsp;🌳 Pontos árvore&emsp;&emsp;<br/>&emsp;&emsp;🌱 pontos grama&emsp;&emsp;"] --> H
+    C --> I["&emsp;&emsp;🌿 NDVI&emsp;&emsp;<br/>&emsp;&emsp;💡 HSV / Canny&emsp;&emsp;"]
+    I --> J["&emsp;&emsp;📋 Três médias&emsp;&emsp;<br/>&emsp;&emsp;por segmento&emsp;&emsp;"]
+    H --> J
+    J --> K["&emsp;&emsp;🌳 Random Forest&emsp;&emsp;<br/>&emsp;&emsp;500 árvores&emsp;&emsp;"]
+    K --> L["&emsp;&emsp;✅ Prever&emsp;&emsp;<br/>&emsp;&emsp;árvore / grama&emsp;&emsp;"]
+    K --> M["&emsp;&emsp;📈 Avaliar&emsp;&emsp;<br/>&emsp;&emsp;acurácia / F1&emsp;&emsp;"]
 
-    classDef entrada fill:#eaf4ff,stroke:#60a5fa,color:#163b5d,stroke-width:2px;
-    classDef metodo fill:#dcfce7,stroke:#4ade80,color:#14532d,stroke-width:2px;
-    classDef resultado fill:#fef3c7,stroke:#f59e0b,color:#78350f,stroke-width:2px;
-    class A,B,C,D,E,F,P,X,Y,I,T entrada;
-    class G,H,R metodo;
-    class S,U resultado;
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
+    classDef processamento fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
+    classDef resultados fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
+    class A,B,C,D,E,P,H,I,J dados;
+    class F,G,K processamento;
+    class L,M resultados;
 ```
 
 **Leitura do fluxo:** o **RGB** produz os polígonos; o **RGB + NIR** fornece os atributos; as referências identificam os exemplos; o **Random Forest** gera as previsões e as métricas.
@@ -124,20 +122,21 @@ Os **458 registros** geraram **366 exemplos de treinamento e 92 de teste**. A ac
 ### Como o código original realiza essa proposta
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 72, "padding": 26}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["Cluster 3"] --> B["Área em m²"]
-    B --> C["C1 a C6"]
-    C --> D["Índice C3"]
-    D --> E{"C3 > 7?"}
-    E -->|Sim| F["Selecionados"]
-    E -->|Não| G["Não passa"]
-    H["Postes"] --> I["Distância 2D"]
+    A["&emsp;&emsp;🌳 Objetos candidatos&emsp;&emsp;<br/>&emsp;&emsp;do cluster 3&emsp;&emsp;"] --> B["&emsp;&emsp;📐 Área em m²&emsp;&emsp;<br/>&emsp;&emsp;dos polígonos&emsp;&emsp;"]
+    B --> C["&emsp;&emsp;🌲 Modelos C1–C6&emsp;&emsp;<br/>&emsp;&emsp;indicadores de porte&emsp;&emsp;"]
+    C --> D["&emsp;&emsp;📏 Configuração C3&emsp;&emsp;<br/>&emsp;&emsp;2,5 × área^0,4&emsp;&emsp;"]
+    D --> E{"&emsp;Índice C3&emsp;<br/>&emsp;maior que 7?&emsp;"}
+    E -->|Sim| F["&emsp;&emsp;📍 Objetos&emsp;&emsp;<br/>&emsp;&emsp;selecionados&emsp;&emsp;"]
+    E -->|Não| G["&emsp;&emsp;Fora do&emsp;&emsp;<br/>&emsp;&emsp;filtro&emsp;&emsp;"]
+    H["&emsp;&emsp;⚡ Postes&emsp;&emsp;"] --> I["&emsp;&emsp;🗺️ Proximidade&emsp;&emsp;<br/>&emsp;&emsp;espacial 2D&emsp;&emsp;"]
     F --> I
-    I --> J["1, 3 e 5 m"]
+    I --> J["&emsp;&emsp;📊 Resultados&emsp;&emsp;<br/>&emsp;&emsp;1, 3 e 5 m&emsp;&emsp;"]
 
-    classDef dados fill:#eaf4ff,stroke:#60a5fa,color:#163b5d,stroke-width:2px;
-    classDef metodo fill:#dcfce7,stroke:#4ade80,color:#14532d,stroke-width:2px;
-    classDef alerta fill:#fef3c7,stroke:#f59e0b,color:#78350f,stroke-width:2px;
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
+    classDef alerta fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:2px;
     class A,B,C,F,G,H dados;
     class D,E alerta;
     class I,J metodo;
@@ -163,7 +162,7 @@ Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos obje
 
 ---
 
-**Sobre os fluxogramas:** ambos estão escritos em **código Mermaid**, diretamente no README, com caixas curtas e cores para facilitar a leitura. Eles representam o método original; as comparações da V2 estão ao final do documento.
+**Sobre os fluxogramas:** ambos estão em **código Mermaid**, como originalmente, com descrições completas, cores e espaçamento ampliado dentro das caixas para evitar cortes no GitHub. Eles representam o método original; a comparação da V2 está ao final do documento.
 
 ---
 
