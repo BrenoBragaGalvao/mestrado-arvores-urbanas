@@ -314,7 +314,7 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
 
-**Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels**
+#### 6.3.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
 
 Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
 
@@ -335,7 +335,11 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 
 **Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
 
-**Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels**
+<p align="center">
+  <img src="docs/infografico_validacao_espacial_256px_250m_500m.webp" alt="Diferença entre segmentação em quadrantes de 256 × 256 pixels e validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros." width="100%">
+</p>
+
+#### 6.3.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
 
 Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada E9, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
 
@@ -354,7 +358,7 @@ Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas
 | HistGradientBoosting | 0,8738 | 0,8390 |
 | Dummy | 0,2847 | 0,2791 |
 
-**Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels**
+#### 6.3.3. Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels
 
 Processamos **exatamente as mesmas regiões** da configuração 2, agora com Quickshift independente em cada parte. Usamos os **mesmos 505 exemplos e as mesmas divisões de treino e teste**, mudando somente a forma de segmentar.
 
