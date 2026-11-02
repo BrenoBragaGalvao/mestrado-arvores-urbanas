@@ -231,6 +231,15 @@ O **método original** segmentava a imagem inteira de uma vez com **Quickshift g
 
 O problema para ampliar os testes foi **repetir a segmentação global com a memória disponível**, e não treinar os classificadores. A V2 resolveu a limitação prática **processando recortes menores**. Com isso, conseguimos comparar **oito algoritmos nas mesmas condições dentro de cada experimento**, em vez de testar somente Random Forest.
 
+**Perguntas que orientaram os testes**
+
+| O que queríamos descobrir? | Como investigamos? |
+|---|---|
+| **1. Por que não continuar usando a imagem inteira?** | Testamos a execução do Quickshift global em um ambiente com **4 GiB de RAM**; houve falta de memória. Por isso, passamos a processar janelas menores, sem reduzir a resolução dos pixels. |
+| **2. Qual algoritmo classifica melhor árvores e gramíneas?** | Comparamos **oito classificadores** usando os **mesmos 505 segmentos rotulados**, os mesmos atributos (NDVI, brilho e bordas) e as mesmas divisões de treino e teste. |
+| **3. Processar janelas de 512 × 512 ou quatro partes de 256 × 256 muda os resultados e a memória utilizada?** | Usamos os **mesmos 119 recortes** nas duas formas de segmentação, comparamos as previsões dos oito classificadores e medimos o pico de memória: **467,19 MiB** e **456,80 MiB**, respectivamente. |
+| **4. Os resultados se mantêm quando testamos em outras regiões da imagem?** | Separamos treino e teste por **blocos geográficos de 250 m e 500 m**, em vez de depender apenas de sorteios aleatórios, e comparamos os resultados pela **F1-macro**. |
+
 ### 6.1. O que mudou de um experimento para o outro?
 
 | Estudo | Como a imagem foi segmentada | O que foi avaliado? |
