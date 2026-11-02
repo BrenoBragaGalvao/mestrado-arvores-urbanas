@@ -245,6 +245,10 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 | [Classificadores e protocolos de avaliação](docs/harmonizacao_protocolos.md) | Comparações de modelos e validação espacial |
 | [Comparação das segmentações de 512 e 256 pixels](docs/comparacao_controlada_segmentacao_512_vs_256.md) | Comparação pareada da segmentação |
 | [Medição real dos recortes](docs/e9_medicao_memoria.md) | Pico de memória observado nos 119 recortes, com janelas de 512 e 256 pixels |
+| [Resultados das sete combinações de atributos](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv) | Planilha CSV com o desempenho das combinações de NDVI, brilho HSV e bordas Canny |
+| [Comparação de dois e três atributos nos oito modelos](docs/E4b_oito_modelos_HSV_Canny_vs_tres_2026-11-02.csv) | Resumo CSV dos resultados dos oito classificadores |
+| [Resultados por divisão espacial](docs/E4b_oito_modelos_resultados_por_particao_2026-11-02.csv) | Avaliações individuais e resultados por partição |
+| [Código reprodutível da comparação 512 × 512 versus 256 × 256](experimentos/e9_reproduzir_512_256.py) | Script Python para reexecutar a comparação das duas formas de segmentação |
 | [Estimativas C1–C6](docs/allometria.md) | Fórmulas exploratórias de porte |
 
 ---
@@ -462,11 +466,13 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 
 **Dividir a imagem ajudou a economizar memória?** O processamento em partes menores permitiu trabalhar com a imagem sem repetir o Quickshift global, que havia apresentado erro por falta de RAM. Nos testes com os **119 recortes**, o pico de memória caiu de **467,19 MiB**, com recortes inteiros de 512 pixels, para **456,80 MiB**, com subdivisões de 256 pixels: uma redução de aproximadamente **2,22%**. A economia foi pequena nessa medição e **não representa o consumo do método original na imagem inteira**.
 
+**A nova metodologia tornou a avaliação mais rigorosa?** No método original, utilizamos uma divisão aleatória de **80% dos dados para treinamento e 20% para teste**. Nos novos experimentos, adotamos uma **validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros** entre exemplos de treinamento e teste. Essa estratégia busca reduzir a influência da proximidade geográfica, evitando avaliações excessivamente otimistas e permitindo testar os classificadores em locais espacialmente separados.
+
 **Quais comparações são cientificamente válidas?** As configurações **2 e 3 podem ser comparadas diretamente**, pois usam as mesmas regiões, referências, atributos e divisões de treino e teste, mudando a forma de segmentação. A configuração **1 utiliza outro protocolo de avaliação** e seus valores não devem ser tratados como uma comparação controlada com as demais. Da mesma forma, **não podemos afirmar que a V2 superou o método original**: no experimento histórico, a acurácia foi **0,87**, enquanto as tabelas atuais apresentam **F1-macro** e foram produzidas com segmentos e estratégias de validação diferentes.
 
 **O que ainda precisa ser validado?** Os resultados foram obtidos exclusivamente na **Area1**, sendo necessária a realização de testes em outras regiões para verificar se os modelos apresentam desempenho semelhante em diferentes áreas de estudo.
 
 **E quanto ao porte das árvores e à proximidade de postes?** Essas análises são **exploratórias**. Sem medições reais de altura, geometria dos cabos e validação adicional, **não é possível concluir que exista risco elétrico**.
 
-**Onde consultar os resultados e reproduzir os testes?** [Sete combinações de atributos](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv) · [Comparação entre dois e três atributos nos oito classificadores](docs/E4b_oito_modelos_HSV_Canny_vs_tres_2026-11-02.csv) · [Resultados detalhados das divisões espaciais](docs/E4b_oito_modelos_resultados_por_particao_2026-11-02.csv) · [Comparação dos oito classificadores](docs/harmonizacao_protocolos.md) · [Comparação entre recortes de 512 e 256 pixels](docs/comparacao_controlada_segmentacao_512_vs_256.md) · [Código de reprodução dos recortes](experimentos/e9_reproduzir_512_256.py) · [Medição de memória RAM](docs/e9_medicao_memoria.md).
+**Onde consultar os resultados e reproduzir os testes?** Os arquivos de resultados, as comparações metodológicas e os códigos estão organizados na [seção 5 — Código e documentação técnica](#5-código-e-documentação-técnica).
 
