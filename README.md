@@ -101,7 +101,7 @@ Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.g
 
 ## 2. Metodologia original — Quickshift + K-Means + Random Forest
 
-### 2.1. Proposta 1 — Identificação de árvores e gramíneas
+### 2.1. 🌳 Proposta 1 — Identificação de árvores e gramíneas
 
 **Objetivo:** classificar objetos vegetados em **árvore** ou **gramínea**, combinando NDVI, brilho HSV e bordas Canny.
 
@@ -172,7 +172,7 @@ Os **458 registros** geraram **366 exemplos de treinamento e 92 de teste**. A ac
 
 ---
 
-### 2.2. Proposta 2 — Indicador de porte e proximidade com postes
+### 2.2. ⚡ Proposta 2 — Indicador de porte e proximidade com postes
 
 **Objetivo:** calcular um indicador experimental de porte dos objetos e verificar sua **proximidade horizontal** aos postes da Area1.
 
