@@ -454,7 +454,7 @@ Os testes espaciais avaliam a generalização **entre regiões da Area1**, com a
 
 **Já documentamos:** auditoria dos rótulos e duplicações; comparação de oito classificadores; validação aleatória e espacial; testes de atributos; sensibilidade de Quickshift/K-Means; proximidade a postes; extrapolação de atributos; sensibilidade dos indicadores de porte; e E9 com segmentações pareadas em recortes equivalentes.
 
-**A prioridade científica seguinte é uma comparação ponta a ponta:** executar novamente o **Quickshift global**, o **K-Means com seis grupos**, a **seleção do cluster 3** e o restante do método original; determinar quais referências são comparáveis entre os pipelines; usar **partições comuns e as mesmas métricas**; e separar a **cobertura dos candidatos** da **qualidade da classificação**. A execução integral atual da V2 sobre os aproximadamente **50,6 milhões de pixels do raster** ainda não está comprovada.
+**Próxima comparação ponta a ponta (E10): código preparado, execução pendente.** Foi publicada uma [nova versão experimental V3](Segmentacao_area_completa_v3_comparacao_ponta_a_ponta.ipynb), independente dos notebooks existentes, para executar novamente o **Quickshift global**, o **K-Means com seis grupos**, a **seleção do cluster 3** e avaliar os **oito classificadores sob as mesmas partições e métricas**. O experimento também audita a **cobertura dos candidatos** separadamente da **qualidade da classificação**, identifica referências comparáveis entre os pipelines e verifica o possível estouro de IDs na conversão histórica para `uint16`. **Não há resultado E10 de execução global comprovada:** as tabelas dependem de executar o notebook com a Area1 e verificar o manifesto; a execução integral atual da V2 nos aproximadamente **50,6 milhões de pixels do raster** também não está comprovada. [Ver protocolo, limitações e instruções E10](docs/e10_comparacao_ponta_a_ponta_2026-11-02.md).
 
 **Limitações permanentes desta base:** não temos alturas verdadeiras medidas, geometria dos cabos elétricos nem rótulos completos do fundo urbano. Assim, **não se pode afirmar altura real, risco elétrico efetivo nem generalização para outras cidades**. Proximidade planimétrica de postes e estimativas empíricas de porte são análises exploratórias.
 
@@ -478,5 +478,6 @@ Os códigos **E1, E2, E3, E8h, E9** etc. identificam partes do notebook, **não 
 | Consolidação científica e revisão bibliográfica | E8 |
 | Harmonização da avaliação aleatória e espacial | E8h |
 | Segmentação de 512 contínuo versus quatro 256 | E9 |
+| Comparação original global × V2 sob partições comuns (**código preparado; execução pendente**) | E10 |
 
-Os detalhes para reprodução estão em [protocolos de classificadores e avaliação aleatória/espacial](docs/harmonizacao_protocolos_2026-11-01.md) e [comparação pareada de segmentação 512 × 256](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md).
+Os detalhes para reprodução estão em [protocolos de classificadores e avaliação aleatória/espacial](docs/harmonizacao_protocolos_2026-11-01.md), [comparação pareada de segmentação 512 × 256](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) e [E10: comparação ponta a ponta com o Quickshift global original](docs/e10_comparacao_ponta_a_ponta_2026-11-02.md).
