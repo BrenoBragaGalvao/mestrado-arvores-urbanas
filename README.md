@@ -278,6 +278,31 @@ Na **figura abaixo**, a grade de 812 quadrantes representa o processamento da **
 
 [**Abrir o infográfico ampliado**](docs/infografico_area1_119_recortes_explicados_2026-11-02.png)
 
+### Como os 812 quadrantes se relacionam com os blocos espaciais de 250 m e 500 m?
+
+**São duas divisões com finalidades diferentes, aplicadas à mesma imagem da Area1.** A grade em **pixels** serve ao processamento do raster; a grade em **metros** é um protocolo de avaliação, usado **depois que as amostras foram formadas**. A segunda não é uma subdivisão física dos 812 quadrantes.
+
+<p align="center">
+  <a href="docs/area1_grades_processamento_validacao_espacial.svg">
+    <img src="docs/area1_grades_processamento_validacao_espacial.svg" alt="Mesma imagem real da Area1 representada com três grades: processamento em quadrantes de 256 pixels e separação espacial de amostras em blocos de 250 e 500 metros" width="100%">
+  </a>
+</p>
+
+[**Abrir a comparação ampliada sobre a imagem da Area1**](docs/area1_grades_processamento_validacao_espacial.svg)
+
+| Etapa | Unidade | O que é dividido? | Para quê? |
+|---|---|---|---|
+| **Processamento: 812 quadrantes** | **256 × 256 pixels** (bordas menores) | A **grade retangular completa do raster** é percorrida por janelas; o Quickshift processa cada uma separadamente | Extrair segmentos e calcular características da vegetação |
+| **Validação espacial: 250 m** | **250 × 250 metros** | As **amostras/segmentos já rotulados** são agrupados em blocos de acordo com suas coordenadas | Separar regiões para treino e teste e medir generalização espacial |
+| **Validação espacial: 500 m** | **500 × 500 metros** | **As mesmas amostras**, reorganizadas em blocos geográficos maiores | Repetir a avaliação com outra escala espacial |
+| **E9: 119 recortes selecionados** | **Até 512 × 512 pixels** | Regiões contendo referências conhecidas; cada recorte é segmentado inteiro ou dividido em quatro janelas de até 256 × 256 px | Comparar duas formas de segmentação, **não** definir os blocos de validação |
+
+**Sequência da comparação de classificadores:** imagem RGB da Area1 → processamento em **812 janelas** de até **256 × 256 px** → associação a referências existentes e deduplicação → **505 segmentos rotulados únicos** (257 árvores e 248 gramíneas) → atribuição das amostras aos **blocos espaciais de 250 m ou 500 m** → formação das partições de treinamento e teste → **embargo de 25 m** para afastar os objetos de treino das geometrias de teste → avaliação de Random Forest, SVM e demais classificadores.
+
+**Exemplo de equivalência apenas de escala:** como o raster tem resolução aproximada de **0,5 metro por pixel**, uma largura de 250 m corresponde a cerca de **500 pixels**, e 500 m a cerca de **1.000 pixels**. **Isso não significa que a segmentação foi refeita em janelas de 500 ou 1.000 pixels:** na V2, o processamento seguiu em janelas de até 256 pixels; 250 m e 500 m são escalas da **separação espacial das amostras**.
+
+**Sobre a figura:** a imagem de fundo é uma visualização da Area1 apresentada no infográfico do projeto. As grades de 250 m e 500 m são **sobreposições didáticas aproximadas**, não a reprodução georreferenciada dos limites exatos das partições do experimento. Os blocos de uma partição podem conter amostras de treino ou de teste; o embargo espacial adicional de 25 m não está desenhado. **Os 119 recortes do E9 são outro experimento** e não representam as partições de 250 m ou 500 m.
+
 **Por que foram escolhidos 119 recortes?** Para o experimento **E9**, selecionamos regiões que continham **pontos conhecidos de árvores e gramíneas**, permitindo comparar o Quickshift nos mesmos locais de duas formas: **(1)** segmentar cada região de até **512 × 512 pixels** de uma só vez; **(2)** segmentar essa mesma região em **quatro partes de até 256 × 256 pixels**. Assim, avaliamos se dividir a região muda a classificação. Os **119 recortes são apenas do E9**; os **812 quadrantes** pertencem a outro experimento, que percorreu toda a imagem.
 
 *Nota metodológica: as grades e marcações do infográfico são ilustrativas. Os limites exatos dos 119 recortes estão nos registros do experimento.*
