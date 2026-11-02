@@ -1,4 +1,4 @@
-# E10 — teste real de viabilidade no ambiente disponível (02/11/2026)
+# E10 — teste real de viabilidade no ambiente disponível
 
 ## Procedimento efetivamente realizado
 
