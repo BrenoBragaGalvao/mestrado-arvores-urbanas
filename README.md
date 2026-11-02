@@ -244,8 +244,6 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 | [Medição real dos recortes](docs/e9_medicao_memoria.md) | Pico de memória observado nos 119 recortes, com janelas de 512 e 256 pixels |
 | [Estimativas C1–C6](docs/allometria.md) | Fórmulas exploratórias de porte |
 
-Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi preparado para **Google Colab**. O processamento global consome muita memória; **uma nova execução completa e bem-sucedida não está comprovada**. As baterias da V2 têm evidências documentadas separadamente, mas nem todas as saídas estão salvas no próprio notebook publicado.
-
 ---
 
 ## 6. Como saímos do método original e comparamos oito algoritmos?
