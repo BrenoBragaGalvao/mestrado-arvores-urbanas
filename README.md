@@ -13,7 +13,7 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 
 ## Por que mudamos o método? A memória RAM foi o limite
 
-**Primeiro, o método original:** aplicamos **Quickshift à imagem RGB inteira**, depois **K-Means (seis grupos, seleção do cluster 3)** e **Random Forest (500 árvores)**. A execução histórica registrou **0,87 de acurácia em 92 exemplos de teste**, mas **não registrou quanto de memória RAM consumiu**.
+**Primeiro, o método original:** aplicamos **Quickshift à imagem RGB inteira**, depois **K-Means (seis grupos, seleção do cluster 3)** e **Random Forest (500 árvores)**. A execução histórica registrou **0,87 de acurácia em 92 exemplos de teste**, mas **não registrou seu pico real de memória RAM**. É possível, porém, **calcular uma estimativa de dimensionamento a partir das matrizes usadas na imagem completa**, apresentada abaixo.
 
 **Depois, tentamos repetir o Quickshift global** para comparar outros algoritmos nas mesmas condições. A imagem tem **6.942 × 7.294 pixels (50.634.948 pixels)**. Em um ambiente com **4 GiB de RAM**, a tentativa **não concluiu**: houve `MemoryError` quando o Quickshift precisou alocar **mais 1,13 GiB** para uma matriz temporária. Como o erro ocorreu **durante a segmentação**, essa nova tentativa **nem chegou ao K-Means ou ao Random Forest**.
 
@@ -21,13 +21,36 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 
 | Situação | Memória | O que esse número significa? |
 |---|---:|---|
-| **Método original completo: Quickshift + K-Means + Random Forest** | **Não medida** | Houve resultado histórico (acurácia 0,87), mas não há registro confiável de pico de RAM da execução. |
+| **Método original completo: Quickshift + K-Means + Random Forest** | **≈ 3,91 GiB (cenário básico) ou ≈ 5,42 GiB (cenário ampliado)** | **Estimativas calculadas para conjuntos de matrizes** da imagem inteira; **não são medições do pico real** e não incluem todo o custo de polígonos, K-Means, Random Forest e Python. O total pode ser maior. |
 | **Nova tentativa do Quickshift global** | **1,13 GiB adicionais solicitados; falhou** | Tamanho de **uma única matriz** que não pôde ser alocada sob o limite do ambiente; **não** é o pico total nem o consumo combinado dos três algoritmos. |
 | **Quickshift em um recorte de 2.048 × 2.048 pixels** | **Cerca de 687 MB de pico** | Medição em um recorte maior, que conseguiu concluir; não equivale à imagem inteira. |
 | **119 recortes de até 512 × 512 pixels, um após o outro** | **467,19 MiB de pico** | Medição do processo na comparação entre tamanhos de janela. |
 | **Os mesmos 119 recortes divididos em até quatro partes de 256 × 256** | **456,80 MiB de pico** | Medição do mesmo tipo de processo; redução observada de **10,38 MiB (2,22%)**. |
 
-Para ter ideia do tamanho dos dados, **apenas uma cópia da imagem RGB inteira em `uint8` ocupa cerca de 145 MiB**; uma cópia do raster RGB+NIR em `uint16`, cerca de **386 MiB**; e a **matriz temporária RGB de três bandas em `float64`**, cerca de **1,13 GiB**. Esses são **tamanhos calculados de matrizes individuais**, não medições de consumo total; a segmentação também requer outras matrizes e estruturas.
+### Como foi calculada a estimativa do método original?
+
+Como a segmentação original usa a imagem **inteira**, e não apenas os 119 recortes da V2, usamos **6.942 × 7.294 = 50.634.948 pixels**. O tamanho teórico de uma matriz sem compressão é:
+
+```text
+Memória (MiB) = quantidade de pixels × bandas × bytes por valor ÷ 1.048.576
+1 GiB = 1.024 MiB
+```
+
+| Matriz correspondente à imagem inteira | Cálculo | Memória calculada |
+|---|---|---:|
+| RGB original, 3 bandas `uint8` | 50.634.948 × 3 × 1 byte | **144,87 MiB** |
+| RGB + NIR, 4 bandas `uint16` | 50.634.948 × 4 × 2 bytes | **386,31 MiB** |
+| Uma matriz RGB/Lab de 3 canais em `float64` | 50.634.948 × 3 × 8 bytes | **1.158,94 MiB (1,13 GiB)** |
+| Um mapa 2D em `float64` ou `int64` | 50.634.948 × 1 × 8 bytes | **386,31 MiB** |
+
+**Dois cenários ilustrativos de ocupação simultânea de matrizes** (não correspondem a uma medição da execução):
+
+- **Básico:** 1 RGB `uint8` + 1 RGB+NIR `uint16` + **2 matrizes RGB/Lab `float64`** + **3 mapas 2D de 8 bytes** = **4.008,01 MiB ≈ 3,91 GiB**.
+- **Ampliado:** cenário básico + **1 matriz RGB/Lab `float64`** + **1 mapa 2D de 8 bytes** = **5.553,26 MiB ≈ 5,42 GiB**.
+
+**Interpretação:** o Quickshift faz conversões e aloca matrizes auxiliares; a representação `float64` de **uma única imagem RGB já exige 1,13 GiB**. O K-Means do notebook atua sobre atributos **por segmento**, e o Random Forest é treinado com **366 pares objeto–rótulo** na rodada histórica; não seria correto multiplicar o número de pixels pelos 6 clusters ou pelas 500 árvores para estimar RAM desses modelos. O custo exato dessas etapas, da vetorização, das tabelas de atributos, das cópias temporárias e da sobrecarga do ambiente **não foi medido**.
+
+**Limite importante:** os dois cenários mostram como algumas matrizes poderiam coexistir; **não são um limite inferior ou superior matemático para o pico real do pipeline**. Sem reexecutar e monitorar todo o método original com RAM suficiente, não é possível afirmar seu consumo máximo exato. Os cenários ajudam a explicar por que **4 GiB não foram suficientes** na nova tentativa de Quickshift global, mas não provam quanta RAM a execução histórica utilizou.
 
 **Decisão:** em vez de insistir no Quickshift global, passamos a **dividir a imagem em janelas menores, sem reduzir a resolução dos pixels**. Isso viabilizou comparar oito classificadores com exemplos e testes equivalentes **dentro de cada novo experimento**. Não significa que reproduzimos o método global original.
 
