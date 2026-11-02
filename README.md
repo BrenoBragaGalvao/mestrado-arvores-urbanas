@@ -58,11 +58,12 @@ Clique no título para abrir diretamente a seção correspondente.
 | [3.6.2. Configuração 2](#sec-3-6-2) | 119 recortes inteiros de até 512 × 512 pixels. |
 | [3.6.3. Configuração 3](#sec-3-6-3) | 119 recortes subdivididos em partes de 256 × 256 pixels. |
 | [3.7. Memória RAM](#sec-3-7) | Comparação dos picos de memória. |
-| [4. Alometria e comparação de alturas](#sec-4) | Comparação de alturas modeladas Meta/WRI e ETH Zurich na Area1. |
-| [4.1. Satélites e mapas](#sec-4-1) | Origem das imagens, sensores e resolução espacial. |
-| [4.2. Precisão publicada](#sec-4-2) | MAE e RMSE dos artigos, sem confundir com acurácia local. |
-| [4.3. Comparação nas 257 árvores](#sec-4-3) | Resultados nas coordenadas originais e 139 pares válidos. |
-| [4.4. Arquivos e referências](#sec-4-4) | Links dos dois GeoTIFFs, artigos e dados da V3. |
+| [4. Alometria Meta/WRI](#sec-4) | Estimativas de altura do dossel nos 257 pontos da Area1. |
+| [4.1. Satélite e método](#sec-4-1) | Imagens Maxar e IA DINOv3 para a altura do dossel. |
+| [4.2. Precisão publicada](#sec-4-2) | MAE do produto e diferença entre resolução e precisão. |
+| [4.3. Alturas dos 257 pontos](#sec-4-3) | Distribuição das previsões da Meta/WRI na Area1. |
+| [4.4. Alometria C3 × Meta](#sec-4-4) | Relação dos índices C1–C6 com as estimativas externas. |
+| [4.5. Dados e reprodução](#sec-4-5) | Raster, notebook V3, CSV, script e referências. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
 
@@ -513,84 +514,91 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
 <a id="sec-4"></a>
-## 4. Alometria das árvores — comparação das estimativas de altura Meta/WRI e ETH Zurich
+## 4. Alometria de árvores de Caxias do Sul — estimativas de altura Meta/WRI CHMv2
 
-Na qualificação foi proposta a verificação da **plausibilidade das alturas de árvores da região de Caxias do Sul (RS)**. Para aprofundar essa questão na **V3**, amostramos **dois produtos públicos e independentes de altura do dossel** nas coordenadas dos mesmos **257 pontos de árvores** da Area1. Os produtos são **estimativas geradas por modelos**, e não alturas medidas em campo para cada indivíduo.
+Na qualificação, a banca sugeriu verificar se as alturas atribuídas às árvores eram plausíveis diante das características da arborização de **Caxias do Sul (RS)**. Para aprofundar essa questão, criamos a **V3 independente**, que utiliza os **257 pontos de referência de árvores da Area1**, as fórmulas experimentais C1–C6 do método original e **uma única fonte externa de estimativas de altura: Meta/WRI CHMv2**.
 
-**Atenção à terminologia:** *resolução espacial* informa o tamanho aproximado de cada pixel; *precisão/erro de estimativa* expressa o quanto um modelo difere de uma altura de referência; *acurácia local* exigiria alturas conhecidas das mesmas árvores da Area1, que **não estão disponíveis**. Um pixel menor não garante, por si só, uma altura mais correta.
+**Distinção fundamental:** as alturas Meta/WRI são **estimativas de dossel produzidas por aprendizado de máquina**. Já C3 (`2,5 × A^0,4`) é um **índice empírico calculado a partir da área de um superpixel Quickshift**, que não representa necessariamente a copa individual. Não existe altura medida de campo dessas árvores nos arquivos da Area1; portanto, não é possível confirmar a altura real de cada indivíduo nem validar a C3 em metros.
 
 <a id="sec-4-1"></a>
-### 4.1. Quais satélites e métodos geraram os dois mapas?
+### 4.1. De qual satélite vêm os dados Meta/WRI?
 
-| Característica | Meta/WRI CHMv2 (2026) | ETH Zurich Global Canopy Height (2020) |
-|---|---|---|
-| Instituições | Meta e World Resources Institute (WRI) | ETH Zurich e colaboradores |
-| Imagem óptica principal | Imagens comerciais RGB de **alta resolução da Maxar** (mosaicos que podem reunir cenas de diferentes satélites, incluindo a família **WorldView**) | **Sentinel-2**, missão Copernicus da **Agência Espacial Europeia (ESA)** |
-| Referência de alturas usada no desenvolvimento | Modelos de altura de dossel derivados de **LiDAR aerotransportado (ALS)** | Medições **GEDI**, LiDAR espacial da NASA instalado na Estação Espacial Internacional |
-| Método de estimativa | Rede de IA baseada em **DINOv3** | Modelo de **aprendizado profundo** que combina imagens Sentinel-2, referências GEDI e informações geográficas |
-| Resolução espacial nominal do produto | Aproximadamente **1 m** | Aproximadamente **10 m** |
-| Referência temporal | Mosaicos de diferentes datas; grande parte das imagens disponíveis é de **2018–2020** | Ano de **2020** |
+O **Meta/WRI CHMv2 (2026)** foi produzido a partir de imagens ópticas comerciais RGB de alta resolução fornecidas pela **Maxar**, cujo mosaico pode reunir diferentes sensores e satélites (incluindo a família **WorldView**). As estimativas são geradas por um modelo de inteligência artificial com representações **DINOv3**, treinado com referências de altura derivadas de **LiDAR aerotransportado**. O GeoTIFF de alturas da Area1 **não informa o satélite exato de cada cena**, por isso não atribuímos um único WorldView às 257 árvores.
 
-**Não se trata de dois satélites que mediram diretamente a altura de cada árvore.** No caso Meta/WRI, o produto se baseia em imagens RGB comerciais da Maxar; a identificação do **satélite específico da cena que cobre cada ponto da Area1** requer os metadados de aquisição da imagem original, e não pode ser deduzida apenas do GeoTIFF de alturas. Na ETH Zurich, a imagem óptica vem do Sentinel-2 e as referências de treinamento vêm do GEDI. A altura é **inferida por modelos**, em ambos os casos.
+| Característica | Meta/WRI CHMv2 |
+|---|---|
+| Instituições | Meta e World Resources Institute (WRI) |
+| Imagens de base | Mosaicos RGB comerciais de alta resolução da Maxar |
+| Referência de alturas no treinamento | LiDAR aerotransportado |
+| Método | Modelo de IA baseado em DINOv3 |
+| Resolução espacial nominal | Aproximadamente **1 m** |
+| Período das imagens | Mosaicos de datas diversas, grande parte com imagens de 2018–2020 |
 
-Fontes: [apresentação da Meta/WRI](https://ai.meta.com/pt-br/ai-for-good/datasets/canopy-height-maps/), [artigo CHMv2 (Brandt et al., 2026)](https://doi.org/10.1038/s41597-026-07882-0), [artigo ETH Zurich (Lang et al., 2023)](https://doi.org/10.1038/s41559-023-02206-6) e [página do produto ETH](https://langnico.github.io/globalcanopyheight/).
+**Importante:** resolução de 1 m significa maior detalhamento espacial, **não** erro garantido de 1 m na altura. A aquisição de cenas e a idade da arborização podem diferir da imagem original da Area1.
+
+Referências: [Catálogo Meta/WRI no AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Brandt et al. (2026), artigo científico](https://doi.org/10.1038/s41597-026-07882-0).
 
 <a id="sec-4-2"></a>
-### 4.2. Qual é a precisão publicada dos produtos?
+### 4.2. Qual é a precisão publicada do Meta/WRI?
 
-O artigo **Brandt et al. (2026)** avaliou modelos globais de altura contra referências independentes de dossel provenientes de LiDAR aerotransportado no conjunto **SatLidar v2**. Nesse **mesmo protocolo de teste**, os autores apresentam:
+No conjunto independente de teste **SatLidar v2**, relatado por **Brandt et al. (2026)**, o **Meta/WRI CHMv2** apresentou **erro absoluto médio (MAE) de aproximadamente 3,0 metros** em relação às alturas de referência do teste. Na mesma avaliação, foi informado **R² de 0,86**.
 
-| Modelo avaliado no artigo CHMv2 | Resolução aproximada | Erro absoluto médio (MAE) |
-|---|---:|---:|
-| **Meta/WRI CHMv2** | 1 m | **3,0 m** |
-| **ETH Zurich / Lang et al.** | 10 m | **8,4 m** |
+O **MAE** resume a diferença absoluta média entre as previsões de altura e as referências do conjunto avaliado. **Não** significa que todas as árvores tenham margem de ±3 metros, nem que esse desempenho se repita nas ruas de Caxias do Sul. Não calculamos MAE/RMSE de altura real para a Area1, pois **não dispomos de alturas medidas dos mesmos 257 indivíduos**.
 
-O **MAE** é a média dos valores absolutos das diferenças entre altura estimada e altura de referência. Quanto menor, melhor **naquele conjunto de teste**. Esses números **não** significam que cada árvore da Area1 tenha uma margem de erro fixa de 3 m ou 8,4 m. A avaliação ocorreu em outras áreas, com protocolos e vegetação distintos da nossa amostra urbana.
-
-**Outra métrica publicada pela ETH:** seu artigo original (Lang et al., 2023) relata **RMSE de 6,0 m** e viés médio de **+1,3 m** em avaliação contra observações GEDI reservadas para teste. Esse RMSE **não é diretamente comparável** aos MAEs da tabela: trata-se de outro indicador e de outro conjunto de validação.
-
-**Interpretação para o mestrado:** o CHMv2 apresenta menor MAE na comparação publicada com o mesmo conjunto de referência, mas **isso não estabelece qual produto estima melhor as alturas de árvores específicas de Caxias do Sul**. Os dados de teste não substituem uma validação local com alturas de indivíduos medidas independentemente.
-
-Fontes científicas: [Brandt et al. (2026), *Scientific Data*, comparação SatLidar v2](https://doi.org/10.1038/s41597-026-07882-0) e [Lang et al. (2023), *Nature Ecology & Evolution*](https://doi.org/10.1038/s41559-023-02206-6).
+Fonte: [Brandt et al. (2026) — descrição, experimentos e limitações do CHMv2](https://doi.org/10.1038/s41597-026-07882-0).
 
 <a id="sec-4-3"></a>
-### 4.3. Como ficaram as estimativas das mesmas 257 árvores da Area1?
+### 4.3. Quais foram as alturas estimadas para os 257 pontos da Area1?
 
-Realizamos a leitura dos mapas diretamente nas coordenadas originais de **Arvores.gpkg**, sem pedir novos pontos e sem modificar os dados da Area1. No mapa Meta/WRI foram obtidos valores para **257/257 pontos**; no mapa ETH Zurich somente **139/257** apresentaram dados válidos (**118 sem dados**, identificados no raster como *NoData* e **não convertidos para altura zero**).
+Extraímos valores diretamente do GeoTIFF público **Meta/WRI CHMv2**, associando cada previsão às coordenadas de `Arvores.gpkg`. Para verificar o efeito do posicionamento, registramos **a previsão no pixel exato** e, como teste complementar, **a maior previsão em um raio de 5 m**.
 
-**Para comparar as duas fontes de forma pareada, utilizamos apenas os mesmos 139 pontos com valor em ambas.**
+| Indicador | Resultado na Area1 |
+|---|---:|
+| Pontos originais com previsão no pixel | **257/257** |
+| Mediana da altura modelada no pixel exato | **2,0 m** |
+| Média da altura modelada no pixel exato | **4,61 m** |
+| Mediana do máximo modelado no raio de 5 m | **6,0 m** |
+| Pixels exatos com valor zero | **107/257 (41,6%)** |
+| Pontos com valor zero em toda a vizinhança de 5 m | **42/257 (16,3%)** |
+| Maior valor modelado observado no raio de 5 m | **30 m** |
 
-| Indicador | Meta/WRI CHMv2 (~1 m) | ETH Zurich 2020 (~10 m) |
-|---|---:|---:|
-| Pontos com valor em toda a Area1 | **257** | **139** |
-| Pontos utilizados na comparação pareada | 139 | 139 |
-| **Mediana das alturas estimadas nos 139 pontos** | **6,00 m** | **14,00 m** |
-| Média das alturas estimadas nos 139 pontos | 6,68 m | 14,28 m |
-| Valores zero entre os 139 pontos | 38 | 0 |
+**Por que há tantos zeros?** O valor 0 aparece efetivamente no produto raster, mas pode corresponder a solo, borda da copa, sombra, deslocamento da coordenada, desatualização da imagem ou ausência de vegetação detectada. **Não significa necessariamente que a árvore cadastrada não existe.**
 
-**Comparação ponto a ponto:** a mediana das diferenças (**ETH − Meta**) foi **+8,00 m**, e a correlação de Pearson entre as estimativas foi **r = 0,399** nos 139 pares. Considerando somente os **101 pares com valores positivos nas duas fontes**, a correlação de Pearson foi **r = 0,553**. São medidas de **concordância entre modelos**, e não erros frente a alturas reais.
-
-**Por que as fontes divergem?** Um pixel de aproximadamente 10 m pode agrupar várias copas e outras superfícies, enquanto um pixel de aproximadamente 1 m pode coincidir com a borda da árvore, solo ou sombra. Além disso, há diferenças entre algoritmos, datas das imagens, georreferenciamento e máscaras de vegetação. Na Meta, **107 pontos** apresentaram valor zero no pixel exato; isso **não comprova ausência de árvore** no local.
-
-**Teste complementar:** para a Meta/WRI calculamos também o **máximo estimado em um raio de 5 m** ao redor de cada coordenada (mediana de **6 m considerando todos os 257 pontos**). Esse valor pode representar **outra árvore**, portanto não equivale à altura do indivíduo indicado pelo ponto e não substitui a comparação principal feita no pixel.
-
-**Relação com a alometria C3:** o índice **C3 = 2,5 × A^0,4**, calculado com a área do **superpixel Quickshift**, teve mediana **16,98** na V3. Esse valor **não é uma altura validada em metros**: a área do superpixel não é necessariamente a área da copa individual, e a fórmula não foi calibrada com alturas reais da região. A discrepância entre mapas externos reforça a necessidade de cautela na interpretação do índice.
-
-**Conclusão preliminar:** as estimativas da ETH Zurich foram, em geral, mais altas nos pontos comparáveis, mas **não podemos dizer que a ETH seja mais precisa na Area1** nem que a Meta esteja errada. Para determinar a exatidão em Caxias do Sul, seria necessário confrontar ambos os modelos com **alturas reais medidas dos mesmos indivíduos**, idealmente após conferir posição e delimitação das copas.
+**O máximo em 5 m não é automaticamente a altura da mesma árvore:** pode captar outra copa próxima. Por isso apresentamos as duas medidas separadamente e sem afirmar altura individual confirmada.
 
 <a id="sec-4-4"></a>
-### 4.4. De onde foram retiradas as alturas? Arquivos e referências
+### 4.4. Como o índice alométrico C3 se relaciona com a altura Meta/WRI?
 
-**GeoTIFFs efetivamente utilizados na extração:**
+A versão original do método utiliza **C3 = 2,5 × A^0,4**, com `A` correspondendo à área do segmento analisado. Na V3 aplicamos a fórmula aos superpixels associados aos 257 pontos originais para avaliar sua plausibilidade.
 
-| Fonte | Arquivo raster original | Página de distribuição / artigo |
-|---|---|---|
-| **Meta/WRI CHMv2** | [Quadrante `2103121330.tif` — mapa de altura do dossel](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) | [AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
-| **ETH Zurich 2020** | [Quadrante `S30W054_Map.tif` — mapa de altura do dossel](https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download?path=%2F3deg_cogs&files=ETH_GlobalCanopyHeight_10m_2020_S30W054_Map.tif) | [ETH Zurich — dados](https://www.research-collection.ethz.ch/entities/researchdata/2ecca65c-bc7b-4e72-9b62-534d606a062e) · [Lang et al. (2023)](https://doi.org/10.1038/s41559-023-02206-6) |
+| Indicador da comparação exploratória | Valor |
+|---|---:|
+| Mediana de **C3**, índice sem altura validada | **16,98** |
+| Correlação Pearson entre C3 e altura Meta no pixel | **0,019** |
+| Correlação Pearson entre C3 e máximo Meta em 5 m | **0,014** |
+| Superpixels que tocam a borda da janela | **79/257 (30,7%)** |
 
-**Arquivos reproduzíveis deste estudo:** [CSV pareado com os 257 pontos](docs/v3_alturas_publicas/v3_meta_eth_alturas_estimadas_257_arvores.csv) · [resumo estatístico JSON](docs/v3_alturas_publicas/v3_meta_eth_resumo_257.json) · [gráfico de dispersão](docs/v3_alturas_publicas/v3_meta_eth_dispersao.png) · [relatório completo com limitações](docs/v3_alturas_publicas/v3_meta_eth_comparacao_257.md) · [script Python de extração e comparação](experimentos/v3_comparar_meta_eth_257.py).
+As correlações próximas de zero indicam que **não identificamos associação linear relevante** entre o índice C3 e as previsões Meta para esses pontos. Isso **não demonstra, isoladamente, que uma fórmula de altura baseada em copas bem delimitadas seja inválida**: nossos superpixels não são copas confirmadas, e as próprias alturas Meta são estimativas modeladas.
 
-**Limite científico:** nenhum desses produtos mede os cabos elétricos, identifica necessariamente a espécie ou comprova a altura real de cada árvore. A análise de proximidade a postes continua **exploratória**, não uma avaliação validada de risco elétrico.
+A V3 também compara as seis formulações **C1–C6** e consulta faixas de porte de espécies citadas no **Plano Diretor de Arborização Urbana de Caxias do Sul**. Essas faixas dão **contexto regional**, mas **não permitem identificar a espécie nem atribuir uma altura real a cada um dos 257 indivíduos**.
+
+<a id="sec-4-5"></a>
+### 4.5. De onde foram obtidas as alturas? Código e arquivos
+
+A fonte externa de altura adotada neste trabalho é **somente Meta/WRI CHMv2**.
+
+| Recurso | Link e finalidade |
+|---|---|
+| **GeoTIFF original** | [`2103121330.tif` — quadrante de Caxias do Sul](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) |
+| **Catálogo da fonte** | [Meta/WRI — AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) |
+| **Artigo científico** | [Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
+| **Notebook da alometria V3** | [`Alometria_caxias_v3.ipynb`](Alometria_caxias_v3.ipynb) |
+| **Cálculo dos índices C1–C6** | [`experimentos/v3_alometria_caxias.py`](experimentos/v3_alometria_caxias.py) |
+| **Extração de alturas Meta/WRI** | [`experimentos/v3_amostrar_altura_publica.py`](experimentos/v3_amostrar_altura_publica.py) |
+| **Dados das 257 árvores, C3 e Meta** | [CSV com os 257 pontos](docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv) |
+| **Metodologia e limites** | [Análise exploratória Meta/WRI × C3](docs/v3_alturas_publicas/v3_analise_comparativa.md) |
+
+**Síntese:** a análise com Meta/WRI ajuda a investigar a plausibilidade dos índices experimentais, **mas nenhuma das 257 alturas foi medida diretamente em campo**. Não inferimos risco elétrico pela proximidade de postes.
 
 ---
 
@@ -620,10 +628,8 @@ Realizamos a leitura dos mapas diretamente nas coordenadas originais de **Arvore
 
 | Material | Conteúdo |
 |---|---|
-| [Notebook V3 — alometria de Caxias do Sul](Segmentacao_area_completa_v3_alometria_caxias.ipynb) | **Auditoria exploratória independente** da fórmula C3 e das variantes C1–C6; consulta faixas de porte do PDAU municipal e compara o índice numérico com a referência regional **sem alegar altura real validada**. [Metodologia e resultados](docs/v3_alometria_caxias.md) · [Script de reprodução](experimentos/v3_alometria_caxias.py). |
-| [V3 — estimativas de altura de dossel via Google Earth Engine](experimentos/v3_alturas_dossel_google_earth_engine.py) | Script opcional para consultar os **257 pontos de árvores** nas bases de altura **Meta/WRI (~1 m)** e **ETH Zurich (10 m)**. Requer autenticação no Earth Engine; **não são alturas medidas em campo**. [Explicação metodológica](docs/v3_alometria_caxias.md). |
-| [V3 — resultados externos de altura para 257 árvores](docs/v3_alturas_publicas/v3_analise_comparativa.md) | **Extração efetivamente executada**, sem autenticação, do mapa Meta/WRI CHMv2; inclui [estimativas por ponto](docs/v3_alturas_publicas/v3_meta_chmv2_estimativas_257_arvores.csv), [comparação com C3](docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv) e limitações da análise. |
-| [V3 — comparação das alturas Meta/WRI e ETH Zurich](docs/v3_alturas_publicas/v3_meta_eth_comparacao_257.md) | **Análise efetivamente executada dos mesmos 257 pontos da Area1**: Meta com valor em 257 pontos, ETH Zurich com valor em 139 (118 sem dado válido). Nos **139 pares**, mediana **6 m (Meta) versus 14 m (ETH)**, diferença mediana **+8 m (ETH − Meta)** e Pearson **0,399**. Inclui [CSV com os 257 pontos](docs/v3_alturas_publicas/v3_meta_eth_alturas_estimadas_257_arvores.csv), [gráfico de dispersão](docs/v3_alturas_publicas/v3_meta_eth_dispersao.png) e ressalvas científicas. **Alturas modeladas, não medidas em campo.** |
+| [Notebook V3 — alometria e altura Meta/WRI](Alometria_caxias_v3.ipynb) | V3 independente: índices experimentais **C1–C6**, contexto regional e comparação com **alturas estimadas Meta/WRI CHMv2** nos 257 pontos. [Script de alometria](experimentos/v3_alometria_caxias.py) · [Metodologia](docs/v3_alometria_caxias.md). |
+| [V3 — resultados de altura Meta/WRI CHMv2 nos 257 pontos](docs/v3_alturas_publicas/v3_analise_comparativa.md) | **Única fonte externa de altura ativa na V3:** estimativa de dossel Meta/WRI (~1 m), com [CSV de 257 pontos e índice C3](docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv), [script de amostragem](experimentos/v3_amostrar_altura_publica.py) e documentação das limitações. Não são alturas medidas em campo. |
 | [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
 | [Notebook V2](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa_v2_experimentos.ipynb) | **Versão experimental com três configurações de processamento**, todas usando a imagem e os pontos de referência originais, **sem reduzir a resolução dos pixels**: <br><br> **(1) Área completa em 812 quadrantes de até 256 × 256 pixels:** aplica Quickshift por quadrante, em lotes com resultados intermediários salvos para controlar o consumo de memória RAM; depois permite avaliar **oito classificadores pelo F1-macro** e investigar combinações de **NDVI, brilho HSV e bordas Canny**. <br><br> **(2) Os 119 recortes de até 512 × 512 pixels:** entre 210 janelas possíveis, seleciona as 119 com pontos conhecidos, aplica Quickshift ao recorte inteiro e avalia **o F1-macro dos oito classificadores**. <br><br> **(3) Os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels:** aplica Quickshift separadamente em cada parte e avalia novamente **os oito classificadores**, para comparar **F1-macro e pico de memória RAM** com a configuração 2, usando as mesmas referências e divisões espaciais de treino/teste. <br><br> **Organização no notebook:** a configuração 1 é um caminho progressivo independente; as configurações 2 e 3 são os dois testes de uma mesma comparação controlada. A rota progressiva oferece ainda análises opcionais de porte e proximidade com postes. **O código está implementado, mas a publicação do notebook não comprova uma nova execução integral dos 812 quadrantes.** O método original com Quickshift global permanece preservado em outro notebook. |
 | [Dados Area1](data/README.md) | Arquivos, coordenadas e estrutura do Drive |

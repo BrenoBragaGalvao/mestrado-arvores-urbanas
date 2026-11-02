@@ -20,7 +20,7 @@ O [Plano Diretor de Arborização Urbana de Caxias do Sul](https://caxias.rs.gov
 As faixas vêm de espécies diferentes. **Não há identificação botânica ou medida de altura nos 257 pontos originais**; não atribuímos espécie a cada ponto nem interpretamos a faixa local como medição na Area1.
 
 ## Método
-O [notebook V3](../Segmentacao_area_completa_v3_alometria_caxias.ipynb) aciona [um script independente](../experimentos/v3_alometria_caxias.py). O script lê apenas as bandas RGB e os pontos de Arvores.gpkg, segmenta **em janelas de 256 pixels**, registra o superpixel que contém cada ponto e sua área em m², assinalando os que tocam a borda da janela. Reproduz as seis fórmulas experimentais C1–C6 (potencial e linear), com destaque para o índice C3 = 2,5 × A^0,4 e seu corte histórico maior que 7. Há opção de repetir com janelas de 512 pixels.
+O [notebook V3](../Alometria_caxias_v3.ipynb) aciona [um script independente](../experimentos/v3_alometria_caxias.py). O script lê apenas as bandas RGB e os pontos de Arvores.gpkg, segmenta **em janelas de 256 pixels**, registra o superpixel que contém cada ponto e sua área em m², assinalando os que tocam a borda da janela. Reproduz as seis fórmulas experimentais C1–C6 (potencial e linear), com destaque para o índice C3 = 2,5 × A^0,4 e seu corte histórico maior que 7. Há opção de repetir com janelas de 512 pixels.
 
 **Superpixel Quickshift não equivale a uma copa individual delimitada.** Os coeficientes C1–C6 não foram ajustados às alturas reais desta região e não são os coeficientes de artigos externos. O índice C3 não tem validação como altura em metros. A publicação [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579) investiga relação largura de copa–altura em três espécies de cidades gregas, mas não calibra a fórmula original da Area1.
 
@@ -52,40 +52,29 @@ python experimentos/v3_alometria_caxias.py --area /content/drive/MyDrive/Area1 \
 
 Se a pasta Area1 estiver em outro local do Drive, ajustar apenas --area. Rodar com --tile 512 é um teste adicional de sensibilidade da segmentação.
 
-## Estimativas externas de altura por ponto no Google Earth Engine (V3)
+## Fonte externa exclusiva: Meta/WRI CHMv2 (257 pontos)
 
-Para responder à pergunta sobre a altura das **257 árvores de referência**, foi preparado o [script de extração GEE](../experimentos/v3_alturas_dossel_google_earth_engine.py), sem alterar as imagens ou os pontos originais da Area1. O script lê **Arvores.gpkg**, mantém seus IDs e consulta duas referências públicas de altura de **dossel estimada por modelos**:
+A V3 passa a utilizar **somente o produto Meta/WRI CHMv2** para estimar a **altura modelada do dossel** nos pontos de referência de árvores da Area1. Os 257 valores por ponto foram efetivamente extraídos do [GeoTIFF público `2103121330.tif`](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif), sem autenticação, pelo [script reprodutível](../experimentos/v3_amostrar_altura_publica.py). A amostragem considera o valor do **pixel exato** e, separadamente, o **máximo dentro de 5 m**.
 
-| Fonte | Resolução aproximada | Uso e ressalva |
-|---|---|---|
-| [Meta/WRI — High Resolution Canopy Height Maps](https://gee-community-catalog.org/projects/meta_trees/) | **1 m** | Preferência para árvores urbanas individuais, mas os valores são **previsões**, não alturas medidas. O mapa pode ter deslocamentos, ruído e datas de imagem diferentes. |
-| [ETH Zurich — Global Canopy Height 2020](https://langnico.github.io/globalcanopyheight/) | **10 m** | Referência secundária científica, com resolução insuficiente para separar algumas árvores vizinhas. O produto também fornece estimativas de incerteza. |
+**Dados e metodologia:** [análise estatística dos 257 pontos](v3_alturas_publicas/v3_analise_comparativa.md), [CSV original com C3 e alturas Meta](v3_alturas_publicas/v3_comparacao_c3_meta_257.csv), [dados Meta brutos](v3_alturas_publicas/v3_meta_chmv2_estimativas_257_arvores.csv), [resumo JSON](v3_alturas_publicas/v3_meta_chmv2_resumo.json).
 
-**Rota Google Earth Engine (opcional):** exige autenticação. Como alternativa, **executamos com sucesso** o acesso direto ao mapa público **Meta/WRI CHMv2 pela AWS**, sem autenticação, produzindo os resultados numéricos de **257 pontos**. Veja a [análise comparativa realizada](v3_alturas_publicas/v3_analise_comparativa.md) e a [tabela pareada com o índice C3](v3_alturas_publicas/v3_comparacao_c3_meta_257.csv). Nenhuma dessas fontes equivale a altura medida em campo.
+| Indicador | Resultado Meta/WRI na Area1 |
+|---|---:|
+| Pontos amostrados | **257/257** |
+| Mediana da previsão no pixel exato | **2 m** |
+| Mediana do máximo estimado em 5 m | **6 m** |
+| Valores zero no pixel | **107 (41,6%)** |
+| Valores zero em todo o raio de 5 m | **42 (16,3%)** |
+| Correlação Pearson C3 × previsão Meta no pixel | **r = 0,019** |
+| Correlação Pearson C3 × máximo Meta no raio de 5 m | **r = 0,014** |
 
-Exemplo, após instalar `earthengine-api`, `geopandas` e `pandas`, montar o Drive e habilitar o projeto Google Cloud:
+A previsão Meta/WRI **não é uma medição direta de altura individual**. Zero no pixel não demonstra inexistência de árvore; o máximo em 5 m pode corresponder a outro indivíduo. **C3 continua um índice não calibrado**, calculado sobre superpixels, e não deve ser interpretado como altura real em metros.
 
-~~~bash
-python experimentos/v3_alturas_dossel_google_earth_engine.py \
-  --area /content/drive/MyDrive/Area1 \
-  --out /content/v3_alturas_gee \
-  --project SEU_ID_DE_PROJETO_GEE \
-  --fontes ambas
-~~~
+### Execução e reprodução no notebook V3
 
-Saídas previstas, **somente depois de executar com sucesso**: `v3_alturas_dossel_estimadas_257_pontos.csv` com 257 linhas (inclusive pontos sem cobertura, marcados como ausentes), e `v3_alturas_dossel_resumo.json`. É possível anexar os índices da V3 pelo argumento `--indices-v3 CAMINHO/CSV` quando o CSV contiver `ponto_id` e `indice_potencial_C3`.
+Abra [`Alometria_caxias_v3.ipynb`](../Alometria_caxias_v3.ipynb). Execute os índices alométricos com os arquivos originais da Area1, então carregue o CSV Meta/WRI já incluído no repositório. O próprio notebook verifica os **257 IDs**, gera uma tabela consolidada com as previsões e os índices e calcula correlações e um gráfico de dispersão. A atualização da fonte externa por COG é **opcional** e fica desativada por padrão.
 
-**Interpretação:** altura do dossel em um pixel georreferenciado **não comprova a altura da árvore individual** à qual o ponto foi associado. A comparação entre a C3 e os produtos Meta/ETH é uma análise de **concordância com outras estimativas modeladas**, não uma validação de campo ou certificação de exatidão (MAE/RMSE perante observações reais). As datas, diferenças de resolução, alinhamento geográfico e trechos sem cobertura devem ser documentados antes de tirar conclusões.
-
-## Comparação externa concluída: Meta/WRI versus ETH Zurich (257 pontos)
-
-A [comparação pareada da V3](v3_alturas_publicas/v3_meta_eth_comparacao_257.md) foi **executada e documentada**, usando o GeoTIFF oficial da ETH Zurich 2020 e as estimativas da Meta/WRI CHMv2 previamente obtidas. Ambas foram amostradas nas coordenadas dos **mesmos 257 pontos** da Area1. O [CSV por ponto](v3_alturas_publicas/v3_meta_eth_alturas_estimadas_257_arvores.csv) contém as duas fontes e indica ausências.
-
-- **Meta/WRI:** 257 pontos com valor no pixel (~1 m).
-- **ETH Zurich:** 139 pontos com valor no pixel (~10 m); **118 sem dados válidos**, não imputados como zero.
-- **Nos 139 pontos comuns:** medianas de **6 m (Meta)** e **14 m (ETH)**; diferença mediana ponto a ponto ETH − Meta de **+8 m**, correlação de Pearson de **0,399**.
-
-A diferença importante indica **discordância entre previsões**, não erro de medição nem comprovação de que a fonte ETH seja mais precisa. Os produtos têm escalas, fontes de informação e máscaras diferentes. As alturas reais dos 257 indivíduos **continuam sem medição de campo**; a C3 permanece um índice não calibrado e não deve ser comparada em metros como se fosse altura validada. [Consulte os dados e as limitações](v3_alturas_publicas/v3_meta_eth_comparacao_257.md).
+Referências externas: [Meta/WRI — AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Brandt et al. (2026), *Scientific Data*](https://doi.org/10.1038/s41597-026-07882-0). O artigo relata **MAE aproximado de 3,0 m** no protocolo de validação SatLidar v2; esse erro **não é uma estimativa de precisão local para a Area1**.
 
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
