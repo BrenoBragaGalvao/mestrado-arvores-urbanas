@@ -222,7 +222,7 @@ O propósito não é simplesmente encontrar um número maior que 0,87, mas enten
 
 | Pergunta científica | Como investigamos |
 |---|---|
-| **1. O tamanho das janelas de segmentação modifica as previsões?** | Os mesmos 119 recortes são segmentados em 512 × 512 pixels ou em quatro partes de 256 × 256 pixels |
+| **1. Como o tamanho das janelas de segmentação influencia o consumo de memória e a classificação de árvores e gramíneas?** | A limitação de memória ao processar a imagem completa motivou o uso de janelas menores. Para investigar o efeito sobre a classificação, comparamos os mesmos 119 recortes, segmentados em janelas de até 512 × 512 pixels ou em quatro partes de até 256 × 256 pixels. O consumo de memória não foi medido sistematicamente nas duas configurações do E9. |
 | **2. Quais atributos da imagem ajudam a identificar árvores e gramíneas?** | Comparamos NDVI, brilho HSV e bordas Canny isolados e combinados |
 | **3. A forma de avaliar influencia o resultado?** | Avaliação aleatória versus separação espacial por blocos de 250 m e 500 m |
 | **4. Qual classificador funciona melhor nas mesmas condições?** | Comparamos oito modelos, incluindo Random Forest, SVM e regressão logística |
