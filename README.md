@@ -278,9 +278,9 @@ Na **figura abaixo**, a grade de 812 quadrantes representa o processamento da **
 
 [**Abrir o infográfico ampliado**](docs/infografico_area1_cobertura_e_recortes_satelitais.png)
 
-*Nota metodológica: o infográfico facilita a compreensão dos procedimentos. As grades e marcações apresentadas são ilustrativas; para identificar os limites exatos dos 119 recortes, devem ser consultados os registros do experimento, não apenas esta figura.*
+**Por que foram escolhidos 119 recortes?** Para o experimento **E9**, selecionamos regiões que continham **pontos conhecidos de árvores e gramíneas**, permitindo comparar o Quickshift nos mesmos locais de duas formas: **(1)** segmentar cada região de até **512 × 512 pixels** de uma só vez; **(2)** segmentar essa mesma região em **quatro partes de até 256 × 256 pixels**. Assim, avaliamos se dividir a região muda a classificação. Os **119 recortes são apenas do E9**; os **812 quadrantes** pertencem a outro experimento, que percorreu toda a imagem.
 
-**Como interpretar os três painéis:** (1) **imagem RGB original**; (2) **cobertura integral em 812 quadrantes**, inclusive nas bordas; (3) **119 recortes selecionados** por conter pontos de referência, utilizados apenas na comparação local entre Quickshift contínuo em 512 pixels e Quickshift em quatro partes de 256 pixels.
+*Nota metodológica: as grades e marcações do infográfico são ilustrativas. Os limites exatos dos 119 recortes estão nos registros do experimento.*
 
 
 Com a resolução aproximada de **0,5 m por pixel**, um recorte de **512 × 512 pixels** representa cerca de **256 × 256 m** no terreno; um quadrante de **256 × 256 pixels** representa **128 × 128 m**. Portanto, **quatro quadrantes de 256 × 256 pixels juntos ocupam a mesma janela de 512 × 512 pixels**. Não são quatro novas áreas.
