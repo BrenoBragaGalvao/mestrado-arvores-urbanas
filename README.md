@@ -297,10 +297,10 @@ flowchart TB
 ```
 
 <p align="center">
-  <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Infográfico da Area1: imagem original, cobertura integral por 812 quadrantes de 256 pixels e seleção de 119 recortes de 512 pixels com pontos de referência" width="100%">
+  <img src="docs/infografico_tres_experimentos_area1.webp" alt="Infográfico dos três experimentos da Area1: Quickshift global do método original; 812 quadrantes de 256 pixels; comparação de 119 recortes em 512 e 256 pixels" width="100%">
 </p>
 
-*Figura — Duas grades alternativas da Area1: 812 quadrantes de 256 × 256 pixels para cobertura integral e 210 janelas possíveis de 512 × 512 pixels, das quais 119 contêm pontos de referência.*
+*Figura — Visão geral dos três experimentos da Area1: método original, processamento por 812 quadrantes de 256 × 256 pixels e comparação controlada dos 119 recortes de até 512 × 512 pixels, também segmentados em partes de 256 × 256 pixels.*
 
 **Perguntas que orientaram os testes**
 
