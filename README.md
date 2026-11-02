@@ -11,11 +11,24 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 
 ### Roteiro de leitura
 
-1. **[Dados da Area1](#1-área-de-estudo-e-dados-utilizados)** — imagens, pontos de referência e área de estudo.
-2. **[Método original](#4-imagem-completa--as-17-etapas-do-código-original)** — Quickshift, K-Means e Random Forest.
-3. **[Limitação de memória](#por-que-mudamos-o-método-a-memória-ram-foi-o-limite)** — **4 GiB de RAM disponíveis** no ambiente de teste, diante de **5,42 GiB de memória estimada** para o método original.
-4. **[Testes com janelas menores](#62-por-que-exatamente-119-recortes-entenda-sem-confundir)** — recortes de 512 × 512 e 256 × 256 pixels.
-5. **[Resultados dos oito classificadores](#64-primeiro-resultado-quais-algoritmos-funcionaram-melhor)** — comparação dos modelos e métricas na seção 6.
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 35, "rankSpacing": 48}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
+flowchart LR
+    A["🛰️ Dados da Area1<br/>Imagens e referências"]
+    B["🧪 Método original<br/>Quickshift + K-Means<br/>+ Random Forest"]
+    C["💾 Limitação de memória<br/>4 GiB disponíveis<br/>5,42 GiB estimados"]
+    D["🧩 Janelas menores<br/>512 × 512 e 256 × 256"]
+    E["📊 Resultados<br/>8 classificadores<br/>Seção 6"]
+
+    A --> B --> C --> D --> E
+
+    classDef etapa fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
+    classDef memoria fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:2px;
+    class A,B,D,E etapa;
+    class C memoria;
+```
+
+*Os **5,42 GiB** são uma estimativa calculada para o método original; não representam uma medição do pico de memória.*
 
 ## Por que mudamos o método? A memória RAM foi o limite
 
