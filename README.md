@@ -325,6 +325,8 @@ A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrante
 | Gaussian Naive Bayes | 0,7409 | **0,8555** | +0,1146 |
 | Dummy (maioria) | 0,2980 | 0,2980 | 0,0000 |
 
+**Ordem dos modelos:** F1-macro médio decrescente da combinação **NDVI + HSV + Canny** nos blocos de 250 m. A dupla HSV + Canny permanece fixa para comparação.
+
 **Blocos espaciais de 500 m — média de cinco divisões**
 
 | Classificador | HSV + Canny | NDVI + HSV + Canny | Ganho ao acrescentar NDVI |
@@ -337,6 +339,8 @@ A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrante
 | KNN (7) | 0,7678 | **0,8502** | +0,0824 |
 | Gaussian Naive Bayes | 0,7699 | **0,8398** | +0,0700 |
 | Dummy (maioria) | 0,2799 | 0,2799 | 0,0000 |
+
+**Ordem dos modelos:** F1-macro médio decrescente da combinação **NDVI + HSV + Canny** nos blocos de 500 m.
 
 **Como interpretar:** com o terceiro atributo, os **sete classificadores treináveis** tiveram F1-macro **médio maior em ambas as escalas**, enquanto o Dummy permaneceu igual porque ignora os atributos. Em **250 m**, o trio venceu a dupla nos cinco testes de cada classificador treinável; em **500 m**, venceu em **quatro dos cinco testes** para regressão logística e Naive Bayes e em **cinco dos cinco** para os demais. Os ganhos são **diferenças absolutas de F1-macro**, não aumentos relativos nem taxas de acerto: +0,1464 significa **14,64 pontos percentuais na escala de F1**.
 
@@ -358,12 +362,14 @@ A tabela mostra o **F1-macro médio**: quanto **maior**, melhor o equilíbrio da
 |---|---:|---:|
 | **SVM RBF** | **0,8987** | **0,8668** |
 | Regressão logística | 0,8928 | 0,8664 |
-| KNN (7) | 0,8874 | 0,8502 |
 | Extra Trees | 0,8790 | 0,8629 |
+| KNN (7) | 0,8874 | 0,8502 |
 | **Random Forest** | **0,8656** | **0,8530** |
 | HistGradientBoosting | 0,8556 | 0,8524 |
 | Gaussian Naive Bayes | 0,8555 | 0,8398 |
 | Dummy (referência simples) | 0,2980 | 0,2799 |
+
+**Ordem dos modelos:** F1-macro médio decrescente da **média aritmética das duas escalas** (250 m e 500 m). Essa média foi usada apenas para ordenar as linhas, sem substituir os resultados por escala nem constituir uma nova avaliação estatística.
 
 **Resultado:** o **SVM RBF** teve o **maior F1-macro médio** nas duas configurações desse teste. Isso mostra um desempenho promissor **nessa nova base**; não é comparação direta com a acurácia histórica 0,87 do método global.
 
@@ -393,14 +399,16 @@ flowchart TD
 
 | Classificador | 250 m: 512 inteiro | 250 m: quatro 256 | 500 m: 512 inteiro | 500 m: quatro 256 |
 |---|---:|---:|---:|---:|
-| Random Forest | **0,8906** | 0,8835 | **0,8657** | 0,8566 |
 | **SVM RBF** | 0,9157 | **0,9341** | 0,8518 | **0,8641** |
 | Regressão logística | 0,9153 | **0,9157** | 0,8484 | **0,8685** |
 | Extra Trees | **0,9064** | 0,8968 | **0,8747** | 0,8545 |
+| Random Forest | **0,8906** | 0,8835 | **0,8657** | 0,8566 |
 | KNN (7) | 0,8940 | **0,9009** | 0,8377 | **0,8486** |
-| HistGradientBoosting | **0,8738** | 0,8714 | 0,8390 | **0,8411** |
 | Gaussian Naive Bayes | **0,8894** | 0,8875 | **0,8573** | 0,8464 |
+| HistGradientBoosting | **0,8738** | 0,8714 | 0,8390 | **0,8411** |
 | Dummy | 0,2847 | 0,2847 | 0,2791 | 0,2791 |
+
+**Ordem dos modelos:** F1-macro médio decrescente da **média aritmética das quatro condições** exibidas (250/500 m × 512/256 px). É somente um critério de apresentação: as diferenças entre protocolos e o vencedor em cada condição continuam descritos separadamente.
 
 **O que aprendemos:** com blocos geográficos de **250 m**, o maior resultado foi **SVM RBF em quatro partes de 256 px (0,9341)**. Com blocos de **500 m**, foi **Extra Trees em recortes inteiros de 512 px (0,8747)**. Ou seja, **não existe um vencedor único em todas as condições**.
 
