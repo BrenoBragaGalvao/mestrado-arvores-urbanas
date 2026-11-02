@@ -12,13 +12,13 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 ### Roteiro de leitura
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 35, "rankSpacing": 48}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 40, "rankSpacing": 50}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
 flowchart LR
-    A["🛰️ Dados da Area1<br/>Imagens e referências"]
-    B["🧪 Método original<br/>Quickshift + K-Means<br/>+ Random Forest"]
-    C["💾 Limitação de memória<br/>4 GiB disponíveis<br/>5,42 GiB estimados"]
+    A["🛰️ Dados da Area1"]
+    B["🧪 Método original"]
+    C["💾 Limitação de memória<br/>4 GiB de RAM disponíveis"]
     D["🧩 Janelas menores<br/>512 × 512 e 256 × 256"]
-    E["📊 Resultados<br/>8 classificadores<br/>Seção 6"]
+    E["📊 Resultados<br/>8 classificadores"]
 
     A --> B --> C --> D --> E
 
@@ -27,8 +27,6 @@ flowchart LR
     class A,B,D,E etapa;
     class C memoria;
 ```
-
-*Os **5,42 GiB** são uma estimativa calculada para o método original; não representam uma medição do pico de memória.*
 
 ## Por que mudamos o método? A memória RAM foi o limite
 
