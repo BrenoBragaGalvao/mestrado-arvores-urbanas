@@ -9,25 +9,6 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 | **🌳 Proposta 1 — Identificação da vegetação** | Como distinguir **árvores e gramíneas** por características de imagens de satélite? | Objetos classificados como árvore ou gramínea. |
 | **⚡ Proposta 2 — Porte e proximidade de postes** | Quais objetos candidatos apresentam **indicador empírico de porte** acima do limiar e ficam próximos de postes? | Seleção exploratória e distâncias 2D a postes, **sem comprovação de risco elétrico**. |
 
-### Roteiro de leitura
-
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 40, "rankSpacing": 48, "minNodeWidth": 260, "wrappingWidth": 240}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
-flowchart TB
-    A["🛰️ Dados da Area1"]
-    B["🧪 Método original<br/>Quickshift<br/>+ K-Means<br/>+ Random Forest"]
-    C["💾 Limitação de memória<br/>4 GiB de RAM disponíveis"]
-    D["🧩 Janelas menores<br/>512 × 512 e 256 × 256"]
-    E["📊 Resultados<br/>8 classificadores"]
-
-    A --> B --> C --> D --> E
-
-    classDef etapa fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
-    classDef memoria fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:2px;
-    class A,B,D,E etapa;
-    class C memoria;
-```
-
 ## Por que mudamos o método? A memória RAM foi o limite
 
 **Primeiro, o método original:** aplicamos **Quickshift à imagem RGB inteira**, seguido de **K-Means (seis grupos, com seleção do cluster 3)** e **Random Forest (500 árvores)**. A execução histórica alcançou **acurácia de 0,87 em 92 exemplos de teste**, com um consumo de **5,42 GiB de memória RAM**, valor superior aos **4 GiB disponíveis** no ambiente atual, o que motivou a adoção de uma nova estratégia de processamento com janelas menores.
