@@ -316,9 +316,7 @@ flowchart TD
 | **V2 — classificadores e validação espacial** | Quickshift independente em **812 blocos de até 256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Divisões **aleatórias e espaciais** |
 | **V2 — comparação da segmentação** | **119 regiões**, cada uma segmentada em **512 contínuo** ou **quatro blocos 256** | **505 referências comuns às duas alternativas de segmentação** | Testes **espaciais pareados** |
 
-**Por que 458 e 505 não são a mesma base?** No original, eram contados **pares segmento–rótulo após a seleção do cluster 3**, sem deduplicação explícita. Na comparação de classificadores, foram obtidos **segmentos rotulados únicos** de outra segmentação. Na comparação das estratégias de segmentação, os **505 são referências compartilhadas entre as duas formas de processar os mesmos recortes**. A coincidência numérica de 505 nas duas comparações novas **não significa que elas tenham as mesmas geometrias**.
-
-Na comparação de classificadores, os 812 blocos produziram **168.133 segmentos** em toda a extensão retangular do raster, incluindo partes fora da AOI. Somente os **505 rotulados** entraram nos testes supervisionados. A comparação de segmentações trabalha com **recortes locais selecionados**, não com toda a imagem.
+**Por que os números são diferentes?** No método original, foram utilizados **458 registros segmento–rótulo** após a seleção do cluster 3 pelo K-Means. Na V2, o Quickshift gerou **168.133 segmentos** ao processar a imagem em 812 blocos, mas apenas **505 segmentos rotulados únicos** foram usados para comparar os classificadores. No E9, foram utilizadas **505 referências comuns** para comparar duas formas de segmentar os mesmos 119 recortes. Apesar do número igual, esses exemplos **não representam necessariamente os mesmos segmentos**. Por isso, os resultados do método original e da V2 **não são diretamente comparáveis**.
 
 ### 6.2. Comparação de oito classificadores — Random Forest, SVM e alternativas
 
