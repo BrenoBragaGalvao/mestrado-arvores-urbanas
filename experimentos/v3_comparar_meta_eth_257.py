@@ -106,7 +106,7 @@ def ler_arcgis(pontos):
 def correlation(x,y,kind="pearson"):
     s=pd.DataFrame({"x":x,"y":y}).dropna()
     if len(s)<3 or s.x.nunique()<2 or s.y.nunique()<2:return None
-    return float(s.x.corr(s.y,method=kind))
+    return float(s.x.rank(method="average").corr(s.y.rank(method="average"))) if kind == "spearman" else float(s.x.corr(s.y,method="pearson"))
 
 def stats(s):
     x=pd.to_numeric(s, errors="coerce").dropna()
