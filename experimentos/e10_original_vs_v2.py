@@ -160,13 +160,26 @@ else:
 
 audit={"date_utc":datetime.now(timezone.utc).isoformat(),"area1_refs":len(refs),
        "historic_pairs":len(pairs),"historic_random_forest_accuracy":rf["acuracia"],
-       "historic_rf_n_test":rf["n_teste"],"original_unique_segments":len(orig),
+       "historic_rf_n_test":rf["n_teste"],"original_unique_segments":len(orig),"original_references_with_candidates":int(pairs.ref_id.nunique()),
+       "original_reference_coverage":float(pairs.ref_id.nunique()/len(refs)),
        "original_conflicting_segment_ids":n_conflict,"v2_checkpoint_status":"ausentes" if absent else
         ("parcial" if missing else "presente"),"v2_missing_reference_tiles":missing,
-       "v2_unique_segments":len(v2),"v2_conflicting_segment_ids":n_v2_conflicts,
+       "v2_unique_segments":len(v2),"v2_reference_count":len(v2_rows),"v2_conflicting_segment_ids":n_v2_conflicts,
        "global_quickshift_label_mode":globals().get("MODO_SEGMENTOS_E10","nao_registrado"),
        "python":platform.python_version(),"numpy":np.__version__,"sklearn":sklearn.__version__,
        "skimage":skimage.__version__,"rasterio":rasterio.__version__}
+# Cobertura calculada antes da modelagem: nao confundir taxa de cobertura e F1.
+coverage=[]
+for cls in ("arvore","grama"):
+    total=int((refs.classe==cls).sum())
+    choices=[("original_pares",pairs),("original_unicos",orig),
+             ("v2_checkpoints",pd.DataFrame(v2_rows) if v2_rows else pd.DataFrame()),
+             ("v2_unicos",v2)]
+    for stage,data in choices:
+        count=int(data.loc[data.classe==cls,"ref_id"].nunique()) if not data.empty else 0
+        coverage.append({"classe":cls,"pipeline":stage,"referencias_total":total,
+                         "referencias_cobertas":count,"fracao_cobertura":count/total})
+pd.DataFrame(coverage).to_csv(OUT/"cobertura_por_classe.csv",index=False)
 results=[]
 tr,te=train_test_split(np.arange(len(orig)),test_size=.2,random_state=42)
 results+=score(orig,tr,te,"original_global_unico","aleatorio_80_20",1)
