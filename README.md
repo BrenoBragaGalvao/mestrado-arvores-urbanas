@@ -35,6 +35,8 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 
 | Característica | Valor |
 |---|---|
+| **Região da imagem** | **Caxias do Sul — Rio Grande do Sul, Brasil** |
+| **Satélite atribuído na documentação** | **JL1KF01B** |
 | **Dimensão de cada pixel no terreno** | **0,50 × 0,50 m** (50 × 50 cm) |
 | **Área representada por pixel** | **0,25 m²** |
 | **Dimensões do retângulo raster no terreno** | **3.471 m de largura × 3.647 m de altura** |
