@@ -16,6 +16,22 @@ são **mapas de altura modelada do dossel**, não medidas de campo da mesma árv
 | Estimativas nulas (zero) | 107 | 0 |
 
 **Pares válidos:** 139 dos 257; **ambos positivos:** 101.
+
+**Comparação pareada correta (139 pontos):** as medianas do conjunto completo (Meta: 2 m em 257 pontos; ETH: 14 m em 139 pontos) **não devem ser comparadas diretamente**, porque o universo de pontos é diferente. Restringindo a análise aos **mesmos 139 pontos com estimativas das duas fontes**, os resultados são:
+
+| Indicador — somente os 139 pontos pareados | Meta/WRI CHMv2 (pixel ~1 m) | ETH Zurich 2020 (pixel ~10 m) |
+|---|---:|---:|
+| Mediana de altura prevista | **6,00 m** | **14,00 m** |
+| Média de altura prevista | **6,68 m** | **14,28 m** |
+| Valor zero | **38 pontos** | **0 pontos** |
+
+Os **118 pontos sem valor na ETH** correspondem a pixels de **NoData** (código 255 na fonte), não a alturas zero. Dessa forma, a cobertura ETH nos pontos originais é **139/257 = 54,1%**, e a diferença entre as duas fontes só pode ser calculada nos 139 pares. A diferença mediana ponto a ponto (**ETH − Meta**) é **+8 m** e a correlação Pearson nos mesmos pontos é **0,399**. Excluindo os pares com altura zero em uma das fontes, restam **101 pares positivos** (Pearson **0,553**).
+
+A estimativa Meta por máximo em raio de 5 m foi preservada no CSV para análise de sensibilidade, mas **pode corresponder a outra árvore**. Na amostra pareada de 139 pontos, sua mediana é **8 m**, e não equivale diretamente à escala da ETH. Por isso, a comparação principal usa o **valor do pixel da coordenada** em ambas as fontes.
+
+**Interpretação científica:** a ETH estimou valores mais elevados nessa amostra, mas isso **não comprova maior precisão da ETH nem erro da Meta**. Os modelos usam sensores, datas de referência, escalas e máscaras distintas. O pixel ETH de ~10 m pode reunir várias árvores ou superfícies urbanas, enquanto o Meta de ~1 m pode cair na borda da copa. São duas previsões com divergências substanciais e **não observações de altura real**.
+
+
 **Diferença mediana ETH − Meta:** 8.00 m;
 **diferença absoluta mediana entre fontes:** 8.00 m.
 Correlação Pearson entre estimativas pareadas: 0.39892518634217783.
