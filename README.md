@@ -276,7 +276,7 @@ Para isso, escolhemos **119 recortes que contêm pontos conhecidos de árvores e
 ```mermaid
 %%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 70, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["119 recortes<br/>da Area1<br/>(até 512 × 512 px)"] --> B["A: Quickshift<br/>contínuo em cada<br/>recorte de até<br/>512 × 512 px"]
+    A["119 recortes<br/>da Area1<br/>(até 512 × 512 px)"] --> B["A: Quickshift<br/>contínuo em cada<br/>recorte de até<br/>512 × 512 px<br/>(não é global)"]
     A --> C["B: Quickshift<br/>em quatro partes<br/>de até<br/>256 × 256 px"]
     B --> D["Mesmas<br/>referências<br/>e divisões<br/>de teste"]
     C --> D
