@@ -1,4 +1,4 @@
-# Projeto de mestrado para detecção de árvores urbanas e avaliação de proximidade com linhas de energia utilizando brilho, bordas, NDVI e imagens aéreas.
+# Projeto de mestrado: Combinação de Características de Brilho, Bordas e NDVI para Detecção de Árvores Urbanas e Avaliação de Proximidade com Linhas de Energia
 
 **Pesquisa de mestrado — Breno Braga Galvão | Em desenvolvimento**
 
