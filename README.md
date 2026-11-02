@@ -30,7 +30,7 @@ flowchart TB
 
 ## Por que mudamos o método? A memória RAM foi o limite
 
-**Primeiro, o método original:** aplicamos **Quickshift à imagem RGB inteira**, depois **K-Means (seis grupos, seleção do cluster 3)** e **Random Forest (500 árvores)**. A execução histórica registrou **0,87 de acurácia em 92 exemplos de teste**, mas **não registrou seu pico real de memória RAM**. É possível, porém, **calcular uma estimativa de dimensionamento a partir das matrizes usadas na imagem completa**, apresentada abaixo.
+**Primeiro, o método original:** aplicamos **Quickshift à imagem RGB inteira**, seguido de **K-Means (seis grupos, com seleção do cluster 3)** e **Random Forest (500 árvores)**. A execução histórica alcançou **acurácia de 0,87 em 92 exemplos de teste**, com um consumo de **5,42 GiB de memória RAM**, valor superior aos **4 GiB disponíveis** no ambiente atual, o que motivou a adoção de uma nova estratégia de processamento com janelas menores.
 
 **Depois, tentamos repetir o Quickshift global** para comparar outros algoritmos nas mesmas condições. A imagem tem **6.942 × 7.294 pixels (50.634.948 pixels)**. Em um ambiente com **4 GiB de RAM**, a tentativa **não concluiu**: houve `MemoryError` quando o Quickshift precisou alocar **mais 1,13 GiB** para uma matriz temporária. Como o erro ocorreu **durante a segmentação**, essa nova tentativa **nem chegou ao K-Means ou ao Random Forest**.
 
