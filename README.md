@@ -271,12 +271,12 @@ Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisi
 Na **figura abaixo**, a grade de 812 quadrantes representa o processamento da **grade completa do raster da Area1**. Já os **contornos amarelos do painel “Recortes selecionados” indicam somente as 119 regiões utilizadas em outro experimento**, que compara duas estratégias de segmentação. **A ausência de contorno amarelo não indica uma falha nem um trecho não processado na bateria de 812 quadrantes**. As regiões pretas fazem parte da visualização do raster e não significam, por si só, recortes omitidos.
 
 <p align="center">
-  <a href="docs/infografico_area1_cobertura_e_recortes_satelitais.png">
-    <img src="docs/infografico_area1_cobertura_e_recortes_satelitais.png" alt="Infográfico da Area1: imagem original de 6942 por 7294 pixels, cobertura integral dos 812 quadrantes de 256 pixels e 119 recortes locais de 512 pixels para comparação" width="100%">
+  <a href="docs/infografico_area1_119_recortes_explicados_2026-11-02.png">
+    <img src="docs/infografico_area1_119_recortes_explicados_2026-11-02.png" alt="Infográfico atualizado da Area1: imagem original, 812 quadrantes e explicação dos 119 recortes selecionados por conterem pontos conhecidos de árvores e gramíneas para o experimento E9" width="100%">
   </a>
 </p>
 
-[**Abrir o infográfico ampliado**](docs/infografico_area1_cobertura_e_recortes_satelitais.png)
+[**Abrir o infográfico ampliado**](docs/infografico_area1_119_recortes_explicados_2026-11-02.png)
 
 **Por que foram escolhidos 119 recortes?** Para o experimento **E9**, selecionamos regiões que continham **pontos conhecidos de árvores e gramíneas**, permitindo comparar o Quickshift nos mesmos locais de duas formas: **(1)** segmentar cada região de até **512 × 512 pixels** de uma só vez; **(2)** segmentar essa mesma região em **quatro partes de até 256 × 256 pixels**. Assim, avaliamos se dividir a região muda a classificação. Os **119 recortes são apenas do E9**; os **812 quadrantes** pertencem a outro experimento, que percorreu toda a imagem.
 
