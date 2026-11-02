@@ -1,0 +1,29 @@
+{
+  "fonte": "Meta/WRI CHMv2 2026 (DINOv3)",
+  "licenca": "CC BY 4.0",
+  "consultado_em_utc": "2026-11-02T23:19:18.849614+00:00",
+  "n_pontos": 257,
+  "com_predicao_no_pixel": 257,
+  "com_predicao_na_vizinhanca_5m": 257,
+  "mediana_pixel_m": 2.0,
+  "mediana_max_raio_5m_m": 6.0,
+  "fontes": [
+    {
+      "quadkey": "2103121330",
+      "url": "https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif",
+      "crs": "EPSG:3857",
+      "pixel_m": [
+        1.1943285669559032,
+        1.1943285669559174
+      ],
+      "nodata": null,
+      "dtype": "uint8"
+    }
+  ],
+  "ressalvas": [
+    "Dados preditos a partir de satelite, sem validacao de campo no local",
+    "Pixel no ponto pode nao coincidir com topo da copa",
+    "O maximo em 5m pode incluir vegetacao de outro individuo",
+    "C3 e indice empirico, nao altura real validada"
+  ]
+}
