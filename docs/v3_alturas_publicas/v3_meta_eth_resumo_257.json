@@ -1,0 +1,56 @@
+{
+  "consultado_em_utc": "2026-11-02T23:34:32.725940+00:00",
+  "area": "Area1, Caxias do Sul, RS",
+  "pontos_originais": 257,
+  "metodo": "amostragem de estimativas modeladas no pixel de cada coordenada; bases com resolucoes diferentes",
+  "meta": "Meta/WRI CHMv2 (pixel de cerca de 1m, cenas de diversas datas)",
+  "eth": "ETH Zurich Global Canopy Height 2020 (10m nominal)",
+  "fonte_eth": {
+    "fonte_acesso": "COG oficial ETH Zurich",
+    "url": "https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download?path=%2F3deg_cogs&files=ETH_GlobalCanopyHeight_10m_2020_S30W054_Map.tif",
+    "tile": "ETH_GlobalCanopyHeight_10m_2020_S30W054_Map.tif",
+    "nodata_original": 255.0,
+    "resolucao_graus": [
+      8.333333333333333e-05,
+      8.333333333333333e-05
+    ],
+    "n_pontos_validos": 139
+  },
+  "erros_de_acesso": {},
+  "meta_pixel": {
+    "n": 257,
+    "mediana_m": 2.0,
+    "media_m": 4.610894941634241,
+    "q25_m": 0.0,
+    "q75_m": 8.0,
+    "zeros": 107,
+    "maximo_m": 28.0
+  },
+  "meta_max_5m": {
+    "n": 257,
+    "mediana_m": 6.0,
+    "media_m": 6.9221789883268485,
+    "q25_m": 2.0,
+    "q75_m": 11.0,
+    "zeros": 42,
+    "maximo_m": 30.0
+  },
+  "eth_pixel": {
+    "n": 139,
+    "mediana_m": 14.0,
+    "media_m": 14.280575539568344,
+    "q25_m": 12.0,
+    "q75_m": 16.0,
+    "zeros": 0,
+    "maximo_m": 22.0
+  },
+  "pares_validos": 139,
+  "pares_ambos_positivos": 101,
+  "eth_menos_meta_pixel_mediana_m": 8.0,
+  "eth_menos_meta_pixel_media_m": 7.597122302158273,
+  "erro_absoluto_mediano_entre_fontes_m": 8.0,
+  "correlacao_pearson_meta_eth": 0.39892518634217783,
+  "correlacao_spearman_meta_eth": 0.3281504483971268,
+  "correlacao_pearson_ambos_positivos": 0.5527886308412189,
+  "aviso": "Diferencas entre modelos nao medem erro contra altura real. Pixels de 1m e 10m nao sao equivalentes; zeros e datas tambem variam."
+}

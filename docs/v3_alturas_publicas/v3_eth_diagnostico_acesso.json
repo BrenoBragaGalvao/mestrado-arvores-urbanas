@@ -1,0 +1,82 @@
+[
+  {
+    "name": "share",
+    "status": 200,
+    "url": "https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt",
+    "type": "text/html; charset=UTF-8",
+    "length": "7640",
+    "range": null,
+    "preview": "<!DOCTYPE html>\n<html class=\"ng-csp\" data-placeholder-focus=\"false\" lang=\"en\" data-locale=\"en\" translate=\"no\" >\n<head data-requesttoken=\"1hA+LTjroUsFQfN4B0wcwCO4BanSYhp3hdazoiYGpz8=:omFORXbYlT9dMp0bMC9ws0X5NJ2jF09G5rH1jXdlxFY=\">\n\t<meta char"
+  },
+  {
+    "name": "download_3deg",
+    "status": 404,
+    "url": "https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download?path=%2F+3deg_cogs&files=ETH_GlobalCanopyHeight_10m_2020_S30W054_Map.tif",
+    "type": "text/html; charset=UTF-8",
+    "length": "13340",
+    "range": null,
+    "preview": "<!DOCTYPE html>\n<html class=\"ng-csp\" data-placeholder-focus=\"false\" lang=\"en\" data-locale=\"en\" translate=\"no\" >\n\t<head\n data-requesttoken=\"ert4q3jkOWgvPTHAt0o694Tg/RJSML5HOg0qLQMm38Q=:O9ko+RG3CVB7SHiC2ztcuumrvmcCYPloTj1/fHNvjJM=\">\n\t\t<meta c"
+  },
+  {
+    "name": "download_3deg_no_space",
+    "status": 206,
+    "url": "https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download?path=%2F3deg_cogs&files=ETH_GlobalCanopyHeight_10m_2020_S30W054_Map.tif",
+    "type": "image/tiff",
+    "length": "1024",
+    "range": "bytes 0-1023/443255628",
+    "preview": "II*\u0000�\u0000\u0000\u0000GDAL_STRUCTURAL_METADATA_SIZE=000140 bytes\nLAYOUT=IFDS_BEFORE_DATA\nBLOCK_ORDER=ROW_MAJOR\nBLOCK_LEADER=SIZE_AS_UINT4\nBLOCK_TRAILER=LAST_4_BYTES_REPEATED\nKNOWN_INCOMPATIBLE_EDITION=NO\n \u0000\u0013\u0000\u0000\u0001\u0003\u0000\u0001\u0000\u0000\u0000��\u0000\u0000\u0001\u0001\u0003\u0000\u0001\u0000\u0000\u0000��\u0000\u0000\u0002\u0001\u0003\u0000\u0001\u0000\u0000\u0000\b\u0000\u0000\u0000\u0003\u0001\u0003\u0000\u0001\u0000\u0000\u0000\u0005\u0000"
+  },
+  {
+    "name": "download_3deg_alt",
+    "status": 404,
+    "url": "https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download?path=%2F+3deg_cogs&files=ETH_GlobalCanopyHeight_10m_2020_S27W054_Map.tif",
+    "type": "text/html; charset=UTF-8",
+    "length": "13340",
+    "range": null,
+    "preview": "<!DOCTYPE html>\n<html class=\"ng-csp\" data-placeholder-focus=\"false\" lang=\"en\" data-locale=\"en\" translate=\"no\" >\n\t<head\n data-requesttoken=\"WrGnUIbuMAqMWfH1oZNgff1t6ZbnFifTR/xWkRg9+Gw=:C/3hIvGHQGbLb6WG7v5YOJskgcWvLmqkcJMO53xejgU=\">\n\t\t<meta c"
+  },
+  {
+    "name": "download_1deg",
+    "status": 404,
+    "url": "https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download?path=%2F+1deg_cogs&files=ETH_GlobalCanopyHeight_10m_2020_S30W052_Map.tif",
+    "type": "text/html; charset=UTF-8",
+    "length": "13340",
+    "range": null,
+    "preview": "<!DOCTYPE html>\n<html class=\"ng-csp\" data-placeholder-focus=\"false\" lang=\"en\" data-locale=\"en\" translate=\"no\" >\n\t<head\n data-requesttoken=\"MhjpIUfeBfzRXycWUkBRwo4NP9RmcAkx7qR5D46D/Pk=:WiqhRwOkZ9P+J39eGA4QsqFXEKc/Onh9mtc/PezGy6o=\">\n\t\t<meta c"
+  },
+  {
+    "name": "10m_Tree_Canopy_Height",
+    "status": 200,
+    "url": "https://tiledimageservices.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/10m_Tree_Canopy_Height/ImageServer?f=json",
+    "type": "application/json; charset=utf-8",
+    "length": "1199",
+    "range": null,
+    "preview": "{\"currentVersion\":12,\"name\":\"10m_Tree_Canopy_Height\",\"serviceDescription\":\"\",\"description\":\"\",\"type\":\"ImageServer\",\"capabilities\":\"Image,TilesOnly\",\"copyrightText\":\"\",\"serviceItemId\":\"2a3dfb00c2c6425f85bd70da420d58eb\",\"meanPixelSize\":9.2766",
+    "capabilities": "Image,TilesOnly",
+    "serviceDataType": "esriImageServiceDataTypeGeneric",
+    "pixelSizeX": 8.33333333333333e-05,
+    "pixelSizeY": 8.33333333333333e-05,
+    "bandCount": 1,
+    "hasHistograms": true,
+    "copyrightText": "",
+    "tileInfo": true
+  },
+  {
+    "name": "arcgis_identify",
+    "status": 200,
+    "url": "https://tiledimageservices.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/10m_Tree_Canopy_Height/ImageServer/identify?f=json&geometry=-51.17681133%2C-29.176047&geometryType=esriGeometryPoint&sr=4326&returnGeometry=false",
+    "type": "application/json; charset=utf-8",
+    "length": "79",
+    "range": null,
+    "preview": "{\"error\":{\"code\":400,\"message\":\"Invalid URL\",\"details\":[\"Invalid URL\"]}}"
+  },
+  {
+    "name": "arcgis_export",
+    "status": 200,
+    "url": "https://tiledimageservices.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/10m_Tree_Canopy_Height/ImageServer/exportImage?f=json&bbox=-51.178%2C-29.178%2C-51.175%2C-29.174&bboxSR=4326&imageSR=4326&size=80%2C80&format=tiff",
+    "type": "application/json; charset=utf-8",
+    "length": "79",
+    "range": null,
+    "preview": "{\"error\":{\"code\":400,\"message\":\"Invalid URL\",\"details\":[\"Invalid URL\"]}}"
+  }
+]
