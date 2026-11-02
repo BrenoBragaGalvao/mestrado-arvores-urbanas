@@ -254,11 +254,11 @@ A seguir, detalhamos **três comparações centrais**: classificadores, formas d
 
 Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisionadas diferentes**, conforme a segmentação e a seleção de objetos.
 
-**A imagem inteira tem 6.942 × 7.294 pixels. Então por que os testes usam 512 × 512 ou 256 × 256 pixels?** Porque esses valores indicam o **tamanho de cada recorte (janela) usado no processamento**, e não o tamanho original do arquivo. Os pixels desses recortes vêm das mesmas imagens RGB e RGB + NIR da Area1.
+**O raster RGB da Area1 tem 6.942 × 7.294 pixels.** Essas são as dimensões reais da grade utilizada nos experimentos; o polígono AOI delimita quais pixels fazem parte da área de estudo. Já os tamanhos **512 × 512** e **256 × 256 pixels** são das janelas de processamento, não das dimensões totais do raster.
 
 | Processamento | Qual parte da imagem foi processada? | Tamanho usado no processamento |
 |---|---|---|
-| **Método original** | Quickshift na **imagem RGB inteira**; depois os polígonos foram recortados à AOI | **6.942 × 7.294 pixels** — dimensões reais do raster |
+| **Método original** | Quickshift no **raster RGB completo da Area1**; depois os segmentos foram recortados pelo polígono AOI | **6.942 × 7.294 pixels** — dimensões reais do raster |
 | **Comparação de classificadores na V2** | **Toda a extensão retangular** do raster, inclusive fora da AOI, percorrida em **812 quadrantes** | **Até 256 × 256 pixels por quadrante** — cada pedaço foi segmentado separadamente |
 | **Comparação da escala de segmentação na V2 (E9)** | Somente **119 regiões contendo referências de árvores/gramíneas**, sem cobrir necessariamente toda a AOI | **Até 512 × 512 pixels por região**, comparados aos **mesmos pixels divididos em quatro quadrantes de até 256 × 256** |
 
@@ -266,7 +266,7 @@ Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisi
 
 **Por que a grade de 256 × 256 pixels parece incompleta na imagem?** Na verdade, **o processamento em 812 quadrantes cobriu todo o retângulo do raster**. Isso ocorre porque a largura de 6.942 pixels exige **28 colunas de quadrantes** e a altura de 7.294 pixels exige **29 linhas**: **28 × 29 = 812**. Os quadrantes das bordas são menores (última coluna com **30 pixels** de largura; última linha com **126 pixels** de altura).
 
-Na **figura abaixo**, a grade de 812 quadrantes representa esse processamento da imagem inteira. Já os **contornos amarelos do painel “Recortes selecionados” indicam somente as 119 regiões utilizadas em outro experimento**, que compara duas estratégias de segmentação. **A ausência de contorno amarelo não indica uma falha nem um trecho não processado na bateria de 812 quadrantes**. As regiões pretas fazem parte da visualização do raster e não significam, por si só, recortes omitidos.
+Na **figura abaixo**, a grade de 812 quadrantes representa o processamento da **grade completa do raster da Area1**. Já os **contornos amarelos do painel “Recortes selecionados” indicam somente as 119 regiões utilizadas em outro experimento**, que compara duas estratégias de segmentação. **A ausência de contorno amarelo não indica uma falha nem um trecho não processado na bateria de 812 quadrantes**. As regiões pretas fazem parte da visualização do raster e não significam, por si só, recortes omitidos.
 
 <p align="center">
   <a href="docs/infografico_area1_cobertura_e_recortes_satelitais.png">
