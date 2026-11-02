@@ -254,22 +254,45 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 
 ### Como a imagem foi dividida e como os classificadores foram comparados?
 
-Inicialmente, utilizamos a **imagem original da Area1, com 6.942 × 7.294 pixels**, correspondente a aproximadamente **50,6 milhões de pixels**. Como a tentativa de repetir o processamento integral pelo Quickshift exigiu mais memória RAM do que a disponível, adotamos estratégias de processamento em partes menores, **sem diminuir a resolução dos pixels**.
+**Fluxograma do experimento:** os dois caminhos partem da **mesma imagem**, mas têm objetivos diferentes. Os valores **256 × 256** e **512 × 512** são tamanhos de *recortes*, não de pixels ampliados.
 
-**Para percorrer toda a área**, dividimos a imagem em **812 quadrantes de até 256 × 256 pixels** (28 colunas e 29 linhas). Essa divisão permite processar a imagem completa progressivamente, em lotes menores, salvando resultados intermediários.
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 45, "rankSpacing": 55}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
+flowchart TB
+    I["🛰️ IMAGEM ORIGINAL DA AREA1<br/>6.942 × 7.294 pixels<br/>aproximadamente 50,6 milhões de pixels"]
 
-**Para comparar as estratégias de segmentação e os classificadores**, utilizamos os **510 pontos de referência georreferenciados** já existentes: **257 árvores** do arquivo `Arvores.gpkg` e **253 gramíneas** do arquivo `Grama.gpkg`. Como conhecemos a localização e a classe desses pontos, podemos comparar as previsões dos modelos com as referências conhecidas.
+    A["CAMINHO 1<br/>Cobertura da imagem inteira"]
+    B["CAMINHO 2<br/>Comparação controlada dos métodos"]
+    I --> A
+    I --> B
 
-Nessa comparação, consideramos **outra grade sobre a mesma imagem**, formada por **210 janelas possíveis de até 512 × 512 pixels** (14 colunas e 15 linhas). **Não dividimos primeiro a imagem em 812 quadrantes para depois transformá-los em 210 janelas:** são duas formas alternativas de organizar a mesma imagem. Ao localizar os 510 pontos na grade de 512 pixels, identificamos **119 janelas que continham pelo menos um ponto de referência**. As outras **91 janelas não continham pontos rotulados conhecidos** e, por isso, não acrescentariam exemplos de teste à comparação controlada.
+    A --> A1["Divisão em 812 quadrantes<br/>de até 256 × 256 pixels<br/>28 colunas × 29 linhas"]
+    A1 --> A2["Processar TODA a imagem<br/>progressivamente, em lotes<br/>com menor uso de RAM"]
 
-**Nos mesmos 119 recortes, comparamos duas formas de aplicar o Quickshift:**
+    B --> B1["Outra grade sobre a MESMA imagem<br/>210 janelas possíveis<br/>de até 512 × 512 pixels<br/>14 colunas × 15 linhas"]
+    P["📍 510 pontos de referência conhecidos<br/>257 árvores + 253 gramíneas<br/>arquivos Arvores.gpkg e Grama.gpkg"]
+    B1 --> S["Identificar quais janelas de 512<br/>contêm pontos de referência"]
+    P --> S
+    S --> R["Selecionar 119 das 210 janelas<br/>com pelo menos um ponto conhecido<br/>91 janelas ficam fora da comparação"]
 
-1. **Segmentação em até 512 × 512 pixels:** o Quickshift foi aplicado a cada recorte inteiro.
-2. **Segmentação em até 256 × 256 pixels:** o mesmo recorte foi subdividido em até quatro partes, e o Quickshift foi aplicado separadamente a cada uma.
+    R --> T1["TESTE A<br/>Quickshift em cada recorte<br/>inteiro de até 512 × 512 pixels"]
+    R --> T2["TESTE B<br/>Quickshift no MESMO recorte<br/>subdividido em até 4 partes<br/>de 256 × 256 pixels"]
 
-Depois de segmentar, extraímos atributos como **NDVI, brilho HSV e bordas Canny** e comparamos **oito classificadores**: Random Forest, SVM RBF, regressão logística, Extra Trees, KNN, HistGradientBoosting, Gaussian Naive Bayes e Dummy. As duas formas de segmentação foram avaliadas com **os mesmos pontos de referência e divisões espaciais de treinamento e teste**, permitindo comparar o **F1-macro** e o consumo de memória RAM. Dos 510 pontos originais, o procedimento de comparação resultou em **505 referências únicas comuns**, após tratar associações repetidas a segmentos.
+    T1 --> C["Mesmas 505 referências únicas comuns<br/>mesmos atributos e divisões<br/>espaciais de treino e teste"]
+    T2 --> C
+    C --> F["Comparação dos 8 classificadores<br/>F1-macro e memória RAM"]
 
-**Em resumo:** os **812 quadrantes de 256 pixels** servem ao processamento progressivo da área completa; as **210 janelas de 512 pixels** são uma grade alternativa, da qual foram escolhidos os **119 recortes com referências conhecidas** para comparar Quickshift em 512 e em 256 pixels. **Os 119 recortes não representam uma cobertura integral da imagem.**
+    classDef origem fill:#e9f1fc,stroke:#467fc4,color:#173b68,stroke-width:2px;
+    classDef cobertura fill:#e5f5ef,stroke:#409f80,color:#12543d,stroke-width:1.5px;
+    classDef comparacao fill:#fff1dd,stroke:#d7a24f,color:#69430b,stroke-width:1.5px;
+    classDef teste fill:#e8efff,stroke:#678dd1,color:#183d75,stroke-width:1.5px;
+    classDef resultado fill:#f0eafa,stroke:#8973bd,color:#40315f,stroke-width:2px;
+    class I,P origem;
+    class A,A1,A2 cobertura;
+    class B,B1,S,R comparacao;
+    class T1,T2,C teste;
+    class F resultado;
+```
 
 <p align="center">
   <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Infográfico da Area1: imagem original, cobertura integral por 812 quadrantes de 256 pixels e seleção de 119 recortes de 512 pixels com pontos de referência" width="100%">
