@@ -257,41 +257,43 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 **Fluxograma do experimento:** os dois caminhos partem da **mesma imagem**, mas têm objetivos diferentes. Os valores **256 × 256** e **512 × 512** são tamanhos de *recortes*, não de pixels ampliados.
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 45, "rankSpacing": 55}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 48, "rankSpacing": 56, "htmlLabels": true}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
 flowchart TB
-    I["🛰️ IMAGEM ORIGINAL DA AREA1<br/>6.942 × 7.294 pixels<br/>aproximadamente 50,6 milhões de pixels"]
+    I["IMAGEM ORIGINAL DA AREA1<br/>6.942 × 7.294 pixels<br/>aproximadamente 50,6 milhões de pixels"]
 
-    A["CAMINHO 1<br/>Cobertura da imagem inteira"]
-    B["CAMINHO 2<br/>Comparação controlada dos métodos"]
-    I --> A
-    I --> B
+    I --> E1["CAMINHO 1 — COBERTURA COMPLETA<br/>Processamento em partes menores"]
+    I --> E2["CAMINHO 2 — COMPARAÇÃO CONTROLADA<br/>Efeito do tamanho dos recortes"]
 
-    A --> A1["Divisão em 812 quadrantes<br/>de até 256 × 256 pixels<br/>28 colunas × 29 linhas"]
-    A1 --> A2["Processar TODA a imagem<br/>progressivamente, em lotes<br/>com menor uso de RAM"]
+    E1 --> A1["812 quadrantes<br/>de até 256 × 256 pixels<br/>28 colunas × 29 linhas"]
+    A1 --> A2["Quickshift por quadrante<br/>Extração de NDVI, brilho HSV<br/>e bordas Canny"]
+    A2 --> A3["Associar segmentos aos pontos<br/>georreferenciados conhecidos<br/>e tratar duplicações e conflitos"]
+    A3 --> A4["Avaliar 8 classificadores<br/>com validação espacial e F1-macro"]
+    A4 --> A5["RESULTADO DO CAMINHO 1<br/>Desempenho dos classificadores<br/>e análise dos atributos na base de 256<br/>Porte e postes: análises opcionais"]
 
-    B --> B1["Outra grade sobre a MESMA imagem<br/>210 janelas possíveis<br/>de até 512 × 512 pixels<br/>14 colunas × 15 linhas"]
-    P["📍 510 pontos de referência conhecidos<br/>257 árvores + 253 gramíneas<br/>arquivos Arvores.gpkg e Grama.gpkg"]
-    B1 --> S["Identificar quais janelas de 512<br/>contêm pontos de referência"]
-    P --> S
-    S --> R["Selecionar 119 das 210 janelas<br/>com pelo menos um ponto conhecido<br/>91 janelas ficam fora da comparação"]
+    E2 --> B1["210 janelas possíveis<br/>de até 512 × 512 pixels<br/>14 colunas × 15 linhas"]
+    B1 --> B2["Localizar os 510 pontos conhecidos<br/>257 árvores e 253 gramíneas"]
+    B2 --> B3["Selecionar 119 janelas com pontos<br/>91 janelas sem referências rotuladas"]
 
-    R --> T1["TESTE A<br/>Quickshift em cada recorte<br/>inteiro de até 512 × 512 pixels"]
-    R --> T2["TESTE B<br/>Quickshift no MESMO recorte<br/>subdividido em até 4 partes<br/>de 256 × 256 pixels"]
+    B3 --> T1["TESTE A<br/>Quickshift no recorte inteiro<br/>de até 512 × 512 pixels"]
+    B3 --> T2["TESTE B<br/>Quickshift no mesmo recorte<br/>dividido em até quatro partes<br/>de 256 × 256 pixels"]
+    T1 --> B4["Mesmas 505 referências únicas comuns<br/>mesmos atributos e divisões<br/>espaciais de treino e teste"]
+    T2 --> B4
+    B4 --> B5["Avaliar os mesmos 8 classificadores<br/>com F1-macro e medir memória RAM"]
+    B5 --> B6["RESULTADO DO CAMINHO 2<br/>Comparação de desempenho e RAM<br/>entre segmentações 512 e 256"]
 
-    T1 --> C["Mesmas 505 referências únicas comuns<br/>mesmos atributos e divisões<br/>espaciais de treino e teste"]
-    T2 --> C
-    C --> F["Comparação dos 8 classificadores<br/>F1-macro e memória RAM"]
+    A5 --> Z["CONCLUSÕES COMPLEMENTARES<br/>Caminho 1: classificação e atributos na base de 256<br/>Caminho 2: efeito do tamanho da segmentação<br/>São protocolos diferentes, não uma única sequência"]
+    B6 --> Z
 
     classDef origem fill:#e9f1fc,stroke:#467fc4,color:#173b68,stroke-width:2px;
     classDef cobertura fill:#e5f5ef,stroke:#409f80,color:#12543d,stroke-width:1.5px;
     classDef comparacao fill:#fff1dd,stroke:#d7a24f,color:#69430b,stroke-width:1.5px;
     classDef teste fill:#e8efff,stroke:#678dd1,color:#183d75,stroke-width:1.5px;
     classDef resultado fill:#f0eafa,stroke:#8973bd,color:#40315f,stroke-width:2px;
-    class I,P origem;
-    class A,A1,A2 cobertura;
-    class B,B1,S,R comparacao;
-    class T1,T2,C teste;
-    class F resultado;
+    class I origem;
+    class E1,A1,A2,A3,A4 cobertura;
+    class E2,B1,B2,B3 comparacao;
+    class T1,T2,B4,B5 teste;
+    class A5,B6,Z resultado;
 ```
 
 <p align="center">
