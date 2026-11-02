@@ -241,6 +241,8 @@ O projeto utiliza a mesma fonte de dados para **três caminhos de processamento*
 | **V2 — comparação de classificadores** | O raster retangular completo é percorrido por **812 quadrantes de até 256 × 256 pixels**, cada um segmentado separadamente | Formar a base de segmentos que alimenta os testes de classificação |
 | **V2 — experimento E9** | **119 regiões de até 512 × 512 pixels**, escolhidas por conter referências conhecidas, são segmentadas de duas maneiras | Comparar os efeitos de processar uma janela inteira ou subdividi-la em quatro janelas |
 
+**Por que a V2 utiliza janelas menores em vez de repetir o Quickshift global?** A decisão também decorre de uma **limitação computacional de memória**. A imagem completa tem aproximadamente **50,6 milhões de pixels**, e a segmentação global do método original exige muito mais RAM do que a disponível no ambiente local utilizado nos testes. Uma tentativa de executar o Quickshift sobre todo o raster nesse ambiente, limitado a aproximadamente **4 GiB de RAM**, foi interrompida com `MemoryError`; janelas menores puderam ser processadas. Por isso, o processamento por quadrantes foi adotado como **alternativa viável para executar experimentos com os dados existentes**, mas **não é equivalente ao Quickshift global**, pois as fronteiras dos segmentos podem mudar. [Registro do teste de memória](docs/e10_teste_execucao_local_2026-11-02.md).
+
 **Por que 812 quadrantes?** A largura exige **28 colunas** e a altura, **29 linhas**; portanto, **28 × 29 = 812**. As janelas nas bordas são menores: a última coluna possui 30 pixels de largura e a última linha, 126 pixels de altura. Essa grade percorre **toda a extensão retangular**, inclusive trechos fora do polígono AOI.
 
 A figura abaixo mostra a **imagem real da Area1**, a cobertura dos **812 quadrantes** e os **119 recortes** utilizados no E9. As dimensões devem ser lidas assim:
@@ -266,6 +268,8 @@ A figura é uma visualização do procedimento, e as grades ilustrativas não re
 ### 6.3. Segmentação: por que comparar 512 pixels com quatro quadrantes de 256? (E9)
 
 Depois de conhecer a imagem original e as janelas de processamento, investigamos a primeira escolha metodológica: **a segmentação muda quando o Quickshift processa uma região inteira em vez de subdividi-la?** Esse é o objetivo do E9. Seus resultados também usam modelos e divisões de teste, detalhados adiante.
+
+**Por que comparar essas duas formas?** Embora a adoção de janelas menores tenha sido motivada pela necessidade de reduzir o consumo de memória, o **E9 não é apenas um teste de desempenho computacional**: ele investiga cientificamente se a subdivisão altera as previsões, utilizando os mesmos pixels, pontos de referência, classificadores e protocolos de avaliação. Assim, a **restrição de memória justifica a estratégia de processamento**, enquanto a **comparação pareada justifica e avalia suas consequências metodológicas**.
 
 Para isso, escolhemos **119 recortes que contêm pontos conhecidos de árvores e gramíneas**. Cada região de **até 512 × 512 pixels** foi analisada das duas formas, **sobre os mesmos pixels**:
 
