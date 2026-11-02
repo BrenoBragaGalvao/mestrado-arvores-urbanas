@@ -318,5 +318,7 @@ A memória também foi medida nesses 119 recortes: **467,19 MiB em 512 contínuo
 - **Ainda não:** não podemos afirmar que a V2 superou o **pipeline global original**, pois ele tinha **outros segmentos, seleção por K-Means e outra avaliação**. Acurácia histórica **0,87** e F1-macro novo **não são a mesma métrica**.
 - **Também não:** como não existem alturas reais medidas nem geometria de cabos, os dados não comprovam risco elétrico. A proximidade calculada é horizontal em relação aos **postes**.
 
-**Para reproduzir os testes:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb), [resultados dos oito classificadores](docs/harmonizacao_protocolos_2026-11-01.md), [comparação E9 de 512 × 256](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) e [medição de memória do E9](docs/e9_medicao_memoria_2026-11-02.md).
+**Código e evidências:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código executável do E9 (512 × 256)](experimentos/e9_reproduzir_512_256.py) · [Resultados dos oito classificadores](docs/harmonizacao_protocolos_2026-11-01.md) · [Resultados comparativos E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
+
+*As tabelas acima vêm dos experimentos já documentados. A nova célula de reexecução E9 foi acrescentada à V2 para reproduzi-los; ela ainda precisa ser executada e conferida antes de substituir os resultados publicados.*
 
