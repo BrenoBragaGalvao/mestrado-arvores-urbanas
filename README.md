@@ -243,15 +243,23 @@ O projeto utiliza a mesma fonte de dados para **três caminhos de processamento*
 
 **Por que 812 quadrantes?** A largura exige **28 colunas** e a altura, **29 linhas**; portanto, **28 × 29 = 812**. As janelas nas bordas são menores: a última coluna possui 30 pixels de largura e a última linha, 126 pixels de altura. Essa grade percorre **toda a extensão retangular**, inclusive trechos fora do polígono AOI.
 
-A figura abaixo utiliza a imagem da Area1 para distinguir o raster original, a cobertura dos 812 quadrantes e os 119 recortes selecionados para o E9.
+A figura abaixo mostra a **imagem real da Area1**, a cobertura dos **812 quadrantes** e os **119 recortes** utilizados no E9. As dimensões devem ser lidas assim:
+
+| Painel | Dimensão em pixels | Significado |
+|---|---|---|
+| **1 — Imagem original** | **6.942 × 7.294 px** | Tamanho do raster RGB completo |
+| **2 — 812 quadrantes** | **256 × 256 px por quadrante** | Janelas de processamento (as bordas são menores) |
+| **3 — 119 recortes do E9** | **512 × 512 px por recorte nominal** | Janelas selecionadas para comparar duas formas de segmentação (recortes de borda podem ser menores) |
+
+A figura é uma visualização do procedimento, e as grades ilustrativas não reproduzem necessariamente os limites georreferenciados exatos.
 
 <p align="center">
-  <a href="docs/infografico_area1_812_quadrantes_119_recortes_atualizado.svg">
-    <img src="docs/infografico_area1_812_quadrantes_119_recortes_atualizado.svg" alt="Area1 original, grade de 812 quadrantes de processamento e 119 recortes selecionados para o experimento E9" width="100%">
+  <a href="docs/infografico_area1_119_recortes_explicados_2026-11-02.png">
+    <img src="docs/infografico_area1_119_recortes_explicados_2026-11-02.png" alt="Area1 original, grade de 812 quadrantes de processamento e 119 recortes selecionados para o experimento E9" width="100%">
   </a>
 </p>
 
-[**Abrir a imagem ampliada — raster, 812 quadrantes e 119 recortes**](docs/infografico_area1_812_quadrantes_119_recortes_atualizado.svg)
+[**Abrir a imagem ampliada — raster, 812 quadrantes e 119 recortes**](docs/infografico_area1_119_recortes_explicados_2026-11-02.png)
 
 **Como ler a figura:** os 119 contornos amarelos indicam somente as regiões selecionadas no **E9**. Eles **não** mostram os únicos locais processados na bateria de 812 quadrantes, que percorreu o raster inteiro. Áreas escuras ou pretas são parte da representação da imagem e, por si sós, não indicam falhas ou omissões. Grades e marcações são ilustrativas; os limites dos recortes estão nos registros do experimento.
 
