@@ -316,7 +316,12 @@ flowchart TD
 | **V2 — classificadores e validação espacial** | Quickshift independente em **812 blocos de até 256 × 256 px** | **505 segmentos únicos** (257 árvores, 248 gramíneas) | Divisões **aleatórias e espaciais** |
 | **V2 — comparação da segmentação** | **119 regiões**, cada uma segmentada em **512 contínuo** ou **quatro blocos 256** | **505 referências comuns às duas alternativas de segmentação** | Testes **espaciais pareados** |
 
-**Por que os números são diferentes?** No método original, foram utilizados **458 registros segmento–rótulo** após a seleção do cluster 3 pelo K-Means. Na V2, o Quickshift gerou **168.133 segmentos** ao processar a imagem em 812 blocos, mas apenas **505 segmentos rotulados únicos** foram usados para comparar os classificadores. No E9, foram utilizadas **505 referências comuns** para comparar duas formas de segmentar os mesmos 119 recortes. Apesar do número igual, esses exemplos **não representam necessariamente os mesmos segmentos**. Por isso, os resultados do método original e da V2 **não são diretamente comparáveis**.
+**Por que antes eram 458 e agora são 505?** Usamos os **mesmos 510 pontos conhecidos** de árvores e gramíneas, mas mudamos a forma de criar e selecionar os segmentos:
+
+- **Método original — 458 registros:** o Quickshift segmentava a imagem, e o K-Means mantinha apenas os objetos do **cluster 3**. Os 458 eram associações entre segmentos e rótulos, não necessariamente 458 objetos diferentes.
+- **V2 — 505 segmentos rotulados:** o Quickshift foi aplicado em **812 quadrantes**, sem o mesmo filtro do cluster 3. Após associar os pontos e eliminar duplicações, **505 segmentos distintos** foram utilizados nos testes dos classificadores.
+
+**Importante:** isso **não significa 47 árvores ou gramíneas novas**: a maneira de contar os exemplos também mudou. No **E9**, aparecem **505 referências comuns** às duas estratégias testadas em 119 recortes, mas elas não representam necessariamente os mesmos segmentos da comparação de classificadores. **Por isso, não podemos comparar diretamente as métricas do método original com as da V2.**
 
 ### 6.2. Comparação de oito classificadores — Random Forest, SVM e alternativas
 
