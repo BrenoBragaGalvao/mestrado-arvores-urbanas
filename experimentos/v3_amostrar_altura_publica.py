@@ -94,7 +94,7 @@ def executar(pontos_csv: Path, saida: Path, raio: float = 5.):
         with rasterio.Env(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR",
                           CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif",
                           GDAL_HTTP_MAX_RETRY="2", GDAL_HTTP_RETRY_DELAY="2",
-                          GDAL_CACHEMAX="128"):
+                          GDAL_CACHEMAX=128):
             with rasterio.open("/vsicurl/" + url) as src:
                 if src.count != 1 or src.crs is None:
                     raise ValueError("GeoTIFF inesperado: uma banda georreferenciada é obrigatória")
