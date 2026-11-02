@@ -9,7 +9,22 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 | **🌳 Proposta 1 — Identificação da vegetação** | Como distinguir **árvores e gramíneas** por características de imagens de satélite? | Objetos classificados como árvore ou gramínea. |
 | **⚡ Proposta 2 — Porte e proximidade de postes** | Quais objetos candidatos apresentam **indicador empírico de porte** acima do limiar e ficam próximos de postes? | Seleção exploratória e distâncias 2D a postes, **sem comprovação de risco elétrico**. |
 
-**Roteiro de leitura:** dados → **Proposta 1** → resultados históricos → **Proposta 2** → imagem completa das 17 etapas → documentação. **Todas as comparações dos experimentos novos aparecem no final do README.**
+**Roteiro de leitura:** dados da Area1 → método original → limitação de memória → testes com janelas menores → resultados dos oito classificadores (seção 6).
+
+## Memória: por que usamos janelas menores?
+
+A imagem original tem **6.942 × 7.294 pixels (50,6 milhões)**. Ao tentar repetir o **Quickshift global** em um ambiente com limite de **4 GiB de RAM**, a execução falhou com `MemoryError` ao solicitar uma matriz adicional de **1,13 GiB**. **1,13 GiB é o tamanho da alocação que falhou, não o consumo total do método original**, que não foi medido na execução histórica.
+
+Por isso, a V2 adotou processamento por **janelas de pixels**, sem diminuir a resolução da imagem. Em uma medição real dos **mesmos 119 recortes da Area1**, processados sequencialmente, obtivemos:
+
+| Configuração | Pico de RAM do processo | Resultado |
+|---|---:|---|
+| **512 × 512 px** (cada recorte inteiro) | **467,19 MiB** | Processamento concluído |
+| **4 × 256 × 256 px** (mesmo recorte dividido) | **456,80 MiB** | Processamento concluído |
+
+A divisão apresentou **10,38 MiB a menos de pico de RAM (2,22%)** nesse teste. São valores de **memória residente do processo inteiro**, não somente do Quickshift. O teste global e o E9 têm tamanhos e protocolos diferentes: **512 pixels por recorte não significa processar a imagem globalmente**. [Medição detalhada de memória](docs/e9_medicao_memoria_2026-11-02.md) · [Tentativa do Quickshift global](docs/e10_teste_execucao_local_2026-11-02.md).
+
+---
 
 ## 1. Área de estudo e dados utilizados
 
@@ -210,228 +225,42 @@ Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi prepar
 
 ---
 
-## 6. Avaliação científica — da imagem aos resultados
+## 6. Por que dividimos a imagem e qual algoritmo funcionou melhor?
 
-Esta seção apresenta os experimentos em uma sequência única: **de onde vieram os dados, como formamos as amostras, como separamos treino e teste, quais métodos comparamos e o que podemos concluir**. Assim, as diferentes divisões da imagem não são confundidas com as diferentes formas de avaliação.
+O **método original** segmentava a imagem inteira de uma vez com **Quickshift global**, usava **K-Means (seis grupos, cluster 3)** e treinava um **Random Forest**. Nesse estudo histórico, a acurácia foi de **0,87 em 92 exemplos de teste**.
 
-> **Ponto de partida:** o método original registrou **0,87 de acurácia em 92 testes**. A V2 ampliou as análises, mas **ainda não há comparação integral e controlada entre os dois pipelines**. Os resultados abaixo descrevem experimentos específicos, sobretudo na base derivada dos dados existentes.
+O problema para ampliar os testes foi **repetir a segmentação global com a memória disponível**, e não treinar os classificadores. A V2 resolveu a limitação prática **processando recortes menores**. Com isso, conseguimos comparar **oito algoritmos nas mesmas condições dentro de cada experimento**, em vez de testar somente Random Forest.
 
-### 6.1. O que queremos investigar?
+### 6.1. O que mudou de um experimento para o outro?
 
-O propósito não é simplesmente encontrar um número maior que 0,87, mas entender **quais escolhas metodológicas mudam os resultados** e se o desempenho se mantém em condições de avaliação mais rigorosas.
-
-| Pergunta científica | Como investigamos |
-|---|---|
-| **1. Como o tamanho das janelas de segmentação influencia o consumo de memória e a classificação de árvores e gramíneas?** | A limitação de RAM motivou o processamento em janelas menores. Nos mesmos 119 recortes, medimos pico de memória residente de **467,19 MiB** (512 contínuo) e **456,80 MiB** (quatro 256), redução observada de **2,22%**. Separadamente, comparamos as previsões dos oito classificadores sob as duas segmentações. |
-| **2. Quais atributos da imagem ajudam a identificar árvores e gramíneas?** | Comparamos NDVI, brilho HSV e bordas Canny isolados e combinados |
-| **3. A forma de avaliar influencia o resultado?** | Avaliação aleatória versus separação espacial por blocos de 250 m e 500 m |
-| **4. Qual classificador funciona melhor nas mesmas condições?** | Comparamos oito modelos, incluindo Random Forest, SVM e regressão logística |
-
-Além dessas perguntas, os experimentos verificam a qualidade dos rótulos, parâmetros de Quickshift e K-Means, proximidade de segmentos a postes, extrapolação dos atributos e sensibilidade de indicadores empíricos de porte. **Não há validação de altura real nem de risco elétrico.**
-
-### 6.2. Primeiro, a imagem: o que foi processado?
-
-A imagem RGB completa da **Area1** possui **6.942 × 7.294 pixels** e resolução espacial aproximada de **0,5 metro por pixel**. O **polígono AOI**, de formato irregular, delimita a área efetiva de estudo dentro da grade retangular.
-
-O projeto utiliza a mesma fonte de dados para **três caminhos de processamento** — e cada caminho responde a uma pergunta diferente:
-
-| Caminho | O que acontece com a imagem? | Para qual finalidade? |
+| Estudo | Como a imagem foi segmentada | O que foi avaliado? |
 |---|---|---|
-| **Método original** | Quickshift executado **globalmente no raster RGB completo**; posteriormente, os segmentos são recortados pela AOI | Reproduzir o método histórico com K-Means (seis grupos e seleção do cluster 3) e Random Forest |
-| **V2 — comparação de classificadores** | O raster retangular completo é percorrido por **812 quadrantes de até 256 × 256 pixels**, cada um segmentado separadamente | Formar a base de segmentos que alimenta os testes de classificação |
-| **V2 — experimento E9** | **119 regiões de até 512 × 512 pixels**, escolhidas por conter referências conhecidas, são segmentadas de duas maneiras | Comparar os efeitos de processar uma janela inteira ou subdividi-la em quatro janelas |
+| **Original** | Quickshift **global** na imagem inteira + K-Means, cluster 3 | Random Forest; acurácia histórica **0,87** |
+| **V2 — comparação de modelos (E3c)** | Quickshift em **janelas de 256 × 256 px**; base derivada com **505 segmentos rotulados únicos** | Oito classificadores nas mesmas partições |
+| **V2 — comparação de janelas (E9)** | Os mesmos **119 recortes de até 512 × 512 px**, processados inteiros **ou** divididos em quatro partes de até 256 × 256 px | Oito classificadores nas **mesmas referências** e divisões, comparando também o tamanho das janelas |
 
-**Por que a V2 utiliza janelas menores em vez de repetir o Quickshift global?** A decisão também decorre de uma **limitação computacional de memória**. A imagem completa tem aproximadamente **50,6 milhões de pixels**, e a segmentação global do método original exige muito mais RAM do que a disponível no ambiente local utilizado nos testes. Uma tentativa de executar o Quickshift sobre todo o raster nesse ambiente, limitado a aproximadamente **4 GiB de RAM**, foi interrompida com `MemoryError`; janelas menores puderam ser processadas. Por isso, o processamento por quadrantes foi adotado como **alternativa viável para executar experimentos com os dados existentes**, mas **não é equivalente ao Quickshift global**, pois as fronteiras dos segmentos podem mudar. [Registro do teste de memória](docs/e10_teste_execucao_local_2026-11-02.md).
+**Não criamos imagens de menor resolução:** dividimos a imagem original em regiões menores para conseguir processá-la. A V2 por quadrantes é um **método experimental diferente** do Quickshift global original.
 
-**Por que 812 quadrantes?** A largura exige **28 colunas** e a altura, **29 linhas**; portanto, **28 × 29 = 812**. As janelas nas bordas são menores: a última coluna possui 30 pixels de largura e a última linha, 126 pixels de altura. Essa grade percorre **toda a extensão retangular**, inclusive trechos fora do polígono AOI.
-
-A figura abaixo mostra a **imagem real da Area1**, a cobertura dos **812 quadrantes** e os **119 recortes** utilizados no E9. As dimensões devem ser lidas assim:
-
-| Painel | Dimensão em pixels | Significado |
-|---|---|---|
-| **1 — Imagem original** | **6.942 × 7.294 px** | Tamanho do raster RGB completo |
-| **2 — 812 quadrantes** | **256 × 256 px por quadrante** | Janelas de processamento (as bordas são menores) |
-| **3 — 119 recortes do E9** | **512 × 512 px por recorte nominal** | Janelas selecionadas para comparar duas formas de segmentação (recortes de borda podem ser menores) |
-
-A figura é uma visualização do procedimento, e as grades ilustrativas não reproduzem necessariamente os limites georreferenciados exatos.
+<details>
+<summary>Ver a Area1 e a localização dos quadrantes e recortes</summary>
 
 <p align="center">
   <a href="docs/infografico_area1_812_quadrantes_119_recortes_final.webp">
-    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Area1 original, grade de 812 quadrantes de processamento e 119 recortes selecionados para o experimento E9" width="100%">
+    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Area1 original, 812 quadrantes de até 256 pixels e 119 recortes de até 512 pixels usados no E9" width="100%">
   </a>
 </p>
 
-[**Abrir a imagem ampliada — raster, 812 quadrantes e 119 recortes**](docs/infografico_area1_812_quadrantes_119_recortes_final.webp)
+A grade completa tem **812 quadrantes** (28 colunas × 29 linhas), com janelas menores nas bordas. Os **119 recortes do E9** foram escolhidos por conter os pontos de referência e **não representam cobertura integral da AOI**.
 
-**Como ler a figura:** os 119 contornos amarelos indicam somente as regiões selecionadas no **E9**. Eles **não** mostram os únicos locais processados na bateria de 812 quadrantes, que percorreu o raster inteiro. Áreas escuras ou pretas são parte da representação da imagem e, por si sós, não indicam falhas ou omissões. Grades e marcações são ilustrativas; os limites dos recortes estão nos registros do experimento.
+</details>
 
-### 6.3. Segmentação: por que comparar 512 pixels com quatro quadrantes de 256? (E9)
+### 6.2. Comparação principal: oito classificadores na mesma base (E3c)
 
-Depois de conhecer a imagem original e as janelas de processamento, investigamos a primeira escolha metodológica: **a segmentação muda quando o Quickshift processa uma região inteira em vez de subdividi-la?** Esse é o objetivo do E9. Seus resultados também usam modelos e divisões de teste, detalhados adiante.
+A avaliação utiliza **505 segmentos rotulados únicos**, extraídos da Area1 por janelas de **256 × 256 px**. Todos os modelos recebem os **mesmos três atributos** (NDVI, brilho HSV e bordas Canny), os **mesmos exemplos de treino/teste** e as mesmas métricas **dentro de cada protocolo**.
 
-**Por que comparar essas duas formas?** Embora a adoção de janelas menores tenha sido motivada pela necessidade de reduzir o consumo de memória, o **E9 não é apenas um teste de desempenho computacional**: ele investiga cientificamente se a subdivisão altera as previsões, utilizando os mesmos pixels, pontos de referência, classificadores e protocolos de avaliação. Assim, a **restrição de memória justifica a estratégia de processamento**, enquanto a **comparação pareada justifica e avalia suas consequências metodológicas**.
+**F1-macro médio** (quanto maior, melhor). Foram usadas cinco divisões espaciais por escala, com blocos de 250 ou 500 **metros** e embargo geométrico de 25 m:
 
-Para isso, escolhemos **119 recortes que contêm pontos conhecidos de árvores e gramíneas**. Cada região de **até 512 × 512 pixels** foi analisada das duas formas, **sobre os mesmos pixels**:
-
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 70, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
-flowchart TD
-    A["119 recortes<br/>da Area1<br/>(até 512 × 512 px)"] --> B["A: Quickshift<br/>contínuo em cada<br/>recorte de até<br/>512 × 512 px<br/>(não é global)"]
-    A --> C["B: Quickshift<br/>em quatro partes<br/>de até<br/>256 × 256 px"]
-    B --> D["Mesmas<br/>referências<br/>e divisões<br/>de teste"]
-    C --> D
-    D --> E["Comparar<br/>F1-macro<br/>com os mesmos<br/>modelos"]
-
-    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
-    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
-    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
-    class A,D dados;
-    class B,C metodo;
-    class E resultado;
-```
-
-**Importante:** neste fluxograma, “contínuo” significa processar **cada recorte de até 512 × 512 px inteiro**, e **não** aplicar Quickshift global à imagem completa do método original com K-Means.
-
-**Medição de memória no E9 (Area1 real, 119 recortes):** além da comparação de classificação, executamos novamente as duas formas de segmentação para registrar o **pico de memória residente (RSS) de cada processo**, incluindo leitura das janelas RGB/NIR, mapas de NDVI, brilho HSV, bordas Canny, Quickshift e médias dos atributos. Cada configuração foi medida em um processo separado, percorrendo as 119 regiões sequencialmente.
-
-| Configuração de segmentação | Pico RSS do processo | Pico adicional à memória inicial | Segmentos produzidos |
-|---|---:|---:|---:|
-| **512 × 512 contínuo** | **467,19 MiB** | 281,32 MiB | 91.984 |
-| **Quatro partes de 256 × 256** | **456,80 MiB** | 270,94 MiB | 90.673 |
-
-Nessas condições, a divisão em quatro partes apresentou **10,38 MiB (2,22%) menos memória de pico total**; a diferença de pico adicional foi de **10,38 MiB (3,69%)**. A medição corresponde à **memória total residente do processo**, não à memória exclusiva do Quickshift, e pode variar conforme ambiente e versões das bibliotecas. Foi uma execução de perfilamento de memória dos 119 recortes, **não uma nova avaliação de acurácia**. [Ver protocolo e resultados detalhados](docs/e9_medicao_memoria_2026-11-02.md).
-
-**Exemplo:** um recorte de **512 × 512 = 262.144 pixels** pode ser processado de uma vez ou em **quatro quadrantes de 256 × 256 = 65.536 pixels cada**. Somados, os quatro quadrantes abrangem **os mesmos pixels**. Não são novas imagens nem houve redução de resolução. Como cada execução do Quickshift pode criar limites diferentes, **os segmentos e suas médias de atributos podem mudar**.
-
-Os **119 recortes não cobrem necessariamente toda a AOI** e podem ter bordas menores ou sobreposições; suas áreas não devem ser simplesmente somadas para inferir a cobertura única do polígono.
-
-Na comparação pareada, mantiveram-se os **505 pontos de referência compartilhados**, os rasters e mapas de NDVI/brilho/Canny, os modelos e as partições de teste (a lógica da separação espacial é explicada na seção 6.6). O protocolo teve **cinco divisões por escala espacial de 250/500 m**, com **embargo de 25 m entre os pontos de referência** — **não** o embargo entre geometrias completas utilizado na comparação de classificadores. Foram **320 avaliações**.
-
-**F1-macro médio das duas formas de segmentar:**
-
-| Blocos espaciais de teste | Modelo | 512 contínuo | Quatro 256 |
-|---|---|---:|---:|
-| 250 m | Random Forest | **0,8906** | 0,8835 |
-| 250 m | SVM RBF | 0,9157 | **0,9341** |
-| 500 m | Random Forest | **0,8657** | 0,8566 |
-| 500 m | SVM RBF | 0,8518 | **0,8641** |
-
-O **Random Forest teve maior média com 512 contínuo** nos resultados exibidos, enquanto o **SVM teve maior média com quatro quadrantes de 256**. Portanto, o efeito da escala de segmentação **dependeu do classificador**.
-
-**Não confundir:** os **512 e 256** desta subseção são medidas **em pixels para segmentação**. Já os **250 e 500 m** da tabela são medidas **geográficas para dividir treino e teste**. Além disso, **Quickshift em 512 pixels locais não equivale ao Quickshift global do método original**, e o E9 não reproduz o filtro histórico do cluster 3.
-
-### 6.4. Das segmentações às amostras: por que aparecem 458 e 505?
-
-**Dividir o raster em janelas não significa criar uma amostra rotulada por pixel.** Primeiro, o Quickshift gera segmentos; depois, suas características são calculadas e as referências conhecidas de árvores e gramíneas são associadas aos objetos candidatos.
-
-Os mesmos **510 pontos de referência existentes** foram usados como ponto de partida, mas os caminhos de processamento **não produzem bases idênticas**:
-
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 72, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
-flowchart TD
-    A["Area1<br/>referências de<br/>árvores e<br/>gramíneas"] --> B["Método original<br/>Quickshift<br/>global"]
-    B --> C["K-Means<br/>6 grupos<br/>seleção do<br/>cluster 3"]
-    C --> D["458 pares<br/>objeto–rótulo<br/>92 testes<br/>aleatórios"]
-
-    A --> E["V2<br/>812 quadrantes<br/>Quickshift<br/>independente"]
-    E --> F["Associação<br/>e deduplicação<br/>505 segmentos<br/>rotulados"]
-
-    A --> G["E9<br/>119 recortes<br/>512 contínuo<br/>ou 4 partes<br/>de 256 × 256"]
-    G --> H["505 referências<br/>comuns aos<br/>dois modos de<br/>segmentar"]
-
-    classDef origem fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
-    classDef historico fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
-    classDef novo fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:1.5px;
-    class A origem;
-    class B,C,D historico;
-    class E,F,G,H novo;
-```
-
-| Base / experimento | Registros empregados | Avaliação documentada |
-|---|---|---|
-| **Original — rodada inicial** | **133 pares objeto–rótulo** | 27 testes aleatórios; recorte inicial não reconstruído integralmente |
-| **Original — rodada ampliada** | **458 pares objeto–rótulo** | 92 testes aleatórios; acurácia histórica de **0,87** |
-| **V2 — classificadores** | **505 segmentos únicos rotulados**: 257 árvores e 248 gramíneas | Divisões aleatórias e espaciais |
-| **V2 — E9 (segmentação)** | **505 referências comuns** às duas formas de segmentar os 119 recortes | Testes espaciais pareados entre as alternativas |
-
-A diferença de **458 para 505** não significa que encontramos 47 novas árvores ou gramíneas. No método original, os registros eram **associações objeto–rótulo após o filtro do cluster 3**; na base de classificadores da V2, os **505 são segmentos distintos após deduplicação**, sem aplicar aquele mesmo filtro. Os 505 do E9 também não significam que seus segmentos sejam necessariamente os mesmos 505 da comparação de classificadores.
-
-**Consequência:** usar os mesmos arquivos e pontos de origem **não garante equivalência entre bases**. Por isso, não é correto confrontar diretamente a acurácia original de 0,87 com a média de outro experimento da V2.
-
-### 6.5. Quais atributos da imagem ajudam a identificar árvores e gramíneas?
-
-Depois de segmentar a imagem e associar os objetos às referências de árvores e gramíneas, precisamos **descrever os segmentos por características numéricas**. Foram investigados três grupos de atributos: **NDVI** (relacionado à resposta espectral da vegetação), **brilho HSV** e **bordas Canny**. Essas medidas são calculadas a partir das imagens disponíveis e resumidas para os objetos segmentados.
-
-Na comparação de atributos (E4), as características foram avaliadas **isoladamente e em combinações**. Entre as combinações examinadas, **NDVI + brilho HSV + bordas Canny** apresentou o maior F1-macro médio nas condições documentadas. Isso **não prova** que a mesma combinação seja ótima em qualquer área ou com outro protocolo. A segmentação também afeta as médias calculadas por objeto, como mostrou o E9.
-
-A análise de sensibilidade (E5) também variou parâmetros de **Quickshift e K-Means**. A métrica *silhouette* do K-Means mede a estrutura dos agrupamentos e **não deve ser confundida com acurácia de classificação**.
-
-### 6.6. Como avaliamos: sorteio aleatório ou blocos geográficos?
-
-Depois de formar os **505 segmentos rotulados da base de classificadores**, precisamos decidir **quais exemplos entram no treinamento e quais ficam reservados para teste**. Foram investigadas duas estratégias:
-
-- **Divisão aleatória 80/20:** sorteia exemplos; objetos próximos geograficamente podem aparecer nos dois conjuntos, tornando a estimativa mais otimista.
-- **Divisão espacial:** agrupa amostras por coordenadas em quadrados de **250 × 250 metros** ou **500 × 500 metros**; determinados blocos são reservados para teste. Na comparação de classificadores, também se aplica um **embargo de 25 m das geometrias de teste** para excluir objetos de treino muito próximos.
-
-**Essa divisão por metros não é um segundo recorte físico dos 812 arquivos/janelas.** Os 812 quadrantes são a **etapa de processamento em pixels**; os blocos geográficos organizam **amostras já extraídas**, de acordo com sua localização.
-
-A imagem abaixo mostra, sobre uma visualização da Area1, as **três grades distintas**:
-
-<p align="center">
-  <a href="docs/area1_grades_processamento_validacao_espacial.svg">
-    <img src="docs/area1_grades_processamento_validacao_espacial.svg" alt="Mesma Area1 com grade de processamento em quadrantes de 256 pixels e grades ilustrativas de validação espacial em blocos de 250 e 500 metros" width="100%">
-  </a>
-</p>
-
-[**Abrir a comparação ampliada — 256 px, 250 m e 500 m**](docs/area1_grades_processamento_validacao_espacial.svg)
-
-| Grade | Unidade | Função |
-|---|---|---|
-| **812 quadrantes** | Até **256 × 256 pixels** | Executar Quickshift por janelas e extrair segmentos da imagem |
-| **Blocos de 250 m** | **250 × 250 metros** | Separar amostras rotuladas para uma avaliação espacial |
-| **Blocos de 500 m** | **500 × 500 metros** | Repetir a separação das mesmas amostras em escala geográfica maior |
-
-Com resolução aproximada de **0,5 m/pixel**, 250 m equivalem a cerca de **500 pixels** de extensão e 500 m, a cerca de **1.000 pixels**. É **apenas uma equivalência de distância**: a segmentação da V2 não foi refeita em quadrantes de 500 ou 1.000 pixels. As grades de validação desenhadas na figura são **didáticas**, não os limites georreferenciados exatos das partições, e não mostram o embargo de 25 m.
-
-**O que mudou no Random Forest usando as mesmas 505 amostras de origem?**
-
-| Protocolo de avaliação | Acurácia média | F1-macro médio |
-|---|---:|---:|
-| **Aleatório 80/20** | **0,8832** | **0,8827** |
-| **Espacial 250 m**, embargo de 25 m | 0,8697 | 0,8656 |
-| **Espacial 500 m**, embargo de 25 m | 0,8591 | 0,8530 |
-
-As médias espaciais são menores nesse conjunto de resultados, mas **isso não comprova por si só overfitting ou que apenas o embargo causou a diferença**: as partições aleatórias e espaciais não testam exatamente os mesmos objetos. Ambas avaliam a **mesma área geográfica geral**, não a transferência para outra cidade.
-
-Também repetimos a **configuração histórica** do Random Forest (500 árvores, sorteio 80/20 e semente 42) **sobre a nova base de 505 segmentos**: **404 exemplos de treino, 101 de teste**, acurácia **0,9010** e F1-macro **0,9009**. Esse resultado **não reproduz o 0,87 original**, pois a amostra avaliada não é a mesma.
-
-### 6.7. Qual classificador teve melhor resultado nas mesmas condições?
-
-A partir da base derivada de **505 segmentos**, testamos **oito classificadores**. Em cada partição, os modelos receberam **os mesmos exemplos, as mesmas características e a mesma divisão de treino e teste**. Alterou-se o algoritmo de classificação, para tornar a comparação válida *dentro do protocolo*.
-
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 70, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
-flowchart TD
-    A["505 segmentos<br/>rotulados"] --> B["NDVI<br/>brilho HSV<br/>bordas Canny"]
-    B --> C["Mesma partição<br/>de treino<br/>e teste"]
-    C --> D["Random Forest"]
-    C --> E["SVM RBF"]
-    C --> F["Outros<br/>6 modelos"]
-    D --> G["Comparar<br/>F1-macro<br/>e acurácia"]
-    E --> G
-    F --> G
-
-    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
-    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
-    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
-    class A,B,C dados;
-    class D,E,F metodo;
-    class G resultado;
-```
-
-A tabela apresenta o **F1-macro médio em cinco divisões espaciais por escala**, com **embargo de 25 m em relação às geometrias de teste**:
-
-| Modelo | Blocos de 250 m | Blocos de 500 m |
+| Classificador | Blocos de 250 m | Blocos de 500 m |
 |---|---:|---:|
 | **SVM RBF** | **0,8987** | **0,8668** |
 | Regressão logística | 0,8928 | 0,8664 |
@@ -442,57 +271,52 @@ A tabela apresenta o **F1-macro médio em cinco divisões espaciais por escala**
 | Gaussian Naive Bayes | 0,8555 | 0,8398 |
 | Dummy (referência simples) | 0,2980 | 0,2799 |
 
-**Como interpretar:** com blocos de 250 m, o SVM apresentou F1-macro médio de **0,8987**, frente a **0,8656** do Random Forest. O SVM liderou **nessas condições**; isso não demonstra superioridade estatística universal nem desempenho superior em outras áreas.
+**O que encontramos:** nessas duas configurações, **SVM RBF obteve o maior F1-macro médio**, superando o Random Forest. Isso é um resultado **descritivo dentro da base derivada de 256 px**, não prova de superioridade universal.
 
-Os três atributos considerados aqui — NDVI, brilho HSV e bordas Canny — e os testes de sua contribuição foram apresentados na **seção 6.5**. Nesta comparação, o que muda entre os modelos é **o classificador**, mantendo as condições de cada partição.
+### 6.3. E se usarmos 512 pixels em vez de quatro partes de 256? (E9)
 
-A harmonização documentou **40 novos ajustes aleatórios** (oito modelos × cinco divisões) e **240 resultados espaciais reutilizados e verificados** — **não 280 ajustes totalmente novos**.
+Esse é **outro teste**, separado da tabela anterior. Usamos os **mesmos 119 recortes** e os **mesmos 505 pontos de referência comuns**. Em cada recorte, comparamos:
 
-### 6.8. O que os resultados permitem — e não permitem — concluir?
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 76}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
+flowchart TD
+    A["119 recortes da Area1<br/>cada um com até 512 × 512 px"] --> B["A: Quickshift contínuo<br/>em cada recorte de até<br/>512 × 512 px<br/>(não é o Quickshift global)"]
+    A --> C["B: Quickshift em<br/>quatro partes de até<br/>256 × 256 px"]
+    B --> D["Mesmas referências<br/>e divisões de teste"]
+    C --> D
+    D --> E["Comparar F1-macro<br/>dos oito modelos"]
 
-Uma comparação é mais forte quando mantém **as mesmas referências de teste, os mesmos atributos, a mesma métrica e as demais condições controladas**. O fato de dois testes virem da mesma imagem não basta.
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
+    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
+    class A,D dados;
+    class B,C metodo;
+    class E resultado;
+```
 
-| Comparação | Interpretação adequada | Por quê? |
-|---|---|---|
-| **Original: 0,81 × 0,87** | Evolução histórica **descritiva** | Rodadas e testes diferentes; não estabelece causa do aumento |
-| **Original: acurácia 0,87 × V2: F1 0,8656** | **Não comparar como se fossem a mesma nota** | Acurácia e F1-macro são métricas distintas; bases e protocolos também diferem |
-| **Original: acurácia 0,87 × V2: acurácia 0,8697** | **Não concluir equivalência ou melhoria direta** | Mesmo nome de métrica, mas objetos e divisões de teste diferentes |
-| **RF × SVM na mesma divisão da V2** | Comparação **interna válida** | Mesmos exemplos, atributos e métricas em cada rodada |
-| **512 contínuo × quatro 256 no E9** | Comparação **pareada válida nesses recortes** | Mesmas referências e avaliações dentro do E9 |
-| **Pipeline original inteiro × pipeline V2 inteiro** | **Ainda pendente** | Falta uma reprodução integral controlada sob condições comuns |
+**F1-macro médio do E9**, com cinco divisões por escala e embargo de **25 m entre pontos de referência**:
 
-**Acurácia** é a proporção de acertos. **F1-macro** faz a média do F1 calculado separadamente para árvore e gramínea, dando o mesmo peso às classes. Por isso, **0,87 de acurácia não é a mesma medida que 0,8656 de F1-macro**.
+| Classificador | 250 m / 512 px | 250 m / 4 × 256 px | 500 m / 512 px | 500 m / 4 × 256 px |
+|---|---:|---:|---:|---:|
+| Random Forest | **0,8906** | 0,8835 | **0,8657** | 0,8566 |
+| **SVM RBF** | 0,9157 | **0,9341** | 0,8518 | **0,8641** |
+| Regressão logística | 0,9153 | **0,9157** | 0,8484 | **0,8685** |
+| Extra Trees | **0,9064** | 0,8968 | **0,8747** | 0,8545 |
+| KNN (7) | 0,8940 | **0,9009** | 0,8377 | **0,8486** |
+| HistGradientBoosting | **0,8738** | 0,8714 | 0,8390 | **0,8411** |
+| Gaussian Naive Bayes | **0,8894** | 0,8875 | **0,8573** | 0,8464 |
+| Dummy | 0,2847 | 0,2847 | 0,2791 | 0,2791 |
 
-Os testes espaciais avaliam a generalização **entre regiões da Area1**, com as limitações da amostragem existente. Eles **não garantem ausência de overfitting** nem demonstram generalização para outras cidades.
+**O que encontramos:** com blocos de **250 m**, o maior F1-macro médio foi do **SVM em quatro partes de 256 px (0,9341)**. Com blocos de **500 m**, o maior foi do **Extra Trees em 512 px contínuos (0,8747)**. Logo, o melhor resultado **dependeu do tamanho das janelas, do classificador e do protocolo de teste**.
 
-### 6.9. O que já foi feito e o que falta?
+A memória também foi medida nesses 119 recortes: **467,19 MiB em 512 contínuo** e **456,80 MiB em quatro 256**. É uma redução observada de **2,22% no pico do processo**, não uma economia de 75%.
 
-**Já documentamos:** auditoria dos rótulos e duplicações; comparação de oito classificadores; validação aleatória e espacial; testes de atributos; sensibilidade de Quickshift/K-Means; proximidade a postes; extrapolação de atributos; sensibilidade dos indicadores de porte; e E9 com segmentações pareadas em recortes equivalentes.
+### 6.4. O que podemos concluir?
 
-**Próxima comparação ponta a ponta (E10): código preparado, execução pendente.** Foi publicada uma [nova versão experimental V3](Segmentacao_area_completa_v3_comparacao_ponta_a_ponta.ipynb), independente dos notebooks existentes, para executar novamente o **Quickshift global**, o **K-Means com seis grupos**, a **seleção do cluster 3** e avaliar os **oito classificadores sob as mesmas partições e métricas**. O experimento também audita a **cobertura dos candidatos** separadamente da **qualidade da classificação**, identifica referências comparáveis entre os pipelines e verifica o possível estouro de IDs na conversão histórica para `uint16`. **Não há resultado E10 de execução global comprovada:** as tabelas dependem de executar o notebook com a Area1 e verificar o manifesto; a execução integral atual da V2 nos aproximadamente **50,6 milhões de pixels do raster** também não está comprovada. [Ver protocolo, limitações e instruções E10](docs/e10_comparacao_ponta_a_ponta_2026-11-02.md).
+- **Sim:** dividir a imagem viabilizou experimentos controlados com **oito classificadores** e os dados existentes da Area1.
+- **Sim:** o **SVM RBF apresentou resultados promissores**, mas não foi o melhor em todas as configurações.
+- **Ainda não:** não podemos afirmar que a V2 superou o **pipeline global original**, pois ele tinha **outros segmentos, seleção por K-Means e outra avaliação**. Acurácia histórica **0,87** e F1-macro novo **não são a mesma métrica**.
+- **Também não:** como não existem alturas reais medidas nem geometria de cabos, os dados não comprovam risco elétrico. A proximidade calculada é horizontal em relação aos **postes**.
 
-**Limitações permanentes desta base:** não temos alturas verdadeiras medidas, geometria dos cabos elétricos nem rótulos completos do fundo urbano. Assim, **não se pode afirmar altura real, risco elétrico efetivo nem generalização para outras cidades**. Proximidade planimétrica de postes e estimativas empíricas de porte são análises exploratórias.
+**Para reproduzir os testes:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb), [resultados dos oito classificadores](docs/harmonizacao_protocolos_2026-11-01.md), [comparação E9 de 512 × 256](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) e [medição de memória do E9](docs/e9_medicao_memoria_2026-11-02.md).
 
-**Síntese para a defesa:**
-
-> “O método original obteve 0,87 de acurácia em 92 testes, com uma base diferente da usada na V2. Na ampliação, comparei classificadores sob partições equivalentes, avaliei a sensibilidade à separação espacial e confrontei formas de segmentação nos mesmos recortes. Essas evidências permitem interpretar cada protocolo, mas ainda não demonstram superioridade do pipeline completo da V2 sobre o original.”
-
-### 6.10. Onde localizar cada experimento?
-
-Os códigos **E1, E2, E3, E8h, E9** etc. identificam partes do notebook, **não algoritmos ou métricas**. Este guia serve para localizar os testes, sem interromper a explicação metodológica anterior.
-
-| Investigação | Código |
-|---|---|
-| Auditoria de amostras, duplicações e rótulos | E1 |
-| Validação espacial por blocos geográficos | E2 |
-| Comparação de classificadores | E3 / E3c |
-| Contribuição de NDVI, HSV e Canny | E4 |
-| Sensibilidade de Quickshift e K-Means | E5 |
-| Proximidade a postes; extrapolação de atributos | E6 / E6c |
-| Sensibilidade de indicadores empíricos de porte | E7 |
-| Consolidação científica e revisão bibliográfica | E8 |
-| Harmonização da avaliação aleatória e espacial | E8h |
-| Segmentação de 512 contínuo versus quatro 256 | E9 |
-| Comparação original global × V2 sob partições comuns (**código preparado; execução pendente**) | E10 |
-
-Os detalhes para reprodução estão em [protocolos de classificadores e avaliação aleatória/espacial](docs/harmonizacao_protocolos_2026-11-01.md), [comparação pareada de segmentação 512 × 256](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) e [E10: comparação ponta a ponta com o Quickshift global original](docs/e10_comparacao_ponta_a_ponta_2026-11-02.md).
