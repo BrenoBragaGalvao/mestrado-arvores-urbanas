@@ -256,7 +256,7 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
   <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Infográfico da Area1: imagem original, cobertura integral por 812 quadrantes de 256 pixels e seleção de 119 recortes de 512 pixels com pontos de referência" width="100%">
 </p>
 
-*Figura — Organização espacial da Area1: imagem original, cobertura integral por 812 quadrantes e seleção de 119 recortes contendo pontos de referência.*
+*Figura — Duas grades alternativas da Area1: 812 quadrantes de 256 × 256 pixels para cobertura integral e 210 janelas possíveis de 512 × 512 pixels, das quais 119 contêm pontos de referência.*
 
 **Perguntas que orientaram os testes**
 
