@@ -68,7 +68,7 @@ def sample_point(ds, lon: float, lat: float, raio: float = 5.0):
     local = ds.read(1, window=Window(left, top, right - left, bottom - top), masked=True)
     yy_grid, xx_grid = np.mgrid[top:bottom, left:right]
     gx, gy = rasterio.transform.xy(ds.transform, yy_grid, xx_grid, offset='center')
-    dist2 = (np.asarray(gx) - xx)**2 + (np.asarray(gy) - yy)**2
+    dist2 = (np.asarray(gx).reshape(local.shape) - xx)**2 + (np.asarray(gy).reshape(local.shape) - yy)**2
     circular = np.ma.array(local, mask=np.ma.getmaskarray(local) | (dist2 > raio ** 2))
     valid = valid_data(circular, ds)
     m = float(np.max(valid)) if len(valid) else None
