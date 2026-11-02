@@ -309,13 +309,15 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 |---|---|
 | **1. Quickshift — criar os segmentos** | Divide a imagem RGB em objetos menores. Nos experimentos novos, o Quickshift é aplicado em janelas de até **256 × 256** ou **512 × 512 pixels**. **O Quickshift não decide** se o segmento é árvore ou gramínea. |
 | **2. Pontos de referência — informar a classe conhecida** | Utilizamos os **510 pontos existentes** da Area1 (**257 árvores e 253 gramíneas**) para associar rótulos aos segmentos correspondentes. **Nem todos os segmentos da imagem possuem um ponto conhecido.** |
-| **3. Atributos — descrever cada segmento** | Calculamos características dos segmentos, especialmente **NDVI, brilho HSV e bordas Canny**. Esses valores ajudam a distinguir padrões da vegetação. |
+| **3. Atributos — descrever cada segmento** | **Antes de treinar os classificadores**, calculamos para os segmentos características como **NDVI** (vermelho + infravermelho próximo), **brilho HSV** e **bordas Canny**. Seus valores médios descrevem cada segmento e, junto dos rótulos conhecidos, formam os exemplos usados pelos modelos. |
 | **4. Separação geográfica — definir treino e teste** | Organizamos os **exemplos rotulados** em blocos de **250 ou 500 metros** para escolher os grupos de treinamento e teste; aplicamos também a exclusão espacial de **25 metros**. **Esses blocos não são segmentos e não recebem uma classe única.** |
 | **5. Oito classificadores — treinar e avaliar** | Cada algoritmo é avaliado **separadamente**, usando os mesmos exemplos e divisões dentro do respectivo experimento. **Sete modelos aprendem com os atributos e rótulos do treinamento**; o **Dummy** serve como referência simples. Depois, comparamos as previsões com os rótulos reservados para teste usando o **F1-macro**. |
 
 **Exemplo:** se um bloco geográfico contém três árvores, duas áreas de gramínea e várias casas, as árvores e gramíneas **que possuem pontos de referência** podem fornecer exemplos rotulados para a avaliação. **As casas não passam a ser uma terceira classe automaticamente**. Como não temos exemplos rotulados de **fundo urbano**, os resultados demonstram a distinção entre árvore e gramínea **nos exemplos avaliados**, mas não comprovam o reconhecimento correto de todas as estruturas da imagem.
 
 **Diferença em relação ao método original:** antes, o **K-Means agrupava os segmentos em seis clusters** e selecionávamos o **cluster 3** como conjunto de candidatos, antes de associar as referências e treinar o Random Forest. **Nos experimentos novos, a comparação dos oito classificadores não depende dessa seleção do cluster 3**: os pontos conhecidos fornecem os rótulos dos segmentos produzidos pelo Quickshift.
+
+**Ordem do processamento:** Quickshift cria os segmentos → os pontos conhecidos fornecem os rótulos → calculamos os atributos dos segmentos → separamos os exemplos geograficamente para treino e teste → treinamos e avaliamos os classificadores. **A análise de quanto cada combinação de atributos melhora o F1-macro aparece depois, na seção 3.6**, porque é uma comparação de resultados, e não uma etapa anterior à classificação.
 
 ### 3.4. Como separamos treinamento e teste nas quatro formas de aplicar Quickshift?
 
@@ -414,9 +416,9 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 
 **Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
 
-### 3.6. NDVI + brilho HSV + bordas Canny: os três juntos são melhores?
+### 3.6. Qual é a contribuição do NDVI, brilho HSV e bordas Canny para o desempenho dos classificadores?
 
-Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
+Os atributos descritos na **seção 3.3 são calculados antes do treinamento**. Aqui, depois de apresentar os resultados gerais dos classificadores, analisamos **como a escolha dos atributos influencia o F1-macro**. Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
 
 **O que representa cada atributo?**
 
