@@ -396,7 +396,7 @@ Agora a pergunta é outra: **se os classificadores receberem segmentos formados 
 %%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 76}, "htmlLabels": false, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
     P["510 pontos conhecidos<br/>distribuídos na imagem"] --> A["119 das 210 janelas<br/>de até 512 × 512 px<br/>contêm esses pontos"]
-    A --> B["A: Quickshift em cada<br/>recorte inteiro<br/>até 512 × 512 px<br/>(não é global)"]
+    A --> B["A: Quickshift em cada<br/>recorte inteiro<br/>até 512 × 512 px"]
     A --> C["B: Quickshift no<br/>mesmo recorte, dividido<br/>em até quatro partes<br/>de 256 × 256 px"]
     B --> D["Mesmos pontos,<br/>atributos e divisões<br/>de treino/teste"]
     C --> D
