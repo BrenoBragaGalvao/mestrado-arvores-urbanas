@@ -58,8 +58,13 @@ Clique no título para abrir diretamente a seção correspondente.
 | [3.6.2. Configuração 2](#sec-3-6-2) | 119 recortes inteiros de até 512 × 512 pixels. |
 | [3.6.3. Configuração 3](#sec-3-6-3) | 119 recortes subdivididos em partes de 256 × 256 pixels. |
 | [3.7. Memória RAM](#sec-3-7) | Comparação dos picos de memória. |
-| [4. Conclusão](#sec-4) | Principais resultados e limites científicos. |
-| [5. Código e documentação técnica](#sec-5) | Notebooks, scripts, CSVs e documentação. |
+| [4. Alometria e comparação de alturas](#sec-4) | Comparação de alturas modeladas Meta/WRI e ETH Zurich na Area1. |
+| [4.1. Satélites e mapas](#sec-4-1) | Origem das imagens, sensores e resolução espacial. |
+| [4.2. Precisão publicada](#sec-4-2) | MAE e RMSE dos artigos, sem confundir com acurácia local. |
+| [4.3. Comparação nas 257 árvores](#sec-4-3) | Resultados nas coordenadas originais e 139 pares válidos. |
+| [4.4. Arquivos e referências](#sec-4-4) | Links dos dois GeoTIFFs, artigos e dados da V3. |
+| [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
+| [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
 
 ---
 
@@ -508,7 +513,89 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
 <a id="sec-4"></a>
-## 4. Conclusão — O que podemos concluir e o que não podemos?
+## 4. Alometria das árvores — comparação das estimativas de altura Meta/WRI e ETH Zurich
+
+Na qualificação foi proposta a verificação da **plausibilidade das alturas de árvores da região de Caxias do Sul (RS)**. Para aprofundar essa questão na **V3**, amostramos **dois produtos públicos e independentes de altura do dossel** nas coordenadas dos mesmos **257 pontos de árvores** da Area1. Os produtos são **estimativas geradas por modelos**, e não alturas medidas em campo para cada indivíduo.
+
+**Atenção à terminologia:** *resolução espacial* informa o tamanho aproximado de cada pixel; *precisão/erro de estimativa* expressa o quanto um modelo difere de uma altura de referência; *acurácia local* exigiria alturas conhecidas das mesmas árvores da Area1, que **não estão disponíveis**. Um pixel menor não garante, por si só, uma altura mais correta.
+
+<a id="sec-4-1"></a>
+### 4.1. Quais satélites e métodos geraram os dois mapas?
+
+| Característica | Meta/WRI CHMv2 (2026) | ETH Zurich Global Canopy Height (2020) |
+|---|---|---|
+| Instituições | Meta e World Resources Institute (WRI) | ETH Zurich e colaboradores |
+| Imagem óptica principal | Imagens comerciais RGB de **alta resolução da Maxar** (mosaicos que podem reunir cenas de diferentes satélites, incluindo a família **WorldView**) | **Sentinel-2**, missão Copernicus da **Agência Espacial Europeia (ESA)** |
+| Referência de alturas usada no desenvolvimento | Modelos de altura de dossel derivados de **LiDAR aerotransportado (ALS)** | Medições **GEDI**, LiDAR espacial da NASA instalado na Estação Espacial Internacional |
+| Método de estimativa | Rede de IA baseada em **DINOv3** | Modelo de **aprendizado profundo** que combina imagens Sentinel-2, referências GEDI e informações geográficas |
+| Resolução espacial nominal do produto | Aproximadamente **1 m** | Aproximadamente **10 m** |
+| Referência temporal | Mosaicos de diferentes datas; grande parte das imagens disponíveis é de **2018–2020** | Ano de **2020** |
+
+**Não se trata de dois satélites que mediram diretamente a altura de cada árvore.** No caso Meta/WRI, o produto se baseia em imagens RGB comerciais da Maxar; a identificação do **satélite específico da cena que cobre cada ponto da Area1** requer os metadados de aquisição da imagem original, e não pode ser deduzida apenas do GeoTIFF de alturas. Na ETH Zurich, a imagem óptica vem do Sentinel-2 e as referências de treinamento vêm do GEDI. A altura é **inferida por modelos**, em ambos os casos.
+
+Fontes: [apresentação da Meta/WRI](https://ai.meta.com/pt-br/ai-for-good/datasets/canopy-height-maps/), [artigo CHMv2 (Brandt et al., 2026)](https://doi.org/10.1038/s41597-026-07882-0), [artigo ETH Zurich (Lang et al., 2023)](https://doi.org/10.1038/s41559-023-02206-6) e [página do produto ETH](https://langnico.github.io/globalcanopyheight/).
+
+<a id="sec-4-2"></a>
+### 4.2. Qual é a precisão publicada dos produtos?
+
+O artigo **Brandt et al. (2026)** avaliou modelos globais de altura contra referências independentes de dossel provenientes de LiDAR aerotransportado no conjunto **SatLidar v2**. Nesse **mesmo protocolo de teste**, os autores apresentam:
+
+| Modelo avaliado no artigo CHMv2 | Resolução aproximada | Erro absoluto médio (MAE) |
+|---|---:|---:|
+| **Meta/WRI CHMv2** | 1 m | **3,0 m** |
+| **ETH Zurich / Lang et al.** | 10 m | **8,4 m** |
+
+O **MAE** é a média dos valores absolutos das diferenças entre altura estimada e altura de referência. Quanto menor, melhor **naquele conjunto de teste**. Esses números **não** significam que cada árvore da Area1 tenha uma margem de erro fixa de 3 m ou 8,4 m. A avaliação ocorreu em outras áreas, com protocolos e vegetação distintos da nossa amostra urbana.
+
+**Outra métrica publicada pela ETH:** seu artigo original (Lang et al., 2023) relata **RMSE de 6,0 m** e viés médio de **+1,3 m** em avaliação contra observações GEDI reservadas para teste. Esse RMSE **não é diretamente comparável** aos MAEs da tabela: trata-se de outro indicador e de outro conjunto de validação.
+
+**Interpretação para o mestrado:** o CHMv2 apresenta menor MAE na comparação publicada com o mesmo conjunto de referência, mas **isso não estabelece qual produto estima melhor as alturas de árvores específicas de Caxias do Sul**. Os dados de teste não substituem uma validação local com alturas de indivíduos medidas independentemente.
+
+Fontes científicas: [Brandt et al. (2026), *Scientific Data*, comparação SatLidar v2](https://doi.org/10.1038/s41597-026-07882-0) e [Lang et al. (2023), *Nature Ecology & Evolution*](https://doi.org/10.1038/s41559-023-02206-6).
+
+<a id="sec-4-3"></a>
+### 4.3. Como ficaram as estimativas das mesmas 257 árvores da Area1?
+
+Realizamos a leitura dos mapas diretamente nas coordenadas originais de **Arvores.gpkg**, sem pedir novos pontos e sem modificar os dados da Area1. No mapa Meta/WRI foram obtidos valores para **257/257 pontos**; no mapa ETH Zurich somente **139/257** apresentaram dados válidos (**118 sem dados**, identificados no raster como *NoData* e **não convertidos para altura zero**).
+
+**Para comparar as duas fontes de forma pareada, utilizamos apenas os mesmos 139 pontos com valor em ambas.**
+
+| Indicador | Meta/WRI CHMv2 (~1 m) | ETH Zurich 2020 (~10 m) |
+|---|---:|---:|
+| Pontos com valor em toda a Area1 | **257** | **139** |
+| Pontos utilizados na comparação pareada | 139 | 139 |
+| **Mediana das alturas estimadas nos 139 pontos** | **6,00 m** | **14,00 m** |
+| Média das alturas estimadas nos 139 pontos | 6,68 m | 14,28 m |
+| Valores zero entre os 139 pontos | 38 | 0 |
+
+**Comparação ponto a ponto:** a mediana das diferenças (**ETH − Meta**) foi **+8,00 m**, e a correlação de Pearson entre as estimativas foi **r = 0,399** nos 139 pares. Considerando somente os **101 pares com valores positivos nas duas fontes**, a correlação de Pearson foi **r = 0,553**. São medidas de **concordância entre modelos**, e não erros frente a alturas reais.
+
+**Por que as fontes divergem?** Um pixel de aproximadamente 10 m pode agrupar várias copas e outras superfícies, enquanto um pixel de aproximadamente 1 m pode coincidir com a borda da árvore, solo ou sombra. Além disso, há diferenças entre algoritmos, datas das imagens, georreferenciamento e máscaras de vegetação. Na Meta, **107 pontos** apresentaram valor zero no pixel exato; isso **não comprova ausência de árvore** no local.
+
+**Teste complementar:** para a Meta/WRI calculamos também o **máximo estimado em um raio de 5 m** ao redor de cada coordenada (mediana de **6 m considerando todos os 257 pontos**). Esse valor pode representar **outra árvore**, portanto não equivale à altura do indivíduo indicado pelo ponto e não substitui a comparação principal feita no pixel.
+
+**Relação com a alometria C3:** o índice **C3 = 2,5 × A^0,4**, calculado com a área do **superpixel Quickshift**, teve mediana **16,98** na V3. Esse valor **não é uma altura validada em metros**: a área do superpixel não é necessariamente a área da copa individual, e a fórmula não foi calibrada com alturas reais da região. A discrepância entre mapas externos reforça a necessidade de cautela na interpretação do índice.
+
+**Conclusão preliminar:** as estimativas da ETH Zurich foram, em geral, mais altas nos pontos comparáveis, mas **não podemos dizer que a ETH seja mais precisa na Area1** nem que a Meta esteja errada. Para determinar a exatidão em Caxias do Sul, seria necessário confrontar ambos os modelos com **alturas reais medidas dos mesmos indivíduos**, idealmente após conferir posição e delimitação das copas.
+
+<a id="sec-4-4"></a>
+### 4.4. De onde foram retiradas as alturas? Arquivos e referências
+
+**GeoTIFFs efetivamente utilizados na extração:**
+
+| Fonte | Arquivo raster original | Página de distribuição / artigo |
+|---|---|---|
+| **Meta/WRI CHMv2** | [Quadrante `2103121330.tif` — mapa de altura do dossel](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) | [AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
+| **ETH Zurich 2020** | [Quadrante `S30W054_Map.tif` — mapa de altura do dossel](https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download?path=%2F3deg_cogs&files=ETH_GlobalCanopyHeight_10m_2020_S30W054_Map.tif) | [ETH Zurich — dados](https://www.research-collection.ethz.ch/entities/researchdata/2ecca65c-bc7b-4e72-9b62-534d606a062e) · [Lang et al. (2023)](https://doi.org/10.1038/s41559-023-02206-6) |
+
+**Arquivos reproduzíveis deste estudo:** [CSV pareado com os 257 pontos](docs/v3_alturas_publicas/v3_meta_eth_alturas_estimadas_257_arvores.csv) · [resumo estatístico JSON](docs/v3_alturas_publicas/v3_meta_eth_resumo_257.json) · [gráfico de dispersão](docs/v3_alturas_publicas/v3_meta_eth_dispersao.png) · [relatório completo com limitações](docs/v3_alturas_publicas/v3_meta_eth_comparacao_257.md) · [script Python de extração e comparação](experimentos/v3_comparar_meta_eth_257.py).
+
+**Limite científico:** nenhum desses produtos mede os cabos elétricos, identifica necessariamente a espécie ou comprova a altura real de cada árvore. A análise de proximidade a postes continua **exploratória**, não uma avaliação validada de risco elétrico.
+
+---
+
+<a id="sec-5"></a>
+## 5. Conclusão — O que podemos concluir e o que não podemos?
 
 **Quais classificadores apresentaram os melhores resultados?** Avaliamos **oito algoritmos** e observamos que o desempenho depende tanto do modelo quanto da forma de segmentar a imagem. Na comparação entre os **mesmos 119 recortes**, o maior F1-macro com blocos espaciais de **250 m** foi do **SVM RBF**, utilizando partes de **256 × 256 pixels (0,9341)**. Com blocos de **500 m**, o melhor resultado foi do **Extra Trees**, utilizando recortes inteiros de **512 × 512 pixels (0,8747)**. Portanto, **nenhuma das duas formas de segmentação foi superior em todas as condições**.
 
@@ -524,12 +611,12 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 
 **E quanto ao porte das árvores e à proximidade de postes?** Essas análises são **exploratórias**. Sem medições reais de altura, geometria dos cabos e validação adicional, **não é possível concluir que exista risco elétrico**.
 
-**Onde consultar os resultados e reproduzir os testes?** Os arquivos de resultados, as comparações metodológicas e os códigos estão organizados na [seção 5 — Código e documentação técnica](#5-código-e-documentação-técnica).
+**Onde consultar os resultados e reproduzir os testes?** Os arquivos de resultados, as comparações metodológicas e os códigos estão organizados na [seção 6 — Código e documentação técnica](#sec-6).
 
 ---
 
-<a id="sec-5"></a>
-## 5. Código e documentação técnica
+<a id="sec-6"></a>
+## 6. Código e documentação técnica
 
 | Material | Conteúdo |
 |---|---|
