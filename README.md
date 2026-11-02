@@ -222,7 +222,7 @@ O propósito não é simplesmente encontrar um número maior que 0,87, mas enten
 
 | Pergunta científica | Como investigamos |
 |---|---|
-| **1. Como o tamanho das janelas de segmentação influencia o consumo de memória e a classificação de árvores e gramíneas?** | A limitação de memória ao processar a imagem completa motivou o uso de janelas menores. Para investigar o efeito sobre a classificação, comparamos os mesmos 119 recortes, segmentados em janelas de até 512 × 512 pixels ou em quatro partes de até 256 × 256 pixels. |
+| **1. Como o tamanho das janelas de segmentação influencia o consumo de memória e a classificação de árvores e gramíneas?** | A limitação de RAM motivou o processamento em janelas menores. Nos mesmos 119 recortes, medimos pico de memória residente de **467,19 MiB** (512 contínuo) e **456,80 MiB** (quatro 256), redução observada de **2,22%**. Separadamente, comparamos as previsões dos oito classificadores sob as duas segmentações. |
 | **2. Quais atributos da imagem ajudam a identificar árvores e gramíneas?** | Comparamos NDVI, brilho HSV e bordas Canny isolados e combinados |
 | **3. A forma de avaliar influencia o resultado?** | Avaliação aleatória versus separação espacial por blocos de 250 m e 500 m |
 | **4. Qual classificador funciona melhor nas mesmas condições?** | Comparamos oito modelos, incluindo Random Forest, SVM e regressão logística |
@@ -289,6 +289,15 @@ flowchart TD
     class B,C metodo;
     class E resultado;
 ```
+
+**Medição de memória no E9 (Area1 real, 119 recortes):** além da comparação de classificação, executamos novamente as duas formas de segmentação para registrar o **pico de memória residente (RSS) de cada processo**, incluindo leitura das janelas RGB/NIR, mapas de NDVI, brilho HSV, bordas Canny, Quickshift e médias dos atributos. Cada configuração foi medida em um processo separado, percorrendo as 119 regiões sequencialmente.
+
+| Configuração de segmentação | Pico RSS do processo | Pico adicional à memória inicial | Segmentos produzidos |
+|---|---:|---:|---:|
+| **512 × 512 contínuo** | **467,19 MiB** | 281,32 MiB | 91.984 |
+| **Quatro partes de 256 × 256** | **456,80 MiB** | 270,94 MiB | 90.673 |
+
+Nessas condições, a divisão em quatro partes apresentou **10,38 MiB (2,22%) menos memória de pico total**; a diferença de pico adicional foi de **10,38 MiB (3,69%)**. A medição corresponde à **memória total residente do processo**, não à memória exclusiva do Quickshift, e pode variar conforme ambiente e versões das bibliotecas. Foi uma execução de perfilamento de memória dos 119 recortes, **não uma nova avaliação de acurácia**. [Ver protocolo e resultados detalhados](docs/e9_medicao_memoria_2026-11-02.md).
 
 **Exemplo:** um recorte de **512 × 512 = 262.144 pixels** pode ser processado de uma vez ou em **quatro quadrantes de 256 × 256 = 65.536 pixels cada**. Somados, os quatro quadrantes abrangem **os mesmos pixels**. Não são novas imagens nem houve redução de resolução. Como cada execução do Quickshift pode criar limites diferentes, **os segmentos e suas médias de atributos podem mudar**.
 
