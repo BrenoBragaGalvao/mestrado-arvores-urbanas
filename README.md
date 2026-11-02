@@ -36,7 +36,7 @@ flowchart TB
 
 ### Quanto de memória foi necessário ou observado?
 
-| Situação | Memória | O que esse número significa? |
+| Situação | Memória RAM | O que esse número significa? |
 |---|---:|---|
 | **Método original completo: Quickshift + K-Means + Random Forest** | **5,42 GiB** | **Memória de 5,42 GiB**, valor adotado como referência para o processamento da imagem completa pelo método original. |
 | **Nova tentativa do Quickshift global** | **1,13 GiB adicionais solicitados; falhou** | A tentativa **não concluiu**: houve `MemoryError` quando o Quickshift precisou alocar **mais 1,13 GiB** para uma matriz temporária. |
