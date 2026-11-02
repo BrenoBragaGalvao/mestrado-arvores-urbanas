@@ -214,7 +214,7 @@ Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi prepar
 
 Esta seção apresenta os experimentos em uma sequência única: **de onde vieram os dados, como formamos as amostras, como separamos treino e teste, quais métodos comparamos e o que podemos concluir**. Assim, as diferentes divisões da imagem não são confundidas com as diferentes formas de avaliação.
 
-> **Ponto de partida:** o método original registrou **0,87 de acurácia em 92 testes**. A V2 ampliou as análises, mas **ainda não há comparação integral e controlada entre os dois pipelines**. Os resultados abaixo descrevem experimentos específicos, sobretudo na base derivada dos dados existentes; não comprovam uma execução completa da V2 sobre todo o raster.
+> **Ponto de partida:** o método original registrou **0,87 de acurácia em 92 testes**. A V2 ampliou as análises, mas **ainda não há comparação integral e controlada entre os dois pipelines**. Os resultados abaixo descrevem experimentos específicos, sobretudo na base derivada dos dados existentes.
 
 ### 6.1. O que queremos investigar?
 
