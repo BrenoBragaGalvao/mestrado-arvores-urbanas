@@ -314,13 +314,14 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
 
+<p align="center">
+  <img src="docs/configuracoes_1_2_3_resumo.webp" alt="Esquema conjunto das configurações 1, 2 e 3, com 812 quadrantes e 119 recortes inteiros ou subdivididos." width="100%">
+</p>
+
 #### 6.3.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
 
 Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
 
-<p align="center">
-  <img src="docs/configuracao_1_812_quadrantes_256.svg" alt="Configuração 1: imagem dividida em 812 quadrantes com Quickshift por quadrante e oito classificadores." width="100%">
-</p>
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
@@ -343,9 +344,6 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 
 Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada E9, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
 
-<p align="center">
-  <img src="docs/configuracao_2_119_recortes_512.svg" alt="Configuração 2: 119 regiões selecionadas em uma grade de 210 janelas e Quickshift em recortes inteiros." width="100%">
-</p>
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
@@ -362,9 +360,6 @@ Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas
 
 Processamos **exatamente as mesmas regiões** da configuração 2, agora com Quickshift independente em cada parte. Usamos os **mesmos 505 exemplos e as mesmas divisões de treino e teste**, mudando somente a forma de segmentar.
 
-<p align="center">
-  <img src="docs/configuracao_3_119_recortes_subdivididos_256.svg" alt="Configuração 3: os mesmos recortes de 512 pixels divididos em quatro partes de 256 pixels para comparar F1-macro e RAM." width="100%">
-</p>
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
