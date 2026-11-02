@@ -248,8 +248,9 @@ Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi prepar
 |---|---|
 | **1. Por que dividimos a imagem?** | Tentamos repetir o Quickshift global com limite de **4 GiB de RAM**, mas faltou memória. Passamos a processar partes menores, preservando os pixels originais. |
 | **2. Por que escolhemos exatamente 119 recortes?** | Reutilizamos as **coordenadas dos 510 pontos de referência originais** (arquivos `Arvores.gpkg` e `Grama.gpkg`), **não as previsões do K-Means ou do Random Forest**. Na grade de até **512 × 512 pixels**, esses pontos ocupam **119 janelas distintas**, onde podemos avaliar a classificação. |
-| **3. Qual algoritmo classifica melhor?** | Colocamos **oito classificadores** diante dos **mesmos exemplos, atributos e divisões de treino/teste**, para comparar a F1-macro. |
-| **4. Dividir cada recorte em quatro partes muda os resultados ou a memória?** | Usamos as **mesmas 119 regiões**: primeiro segmentadas inteiras (até **512 × 512**) e depois em até **quatro partes de 256 × 256**. Comparamos previsões e medimos o pico de RAM. |
+| **3. NDVI, brilho HSV e bordas Canny funcionam melhor juntos?** | Comparamos **as sete combinações** de um, dois ou três atributos nas mesmas divisões espaciais, mantendo cada classificador e suas amostras de treino/teste. |
+| **4. Qual algoritmo classifica melhor?** | Colocamos **oito classificadores** diante dos **mesmos exemplos, atributos e divisões de treino/teste**, para comparar o F1-macro. |
+| **5. Dividir cada recorte em quatro partes muda os resultados ou a memória?** | Usamos as **mesmas 119 regiões**: primeiro segmentadas inteiras (até **512 × 512**) e depois em até **quatro partes de 256 × 256**. Comparamos previsões e medimos o pico de RAM. |
 
 ### 6.1. Primeiro: a imagem inteira e a mudança de estratégia
 
@@ -299,7 +300,38 @@ Nos 119 recortes existem **510 pontos originais**, mas, após agrupar referênci
 
 </details>
 
-### 6.3. Primeiro resultado: quais algoritmos funcionaram melhor?
+### 6.3. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4)
+
+**Sim, na bateria experimental disponível, a combinação dos três atributos apresentou maior F1-macro médio do que qualquer combinação com apenas um ou dois atributos.** A verificação foi feita usando os resultados reais de **812 quadrantes de 256 × 256 pixels**, registrados em 01/11/2026, sem acrescentar imagens ou rótulos à Area1. A execução percorreu o raster retangular completo, mas os exemplos supervisionados continuaram sendo os **505 segmentos únicos rotulados** derivados dos 510 pontos de referência disponíveis.
+
+**O que significa cada atributo?**
+
+- **NDVI (`mean_ndvi`):** índice calculado com as bandas vermelha e infravermelha próxima (NIR), que descreve a resposta espectral da vegetação.
+- **Brilho HSV (`mean_intensity`):** componente de intensidade/valor de cor, que ajuda a diferenciar características visuais de segmentos.
+- **Bordas Canny (`mean_edges`):** proporção média de pixels de borda detectados no objeto, representando transições de textura/contorno.
+
+**Como testamos:** as **sete combinações possíveis** foram: NDVI; HSV; Canny; NDVI + HSV; NDVI + Canny; HSV + Canny; e **NDVI + HSV + Canny**. Elas foram avaliadas com **Random Forest (500 árvores), SVM RBF e regressão logística** nas **mesmas dez partições espaciais** (cinco com blocos de 250 m e cinco com blocos de 500 m), com exclusão de treino a até **25 m das geometrias de teste**. Em cada combinação, comparamos o **F1-macro**, que dá o mesmo peso às classes árvore e gramínea.
+
+**Resultado: três atributos contra a melhor dupla de cada modelo/escala**
+
+| Classificador | Blocos | F1-macro: três atributos | Melhor dupla (F1-macro) | Ganho dos três |
+|---|---:|---:|---|---:|
+| Random Forest | 250 m | **0,8627** | NDVI + Canny (0,7759) | **+0,0868** |
+| Random Forest | 500 m | **0,8499** | NDVI + HSV (0,7702) | **+0,0797** |
+| SVM RBF | 250 m | **0,8946** | NDVI + HSV (0,8265) | **+0,0680** |
+| SVM RBF | 500 m | **0,8970** | NDVI + HSV (0,8186) | **+0,0783** |
+| Regressão logística | 250 m | **0,8981** | NDVI + HSV (0,8320) | **+0,0661** |
+| Regressão logística | 500 m | **0,8963** | NDVI + HSV (0,8131) | **+0,0832** |
+
+*As diferenças são de F1-macro, na escala de 0 a 1; por exemplo, +0,0868 equivale a 8,68 pontos percentuais. As melhores duplas foram identificadas retrospectivamente a partir das médias dos mesmos testes.* Os três atributos também venceram a respectiva melhor dupla em **5 das 5 divisões pareadas** de cada uma dessas seis comparações. As divisões **reutilizam amostras e não constituem experimentos externos independentes**.
+
+**Interpretação científica:** os três atributos parecem fornecer informações **complementares** nas condições estudadas; nenhum atributo isolado ou dupla alcançou o mesmo F1-macro médio. Isso **não comprova que os três sempre serão melhores**, nem permite atribuir causalmente o ganho a cada variável sem análise adicional. Também não há validação em outra cidade nem classe de fundo urbano não vegetado. Uma avaliação posterior independente é necessária para estimar o benefício fora desta Area1.
+
+**Proveniência e reprodutibilidade:** os números foram conferidos nos **220 registros** do arquivo `E3_E4_resultados_por_particao.csv` do pacote de evidências `mestrado_v2_cobertura_812_resultados_2026-11-01.zip`. O [CSV de médias do E4](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv) contém as **44 linhas resumidas** (sete combinações × três modelos × duas escalas, mais Dummy de referência). O notebook [V2](Segmentacao_area_completa_v2_experimentos.ipynb) possui o E4 integrado à **Etapa 2** e agora gera automaticamente `E4_resumo_ablacao.csv` e `E4_tres_vs_melhor_dupla.csv` após sua execução.
+
+**Importante:** o CSV histórico usa **embargo de 25 m entre geometrias completas dos segmentos**; a implementação simplificada atualmente publicada na V2 emprega **distância de 25 m entre centroides**. Portanto, os resultados históricos aqui apresentados são verificáveis como **bateria derivada executada**, mas **não devem ser anunciados como reexecução idêntica da versão atual do notebook** antes de conferir seus novos CSVs.
+
+### 6.4. Primeiro resultado: quais algoritmos funcionaram melhor?
 
 Com os segmentos derivados das **janelas de 256 × 256 pixels**, comparamos **oito classificadores** usando os **mesmos 505 segmentos rotulados únicos**, três atributos (**NDVI, brilho HSV e bordas Canny**) e divisões de treinamento e teste equivalentes.
 
@@ -318,7 +350,7 @@ A tabela mostra o **F1-macro médio**: quanto **maior**, melhor o equilíbrio da
 
 **Resultado:** o **SVM RBF** teve o **maior F1-macro médio** nas duas configurações desse teste. Isso mostra um desempenho promissor **nessa nova base**; não é comparação direta com a acurácia histórica 0,87 do método global.
 
-### 6.4. Segundo resultado: 512 × 512 é melhor que quatro partes de 256 × 256?
+### 6.5. Segundo resultado: 512 × 512 é melhor que quatro partes de 256 × 256?
 
 Agora a pergunta é outra: **se os classificadores receberem segmentos formados de maneiras diferentes, a previsão muda?** Para responder, mantivemos **os mesmos 119 recortes**, referências e divisões de teste; só alteramos a segmentação:
 
@@ -357,15 +389,15 @@ flowchart TD
 
 Medimos também a memória: **467,19 MiB** no processamento de 512 contínuo e **456,80 MiB** em quatro partes de 256; uma diferença de **10,38 MiB (2,22%)** no pico total de RAM do processo, considerando os **119 recortes processados sequencialmente**. **Esse valor não representa a RAM necessária para executar o Quickshift global original.**
 
-### 6.5. O que podemos concluir — e o que não podemos?
+### 6.6. O que podemos concluir — e o que não podemos?
 
-**Conseguimos:** contornar a limitação de memória pela segmentação em partes, comparar **oito classificadores** em condições homogêneas dentro de cada teste, avaliar o efeito de janelas de **512 e 256 pixels** e identificar resultados promissores, principalmente do **SVM RBF**.
+**Conseguimos:** contornar a limitação de memória pela segmentação em partes, comparar **sete combinações de NDVI, brilho HSV e Canny**, avaliar **oito classificadores** em condições homogêneas dentro de cada teste, investigar o efeito de janelas de **512 e 256 pixels** e identificar resultados promissores, principalmente do **SVM RBF**.
 
 **Ainda não conseguimos comprovar:** que a V2 supera o **Quickshift global + K-Means + Random Forest** original. Embora os **pontos de referência sejam os mesmos arquivos de origem**, a V2 gerou **novos segmentos** em janelas, não reutilizou o cluster 3 nem as previsões históricas e usou outro treinamento/teste. Além disso, o resultado histórico **0,87 é acurácia**, não a mesma F1-macro da V2. Também **não medimos a memória total do pipeline original**.
 
 As análises de porte e proximidade são **exploratórias**: sem alturas medidas, classe de fundo urbano e geometria dos cabos, **não comprovam risco elétrico**.
 
-**Onde estão os códigos e os resultados:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código para comparar 512 e 256 pixels](experimentos/e9_reproduzir_512_256.py) · [Comparação dos oito algoritmos](docs/harmonizacao_protocolos_2026-11-01.md) · [Comparação das janelas](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
+**Onde estão os códigos e os resultados:** [Resumo E4 — combinações de atributos](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv) · [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código para comparar 512 e 256 pixels](experimentos/e9_reproduzir_512_256.py) · [Comparação dos oito algoritmos](docs/harmonizacao_protocolos_2026-11-01.md) · [Comparação das janelas](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
 
 *As tabelas foram obtidas em experimentos já documentados. O código atual da V2 foi reorganizado para reexecutá-los, mas essa versão simplificada ainda precisa ser executada e comparada aos resultados publicados.*
 
