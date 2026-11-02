@@ -80,6 +80,8 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 
 Portanto, existem **510 pontos de referência**. Isso **não significa 510 objetos ou 510 registros de treinamento**: o Quickshift cria segmentos, que depois são associados aos pontos conhecidos.
 
+**Esses pontos são dados originais da Area1:** já existiam nos arquivos `Arvores.gpkg` e `Grama.gpkg` e também foram utilizados no estudo inicial. Na V2 **reutilizamos somente a localização e a classe conhecida desses pontos**, não os segmentos escolhidos pelo K-Means, o Random Forest treinado, as previsões nem a acurácia de 0,87 do estudo inicial.
+
 Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6). Veja o [detalhamento dos arquivos e coordenadas](data/README.md).
 
 ---
@@ -238,12 +240,14 @@ Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi prepar
 
 **Em uma frase:** a imagem inteira ficou pesada demais para repetir o Quickshift global no ambiente disponível; por isso, passamos a trabalhar em **janelas da mesma imagem**, com os mesmos pontos conhecidos e as mesmas condições de avaliação entre os classificadores.
 
+**O que foi reaproveitado do método original?** **A imagem da Area1 e os 510 pontos de referência** dos arquivos `Arvores.gpkg` (257 árvores) e `Grama.gpkg` (253 gramíneas), que já existiam **antes** das previsões do modelo. **O que NÃO foi reaproveitado?** O resultado do K-Means, os 458 pares objeto–rótulo da rodada histórica, o modelo Random Forest treinado e suas previsões. Na V2, os segmentos e atributos foram calculados novamente com Quickshift por janelas; depois treinamos e avaliamos os classificadores. **Os 119 recortes foram encontrados pelas coordenadas dos pontos de referência, e não selecionados pelos acertos ou erros do Random Forest.**
+
 **Perguntas que orientaram os testes**
 
 | Pergunta | Como investigamos? |
 |---|---|
 | **1. Por que dividimos a imagem?** | Tentamos repetir o Quickshift global com limite de **4 GiB de RAM**, mas faltou memória. Passamos a processar partes menores, preservando os pixels originais. |
-| **2. Por que escolhemos exatamente 119 recortes?** | Distribuímos os **510 pontos conhecidos de árvores e gramíneas** na grade de janelas de **512 × 512 pixels**. Eles ficaram em **119 janelas diferentes**. Essas são as regiões em que conseguimos verificar os acertos da classificação. |
+| **2. Por que escolhemos exatamente 119 recortes?** | Reutilizamos as **coordenadas dos 510 pontos de referência originais** (arquivos `Arvores.gpkg` e `Grama.gpkg`), **não as previsões do K-Means ou do Random Forest**. Na grade de até **512 × 512 pixels**, esses pontos ocupam **119 janelas distintas**, onde podemos avaliar a classificação. |
 | **3. Qual algoritmo classifica melhor?** | Colocamos **oito classificadores** diante dos **mesmos exemplos, atributos e divisões de treino/teste**, para comparar a F1-macro. |
 | **4. Dividir cada recorte em quatro partes muda os resultados ou a memória?** | Usamos as **mesmas 119 regiões**: primeiro segmentadas inteiras (até **512 × 512**) e depois em até **quatro partes de 256 × 256**. Comparamos previsões e medimos o pico de RAM. |
 
@@ -268,9 +272,9 @@ Na V2, usamos a **mesma imagem da Area1**, mas **segmentamos cada janela separad
 
 ### 6.2. Por que exatamente 119 recortes? Entenda sem confundir
 
-**Não escolhemos o número 119 antes de começar. Ele apareceu a partir dos pontos de referência.**
+**Não escolhemos o número 119 antes de começar. Ele apareceu a partir dos pontos de referência dos arquivos originais `Arvores.gpkg` e `Grama.gpkg`, e NÃO do K-Means ou das previsões do Random Forest.**
 
-1. Já tínhamos **257 pontos identificados como árvores** e **253 como gramíneas**: **510 pontos conhecidos**, marcados na imagem original.
+1. **Antes de executar qualquer classificador**, a Area1 já tinha **257 pontos identificados como árvores** (`Arvores.gpkg`) e **253 como gramíneas** (`Grama.gpkg`): **510 pontos de referência conhecidos**. O método inicial também utilizou esses mesmos arquivos.
 2. Dividimos **mentalmente a grade da imagem** em **210 posições possíveis de 512 × 512 pixels**. As janelas nas bordas podem ser menores.
 3. Localizamos cada um dos **510 pontos** na sua respectiva janela. **Vários pontos podem estar na mesma janela.**
 4. Ao contar **somente as posições diferentes que continham pelo menos um ponto**, encontramos **119 janelas**. São esses os **119 recortes** — e **não 119 novas imagens nem 119 árvores**.
@@ -281,6 +285,8 @@ Na V2, usamos a **mesma imagem da Area1**, mas **segmentamos cada janela separad
 **Por que não as 210 janelas?** É possível segmentar todas elas, mas **as outras 91 não contêm pontos de referência conhecidos nesse conjunto**. Portanto, elas **não acrescentariam novos exemplos rotulados para calcular acurácia ou F1-macro**. Escolhemos as 119 para fazer a comparação dos classificadores **sem gastar processamento nas regiões sem rótulos**.
 
 Nos 119 recortes existem **510 pontos originais**, mas, após agrupar referências que compartilham um mesmo segmento, a comparação controlada utiliza **505 referências únicas comuns**. **Pontos, recortes e segmentos são contagens diferentes.**
+
+**Isso é diferente de comparar com o método original:** na execução histórica, a segmentação era global, havia seleção do **cluster 3 do K-Means** e foram obtidos **458 pares objeto–rótulo** para treinar/testar o Random Forest. Na comparação dos 119 recortes, a segmentação foi **refeita localmente**; por isso, os exemplos resultantes e o protocolo não são idênticos. **Os 119 recortes servem para comparar os novos algoritmos e os tamanhos de janela entre si, não para provar que um deles superou a acurácia histórica de 0,87.**
 
 <details>
 <summary>Ver a imagem mostrando a diferença entre 812 quadrantes e 119 recortes</summary>
@@ -355,7 +361,7 @@ Medimos também a memória: **467,19 MiB** no processamento de 512 contínuo e *
 
 **Conseguimos:** contornar a limitação de memória pela segmentação em partes, comparar **oito classificadores** em condições homogêneas dentro de cada teste, avaliar o efeito de janelas de **512 e 256 pixels** e identificar resultados promissores, principalmente do **SVM RBF**.
 
-**Ainda não conseguimos comprovar:** que a V2 supera o **Quickshift global + K-Means + Random Forest** original. O método global selecionava outros segmentos, usava outro treinamento/teste e foi reportado em **acurácia**, não no mesmo F1-macro da V2. Também **não medimos a memória total do pipeline original**.
+**Ainda não conseguimos comprovar:** que a V2 supera o **Quickshift global + K-Means + Random Forest** original. Embora os **pontos de referência sejam os mesmos arquivos de origem**, a V2 gerou **novos segmentos** em janelas, não reutilizou o cluster 3 nem as previsões históricas e usou outro treinamento/teste. Além disso, o resultado histórico **0,87 é acurácia**, não a mesma F1-macro da V2. Também **não medimos a memória total do pipeline original**.
 
 As análises de porte e proximidade são **exploratórias**: sem alturas medidas, classe de fundo urbano e geometria dos cabos, **não comprovam risco elétrico**.
 
