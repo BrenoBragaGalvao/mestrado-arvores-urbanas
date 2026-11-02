@@ -292,6 +292,10 @@ Na **V2**, investigamos três configurações de segmentação:
 
 **A diferença essencial:** os **812 quadrantes cobrem toda a imagem**; já os **119 recortes** são apenas as regiões da grade de 512 px que contêm pontos de referência conhecidos. As duas últimas configurações formam **uma comparação controlada**.
 
+<p align="center">
+  <img src="docs/comparacao_recorte_512_256.webp" alt="Mesmo recorte de 512 × 512 pixels: Quickshift aplicado ao recorte inteiro ou separadamente em quatro partes de 256 × 256 pixels" width="88%">
+</p>
+
 ### 6.2. Por que exatamente 119 recortes? Entenda sem confundir
 
 **Não escolhemos o número 119 antes de começar. Ele apareceu a partir dos pontos de referência dos arquivos originais `Arvores.gpkg` e `Grama.gpkg`, e NÃO do K-Means ou das previsões do Random Forest.**
