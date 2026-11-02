@@ -253,11 +253,13 @@ Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisi
 
 **A imagem inteira tem 6.942 × 7.294 pixels. Então por que os testes usam 512 × 512 ou 256 × 256 pixels?** Porque esses valores indicam o **tamanho de cada recorte (janela) usado no processamento**, e não o tamanho original do arquivo. Os pixels desses recortes vêm das mesmas imagens RGB e RGB + NIR da Area1.
 
-| Processamento | Quanto da imagem foi utilizado? | O que significa o tamanho citado? |
+| Processamento | Qual parte da imagem foi processada? | Tamanho usado no processamento |
 |---|---|---|
-| **Método original** | Quickshift aplicado ao raster RGB inteiro | **6.942 × 7.294 pixels**: imagem completa |
-| **Comparação de classificadores na V2** | A extensão retangular inteira foi percorrida em **812 quadrantes**, inclusive fora da AOI | **Até 256 × 256 pixels por quadrante**: cada execução do Quickshift processou um pedaço separado |
-| **Comparação da escala de segmentação na V2** | Apenas **119 regiões de até 512 × 512 pixels com referências de árvores/gramíneas** | **512 × 512 pixels** por região ou os **mesmos pixels divididos em quatro quadrantes de 256 × 256 pixels** |
+| **Método original** | Quickshift na **imagem RGB inteira**; depois os polígonos foram recortados à AOI | **6.942 × 7.294 pixels** — dimensões reais do raster |
+| **Comparação de classificadores na V2** | **Toda a extensão retangular** do raster, inclusive fora da AOI, percorrida em **812 quadrantes** | **Até 256 × 256 pixels por quadrante** — cada pedaço foi segmentado separadamente |
+| **Comparação da escala de segmentação na V2 (E9)** | Somente **119 regiões contendo referências de árvores/gramíneas**, sem cobrir necessariamente toda a AOI | **Até 512 × 512 pixels por região**, comparados aos **mesmos pixels divididos em quatro quadrantes de até 256 × 256** |
+
+*As dimensões ≈ **6.797 × 7.142 pixels** da seção 1 representam apenas um **retângulo de área equivalente à AOI**; nenhum desses três procedimentos usou uma imagem recortada com esse tamanho.*
 
 **Por que a grade de 256 × 256 pixels parece incompleta na imagem?** Na verdade, **o processamento em 812 quadrantes cobriu todo o retângulo do raster**. Isso ocorre porque a largura de 6.942 pixels exige **28 colunas de quadrantes** e a altura de 7.294 pixels exige **29 linhas**: **28 × 29 = 812**. Os quadrantes das bordas são menores (última coluna com **30 pixels** de largura; última linha com **126 pixels** de altura).
 
