@@ -61,7 +61,7 @@ Para responder à pergunta sobre a altura das **257 árvores de referência**, f
 | [Meta/WRI — High Resolution Canopy Height Maps](https://gee-community-catalog.org/projects/meta_trees/) | **1 m** | Preferência para árvores urbanas individuais, mas os valores são **previsões**, não alturas medidas. O mapa pode ter deslocamentos, ruído e datas de imagem diferentes. |
 | [ETH Zurich — Global Canopy Height 2020](https://langnico.github.io/globalcanopyheight/) | **10 m** | Referência secundária científica, com resolução insuficiente para separar algumas árvores vizinhas. O produto também fornece estimativas de incerteza. |
 
-**Não foram obtidos 257 valores medidos nesta etapa:** a consulta numérica exige uma sessão **autenticada do Google Earth Engine** em um projeto habilitado. O script está pronto para rodar no Colab com esse acesso e **não contém alturas inventadas**.
+**Rota Google Earth Engine (opcional):** exige autenticação. Como alternativa, **executamos com sucesso** o acesso direto ao mapa público **Meta/WRI CHMv2 pela AWS**, sem autenticação, produzindo os resultados numéricos de **257 pontos**. Veja a [análise comparativa realizada](v3_alturas_publicas/v3_analise_comparativa.md) e a [tabela pareada com o índice C3](v3_alturas_publicas/v3_comparacao_c3_meta_257.csv). Nenhuma dessas fontes equivale a altura medida em campo.
 
 Exemplo, após instalar `earthengine-api`, `geopandas` e `pandas`, montar o Drive e habilitar o projeto Google Cloud:
 
