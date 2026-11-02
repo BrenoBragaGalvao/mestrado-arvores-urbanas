@@ -310,26 +310,82 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **Por que isso é importante?** Porque utilizamos **as mesmas regiões, os mesmos pontos conhecidos e as mesmas condições de avaliação** nas duas estratégias. Assim, conseguimos investigar se **alterar o tamanho da janela de segmentação influencia a qualidade da classificação e o consumo de memória**, sem confundir essa diferença com mudanças na região analisada.
 
-### 6.3. Primeiro resultado: quais algoritmos funcionaram melhor?
+### 6.3. Resultados dos oito classificadores nas três configurações
 
-Com os segmentos derivados das **janelas de 256 × 256 pixels**, comparamos **oito classificadores** usando os **mesmos 505 segmentos rotulados únicos**, três atributos (**NDVI, brilho HSV e bordas Canny**) e divisões de treinamento e teste equivalentes.
+As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
 
-A tabela mostra o **F1-macro médio**: quanto **maior**, melhor o equilíbrio da classificação das duas classes. Os blocos de **250 e 500 metros** servem para separar espacialmente treinamento e teste; **não são tamanhos de recortes em pixels**. Foi usado embargo de 25 m e cinco divisões por escala.
+**Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels**
 
-| Classificador | Blocos de 250 m | Blocos de 500 m |
+Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
+
+| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
-| **SVM RBF** | **0,8987** | **0,8668** |
+| SVM RBF | **0,8987** | **0,8668** |
 | Regressão logística | 0,8928 | 0,8664 |
 | Extra Trees | 0,8790 | 0,8629 |
 | KNN (7) | 0,8874 | 0,8502 |
-| **Random Forest** | **0,8656** | **0,8530** |
+| Random Forest | 0,8656 | 0,8530 |
 | HistGradientBoosting | 0,8556 | 0,8524 |
 | Gaussian Naive Bayes | 0,8555 | 0,8398 |
 | Dummy (referência simples) | 0,2980 | 0,2799 |
 
-**Ordem dos modelos:** F1-macro médio decrescente da **média aritmética das duas escalas** (250 m e 500 m). Essa média foi usada apenas para ordenar as linhas, sem substituir os resultados por escala nem constituir uma nova avaliação estatística.
+**Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
 
-**Resultado:** o **SVM RBF** teve o **maior F1-macro médio** nas duas configurações desse teste. Isso mostra um desempenho promissor **nessa nova base**; não é comparação direta com a acurácia histórica 0,87 do método global.
+**Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels**
+
+Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada E9, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
+
+| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
+|---|---:|---:|
+| Extra Trees | 0,9064 | **0,8747** |
+| SVM RBF | **0,9157** | 0,8518 |
+| Regressão logística | 0,9153 | 0,8484 |
+| Random Forest | 0,8906 | 0,8657 |
+| Gaussian Naive Bayes | 0,8894 | 0,8573 |
+| KNN (7) | 0,8940 | 0,8377 |
+| HistGradientBoosting | 0,8738 | 0,8390 |
+| Dummy | 0,2847 | 0,2791 |
+
+**Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels**
+
+Processamos **exatamente as mesmas regiões** da configuração 2, agora com Quickshift independente em cada parte. Usamos os **mesmos 505 exemplos e as mesmas divisões de treino e teste**, mudando somente a forma de segmentar.
+
+| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
+|---|---:|---:|
+| SVM RBF | **0,9341** | 0,8641 |
+| Regressão logística | 0,9157 | **0,8685** |
+| Extra Trees | 0,8968 | 0,8545 |
+| KNN (7) | 0,9009 | 0,8486 |
+| Random Forest | 0,8835 | 0,8566 |
+| Gaussian Naive Bayes | 0,8875 | 0,8464 |
+| HistGradientBoosting | 0,8714 | 0,8411 |
+| Dummy | 0,2847 | 0,2791 |
+
+**Como as tabelas estão ordenadas:** em cada configuração, do maior para o menor F1-macro conforme a **média aritmética dos valores de 250 m e 500 m**, usada apenas para organizar as linhas. Os melhores resultados **de cada coluna** estão destacados em negrito.
+
+**O que aprendemos na comparação controlada:** entre as configurações **2 e 3**, com blocos de **250 m**, o maior F1-macro foi do **SVM RBF com quatro partes de 256 px (0,9341)**. Com blocos de **500 m**, o maior foi do **Extra Trees no recorte inteiro de 512 px (0,8747)**. Portanto, **não há uma escala de segmentação melhor para todos os classificadores**.
+
+**Atenção à interpretação:** as configurações **2 e 3 são diretamente comparáveis entre si**, pois compartilham referências, atributos e divisões espaciais. A configuração **1 foi produzida em outro protocolo**, com outra base de segmentos e embargo por geometrias completas; seus números **não constituem uma comparação controlada direta** com as configurações 2 e 3. As cinco divisões por escala também não são experimentos independentes.
+
+**Esquema da comparação controlada entre 512 e 256 pixels:**
+
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 76}, "htmlLabels": false, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
+flowchart TD
+    P["510 pontos conhecidos<br/>distribuídos na imagem"] --> A["119 das 210 janelas<br/>de até 512 × 512 px<br/>contêm esses pontos"]
+    A --> B["A: Quickshift em cada<br/>recorte inteiro<br/>até 512 × 512 px"]
+    A --> C["B: Quickshift no<br/>mesmo recorte, dividido<br/>em até quatro partes<br/>de 256 × 256 px"]
+    B --> D["Mesmos pontos,<br/>atributos e divisões<br/>de treino/teste"]
+    C --> D
+    D --> E["Comparar F1-macro<br/>dos oito algoritmos"]
+
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
+    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
+    class P,A,D dados;
+    class B,C metodo;
+    class E resultado;
+```
 
 ### 6.4. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4/E4b)
 
@@ -383,46 +439,18 @@ A [V2](Segmentacao_area_completa_v2_experimentos.ipynb) foi ampliada na **Etapa 
 
 **Limites científicos:** os testes reutilizam exemplos da **mesma Area1**, sem dados rotulados de fundo urbano e sem validação externa. As cinco divisões por escala também não são observações independentes. O resultado sustenta que **acrescentar NDVI melhorou o F1-macro médio nos protocolos avaliados**, mas não prova desempenho superior em outras regiões ou significância estatística.
 
-### 6.5. Segundo resultado: 512 × 512 é melhor que quatro partes de 256 × 256?
+### 6.5. Qual configuração consome menos memória RAM?
 
-Agora a pergunta é outra: **se os classificadores receberem segmentos formados de maneiras diferentes, a previsão muda?** Para responder, mantivemos **os mesmos 119 recortes**, referências e divisões de teste; só alteramos a segmentação:
+A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o processamento sequencial dos **mesmos 119 recortes** nas duas estratégias:
 
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 76}, "htmlLabels": false, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
-flowchart TD
-    P["510 pontos conhecidos<br/>distribuídos na imagem"] --> A["119 das 210 janelas<br/>de até 512 × 512 px<br/>contêm esses pontos"]
-    A --> B["A: Quickshift em cada<br/>recorte inteiro<br/>até 512 × 512 px"]
-    A --> C["B: Quickshift no<br/>mesmo recorte, dividido<br/>em até quatro partes<br/>de 256 × 256 px"]
-    B --> D["Mesmos pontos,<br/>atributos e divisões<br/>de treino/teste"]
-    C --> D
-    D --> E["Comparar F1-macro<br/>dos oito algoritmos"]
+| Estratégia de segmentação | Pico de memória RAM |
+|---|---:|
+| **119 recortes inteiros de até 512 × 512 px** | **467,19 MiB** |
+| **Mesmos 119 recortes, subdivididos em até quatro partes de 256 × 256 px** | **456,80 MiB** |
 
-    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
-    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
-    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
-    class P,A,D dados;
-    class B,C metodo;
-    class E resultado;
-```
+**Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 6.3).
 
-**F1-macro médio com cinco divisões por escala e distância de exclusão de 25 m entre os pontos:**
-
-| Classificador | 250 m: 512 inteiro | 250 m: quatro 256 | 500 m: 512 inteiro | 500 m: quatro 256 |
-|---|---:|---:|---:|---:|
-| **SVM RBF** | 0,9157 | **0,9341** | 0,8518 | **0,8641** |
-| Regressão logística | 0,9153 | **0,9157** | 0,8484 | **0,8685** |
-| Extra Trees | **0,9064** | 0,8968 | **0,8747** | 0,8545 |
-| Random Forest | **0,8906** | 0,8835 | **0,8657** | 0,8566 |
-| KNN (7) | 0,8940 | **0,9009** | 0,8377 | **0,8486** |
-| Gaussian Naive Bayes | **0,8894** | 0,8875 | **0,8573** | 0,8464 |
-| HistGradientBoosting | **0,8738** | 0,8714 | 0,8390 | **0,8411** |
-| Dummy | 0,2847 | 0,2847 | 0,2791 | 0,2791 |
-
-**Ordem dos modelos:** F1-macro médio decrescente da **média aritmética das quatro condições** exibidas (250/500 m × 512/256 px). É somente um critério de apresentação: as diferenças entre protocolos e o vencedor em cada condição continuam descritos separadamente.
-
-**O que aprendemos:** com blocos geográficos de **250 m**, o maior resultado foi **SVM RBF em quatro partes de 256 px (0,9341)**. Com blocos de **500 m**, foi **Extra Trees em recortes inteiros de 512 px (0,8747)**. Ou seja, **não existe um vencedor único em todas as condições**.
-
-Medimos também a memória: **467,19 MiB** no processamento de 512 contínuo e **456,80 MiB** em quatro partes de 256; uma diferença de **10,38 MiB (2,22%)** no pico total de RAM do processo, considerando os **119 recortes processados sequencialmente**. **Esse valor não representa a RAM necessária para executar o Quickshift global original.**
+**Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
 ### 6.6. O que podemos concluir — e o que não podemos?
 
