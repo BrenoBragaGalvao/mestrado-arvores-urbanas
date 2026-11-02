@@ -377,31 +377,11 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 | HistGradientBoosting | 0,8714 | 0,8411 |
 | Dummy | 0,2847 | 0,2791 |
 
-**Como as tabelas estão ordenadas:** em cada configuração, do maior para o menor F1-macro conforme a **média aritmética dos valores de 250 m e 500 m**, usada apenas para organizar as linhas. Os melhores resultados **de cada coluna** estão destacados em negrito.
+**Como interpretar os resultados?** Em cada configuração, os oito classificadores estão organizados pela média do F1-macro nos blocos espaciais de 250 e 500 metros. Essa média serve apenas para ordenar a tabela; os melhores valores de cada coluna estão destacados em negrito.
 
-**O que aprendemos na comparação controlada:** entre as configurações **2 e 3**, com blocos de **250 m**, o maior F1-macro foi do **SVM RBF com quatro partes de 256 px (0,9341)**. Com blocos de **500 m**, o maior foi do **Extra Trees no recorte inteiro de 512 px (0,8747)**. Portanto, **não há uma escala de segmentação melhor para todos os classificadores**.
+**O que descobrimos?** Na comparação dos mesmos 119 recortes, os resultados variaram conforme o tamanho da segmentação e o classificador. Com blocos de **250 m**, o melhor resultado foi do **SVM RBF com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,9341)**. Com blocos de **500 m**, destacou-se o **Extra Trees com recortes inteiros de 512 × 512 pixels (F1-macro = 0,8747)**. Portanto, **não existe uma única estratégia superior em todas as condições**.
 
-**Atenção à interpretação:** as configurações **2 e 3 são diretamente comparáveis entre si**, pois compartilham referências, atributos e divisões espaciais. A configuração **1 foi produzida em outro protocolo**, com outra base de segmentos e embargo por geometrias completas; seus números **não constituem uma comparação controlada direta** com as configurações 2 e 3. As cinco divisões por escala também não são experimentos independentes.
-
-**Esquema da comparação controlada entre 512 e 256 pixels:**
-
-```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 76}, "htmlLabels": false, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
-flowchart TD
-    P["510 pontos conhecidos<br/>distribuídos na imagem"] --> A["119 das 210 janelas<br/>de até 512 × 512 px<br/>contêm esses pontos"]
-    A --> B["A: Quickshift em cada<br/>recorte inteiro<br/>até 512 × 512 px"]
-    A --> C["B: Quickshift no<br/>mesmo recorte, dividido<br/>em até quatro partes<br/>de 256 × 256 px"]
-    B --> D["Mesmos pontos,<br/>atributos e divisões<br/>de treino/teste"]
-    C --> D
-    D --> E["Comparar F1-macro<br/>dos oito algoritmos"]
-
-    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
-    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
-    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
-    class P,A,D dados;
-    class B,C metodo;
-    class E resultado;
-```
+**Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
 
 ### 6.4. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4/E4b)
 
