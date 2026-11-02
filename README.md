@@ -9,7 +9,13 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 | **🌳 Proposta 1 — Identificação da vegetação** | Como distinguir **árvores e gramíneas** por características de imagens de satélite? | Objetos classificados como árvore ou gramínea. |
 | **⚡ Proposta 2 — Porte e proximidade de postes** | Quais objetos candidatos apresentam **indicador empírico de porte** acima do limiar e ficam próximos de postes? | Seleção exploratória e distâncias 2D a postes, **sem comprovação de risco elétrico**. |
 
-**Roteiro de leitura:** dados da Area1 → método original → limitação de memória → testes com janelas menores → resultados dos oito classificadores (seção 6).
+### Roteiro de leitura
+
+1. **[Dados da Area1](#1-área-de-estudo-e-dados-utilizados)** — imagens, pontos de referência e área de estudo.
+2. **[Método original](#4-imagem-completa--as-17-etapas-do-código-original)** — Quickshift, K-Means e Random Forest.
+3. **[Limitação de memória](#por-que-mudamos-o-método-a-memória-ram-foi-o-limite)** — **4 GiB de RAM disponíveis** no ambiente de teste, diante de **5,42 GiB de memória estimada** para o método original.
+4. **[Testes com janelas menores](#62-por-que-exatamente-119-recortes-entenda-sem-confundir)** — recortes de 512 × 512 e 256 × 256 pixels.
+5. **[Resultados dos oito classificadores](#64-primeiro-resultado-quais-algoritmos-funcionaram-melhor)** — comparação dos modelos e métricas na seção 6.
 
 ## Por que mudamos o método? A memória RAM foi o limite
 
