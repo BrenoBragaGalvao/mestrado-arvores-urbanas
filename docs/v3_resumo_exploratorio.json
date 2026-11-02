@@ -1,0 +1,16 @@
+{
+  "area": "Area1 — Caxias do Sul",
+  "pontos_originais": 257,
+  "pontos_validos": 257,
+  "janelas_unicas_256px": 114,
+  "segmentos_na_borda": 79,
+  "fracao_segmentos_na_borda": 0.307,
+  "area_mediana_superpixel_m2": 120.25,
+  "indice_C3_mediano": 16.98142153315913,
+  "indice_C3_minimo": 7.33595767165391,
+  "indice_C3_maximo": 29.399703092532945,
+  "fracao_C3_maior_7": 1,
+  "advertencia": "C3 não é altura em metros: área é do superpixel, não da copa validada.",
+  "entrada": "AOI_RGB_NEW.tif e Arvores.gpkg da Area1",
+  "fonte_externa": "PDAU Caxias do Sul — Anexo 1"
+}
