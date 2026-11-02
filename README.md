@@ -310,7 +310,24 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **Por que isso é importante?** Porque utilizamos **as mesmas regiões, os mesmos pontos conhecidos e as mesmas condições de avaliação** nas duas estratégias. Assim, conseguimos investigar se **alterar o tamanho da janela de segmentação influencia a qualidade da classificação e o consumo de memória**, sem confundir essa diferença com mudanças na região analisada.
 
-### 6.3. Resultados dos oito classificadores nas três configurações
+### 6.3. Como separamos treinamento e teste nas quatro formas de aplicar Quickshift?
+
+**Primeiro, uma distinção:** os **256 × 256 e 512 × 512 pixels** indicam o tamanho das janelas usadas na **segmentação da imagem**. Já o treinamento e o teste são separados **depois**, a partir dos exemplos rotulados associados aos pontos conhecidos de árvores e gramíneas. Nas avaliações mais recentes, usamos também a localização geográfica desses exemplos para reduzir a influência da proximidade espacial.
+
+| Forma de processamento | Exemplos usados para avaliar | Como separamos treinamento e teste? |
+|---|---|---|
+| **1. Método original: Quickshift na imagem inteira + K-Means + Random Forest** | **458 pares objeto–rótulo**, derivados da seleção do cluster 3 e da associação com as referências. | Divisão **aleatória de 80% para treinamento e 20% para teste**: **366 registros de treino e 92 de teste**, com semente fixa (`random_state=42`). **Não houve separação por localização geográfica** nem exclusão de 25 m. |
+| **2. Quadrantes de até 256 × 256 pixels (grade de 812)** | **505 segmentos rotulados únicos** na bateria de resultados já documentada. | **Validação espacial:** agrupamos os exemplos em blocos geográficos de **250 m** e, separadamente, **500 m**. Em cada escala, realizamos **cinco divisões**, destinando aproximadamente **80% dos grupos ao treino e 20% ao teste**. Excluímos do treinamento objetos a até **25 m das geometrias de teste**. |
+| **3. Os 119 recortes inteiros de até 512 × 512 pixels** | **505 referências comuns**, após eliminar associações repetidas entre os dois modos de segmentação. | **Validação espacial:** cinco divisões com blocos de **250 m** e cinco com blocos de **500 m**, reservando cerca de **20% dos grupos para teste**. Aplicamos exclusão de **25 m entre os pontos de treino e teste**. |
+| **4. Os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels** | **As mesmas 505 referências** da forma 3. | **Exatamente as mesmas divisões geográficas e os mesmos exemplos de treino e teste da forma 3**, com exclusão de 25 m entre pontos. Assim, o que muda entre as formas 3 e 4 é **a segmentação**, não a seleção dos exemplos. |
+
+**Por que usamos blocos de 250 e 500 metros?** Para avaliar os classificadores em **grupos de locais diferentes** daqueles utilizados no treinamento. Testamos os dois tamanhos de bloco para verificar como a distribuição geográfica dos exemplos influencia o **F1-macro**. Os blocos são medidos em **metros**, enquanto as janelas do Quickshift são medidas em **pixels**.
+
+**E os 25 metros?** Depois de escolher os exemplos de teste, retiramos do conjunto de **treinamento** os exemplos demasiado próximos deles. Na bateria da forma 2, a distância foi considerada entre **geometrias dos segmentos**; nas formas 3 e 4, entre **pontos de referência**. Isso torna as duas formas de validação semelhantes em objetivo, mas **não idênticas**. Além disso, como a exclusão remove exemplos do treino, **a quantidade final de objetos treinados pode variar de uma divisão para outra**: 80%/20% refere-se à seleção dos grupos, não necessariamente à contagem exata de objetos após a exclusão.
+
+**O que podemos comparar diretamente?** Os **oito classificadores são avaliados com as mesmas divisões dentro de cada protocolo**, mas somente as **formas 3 e 4** compartilham exatamente as mesmas referências e divisões entre as estratégias de segmentação. O resultado histórico da forma 1 não é diretamente comparável aos F1-macro das novas formas. Os resultados publicados da forma 2 vieram de uma bateria anterior; **a execução integral da rota progressiva atual dos 812 quadrantes no Notebook V2 ainda não foi confirmada** e essa rota utiliza exclusão por **centroides**, em vez de geometrias completas.
+
+### 6.4. Resultados dos oito classificadores nas três configurações
 
 As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
 
@@ -322,7 +339,7 @@ As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto mai
   <img src="docs/infografico_validacao_espacial_256px_250m_500m.webp" alt="Diferença entre segmentação em quadrantes de 256 × 256 pixels e validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros." width="100%">
 </p>
 
-#### 6.3.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
+#### 6.4.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
 
 Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
 
@@ -340,7 +357,7 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 
 **Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
 
-#### 6.3.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
+#### 6.4.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
 
 Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada E9, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
 
@@ -356,7 +373,7 @@ Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas
 | HistGradientBoosting | 0,8738 | 0,8390 |
 | Dummy | 0,2847 | 0,2791 |
 
-#### 6.3.3. Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels
+#### 6.4.3. Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels
 
 Processamos **exatamente as mesmas regiões** da configuração 2, agora com Quickshift independente em cada parte. Usamos os **mesmos 505 exemplos e as mesmas divisões de treino e teste**, mudando somente a forma de segmentar.
 
@@ -378,7 +395,7 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 
 **Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
 
-### 6.4. NDVI + brilho HSV + bordas Canny: os três juntos são melhores?
+### 6.5. NDVI + brilho HSV + bordas Canny: os três juntos são melhores?
 
 Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
 
@@ -420,7 +437,7 @@ A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrante
 
 **Ordem dos modelos:** F1-macro médio decrescente da combinação **NDVI + HSV + Canny** nos blocos de 500 m.
 
-### 6.5. Qual configuração consome menos memória RAM?
+### 6.6. Qual configuração consome menos memória RAM?
 
 A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o processamento sequencial dos **mesmos 119 recortes** nas duas estratégias:
 
@@ -429,11 +446,11 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 | **119 recortes inteiros de até 512 × 512 px** | **467,19 MiB** |
 | **Mesmos 119 recortes, subdivididos em até quatro partes de 256 × 256 px** | **456,80 MiB** |
 
-**Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 6.3).
+**Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 6.4).
 
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
-### 6.6. O que podemos concluir — e o que não podemos?
+### 6.7. O que podemos concluir — e o que não podemos?
 
 **Quais classificadores apresentaram os melhores resultados?** Avaliamos **oito algoritmos** e observamos que o desempenho depende tanto do modelo quanto da forma de segmentar a imagem. Na comparação entre os **mesmos 119 recortes**, o maior F1-macro com blocos espaciais de **250 m** foi do **SVM RBF**, utilizando partes de **256 × 256 pixels (0,9341)**. Com blocos de **500 m**, o melhor resultado foi do **Extra Trees**, utilizando recortes inteiros de **512 × 512 pixels (0,8747)**. Portanto, **nenhuma das duas formas de segmentação foi superior em todas as condições**.
 
