@@ -1,0 +1,48 @@
+name: V3 - Extrair alturas Meta CHMv2 para 257 arvores
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v3_alturas_meta.yml'
+      - 'dados_v3/pontos_area1_257.csv'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  consultar-meta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar pacotes geoespaciais
+        run: python -m pip install --upgrade "numpy<2" pandas rasterio pyproj
+      - name: Consultar altura de dossel publica Meta/WRI (sem autenticacao GEE)
+        env:
+          GDAL_HTTP_MAX_RETRY: '3'
+          GDAL_HTTP_RETRY_DELAY: '2'
+        run: |
+          python experimentos/v3_amostrar_altura_publica.py \
+            --pontos dados_v3/pontos_area1_257.csv \
+            --out docs/v3_alturas_publicas \
+            --raio 5
+      - name: Publicar CSV e resumo como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-alturas-estimadas-257-arvores
+          path: docs/v3_alturas_publicas/
+      - name: Registrar resultados no GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/v3_alturas_publicas/
+          if git diff --cached --quiet; then
+            echo 'Nenhuma mudança nos resultados'
+          else
+            git commit -m 'data(v3): registra estimativas Meta CHMv2 por ponto'
+            git push
+          fi
