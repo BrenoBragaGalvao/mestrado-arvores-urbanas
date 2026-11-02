@@ -120,19 +120,20 @@ flowchart TD
     C --> I["🌿 NDVI<br/>💡 Brilho HSV<br/>◻️ Bordas Canny"]
     I --> J["📋 Três médias<br/>por segmento"]
     H --> J
-    J --> K["🌳 Random<br/>Forest<br/>500 árvores"]
-    K --> L["✅ Prever<br/>árvore / grama"]
-    K --> M["📈 Avaliar<br/>acurácia / F1"]
+    J --> T["🎲 Treinamento / teste<br/>aleatório: 80% / 20%"]
+    T --> K["🌳 Random<br/>Forest<br/>500 árvores"]
+    K --> L["✅ Prever candidatos<br/>árvore / grama"]
+    K --> M["📈 Avaliar no teste<br/>acurácia / F1"]
 
     classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
     classDef processamento fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:2px;
     classDef resultados fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
-    class A,B,C,D,E,P,H,I,J dados;
+    class A,B,C,D,E,P,H,I,J,T dados;
     class F,G,K processamento;
     class L,M resultados;
 ```
 
-**Leitura do fluxo:** o **RGB** produz os polígonos; o **RGB + NIR** fornece os atributos; as referências identificam os exemplos; o **Random Forest** gera as previsões e as métricas.
+**Leitura do fluxo:** o **Quickshift** segmenta o RGB, e os segmentos são convertidos em polígonos. As bandas **RGB + NIR** fornecem as características, e as referências identificam os exemplos de árvores e gramíneas. Depois de calcular as **três médias por segmento** (NDVI, brilho HSV e bordas Canny), o código separa aleatoriamente os dados rotulados em **80% para treinamento e 20% para teste** (`random_state=42`). O **Random Forest com 500 árvores** é treinado apenas com o conjunto de treinamento, **avaliado no conjunto de teste** (acurácia e F1) e, em seguida, aplicado para prever as classes dos objetos candidatos do **cluster 3**.
 
 **O que está acontecendo:** o Quickshift divide a imagem RGB em segmentos; o K-Means utiliza **quatro médias e quatro desvios-padrão RGB/NIR** e seleciona os objetos do **cluster 3**. Os pontos conhecidos identificam exemplos de árvores e gramíneas. O Random Forest recebe **três valores médios por objeto** — **brilho HSV, bordas Canny e NDVI** — para aprender a distinguir as duas classes.
 
