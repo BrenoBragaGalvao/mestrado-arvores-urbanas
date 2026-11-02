@@ -12,10 +12,10 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 ### Roteiro de leitura
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 40, "rankSpacing": 50}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
-flowchart LR
+%%{init: {"flowchart": {"nodeSpacing": 40, "rankSpacing": 48}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "15px"}}}%%
+flowchart TB
     A["🛰️ Dados da Area1"]
-    B["🧪 Método original"]
+    B["🧪 Método original<br/>Quickshift<br/>+ K-Means<br/>+ Random Forest"]
     C["💾 Limitação de memória<br/>4 GiB de RAM disponíveis"]
     D["🧩 Janelas menores<br/>512 × 512 e 256 × 256"]
     E["📊 Resultados<br/>8 classificadores"]
