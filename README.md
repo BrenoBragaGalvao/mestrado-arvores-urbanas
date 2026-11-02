@@ -332,7 +332,7 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
 
 <p align="center">
-  <img src="docs/configuracoes_1_2_3_resumo.webp" alt="Esquema conjunto das configurações 1, 2 e 3, com 812 quadrantes e 119 recortes inteiros ou subdivididos." width="100%">
+  <img src="docs/configuracoes_1_2_3_sem_numeracao.webp" alt="Esquema conjunto das configurações 1, 2 e 3, com 812 quadrantes e 119 recortes inteiros ou subdivididos." width="100%">
 </p>
 
 <p align="center">
