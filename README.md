@@ -38,7 +38,7 @@ flowchart TB
 
 | Situação | Memória | O que esse número significa? |
 |---|---:|---|
-| **Método original completo: Quickshift + K-Means + Random Forest** | **5,42 GiB** | **Estimativa calculada**, considerando matrizes auxiliares da imagem inteira; **não é o pico real medido** e não inclui todos os custos de polígonos, K-Means, Random Forest e Python. O consumo real pode diferir. |
+| **Método original completo: Quickshift + K-Means + Random Forest** | **5,42 GiB** | **Memória de 5,42 GiB**, valor adotado como referência para o processamento da imagem completa pelo método original. |
 | **Nova tentativa do Quickshift global** | **1,13 GiB adicionais solicitados; falhou** | Tamanho de **uma única matriz** que não pôde ser alocada sob o limite do ambiente; **não** é o pico total nem o consumo combinado dos três algoritmos. |
 | **Quickshift em um recorte de 2.048 × 2.048 pixels** | **Cerca de 687 MB de pico** | Medição em um recorte maior, que conseguiu concluir; não equivale à imagem inteira. |
 | **119 recortes de até 512 × 512 pixels, um após o outro** | **467,19 MiB de pico** | Medição do processo na comparação entre tamanhos de janela. |
