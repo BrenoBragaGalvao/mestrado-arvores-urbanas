@@ -145,7 +145,7 @@ flowchart TD
 | Random Forest | **500 árvores**, `random_state=42` |
 | Treino/teste | Aleatório **80%/20%**, `random_state=42`, sem estratificação |
 
-O método **não utiliza 50 milhões de pixels como 50 milhões de registros independentes**. Também não havia deduplicação explícita nem separação espacial entre treino e teste.
+O método original processa aproximadamente 50 milhões de pixels, agrupando-os em segmentos por meio do Quickshift. A classificação pelo Random Forest utiliza características desses segmentos, e não os pixels individualmente. Na execução histórica, foram utilizados 458 registros rotulados, divididos aleatoriamente entre treinamento (366) e teste (92). Entretanto, o código não separava geograficamente os exemplos de treinamento e teste, o que pode influenciar a avaliação do desempenho do modelo.
 
 ### Resultados históricos da Proposta 1
 
