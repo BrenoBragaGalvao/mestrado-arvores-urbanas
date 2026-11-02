@@ -252,6 +252,25 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 
 **O que foi reaproveitado do método original?** **A imagem da Area1 e os 510 pontos de referência** dos arquivos `Arvores.gpkg` (257 árvores) e `Grama.gpkg` (253 gramíneas), que já existiam **antes** das previsões do modelo. **O que NÃO foi reaproveitado?** O resultado do K-Means, os 458 pares objeto–rótulo da rodada histórica, o modelo Random Forest treinado e suas previsões. Na V2, os segmentos e atributos foram calculados novamente com Quickshift por janelas; depois treinamos e avaliamos os classificadores. **Os 119 recortes foram encontrados pelas coordenadas dos pontos de referência, e não selecionados pelos acertos ou erros do Random Forest.**
 
+### Como a imagem foi dividida e como os classificadores foram comparados?
+
+Inicialmente, utilizamos a **imagem original da Area1, com 6.942 × 7.294 pixels**, correspondente a aproximadamente **50,6 milhões de pixels**. Como a tentativa de repetir o processamento integral pelo Quickshift exigiu mais memória RAM do que a disponível, adotamos estratégias de processamento em partes menores, **sem diminuir a resolução dos pixels**.
+
+**Para percorrer toda a área**, dividimos a imagem em **812 quadrantes de até 256 × 256 pixels** (28 colunas e 29 linhas). Essa divisão permite processar a imagem completa progressivamente, em lotes menores, salvando resultados intermediários.
+
+**Para comparar as estratégias de segmentação e os classificadores**, utilizamos os **510 pontos de referência georreferenciados** já existentes: **257 árvores** do arquivo `Arvores.gpkg` e **253 gramíneas** do arquivo `Grama.gpkg`. Como conhecemos a localização e a classe desses pontos, podemos comparar as previsões dos modelos com as referências conhecidas.
+
+Nessa comparação, consideramos **outra grade sobre a mesma imagem**, formada por **210 janelas possíveis de até 512 × 512 pixels** (14 colunas e 15 linhas). **Não dividimos primeiro a imagem em 812 quadrantes para depois transformá-los em 210 janelas:** são duas formas alternativas de organizar a mesma imagem. Ao localizar os 510 pontos na grade de 512 pixels, identificamos **119 janelas que continham pelo menos um ponto de referência**. As outras **91 janelas não continham pontos rotulados conhecidos** e, por isso, não acrescentariam exemplos de teste à comparação controlada.
+
+**Nos mesmos 119 recortes, comparamos duas formas de aplicar o Quickshift:**
+
+1. **Segmentação em até 512 × 512 pixels:** o Quickshift foi aplicado a cada recorte inteiro.
+2. **Segmentação em até 256 × 256 pixels:** o mesmo recorte foi subdividido em até quatro partes, e o Quickshift foi aplicado separadamente a cada uma.
+
+Depois de segmentar, extraímos atributos como **NDVI, brilho HSV e bordas Canny** e comparamos **oito classificadores**: Random Forest, SVM RBF, regressão logística, Extra Trees, KNN, HistGradientBoosting, Gaussian Naive Bayes e Dummy. As duas formas de segmentação foram avaliadas com **os mesmos pontos de referência e divisões espaciais de treinamento e teste**, permitindo comparar o **F1-macro** e o consumo de memória RAM. Dos 510 pontos originais, o procedimento de comparação resultou em **505 referências únicas comuns**, após tratar associações repetidas a segmentos.
+
+**Em resumo:** os **812 quadrantes de 256 pixels** servem ao processamento progressivo da área completa; as **210 janelas de 512 pixels** são uma grade alternativa, da qual foram escolhidos os **119 recortes com referências conhecidas** para comparar Quickshift em 512 e em 256 pixels. **Os 119 recortes não representam uma cobertura integral da imagem.**
+
 <p align="center">
   <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Infográfico da Area1: imagem original, cobertura integral por 812 quadrantes de 256 pixels e seleção de 119 recortes de 512 pixels com pontos de referência" width="100%">
 </p>
