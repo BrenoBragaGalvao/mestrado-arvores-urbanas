@@ -44,28 +44,6 @@ flowchart TB
 | **119 recortes de até 512 × 512 pixels, um após o outro** | **467,19 MiB de pico** | Medição do processo na comparação entre tamanhos de janela. |
 | **Os mesmos 119 recortes divididos em até quatro partes de 256 × 256** | **456,80 MiB de pico** | Medição do mesmo tipo de processo; redução observada de **10,38 MiB (2,22%)**. |
 
-### Como foi calculada a estimativa do método original?
-
-Como a segmentação original usa a imagem **inteira**, e não apenas os 119 recortes da V2, usamos **6.942 × 7.294 = 50.634.948 pixels**. O tamanho teórico de uma matriz sem compressão é:
-
-```text
-Memória (MiB) = quantidade de pixels × bandas × bytes por valor ÷ 1.048.576
-1 GiB = 1.024 MiB
-```
-
-| Matriz correspondente à imagem inteira | Cálculo | Memória calculada |
-|---|---|---:|
-| RGB original, 3 bandas `uint8` | 50.634.948 × 3 × 1 byte | **144,87 MiB** |
-| RGB + NIR, 4 bandas `uint16` | 50.634.948 × 4 × 2 bytes | **386,31 MiB** |
-| Uma matriz RGB/Lab de 3 canais em `float64` | 50.634.948 × 3 × 8 bytes | **1.158,94 MiB (1,13 GiB)** |
-| Um mapa 2D em `float64` ou `int64` | 50.634.948 × 1 × 8 bytes | **386,31 MiB** |
-
-**Cenário ilustrativo adotado para dimensionamento** (não corresponde a uma medição da execução): **1 RGB `uint8` + 1 RGB+NIR `uint16` + 3 matrizes RGB/Lab `float64` + 4 mapas 2D de 8 bytes = 5.553,26 MiB ≈ 5,42 GiB**.
-
-**Interpretação:** o Quickshift faz conversões e aloca matrizes auxiliares; a representação `float64` de **uma única imagem RGB já exige 1,13 GiB**. O K-Means do notebook atua sobre atributos **por segmento**, e o Random Forest é treinado com **366 pares objeto–rótulo** na rodada histórica; não seria correto multiplicar o número de pixels pelos 6 clusters ou pelas 500 árvores para estimar RAM desses modelos. O custo exato dessas etapas, da vetorização, das tabelas de atributos, das cópias temporárias e da sobrecarga do ambiente **não foi medido**.
-
-**Limite importante:** esse cálculo é uma **estimativa de ocupação simultânea de matrizes**, não um limite inferior ou superior matemático do pico real do pipeline. Sem reexecutar e monitorar todo o método original com RAM suficiente, não é possível afirmar seu consumo máximo exato. A estimativa ajuda a explicar por que **4 GiB não foram suficientes** na nova tentativa de Quickshift global, mas não prova quanta RAM a execução histórica utilizou.
-
 **Decisão:** em vez de insistir no Quickshift global, passamos a **dividir a imagem em janelas menores, sem reduzir a resolução dos pixels**. Isso viabilizou comparar oito classificadores com exemplos e testes equivalentes **dentro de cada novo experimento**. Não significa que reproduzimos o método global original.
 
 [Detalhes da tentativa com imagem completa](docs/e10_teste_execucao_local_2026-11-02.md) · [Medição real dos recortes](docs/e9_medicao_memoria_2026-11-02.md)
