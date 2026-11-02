@@ -296,23 +296,19 @@ Na **V2**, investigamos três configurações de segmentação:
   <img src="docs/comparacao_recorte_512_256.webp" alt="Mesmo recorte de 512 × 512 pixels: Quickshift aplicado ao recorte inteiro ou separadamente em quatro partes de 256 × 256 pixels" width="88%">
 </p>
 
-### 6.2. Por que exatamente 119 recortes? Entenda sem confundir
+### 6.2. Por que selecionamos exatamente 119 recortes?
 
-**Não escolhemos o número 119 antes de começar. Ele apareceu a partir dos pontos de referência dos arquivos originais `Arvores.gpkg` e `Grama.gpkg`, e NÃO do K-Means ou das previsões do Random Forest.**
+O número de **119 recortes não foi definido previamente**. Ele surgiu a partir da localização dos **510 pontos de referência já conhecidos** da Area1, sendo **257 árvores** (`Arvores.gpkg`) e **253 gramíneas** (`Grama.gpkg`), utilizados também no método original.
 
-1. **Antes de executar qualquer classificador**, a Area1 já tinha **257 pontos identificados como árvores** (`Arvores.gpkg`) e **253 como gramíneas** (`Grama.gpkg`): **510 pontos de referência conhecidos**. O método inicial também utilizou esses mesmos arquivos.
-2. Dividimos **mentalmente a grade da imagem** em **210 posições possíveis de 512 × 512 pixels**. As janelas nas bordas podem ser menores.
-3. Localizamos cada um dos **510 pontos** na sua respectiva janela. **Vários pontos podem estar na mesma janela.**
-4. Ao contar **somente as posições diferentes que continham pelo menos um ponto**, encontramos **119 janelas**. São esses os **119 recortes** — e **não 119 novas imagens nem 119 árvores**.
-5. Usamos **cada um desses mesmos recortes duas vezes**: uma segmentação Quickshift com o recorte inteiro (até 512 × 512), outra com o recorte dividido em até quatro partes (256 × 256). Assim, a diferença entre os testes está **na forma de segmentar**, não no local da imagem.
+Para entender como chegamos a esse número, seguimos cinco etapas:
 
-**Exemplo apenas para entender a contagem:** se dez pontos conhecidos estivessem distribuídos em apenas duas janelas, usaríamos **dois recortes**, não dez. No conjunto real, os **510 pontos ficaram em 119 recortes**.
+1. **Dividimos a imagem em uma grade de 512 × 512 pixels**, formando **210 janelas possíveis** (14 colunas × 15 linhas). As janelas nas bordas podem ter dimensões menores.
+2. **Localizamos os 510 pontos de referência** nessa grade, identificando em qual janela cada árvore ou gramínea estava. Uma mesma janela pode conter vários pontos.
+3. **Selecionamos somente as janelas que continham pelo menos um ponto conhecido.** Das 210 janelas possíveis, **119 tinham referências** e as outras 91 não tinham pontos rotulados para avaliar os classificadores.
+4. **Processamos os 119 recortes inteiros**, aplicando Quickshift em janelas de até **512 × 512 pixels** e avaliando o **F1-macro dos oito classificadores**.
+5. **Processamos novamente as mesmas 119 regiões**, mas dividindo cada recorte em até quatro partes de **256 × 256 pixels**, para comparar o **F1-macro e o consumo de memória RAM** com a estratégia anterior.
 
-**Por que não as 210 janelas?** É possível segmentar todas elas, mas **as outras 91 não contêm pontos de referência conhecidos nesse conjunto**. Portanto, elas **não acrescentariam novos exemplos rotulados para calcular acurácia ou F1-macro**. Escolhemos as 119 para fazer a comparação dos classificadores **sem gastar processamento nas regiões sem rótulos**.
-
-Nos 119 recortes existem **510 pontos originais**, mas, após agrupar referências que compartilham um mesmo segmento, a comparação controlada utiliza **505 referências únicas comuns**. **Pontos, recortes e segmentos são contagens diferentes.**
-
-**Isso é diferente de comparar com o método original:** na execução histórica, a segmentação era global, havia seleção do **cluster 3 do K-Means** e foram obtidos **458 pares objeto–rótulo** para treinar/testar o Random Forest. Na comparação dos 119 recortes, a segmentação foi **refeita localmente**; por isso, os exemplos resultantes e o protocolo não são idênticos. **Os 119 recortes servem para comparar os novos algoritmos e os tamanhos de janela entre si, não para provar que um deles superou a acurácia histórica de 0,87.**
+**Por que isso é importante?** Porque utilizamos **as mesmas regiões, os mesmos pontos conhecidos e as mesmas condições de avaliação** nas duas estratégias. Assim, conseguimos investigar se **alterar o tamanho da janela de segmentação influencia a qualidade da classificação e o consumo de memória**, sem confundir essa diferença com mudanças na região analisada.
 
 ### 6.3. Primeiro resultado: quais algoritmos funcionaram melhor?
 
