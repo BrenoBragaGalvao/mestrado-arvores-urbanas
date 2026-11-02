@@ -28,8 +28,8 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 |---|---|---:|---:|
 | **Imagem RGB completa** (`AOI_RGB_NEW.tif`) | **6.942 × 7.294** | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
 | **Imagem RGB + NIR completa** (`AOI_NEW_MULTI.tif`) | **6.942 × 7.294** | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
-| **Polígono AOI sobre o RGB** (área efetiva de estudo) | **6.942 × 7.294** (retângulo envolvente) | **48.548.811** | **≈ 12,1372 km²** (≈ 12,14 km²) |
-| **Polígono AOI sobre o RGB + NIR** (mesma área de estudo) | **6.942 × 7.294** (retângulo envolvente) | **48.548.645** | **≈ 12,1372 km²** (≈ 12,14 km²) |
+| **Polígono AOI sobre o RGB** (área efetiva de estudo) | — (polígono irregular) | **48.548.811** | **≈ 12,1372 km²** (≈ 12,14 km²) |
+| **Polígono AOI sobre o RGB + NIR** (mesma área de estudo) | — (polígono irregular) | **48.548.645** | **≈ 12,1372 km²** (≈ 12,14 km²) |
 
 ### Resolução espacial e referência geográfica
 
@@ -40,7 +40,7 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 | **Dimensões do retângulo raster no terreno** | **3.471 m de largura × 3.647 m de altura** |
 | **Sistema de coordenadas dos rasters** | **EPSG:31982** |
 
-**Por que a AOI tem as mesmas dimensões de largura × altura da imagem completa, apesar de ter menos pixels incluídos?** Conferindo o arquivo original `AOI_new.shp` com a grade do raster RGB (`AOI_RGB_NEW.tif`), a janela mínima que envolve a AOI **dentro dos limites da imagem** corresponde à imagem inteira: **6.942 colunas × 7.294 linhas**. O polígono irregular chega às extremidades da grade, mas deixa espaços fora de seus limites. Por isso, **6.942 × 7.294 = 50.634.948** é o número de posições no **retângulo envolvente**, **não** a quantidade de pixels dentro da AOI. Destes, **48.548.811 pixels (aproximadamente 95,88%) estão dentro do polígono na grade RGB**, e **2.086.137 pixels ficam fora**. Na grade RGB + NIR, **48.548.645 pixels** estão dentro do mesmo polígono (pequena diferença decorrente do deslocamento entre as grades). Em resumo: **dimensões da matriz do recorte ≠ quantidade de pixels efetivamente cobertos pelo polígono**.
+**Como interpretar a AOI?** A largura e a altura em pixels da tabela referem-se apenas às **imagens retangulares completas**. A Área 1 (`AOI_new.shp`) é um **polígono irregular**, por isso não apresentamos uma largura × altura própria para ela. Em vez disso, informamos quantos pixels da imagem estão dentro do polígono: **48.548.811 no raster RGB** e **48.548.645 no RGB + NIR**. No raster RGB, **2.086.137 pixels** ficam fora da AOI. Esses números são contagens de pixels no polígono, não dimensões de uma nova imagem retangular.
 
 As duas contagens da AOI foram **calculadas diretamente sobre os rasters originais**, contabilizando os pixels **cujo centro cai dentro do polígono**. A diferença de **166 pixels** entre RGB e RGB + NIR decorre do pequeno deslocamento entre as grades. Trata-se da **cobertura geométrica do polígono**, não do número de exemplos usados para treinar o Random Forest nem de uma medida de pixels espectrais válidos.
 
