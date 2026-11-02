@@ -300,36 +300,48 @@ Nos 119 recortes existem **510 pontos originais**, mas, após agrupar referênci
 
 </details>
 
-### 6.3. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4)
+### 6.3. NDVI + brilho HSV + bordas Canny: vale a pena usar os três? (E4 / E4b)
 
-**Sim, na bateria experimental disponível, a combinação dos três atributos apresentou maior F1-macro médio do que qualquer combinação com apenas um ou dois atributos.** A verificação foi feita usando os resultados reais de **812 quadrantes de 256 × 256 pixels**, registrados em 01/11/2026, sem acrescentar imagens ou rótulos à Area1. A execução percorreu o raster retangular completo, mas os exemplos supervisionados continuaram sendo os **505 segmentos únicos rotulados** derivados dos 510 pontos de referência disponíveis.
+**Pergunta científica:** ao acrescentar o **NDVI** aos atributos **brilho HSV + bordas Canny**, o classificador melhora? Para responder de forma clara, a tabela principal fixa a **mesma dupla de comparação em todos os oito modelos**. Assim, a única mudança nos atributos é a inclusão do NDVI.
 
-**O que significa cada atributo?**
+**O que cada atributo representa:**
 
-- **NDVI (`mean_ndvi`):** índice calculado com as bandas vermelha e infravermelha próxima (NIR), que descreve a resposta espectral da vegetação.
-- **Brilho HSV (`mean_intensity`):** componente de intensidade/valor de cor, que ajuda a diferenciar características visuais de segmentos.
-- **Bordas Canny (`mean_edges`):** proporção média de pixels de borda detectados no objeto, representando transições de textura/contorno.
+- **NDVI (`mean_ndvi`):** índice espectral calculado com vermelho e infravermelho próximo (NIR), relacionado à resposta da vegetação.
+- **Brilho HSV (`mean_intensity`):** intensidade/valor de cor, resumido como média por segmento.
+- **Bordas Canny (`mean_edges`):** medida média de bordas por segmento, associada a contornos e transições visuais.
 
-**Como testamos:** as **sete combinações possíveis** foram: NDVI; HSV; Canny; NDVI + HSV; NDVI + Canny; HSV + Canny; e **NDVI + HSV + Canny**. Elas foram avaliadas com **Random Forest (500 árvores), SVM RBF e regressão logística** nas **mesmas dez partições espaciais** (cinco com blocos de 250 m e cinco com blocos de 500 m), com exclusão de treino a até **25 m das geometrias de teste**. Em cada combinação, comparamos o **F1-macro**, que dá o mesmo peso às classes árvore e gramínea.
+**Como fizemos a comparação de oito modelos (E4b):** utilizamos os **mesmos 505 segmentos rotulados** da bateria derivada dos **812 quadrantes de 256 × 256 pixels**, sem incorporar novos dados. Para cada um dos oito classificadores, comparamos somente dois conjuntos de atributos: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Foram empregadas as **mesmas cinco divisões por escala espacial** de **250 m e 500 m**, com **GroupShuffleSplit (semente 2026)** e embargo de **25 m entre as geometrias dos segmentos** de treinamento e teste. Os parâmetros dos modelos foram preservados do E3c. Assim, **cada par de resultados utiliza os mesmos exemplos de teste**.
 
-**Resultado: três atributos contra a melhor dupla de cada modelo/escala**
+**Resultados — F1-macro médio em cinco divisões por escala:**
 
-| Classificador | Blocos | F1-macro: três atributos | Melhor dupla (F1-macro) | Ganho dos três |
-|---|---:|---:|---|---:|
-| Random Forest | 250 m | **0,8627** | NDVI + Canny (0,7759) | **+0,0868** |
-| Random Forest | 500 m | **0,8499** | NDVI + HSV (0,7702) | **+0,0797** |
-| SVM RBF | 250 m | **0,8946** | NDVI + HSV (0,8265) | **+0,0680** |
-| SVM RBF | 500 m | **0,8970** | NDVI + HSV (0,8186) | **+0,0783** |
-| Regressão logística | 250 m | **0,8981** | NDVI + HSV (0,8320) | **+0,0661** |
-| Regressão logística | 500 m | **0,8963** | NDVI + HSV (0,8131) | **+0,0832** |
+| Classificador | Blocos espaciais | NDVI + HSV + Canny (F1-macro) | **Brilho HSV + bordas Canny (F1-macro)** | Ganho ao incluir NDVI |
+|---|---:|---:|---:|---:|
+| SVM (RBF) | 250 m | **0,8987** | 0,7523 | +0,1464 |
+| Regressão logística | 250 m | **0,8928** | 0,7556 | +0,1372 |
+| KNN (7) | 250 m | **0,8874** | 0,7445 | +0,1429 |
+| Extra Trees | 250 m | **0,8790** | 0,7008 | +0,1782 |
+| Random Forest | 250 m | **0,8656** | 0,6925 | +0,1731 |
+| HistGradientBoosting | 250 m | **0,8556** | 0,7206 | +0,1349 |
+| Gaussian Naive Bayes | 250 m | **0,8555** | 0,7409 | +0,1146 |
+| Dummy (maioria) | 250 m | **0,2980** | 0,2980 | 0,0000 |
+| SVM (RBF) | 500 m | **0,8668** | 0,7886 | +0,0781 |
+| Regressão logística | 500 m | **0,8664** | 0,7992 | +0,0671 |
+| KNN (7) | 500 m | **0,8502** | 0,7678 | +0,0824 |
+| Extra Trees | 500 m | **0,8629** | 0,7208 | +0,1421 |
+| Random Forest | 500 m | **0,8530** | 0,7264 | +0,1266 |
+| HistGradientBoosting | 500 m | **0,8524** | 0,7327 | +0,1197 |
+| Gaussian Naive Bayes | 500 m | **0,8398** | 0,7699 | +0,0700 |
+| Dummy (maioria) | 500 m | **0,2799** | 0,2799 | 0,0000 |
 
-*As diferenças são de F1-macro, na escala de 0 a 1; por exemplo, +0,0868 equivale a 8,68 pontos percentuais. As melhores duplas foram identificadas retrospectivamente a partir das médias dos mesmos testes.* Os três atributos também venceram a respectiva melhor dupla em **5 das 5 divisões pareadas** de cada uma dessas seis comparações. As divisões **reutilizam amostras e não constituem experimentos externos independentes**.
+**Leitura da tabela:** a coluna **“Brilho HSV + bordas Canny” é uma dupla FIXA de referência**, **não a “melhor dupla” escolhida depois de olhar os resultados**. Os valores de ganho são diferenças de F1-macro na escala de 0 a 1. Por exemplo, **+0,1464** equivale a **14,64 pontos percentuais de F1-macro**, não a 14,64% de aumento relativo.
 
-**Interpretação científica:** os três atributos parecem fornecer informações **complementares** nas condições estudadas; nenhum atributo isolado ou dupla alcançou o mesmo F1-macro médio. Isso **não comprova que os três sempre serão melhores**, nem permite atribuir causalmente o ganho a cada variável sem análise adicional. Também não há validação em outra cidade nem classe de fundo urbano não vegetado. Uma avaliação posterior independente é necessária para estimar o benefício fora desta Area1.
+**O que observamos:** nos **sete modelos que utilizam efetivamente os atributos**, os **três atributos tiveram F1-macro médio maior** que a dupla HSV + Canny em ambas as escalas. Nas **70 avaliações pareadas** desses sete modelos (sete modelos × duas escalas × cinco divisões), os três atributos venceram em **68** e ficaram abaixo em **2**. O **Dummy** empatou em todas as dez divisões, pois não utiliza os atributos para prever.
 
-**Proveniência e reprodutibilidade:** os números foram conferidos nos **220 registros** do arquivo `E3_E4_resultados_por_particao.csv` do pacote de evidências `mestrado_v2_cobertura_812_resultados_2026-11-01.zip`. O [CSV de médias do E4](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv) contém as **44 linhas resumidas** (sete combinações × três modelos × duas escalas, mais Dummy de referência). O notebook [V2](Segmentacao_area_completa_v2_experimentos.ipynb) possui o E4 integrado à **Etapa 2** e agora gera automaticamente `E4_resumo_ablacao.csv` e `E4_tres_vs_melhor_dupla.csv` após sua execução.
+**E os outros pares de atributos?** Na bateria **E4 original**, já havíamos analisado **sete subconjuntos** (NDVI, HSV, Canny, três duplas e os três juntos) com **Random Forest, SVM e regressão logística**. Nesse outro protocolo, os três atributos também apresentaram maior F1-macro médio que qualquer subconjunto menor. Os números das sete combinações estão no [CSV da ablação original](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv). **Não misturamos suas médias com a nova tabela**, pois o E4 original usou **outras divisões (semente 42)**, enquanto a comparação de oito modelos E4b reproduz **as divisões do E3c (semente 2026)**.
 
-**Importante:** o CSV histórico usa **embargo de 25 m entre geometrias completas dos segmentos**; a implementação simplificada atualmente publicada na V2 emprega **distância de 25 m entre centroides**. Portanto, os resultados históricos aqui apresentados são verificáveis como **bateria derivada executada**, mas **não devem ser anunciados como reexecução idêntica da versão atual do notebook** antes de conferir seus novos CSVs.
+**Rastreabilidade:** a análise E4b produziu **160 avaliações** (oito modelos × dois conjuntos de atributos × duas escalas × cinco divisões). Conferimos os **80 resultados com os três atributos** contra o arquivo de evidências anterior `E3c_8_modelos_812.csv`: a diferença numérica máxima foi **zero** para F1-macro, acurácia e acurácia balanceada. Os **80 resultados HSV + Canny** foram calculados agora, mantendo as mesmas partições. Estão disponíveis o [resumo dos oito modelos](docs/E4b_oito_modelos_HSV_Canny_vs_tres_atributos_resumo_2026-11-02.csv) e os [resultados individuais das 160 avaliações](docs/E4b_oito_modelos_HSV_Canny_vs_tres_atributos_rodadas_2026-11-02.csv).
+
+**Limitações:** são resultados de **classificação entre árvores e gramíneas já rotuladas**, não de detecção de toda a vegetação ou discriminação frente a telhados, ruas e solo exposto. As cinco divisões espaciais compartilham amostras e **não são cinco validações externas independentes**. Os resultados dizem respeito à **Area1** e ao Quickshift **por quadrantes**, não reproduzem o Quickshift global original, nem demonstram superioridade universal. A V2 atual possui E4 na Etapa 2 com protocolo próprio, usando afastamento entre centroides; os resultados E4b desta tabela seguem o protocolo com **embargo geométrico do E3c**, e não devem ser anunciados como saída de uma nova execução completa do notebook V2.
 
 ### 6.4. Primeiro resultado: quais algoritmos funcionaram melhor?
 
