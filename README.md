@@ -214,7 +214,7 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 | Material | Conteúdo |
 |---|---|
 | [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
-| [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) | Auditoria de amostras, comparação de modelos, validação espacial, atributos, segmentação, porte e proximidade com postes |
+| [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) | **Dois caminhos claros:** (1) comparar oito algoritmos nos mesmos 119 recortes em janelas de 512 e 256 pixels, com medição de memória; (2) processar progressivamente os 812 quadrantes de 256 pixels, com comparação de oito modelos e análise opcional de postes/porte. O código antigo e duplicado foi retirado deste notebook; o original continua preservado. |
 | [Dados Area1](data/README.md) | Arquivos, coordenadas e estrutura do Drive |
 | [Registro do método original](docs/experimento_area_completa_2026-10-29.md) | Parâmetros, resultados históricos e limitações |
 | [Classificadores e protocolos de avaliação](docs/harmonizacao_protocolos_2026-11-01.md) | Comparações de modelos e validação espacial |
