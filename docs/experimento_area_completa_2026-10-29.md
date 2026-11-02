@@ -1,4 +1,4 @@
-# Registro do experimento — área completa (29/10/2026)
+# Registro do experimento — área completa
 
 ## Origem e versão de referência
 
