@@ -317,7 +317,7 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **Diferença em relação ao método original:** antes, o **K-Means agrupava os segmentos em seis clusters** e selecionávamos o **cluster 3** como conjunto de candidatos, antes de associar as referências e treinar o Random Forest. **Nos experimentos novos, a comparação dos oito classificadores não depende dessa seleção do cluster 3**: os pontos conhecidos fornecem os rótulos dos segmentos produzidos pelo Quickshift.
 
-**Ordem do processamento:** Quickshift cria os segmentos → os pontos conhecidos fornecem os rótulos → calculamos os atributos dos segmentos → separamos os exemplos geograficamente para treino e teste → treinamos e avaliamos os classificadores. **A análise de quanto cada combinação de atributos melhora o F1-macro aparece depois, na seção 3.6**, porque é uma comparação de resultados, e não uma etapa anterior à classificação.
+**Ordem do processamento:** Quickshift cria os segmentos → os pontos conhecidos fornecem os rótulos → calculamos os atributos dos segmentos → separamos os exemplos geograficamente para treino e teste → treinamos e avaliamos os classificadores. **A comparação das combinações de atributos aparece na seção 3.5**, antes dos resultados gerais dos oito classificadores na seção 3.6, porque constitui uma análise experimental do desempenho, e não uma etapa anterior à classificação.
 
 ### 3.4. Como separamos treinamento e teste nas quatro formas de aplicar Quickshift?
 
@@ -348,77 +348,9 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **O que podemos comparar diretamente?** Os **oito classificadores** usam as mesmas divisões de treinamento e teste **dentro de cada avaliação**. Porém, somente as **formas 3 e 4** (os mesmos 119 recortes, inteiros ou subdivididos) compartilham exatamente as referências e divisões entre as duas formas de segmentação. Assim, podemos analisar mais diretamente o efeito de dividir os recortes, sem trocar também os locais de teste. A **forma 1**, do método original, usou divisão aleatória e outra métrica, portanto não é diretamente comparável aos F1-macro atuais. Os resultados documentados da **forma 2** vieram de uma bateria anterior: **a execução integral da rotina progressiva atual dos 812 quadrantes no Notebook V2 ainda não foi confirmada**, e essa rotina usa distâncias entre **centroides**, em vez de geometrias completas.
 
-### 3.5. Resultados dos oito classificadores nas três configurações
+### 3.5. Qual é a contribuição do NDVI, brilho HSV e bordas Canny para o desempenho dos classificadores?
 
-As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
-
-<p align="center">
-  <img src="docs/configuracoes_1_2_3_sem_numeracao.webp" alt="Esquema conjunto das configurações 1, 2 e 3, com 812 quadrantes e 119 recortes inteiros ou subdivididos." width="100%">
-</p>
-
-<p align="center">
-  <img src="docs/infografico_validacao_espacial_256px_250m_500m.webp" alt="Diferença entre segmentação em quadrantes de 256 × 256 pixels e validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros." width="100%">
-</p>
-
-#### 3.5.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
-
-Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
-
-
-| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
-|---|---:|---:|
-| SVM RBF | **0,8987** | **0,8668** |
-| Regressão logística | 0,8928 | 0,8664 |
-| Extra Trees | 0,8790 | 0,8629 |
-| KNN (7) | 0,8874 | 0,8502 |
-| Random Forest | 0,8656 | 0,8530 |
-| HistGradientBoosting | 0,8556 | 0,8524 |
-| Gaussian Naive Bayes | 0,8555 | 0,8398 |
-| Dummy (referência simples) | 0,2980 | 0,2799 |
-
-**Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
-
-#### 3.5.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
-
-Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada E9, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
-
-
-| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
-|---|---:|---:|
-| Extra Trees | 0,9064 | **0,8747** |
-| SVM RBF | **0,9157** | 0,8518 |
-| Regressão logística | 0,9153 | 0,8484 |
-| Random Forest | 0,8906 | 0,8657 |
-| Gaussian Naive Bayes | 0,8894 | 0,8573 |
-| KNN (7) | 0,8940 | 0,8377 |
-| HistGradientBoosting | 0,8738 | 0,8390 |
-| Dummy | 0,2847 | 0,2791 |
-
-#### 3.5.3. Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels
-
-Processamos **exatamente as mesmas regiões** da configuração 2, agora com Quickshift independente em cada parte. Usamos os **mesmos 505 exemplos e as mesmas divisões de treino e teste**, mudando somente a forma de segmentar.
-
-
-| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
-|---|---:|---:|
-| SVM RBF | **0,9341** | 0,8641 |
-| Regressão logística | 0,9157 | **0,8685** |
-| Extra Trees | 0,8968 | 0,8545 |
-| KNN (7) | 0,9009 | 0,8486 |
-| Random Forest | 0,8835 | 0,8566 |
-| Gaussian Naive Bayes | 0,8875 | 0,8464 |
-| HistGradientBoosting | 0,8714 | 0,8411 |
-| Dummy | 0,2847 | 0,2791 |
-
-**Como interpretar os resultados?** Em cada configuração, os oito classificadores estão organizados pela média do F1-macro nos blocos espaciais de 250 e 500 metros. Essa média serve apenas para ordenar a tabela; os melhores valores de cada coluna estão destacados em negrito.
-
-**O que descobrimos?** Na comparação dos mesmos 119 recortes, os resultados variaram conforme o tamanho da segmentação e o classificador. Com blocos de **250 m**, o melhor resultado foi do **SVM RBF com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,9341)**. Com blocos de **500 m**, destacou-se o **Extra Trees com recortes inteiros de 512 × 512 pixels (F1-macro = 0,8747)**. Portanto, **não existe uma única estratégia superior em todas as condições**.
-
-**Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
-
-### 3.6. Qual é a contribuição do NDVI, brilho HSV e bordas Canny para o desempenho dos classificadores?
-
-Os atributos descritos na **seção 3.3 são calculados antes do treinamento**. Aqui, depois de apresentar os resultados gerais dos classificadores, analisamos **como a escolha dos atributos influencia o F1-macro**. Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
+Os atributos descritos na **seção 3.3 são calculados antes do treinamento**. Nesta seção, **antes da comparação geral das três configurações de processamento**, analisamos **como a escolha dos atributos influencia o F1-macro dos classificadores**. Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
 
 **O que representa cada atributo?**
 
@@ -458,6 +390,74 @@ A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrante
 
 **Ordem dos modelos:** F1-macro médio decrescente da combinação **NDVI + HSV + Canny** nos blocos de 500 m.
 
+### 3.6. Resultados dos oito classificadores nas três configurações
+
+As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
+
+<p align="center">
+  <img src="docs/configuracoes_1_2_3_sem_numeracao.webp" alt="Esquema conjunto das configurações 1, 2 e 3, com 812 quadrantes e 119 recortes inteiros ou subdivididos." width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/infografico_validacao_espacial_256px_250m_500m.webp" alt="Diferença entre segmentação em quadrantes de 256 × 256 pixels e validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros." width="100%">
+</p>
+
+#### 3.6.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
+
+Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
+
+
+| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
+|---|---:|---:|
+| SVM RBF | **0,8987** | **0,8668** |
+| Regressão logística | 0,8928 | 0,8664 |
+| Extra Trees | 0,8790 | 0,8629 |
+| KNN (7) | 0,8874 | 0,8502 |
+| Random Forest | 0,8656 | 0,8530 |
+| HistGradientBoosting | 0,8556 | 0,8524 |
+| Gaussian Naive Bayes | 0,8555 | 0,8398 |
+| Dummy (referência simples) | 0,2980 | 0,2799 |
+
+**Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
+
+#### 3.6.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
+
+Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada E9, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
+
+
+| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
+|---|---:|---:|
+| Extra Trees | 0,9064 | **0,8747** |
+| SVM RBF | **0,9157** | 0,8518 |
+| Regressão logística | 0,9153 | 0,8484 |
+| Random Forest | 0,8906 | 0,8657 |
+| Gaussian Naive Bayes | 0,8894 | 0,8573 |
+| KNN (7) | 0,8940 | 0,8377 |
+| HistGradientBoosting | 0,8738 | 0,8390 |
+| Dummy | 0,2847 | 0,2791 |
+
+#### 3.6.3. Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels
+
+Processamos **exatamente as mesmas regiões** da configuração 2, agora com Quickshift independente em cada parte. Usamos os **mesmos 505 exemplos e as mesmas divisões de treino e teste**, mudando somente a forma de segmentar.
+
+
+| Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
+|---|---:|---:|
+| SVM RBF | **0,9341** | 0,8641 |
+| Regressão logística | 0,9157 | **0,8685** |
+| Extra Trees | 0,8968 | 0,8545 |
+| KNN (7) | 0,9009 | 0,8486 |
+| Random Forest | 0,8835 | 0,8566 |
+| Gaussian Naive Bayes | 0,8875 | 0,8464 |
+| HistGradientBoosting | 0,8714 | 0,8411 |
+| Dummy | 0,2847 | 0,2791 |
+
+**Como interpretar os resultados?** Em cada configuração, os oito classificadores estão organizados pela média do F1-macro nos blocos espaciais de 250 e 500 metros. Essa média serve apenas para ordenar a tabela; os melhores valores de cada coluna estão destacados em negrito.
+
+**O que descobrimos?** Na comparação dos mesmos 119 recortes, os resultados variaram conforme o tamanho da segmentação e o classificador. Com blocos de **250 m**, o melhor resultado foi do **SVM RBF com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,9341)**. Com blocos de **500 m**, destacou-se o **Extra Trees com recortes inteiros de 512 × 512 pixels (F1-macro = 0,8747)**. Portanto, **não existe uma única estratégia superior em todas as condições**.
+
+**Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
+
 ### 3.7. Qual configuração consome menos memória RAM?
 
 A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o processamento sequencial dos **mesmos 119 recortes** nas duas estratégias:
@@ -467,7 +467,7 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 | **119 recortes inteiros de até 512 × 512 px** | **467,19 MiB** |
 | **Mesmos 119 recortes, subdivididos em até quatro partes de 256 × 256 px** | **456,80 MiB** |
 
-**Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 3.5).
+**Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 3.6).
 
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
