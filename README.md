@@ -314,6 +314,10 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **Primeiro, uma distinção:** os **256 × 256 e 512 × 512 pixels** indicam o tamanho das janelas usadas na **segmentação da imagem**. Já o treinamento e o teste são separados **depois**, a partir dos exemplos rotulados associados aos pontos conhecidos de árvores e gramíneas. Nas avaliações mais recentes, usamos também a localização geográfica desses exemplos para reduzir a influência da proximidade espacial.
 
+<p align="center">
+  <img src="docs/diagrama_treino_teste_quickshift_4_configuracoes.png" alt="Comparação entre a divisão aleatória de treinamento e teste no método original e a validação espacial em blocos de 250 e 500 metros, com exclusão de 25 metros, nas quatro formas de aplicação do Quickshift." width="100%">
+</p>
+
 | Forma de processamento | Exemplos usados para avaliar | Como separamos treinamento e teste? |
 |---|---|---|
 | **1. Método original: Quickshift na imagem inteira + K-Means + Random Forest** | **458 pares objeto–rótulo**, derivados da seleção do cluster 3 e da associação com as referências. | Divisão **aleatória de 80% para treinamento e 20% para teste**: **366 registros de treino e 92 de teste**, com semente fixa (`random_state=42`). **Não houve separação por localização geográfica** nem exclusão de 25 m. |
