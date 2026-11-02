@@ -273,24 +273,21 @@ Partimos da **imagem original da Area1 (6.942 × 7.294 pixels)** e dos **510 pon
 | **4. Dividir cada recorte em quatro partes muda os resultados ou a memória?** | Usamos as **mesmas 119 regiões** para descobrir se o tamanho da janela influencia os resultados. Primeiro, aplicamos o Quickshift nos recortes inteiros de **até 512 × 512 pixels**; depois, dividimos esses mesmos recortes em até quatro partes de **256 × 256 pixels**. Assim, podemos verificar **qual estratégia oferece melhor F1-macro para os oito classificadores e qual consome menos memória RAM**, mantendo as mesmas referências e condições de avaliação. |
 | **5. NDVI, brilho HSV e bordas Canny funcionam melhor juntos?** | Comparamos **sete combinações** dos três atributos: **(1)** apenas NDVI; **(2)** apenas brilho HSV; **(3)** apenas bordas Canny; **(4)** NDVI + brilho HSV; **(5)** NDVI + bordas Canny; **(6)** brilho HSV + bordas Canny; e **(7)** NDVI + brilho HSV + bordas Canny. Todas as combinações foram avaliadas com os mesmos classificadores e as mesmas divisões espaciais de treinamento e teste, para identificar quais características proporcionam melhores resultados na classificação de árvores e gramíneas. |
 
-### 6.1. Primeiro: a imagem inteira e a mudança de estratégia
+### 6.1. Por que deixamos de processar a imagem inteira?
 
-O método original era:
+**No método original**, aplicamos **Quickshift na imagem inteira → K-Means (6 grupos, cluster 3) → Random Forest**, com **acurácia histórica de 0,87**.
 
-**Imagem completa → Quickshift global → K-Means (6 grupos, cluster 3) → Random Forest → acurácia histórica 0,87.**
+**Por que mudamos?** Ao tentar repetir a segmentação global, faltou memória RAM antes das etapas de K-Means e Random Forest. O erro indicou uma tentativa de alocação **adicional de 1,13 GiB** — **não** o consumo total do método. Como a imagem tem cerca de **50,6 milhões de pixels**, passamos a executar o Quickshift em partes menores, **sem reduzir a resolução dos pixels**.
 
-Ao tentar repetir esse processamento, o Quickshift global falhou por memória insuficiente, antes de chegar ao K-Means e ao Random Forest. O valor de **1,13 GiB** registrado no erro era **uma alocação adicional**, não a RAM total do método. Os números e limites estão apresentados no início do README.
+Na **V2**, investigamos três configurações de segmentação:
 
-Na V2, usamos a **mesma imagem da Area1**, mas **segmentamos cada janela separadamente**. Isso reduz a quantidade de pixels processados **de uma só vez**, sem fazer a imagem ficar menos nítida.
+| Configuração | Área processada | Objetivo |
+|---|---|---|
+| **Quadrantes de até 256 × 256 px** | **812 quadrantes** (28 × 29), cobrindo a imagem inteira | Processar progressivamente com menos demanda de RAM e comparar **oito classificadores** e combinações de atributos. |
+| **Recortes inteiros de até 512 × 512 px** | **119 recortes com referências**, selecionados entre **210 janelas possíveis** (14 × 15) | Calcular o **F1-macro dos oito classificadores** com Quickshift aplicado ao recorte inteiro. |
+| **Os mesmos recortes, subdivididos em até quatro partes de 256 × 256 px** | As **mesmas 119 regiões e referências** da linha anterior | Verificar como a subdivisão altera o **F1-macro** e o **pico de memória RAM**. |
 
-| Forma de trabalhar | Quantas janelas? | Para que serviu? |
-|---|---:|---|
-| **Imagem original inteira** | 1 imagem com **50,6 milhões de pixels** | Referência do método global Quickshift + K-Means + Random Forest. |
-| **Toda a grade em janelas de até 256 × 256 pixels** | **812 quadrantes** (28 colunas × 29 linhas) | Percorrer a **imagem retangular inteira** em partes menores. |
-| **Toda a grade se fosse dividida em janelas de até 512 × 512 pixels** | **210 janelas possíveis** (14 colunas × 15 linhas) | Mostrar de onde vêm os recortes usados no teste seguinte. |
-| **Somente janelas de 512 que contêm pontos conhecidos** | **119 das 210 janelas** | Comparar classificações **onde temos a resposta correta** (árvore ou gramínea). |
-
-**Importante:** os **812 quadrantes** e os **119 recortes** **não são duas coberturas completas equivalentes**. Os 812 percorrem a imagem toda usando janelas de 256 px. Os 119 são **uma seleção** dentro da grade de 512 px, apenas para o teste com referências conhecidas.
+**A diferença essencial:** os **812 quadrantes cobrem toda a imagem**; já os **119 recortes** são apenas as regiões da grade de 512 px que contêm pontos de referência conhecidos. As duas últimas configurações formam **uma comparação controlada**. Como a segmentação e a validação diferem do método original, seus resultados não devem ser comparados diretamente à acurácia histórica de 0,87.
 
 ### 6.2. Por que exatamente 119 recortes? Entenda sem confundir
 
