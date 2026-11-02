@@ -25,4 +25,4 @@ Foi consultado também o notebook já presente no Google Drive, `Segmentação_b
 
 ## Conclusão verificada
 
-Acesso às entradas e pilotos reais confirmados. **Não** foi concluído Quickshift global, K-Means global, cluster 3 nem a avaliação de oito classificadores nesse mesmo pipeline. **Não** há novas métricas E10. Para reproduzir o original, executar a V3 em ambiente de alta RAM, registrar saída e comparar somente após validar a reprodução. A comparação por recortes da V2/E9 permanece separada.
+Acesso às entradas e pilotos reais confirmados. **Não** foi concluído Quickshift global, K-Means global, cluster 3 nem a avaliação de oito classificadores nesse mesmo pipeline. **Não** há novas métricas E10. Para reproduzir o original seria necessário ambiente com mais RAM e uma nova execução controlada; isso não faz parte da comparação por janelas da V2. A comparação por recortes da V2/E9 permanece separada.
