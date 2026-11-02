@@ -254,12 +254,12 @@ A figura abaixo mostra a **imagem real da Area1**, a cobertura dos **812 quadran
 A figura é uma visualização do procedimento, e as grades ilustrativas não reproduzem necessariamente os limites georreferenciados exatos.
 
 <p align="center">
-  <a href="docs/infografico_area1_119_recortes_explicados_2026-11-02.png">
-    <img src="docs/infografico_area1_119_recortes_explicados_2026-11-02.png" alt="Area1 original, grade de 812 quadrantes de processamento e 119 recortes selecionados para o experimento E9" width="100%">
+  <a href="docs/infografico_area1_812_quadrantes_119_recortes_final.webp">
+    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Area1 original, grade de 812 quadrantes de processamento e 119 recortes selecionados para o experimento E9" width="100%">
   </a>
 </p>
 
-[**Abrir a imagem ampliada — raster, 812 quadrantes e 119 recortes**](docs/infografico_area1_119_recortes_explicados_2026-11-02.png)
+[**Abrir a imagem ampliada — raster, 812 quadrantes e 119 recortes**](docs/infografico_area1_812_quadrantes_119_recortes_final.webp)
 
 **Como ler a figura:** os 119 contornos amarelos indicam somente as regiões selecionadas no **E9**. Eles **não** mostram os únicos locais processados na bateria de 812 quadrantes, que percorreu o raster inteiro. Áreas escuras ou pretas são parte da representação da imagem e, por si sós, não indicam falhas ou omissões. Grades e marcações são ilustrativas; os limites dos recortes estão nos registros do experimento.
 
