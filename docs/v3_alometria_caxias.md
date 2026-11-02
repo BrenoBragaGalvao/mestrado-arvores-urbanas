@@ -52,5 +52,30 @@ python experimentos/v3_alometria_caxias.py --area /content/drive/MyDrive/Area1 \
 
 Se a pasta Area1 estiver em outro local do Drive, ajustar apenas --area. Rodar com --tile 512 é um teste adicional de sensibilidade da segmentação.
 
+## Estimativas externas de altura por ponto no Google Earth Engine (V3)
+
+Para responder à pergunta sobre a altura das **257 árvores de referência**, foi preparado o [script de extração GEE](../experimentos/v3_alturas_dossel_google_earth_engine.py), sem alterar as imagens ou os pontos originais da Area1. O script lê **Arvores.gpkg**, mantém seus IDs e consulta duas referências públicas de altura de **dossel estimada por modelos**:
+
+| Fonte | Resolução aproximada | Uso e ressalva |
+|---|---|---|
+| [Meta/WRI — High Resolution Canopy Height Maps](https://gee-community-catalog.org/projects/meta_trees/) | **1 m** | Preferência para árvores urbanas individuais, mas os valores são **previsões**, não alturas medidas. O mapa pode ter deslocamentos, ruído e datas de imagem diferentes. |
+| [ETH Zurich — Global Canopy Height 2020](https://langnico.github.io/globalcanopyheight/) | **10 m** | Referência secundária científica, com resolução insuficiente para separar algumas árvores vizinhas. O produto também fornece estimativas de incerteza. |
+
+**Não foram obtidos 257 valores medidos nesta etapa:** a consulta numérica exige uma sessão **autenticada do Google Earth Engine** em um projeto habilitado. O script está pronto para rodar no Colab com esse acesso e **não contém alturas inventadas**.
+
+Exemplo, após instalar `earthengine-api`, `geopandas` e `pandas`, montar o Drive e habilitar o projeto Google Cloud:
+
+~~~bash
+python experimentos/v3_alturas_dossel_google_earth_engine.py \
+  --area /content/drive/MyDrive/Area1 \
+  --out /content/v3_alturas_gee \
+  --project SEU_ID_DE_PROJETO_GEE \
+  --fontes ambas
+~~~
+
+Saídas previstas, **somente depois de executar com sucesso**: `v3_alturas_dossel_estimadas_257_pontos.csv` com 257 linhas (inclusive pontos sem cobertura, marcados como ausentes), e `v3_alturas_dossel_resumo.json`. É possível anexar os índices da V3 pelo argumento `--indices-v3 CAMINHO/CSV` quando o CSV contiver `ponto_id` e `indice_potencial_C3`.
+
+**Interpretação:** altura do dossel em um pixel georreferenciado **não comprova a altura da árvore individual** à qual o ponto foi associado. A comparação entre a C3 e os produtos Meta/ETH é uma análise de **concordância com outras estimativas modeladas**, não uma validação de campo ou certificação de exatidão (MAE/RMSE perante observações reais). As datas, diferenças de resolução, alinhamento geográfico e trechos sem cobertura devem ser documentados antes de tirar conclusões.
+
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
