@@ -378,7 +378,7 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 
 **Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
 
-### 6.4. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4/E4b)
+### 6.4. NDVI + brilho HSV + bordas Canny: os três juntos são melhores?
 
 Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
 
