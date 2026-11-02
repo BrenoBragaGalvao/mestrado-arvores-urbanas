@@ -159,6 +159,9 @@ Os valores abaixo foram **registrados em execuções anteriores**:
 | **Acurácia** | **0,81** | **0,87** |
 | F1 — árvores | 0,80 | 0,85 |
 | F1 — gramíneas | 0,83 | 0,88 |
+| **F1-macro (aproximado)** | **≈ 0,815** | **≈ 0,865** |
+
+*O F1-macro foi aproximado pela média dos F1 das duas classes, que já estão arredondados na tabela. Os valores exatos exigem as métricas originais sem arredondamento.*
 
 **Por que são 510 pontos de referência, mas 458 registros na rodada maior?** O código mantém apenas objetos do **cluster 3** e os associa espacialmente aos pontos conhecidos. O resultado é uma tabela de **pares objeto–rótulo**: um ponto pode não ter candidato e um segmento pode gerar mais de uma associação.
 
