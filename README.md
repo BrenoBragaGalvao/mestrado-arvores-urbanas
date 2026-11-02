@@ -246,12 +246,12 @@ O projeto utiliza a mesma fonte de dados para **três caminhos de processamento*
 A figura abaixo utiliza a imagem da Area1 para distinguir o raster original, a cobertura dos 812 quadrantes e os 119 recortes selecionados para o E9.
 
 <p align="center">
-  <a href="docs/infografico_area1_119_recortes_explicados_2026-11-02.png">
-    <img src="docs/infografico_area1_119_recortes_explicados_2026-11-02.png" alt="Area1 original, grade de 812 quadrantes de processamento e 119 recortes selecionados para o experimento E9" width="100%">
+  <a href="docs/infografico_area1_812_quadrantes_119_recortes_atualizado.svg">
+    <img src="docs/infografico_area1_812_quadrantes_119_recortes_atualizado.svg" alt="Area1 original, grade de 812 quadrantes de processamento e 119 recortes selecionados para o experimento E9" width="100%">
   </a>
 </p>
 
-[**Abrir a imagem ampliada — raster, 812 quadrantes e 119 recortes**](docs/infografico_area1_119_recortes_explicados_2026-11-02.png)
+[**Abrir a imagem ampliada — raster, 812 quadrantes e 119 recortes**](docs/infografico_area1_812_quadrantes_119_recortes_atualizado.svg)
 
 **Como ler a figura:** os 119 contornos amarelos indicam somente as regiões selecionadas no **E9**. Eles **não** mostram os únicos locais processados na bateria de 812 quadrantes, que percorreu o raster inteiro. Áreas escuras ou pretas são parte da representação da imagem e, por si sós, não indicam falhas ou omissões. Grades e marcações são ilustrativas; os limites dos recortes estão nos registros do experimento.
 
