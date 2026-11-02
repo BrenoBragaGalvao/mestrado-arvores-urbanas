@@ -237,11 +237,11 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 | [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
 | [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) | **Dois caminhos claros:** (1) comparar oito algoritmos nos mesmos 119 recortes em janelas de 512 e 256 pixels, com medição de memória; (2) processar progressivamente os 812 quadrantes de 256 pixels, com comparação de oito modelos e análise opcional de postes/porte. O código antigo e duplicado foi retirado deste notebook; o original continua preservado. |
 | [Dados Area1](data/README.md) | Arquivos, coordenadas e estrutura do Drive |
-| [Registro do método original](docs/experimento_area_completa_2026-10-29.md) | Parâmetros, resultados históricos e limitações |
-| [Detalhes da tentativa com imagem completa](docs/e10_teste_execucao_local_2026-11-02.md) | Execução do Quickshift global e erro por insuficiência de memória |
-| [Classificadores e protocolos de avaliação](docs/harmonizacao_protocolos_2026-11-01.md) | Comparações de modelos e validação espacial |
-| [Comparação das segmentações de 512 e 256 pixels](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) | Comparação pareada da segmentação |
-| [Medição real dos recortes](docs/e9_medicao_memoria_2026-11-02.md) | Pico de memória observado nos 119 recortes, com janelas de 512 e 256 pixels |
+| [Registro do método original](docs/experimento_area_completa.md) | Parâmetros, resultados históricos e limitações |
+| [Detalhes da tentativa com imagem completa](docs/e10_teste_execucao_local.md) | Execução do Quickshift global e erro por insuficiência de memória |
+| [Classificadores e protocolos de avaliação](docs/harmonizacao_protocolos.md) | Comparações de modelos e validação espacial |
+| [Comparação das segmentações de 512 e 256 pixels](docs/comparacao_controlada_segmentacao_512_vs_256.md) | Comparação pareada da segmentação |
+| [Medição real dos recortes](docs/e9_medicao_memoria.md) | Pico de memória observado nos 119 recortes, com janelas de 512 e 256 pixels |
 | [Estimativas C1–C6](docs/allometria.md) | Fórmulas exploratórias de porte |
 
 Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi preparado para **Google Colab**. O processamento global consome muita memória; **uma nova execução completa e bem-sucedida não está comprovada**. As baterias da V2 têm evidências documentadas separadamente, mas nem todas as saídas estão salvas no próprio notebook publicado.
@@ -434,7 +434,7 @@ Medimos também a memória: **467,19 MiB** no processamento de 512 contínuo e *
 
 As análises de porte e proximidade são **exploratórias**: sem alturas medidas, classe de fundo urbano e geometria dos cabos, **não comprovam risco elétrico**.
 
-**Onde estão os códigos e os resultados:** [Resumo E4 — combinações de atributos](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv) · [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código para comparar 512 e 256 pixels](experimentos/e9_reproduzir_512_256.py) · [Comparação dos oito algoritmos](docs/harmonizacao_protocolos_2026-11-01.md) · [Comparação das janelas](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
+**Onde estão os códigos e os resultados:** [Resumo E4 — combinações de atributos](docs/E4_resumo_ablacao_812_quadrantes_2026-11-01.csv) · [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código para comparar 512 e 256 pixels](experimentos/e9_reproduzir_512_256.py) · [Comparação dos oito algoritmos](docs/harmonizacao_protocolos.md) · [Comparação das janelas](docs/comparacao_controlada_segmentacao_512_vs_256.md) · [Medição de memória](docs/e9_medicao_memoria.md).
 
 *As tabelas foram obtidas em experimentos já documentados. O código atual da V2 foi reorganizado para reexecutá-los, mas essa versão simplificada ainda precisa ser executada e comparada aos resultados publicados.*
 

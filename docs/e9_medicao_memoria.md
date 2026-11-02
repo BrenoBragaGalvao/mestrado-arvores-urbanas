@@ -1,4 +1,4 @@
-# E9 — medição de memória nos mesmos 119 recortes da Area1 (02/11/2026)
+# E9 — medição de memória nos mesmos 119 recortes da Area1
 
 ## Resultado real, não estimado
 

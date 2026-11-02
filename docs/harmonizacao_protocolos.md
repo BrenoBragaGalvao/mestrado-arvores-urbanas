@@ -1,4 +1,4 @@
-# Harmonização metodológica dos experimentos — 01/11/2026
+# Harmonização metodológica dos experimentos
 
 > **Escopo:** comparação de algoritmos com **métricas homogêneas e a mesma base experimental derivada**. Não é uma reprodução do Quickshift monolítico nem da acurácia histórica obtida com 458 pares.
 
@@ -76,4 +76,4 @@ O Random Forest obteve F1-macro médio de **0,8906 vs. 0,8835** (blocos de 250 m
 
 **Limite mantido:** o teste E9 isola a escala em recortes de 512 px; não reproduz o Quickshift monolítico sobre todo o raster, o filtro global K-Means cluster 3 nem os 458 pares históricos. Por isso, **a acurácia 0,87 não se tornou diretamente comparável** com E9.
 
-Consulte a [documentação e o fluxograma completos do E9](comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md).
+Consulte a [documentação e o fluxograma completos do E9](comparacao_controlada_segmentacao_512_vs_256.md).
