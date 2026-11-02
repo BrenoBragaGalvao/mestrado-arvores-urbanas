@@ -11,18 +11,27 @@ Esta pesquisa investiga duas propostas complementares a partir de **uma única �
 
 **Roteiro de leitura:** dados da Area1 → método original → limitação de memória → testes com janelas menores → resultados dos oito classificadores (seção 6).
 
-## Memória: por que usamos janelas menores?
+## Por que mudamos o método? A memória RAM foi o limite
 
-A imagem original tem **6.942 × 7.294 pixels (50,6 milhões)**. Ao tentar repetir o **Quickshift global** em um ambiente com limite de **4 GiB de RAM**, a execução falhou com `MemoryError` ao solicitar uma matriz adicional de **1,13 GiB**. **1,13 GiB é o tamanho da alocação que falhou, não o consumo total do método original**, que não foi medido na execução histórica.
+**Primeiro, o método original:** aplicamos **Quickshift à imagem RGB inteira**, depois **K-Means (seis grupos, seleção do cluster 3)** e **Random Forest (500 árvores)**. A execução histórica registrou **0,87 de acurácia em 92 exemplos de teste**, mas **não registrou quanto de memória RAM consumiu**.
 
-Por isso, a V2 adotou processamento por **janelas de pixels**, sem diminuir a resolução da imagem. Em uma medição real dos **mesmos 119 recortes da Area1**, processados sequencialmente, obtivemos:
+**Depois, tentamos repetir o Quickshift global** para comparar outros algoritmos nas mesmas condições. A imagem tem **6.942 × 7.294 pixels (50.634.948 pixels)**. Em um ambiente com **4 GiB de RAM**, a tentativa **não concluiu**: houve `MemoryError` quando o Quickshift precisou alocar **mais 1,13 GiB** para uma matriz temporária. Como o erro ocorreu **durante a segmentação**, essa nova tentativa **nem chegou ao K-Means ou ao Random Forest**.
 
-| Configuração | Pico de RAM do processo | Resultado |
+### Quanto de memória foi necessário ou observado?
+
+| Situação | Memória | O que esse número significa? |
 |---|---:|---|
-| **512 × 512 px** (cada recorte inteiro) | **467,19 MiB** | Processamento concluído |
-| **4 × 256 × 256 px** (mesmo recorte dividido) | **456,80 MiB** | Processamento concluído |
+| **Método original completo: Quickshift + K-Means + Random Forest** | **Não medida** | Houve resultado histórico (acurácia 0,87), mas não há registro confiável de pico de RAM da execução. |
+| **Nova tentativa do Quickshift global** | **1,13 GiB adicionais solicitados; falhou** | Tamanho de **uma única matriz** que não pôde ser alocada sob o limite do ambiente; **não** é o pico total nem o consumo combinado dos três algoritmos. |
+| **Quickshift em um recorte de 2.048 × 2.048 pixels** | **Cerca de 687 MB de pico** | Medição em um recorte maior, que conseguiu concluir; não equivale à imagem inteira. |
+| **119 recortes de até 512 × 512 pixels, um após o outro** | **467,19 MiB de pico** | Medição do processo na comparação entre tamanhos de janela. |
+| **Os mesmos 119 recortes divididos em até quatro partes de 256 × 256** | **456,80 MiB de pico** | Medição do mesmo tipo de processo; redução observada de **10,38 MiB (2,22%)**. |
 
-A divisão apresentou **10,38 MiB a menos de pico de RAM (2,22%)** nesse teste. São valores de **memória residente do processo inteiro**, não somente do Quickshift. O teste global e a comparação entre tamanhos de janela têm dimensões e protocolos diferentes: **512 pixels por recorte não significa processar a imagem globalmente**. [Medição detalhada de memória](docs/e9_medicao_memoria_2026-11-02.md) · [Tentativa do Quickshift global](docs/e10_teste_execucao_local_2026-11-02.md).
+Para ter ideia do tamanho dos dados, **apenas uma cópia da imagem RGB inteira em `uint8` ocupa cerca de 145 MiB**; uma cópia do raster RGB+NIR em `uint16`, cerca de **386 MiB**; e a **matriz temporária RGB de três bandas em `float64`**, cerca de **1,13 GiB**. Esses são **tamanhos calculados de matrizes individuais**, não medições de consumo total; a segmentação também requer outras matrizes e estruturas.
+
+**Decisão:** em vez de insistir no Quickshift global, passamos a **dividir a imagem em janelas menores, sem reduzir a resolução dos pixels**. Isso viabilizou comparar oito classificadores com exemplos e testes equivalentes **dentro de cada novo experimento**. Não significa que reproduzimos o método global original.
+
+[Detalhes da tentativa com imagem completa](docs/e10_teste_execucao_local_2026-11-02.md) · [Medição real dos recortes](docs/e9_medicao_memoria_2026-11-02.md)
 
 ---
 
@@ -225,49 +234,70 @@ Os arquivos da Area1 ficam no **Google Drive**, e o notebook original foi prepar
 
 ---
 
-## 6. Por que dividimos a imagem e qual algoritmo funcionou melhor?
+## 6. Como saímos do método original e comparamos oito algoritmos?
 
-O **método original** segmentava a imagem inteira de uma vez com **Quickshift global**, usava **K-Means (seis grupos, cluster 3)** e treinava um **Random Forest**. Nesse estudo histórico, a acurácia foi de **0,87 em 92 exemplos de teste**.
-
-O problema para ampliar os testes foi **repetir a segmentação global com a memória disponível**, e não treinar os classificadores. A V2 resolveu a limitação prática **processando recortes menores**. Com isso, conseguimos comparar **oito algoritmos nas mesmas condições dentro de cada experimento**, em vez de testar somente Random Forest.
+**Em uma frase:** a imagem inteira ficou pesada demais para repetir o Quickshift global no ambiente disponível; por isso, passamos a trabalhar em **janelas da mesma imagem**, com os mesmos pontos conhecidos e as mesmas condições de avaliação entre os classificadores.
 
 **Perguntas que orientaram os testes**
 
-| O que queríamos descobrir? | Como investigamos? |
+| Pergunta | Como investigamos? |
 |---|---|
-| **1. Por que não continuar usando a imagem inteira?** | Testamos a execução do Quickshift global em um ambiente com **4 GiB de RAM**; houve falta de memória. Por isso, passamos a processar janelas menores, sem reduzir a resolução dos pixels. |
-| **2. Qual algoritmo classifica melhor árvores e gramíneas?** | Comparamos **oito classificadores** usando os **mesmos 505 segmentos rotulados**, os mesmos atributos (NDVI, brilho e bordas) e as mesmas divisões de treino e teste. |
-| **3. Processar janelas de 512 × 512 ou quatro partes de 256 × 256 muda os resultados e a memória utilizada?** | Usamos os **mesmos 119 recortes** nas duas formas de segmentação, comparamos as previsões dos oito classificadores e medimos o pico de memória: **467,19 MiB** e **456,80 MiB**, respectivamente. |
-| **4. Os resultados se mantêm quando testamos em outras regiões da imagem?** | Separamos treino e teste por **blocos geográficos de 250 m e 500 m**, em vez de depender apenas de sorteios aleatórios, e comparamos os resultados pela **F1-macro**. |
+| **1. Por que dividimos a imagem?** | Tentamos repetir o Quickshift global com limite de **4 GiB de RAM**, mas faltou memória. Passamos a processar partes menores, preservando os pixels originais. |
+| **2. Por que escolhemos exatamente 119 recortes?** | Distribuímos os **510 pontos conhecidos de árvores e gramíneas** na grade de janelas de **512 × 512 pixels**. Eles ficaram em **119 janelas diferentes**. Essas são as regiões em que conseguimos verificar os acertos da classificação. |
+| **3. Qual algoritmo classifica melhor?** | Colocamos **oito classificadores** diante dos **mesmos exemplos, atributos e divisões de treino/teste**, para comparar a F1-macro. |
+| **4. Dividir cada recorte em quatro partes muda os resultados ou a memória?** | Usamos as **mesmas 119 regiões**: primeiro segmentadas inteiras (até **512 × 512**) e depois em até **quatro partes de 256 × 256**. Comparamos previsões e medimos o pico de RAM. |
 
-### 6.1. O que mudou de um experimento para o outro?
+### 6.1. Primeiro: a imagem inteira e a mudança de estratégia
 
-| Estudo | Como a imagem foi segmentada | O que foi avaliado? |
-|---|---|---|
-| **Original** | Quickshift **global** na imagem inteira + K-Means, cluster 3 | Random Forest; acurácia histórica **0,87** |
-| **V2 — comparação dos algoritmos** | Quickshift em **janelas de 256 × 256 px**; base derivada com **505 segmentos rotulados únicos** | Oito classificadores nas mesmas partições |
-| **V2 — comparação dos tamanhos das janelas** | Os mesmos **119 recortes de até 512 × 512 px**, processados inteiros **ou** divididos em quatro partes de até 256 × 256 px | Oito classificadores nas **mesmas referências** e divisões, comparando também o tamanho das janelas |
+O método original era:
 
-**Não criamos imagens de menor resolução:** dividimos a imagem original em regiões menores para conseguir processá-la. A V2 por quadrantes é um **método experimental diferente** do Quickshift global original.
+**Imagem completa → Quickshift global → K-Means (6 grupos, cluster 3) → Random Forest → acurácia histórica 0,87.**
+
+Ao tentar repetir esse processamento, o Quickshift global falhou por memória insuficiente, antes de chegar ao K-Means e ao Random Forest. O valor de **1,13 GiB** registrado no erro era **uma alocação adicional**, não a RAM total do método. Os números e limites estão apresentados no início do README.
+
+Na V2, usamos a **mesma imagem da Area1**, mas **segmentamos cada janela separadamente**. Isso reduz a quantidade de pixels processados **de uma só vez**, sem fazer a imagem ficar menos nítida.
+
+| Forma de trabalhar | Quantas janelas? | Para que serviu? |
+|---|---:|---|
+| **Imagem original inteira** | 1 imagem com **50,6 milhões de pixels** | Referência do método global Quickshift + K-Means + Random Forest. |
+| **Toda a grade em janelas de até 256 × 256 pixels** | **812 quadrantes** (28 colunas × 29 linhas) | Percorrer a **imagem retangular inteira** em partes menores. |
+| **Toda a grade se fosse dividida em janelas de até 512 × 512 pixels** | **210 janelas possíveis** (14 colunas × 15 linhas) | Mostrar de onde vêm os recortes usados no teste seguinte. |
+| **Somente janelas de 512 que contêm pontos conhecidos** | **119 das 210 janelas** | Comparar classificações **onde temos a resposta correta** (árvore ou gramínea). |
+
+**Importante:** os **812 quadrantes** e os **119 recortes** **não são duas coberturas completas equivalentes**. Os 812 percorrem a imagem toda usando janelas de 256 px. Os 119 são **uma seleção** dentro da grade de 512 px, apenas para o teste com referências conhecidas.
+
+### 6.2. Por que exatamente 119 recortes? Entenda sem confundir
+
+**Não escolhemos o número 119 antes de começar. Ele apareceu a partir dos pontos de referência.**
+
+1. Já tínhamos **257 pontos identificados como árvores** e **253 como gramíneas**: **510 pontos conhecidos**, marcados na imagem original.
+2. Dividimos **mentalmente a grade da imagem** em **210 posições possíveis de 512 × 512 pixels**. As janelas nas bordas podem ser menores.
+3. Localizamos cada um dos **510 pontos** na sua respectiva janela. **Vários pontos podem estar na mesma janela.**
+4. Ao contar **somente as posições diferentes que continham pelo menos um ponto**, encontramos **119 janelas**. São esses os **119 recortes** — e **não 119 novas imagens nem 119 árvores**.
+5. Usamos **cada um desses mesmos recortes duas vezes**: uma segmentação Quickshift com o recorte inteiro (até 512 × 512), outra com o recorte dividido em até quatro partes (256 × 256). Assim, a diferença entre os testes está **na forma de segmentar**, não no local da imagem.
+
+**Exemplo apenas para entender a contagem:** se dez pontos conhecidos estivessem distribuídos em apenas duas janelas, usaríamos **dois recortes**, não dez. No conjunto real, os **510 pontos ficaram em 119 recortes**.
+
+**Por que não as 210 janelas?** É possível segmentar todas elas, mas **as outras 91 não contêm pontos de referência conhecidos nesse conjunto**. Portanto, elas **não acrescentariam novos exemplos rotulados para calcular acurácia ou F1-macro**. Escolhemos as 119 para fazer a comparação dos classificadores **sem gastar processamento nas regiões sem rótulos**.
+
+Nos 119 recortes existem **510 pontos originais**, mas, após agrupar referências que compartilham um mesmo segmento, a comparação controlada utiliza **505 referências únicas comuns**. **Pontos, recortes e segmentos são contagens diferentes.**
 
 <details>
-<summary>Ver a Area1 e a localização dos quadrantes e recortes</summary>
+<summary>Ver a imagem mostrando a diferença entre 812 quadrantes e 119 recortes</summary>
 
 <p align="center">
   <a href="docs/infografico_area1_812_quadrantes_119_recortes_final.webp">
-    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Area1 original, 812 quadrantes de até 256 pixels e 119 recortes de até 512 pixels usados na comparação entre janelas" width="100%">
+    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="A imagem retangular inteira dividida em 812 quadrantes de 256 pixels, e a seleção de 119 janelas de 512 pixels contendo pontos conhecidos" width="100%">
   </a>
 </p>
 
-A grade completa tem **812 quadrantes** (28 colunas × 29 linhas), com janelas menores nas bordas. Os **119 recortes do teste de tamanhos de janela** foram escolhidos por conter os pontos de referência e **não representam cobertura integral da AOI**.
-
 </details>
 
-### 6.2. Qual algoritmo identificou melhor árvores e gramíneas?
+### 6.3. Primeiro resultado: quais algoritmos funcionaram melhor?
 
-A avaliação utiliza **505 segmentos rotulados únicos**, extraídos da Area1 por janelas de **256 × 256 px**. Todos os modelos recebem os **mesmos três atributos** (NDVI, brilho HSV e bordas Canny), os **mesmos exemplos de treino/teste** e as mesmas métricas **dentro de cada protocolo**.
+Com os segmentos derivados das **janelas de 256 × 256 pixels**, comparamos **oito classificadores** usando os **mesmos 505 segmentos rotulados únicos**, três atributos (**NDVI, brilho HSV e bordas Canny**) e divisões de treinamento e teste equivalentes.
 
-**F1-macro médio** (quanto maior, melhor). Foram usadas cinco divisões espaciais por escala, com blocos de 250 ou 500 **metros** e embargo geométrico de 25 m:
+A tabela mostra o **F1-macro médio**: quanto **maior**, melhor o equilíbrio da classificação das duas classes. Os blocos de **250 e 500 metros** servem para separar espacialmente treinamento e teste; **não são tamanhos de recortes em pixels**. Foi usado embargo de 25 m e cinco divisões por escala.
 
 | Classificador | Blocos de 250 m | Blocos de 500 m |
 |---|---:|---:|
@@ -280,32 +310,33 @@ A avaliação utiliza **505 segmentos rotulados únicos**, extraídos da Area1 p
 | Gaussian Naive Bayes | 0,8555 | 0,8398 |
 | Dummy (referência simples) | 0,2980 | 0,2799 |
 
-**O que encontramos:** nessas duas configurações, **SVM RBF obteve o maior F1-macro médio**, superando o Random Forest. Isso é um resultado **descritivo dentro da base derivada de 256 px**, não prova de superioridade universal.
+**Resultado:** o **SVM RBF** teve o **maior F1-macro médio** nas duas configurações desse teste. Isso mostra um desempenho promissor **nessa nova base**; não é comparação direta com a acurácia histórica 0,87 do método global.
 
-### 6.3. O tamanho das janelas muda a classificação?
+### 6.4. Segundo resultado: 512 × 512 é melhor que quatro partes de 256 × 256?
 
-Esse é **outro teste**, separado da tabela anterior. Usamos os **mesmos 119 recortes** e os **mesmos 505 pontos de referência comuns**. Em cada recorte, comparamos:
+Agora a pergunta é outra: **se os classificadores receberem segmentos formados de maneiras diferentes, a previsão muda?** Para responder, mantivemos **os mesmos 119 recortes**, referências e divisões de teste; só alteramos a segmentação:
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 76}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
+%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 76}, "htmlLabels": false, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["119 recortes da Area1<br/>cada um com até 512 × 512 px"] --> B["A: Quickshift contínuo<br/>em cada recorte de até<br/>512 × 512 px<br/>(não é o Quickshift global)"]
-    A --> C["B: Quickshift em<br/>quatro partes de até<br/>256 × 256 px"]
-    B --> D["Mesmas referências<br/>e divisões de teste"]
+    P["510 pontos conhecidos<br/>distribuídos na imagem"] --> A["119 das 210 janelas<br/>de até 512 × 512 px<br/>contêm esses pontos"]
+    A --> B["A: Quickshift em cada<br/>recorte inteiro<br/>até 512 × 512 px<br/>(não é global)"]
+    A --> C["B: Quickshift no<br/>mesmo recorte, dividido<br/>em até quatro partes<br/>de 256 × 256 px"]
+    B --> D["Mesmos pontos,<br/>atributos e divisões<br/>de treino/teste"]
     C --> D
-    D --> E["Comparar F1-macro<br/>dos oito modelos"]
+    D --> E["Comparar F1-macro<br/>dos oito algoritmos"]
 
     classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
     classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
     classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714;
-    class A,D dados;
+    class P,A,D dados;
     class B,C metodo;
     class E resultado;
 ```
 
-**F1-macro médio da comparação entre janelas**, com cinco divisões por escala e embargo de **25 m entre pontos de referência**:
+**F1-macro médio com cinco divisões por escala e distância de exclusão de 25 m entre os pontos:**
 
-| Classificador | 250 m / 512 px | 250 m / 4 × 256 px | 500 m / 512 px | 500 m / 4 × 256 px |
+| Classificador | 250 m: 512 inteiro | 250 m: quatro 256 | 500 m: 512 inteiro | 500 m: quatro 256 |
 |---|---:|---:|---:|---:|
 | Random Forest | **0,8906** | 0,8835 | **0,8657** | 0,8566 |
 | **SVM RBF** | 0,9157 | **0,9341** | 0,8518 | **0,8641** |
@@ -316,18 +347,19 @@ flowchart TD
 | Gaussian Naive Bayes | **0,8894** | 0,8875 | **0,8573** | 0,8464 |
 | Dummy | 0,2847 | 0,2847 | 0,2791 | 0,2791 |
 
-**O que encontramos:** com blocos de **250 m**, o maior F1-macro médio foi do **SVM em quatro partes de 256 px (0,9341)**. Com blocos de **500 m**, o maior foi do **Extra Trees em 512 px contínuos (0,8747)**. Logo, o melhor resultado **dependeu do tamanho das janelas, do classificador e do protocolo de teste**.
+**O que aprendemos:** com blocos geográficos de **250 m**, o maior resultado foi **SVM RBF em quatro partes de 256 px (0,9341)**. Com blocos de **500 m**, foi **Extra Trees em recortes inteiros de 512 px (0,8747)**. Ou seja, **não existe um vencedor único em todas as condições**.
 
-A memória também foi medida nesses 119 recortes: **467,19 MiB em 512 contínuo** e **456,80 MiB em quatro 256**. É uma redução observada de **2,22% no pico do processo**, não uma economia de 75%.
+Medimos também a memória: **467,19 MiB** no processamento de 512 contínuo e **456,80 MiB** em quatro partes de 256; uma diferença de **10,38 MiB (2,22%)** no pico total de RAM do processo, considerando os **119 recortes processados sequencialmente**. **Esse valor não representa a RAM necessária para executar o Quickshift global original.**
 
-### 6.4. O que podemos concluir?
+### 6.5. O que podemos concluir — e o que não podemos?
 
-- **Sim:** dividir a imagem viabilizou experimentos controlados com **oito classificadores** e os dados existentes da Area1.
-- **Sim:** o **SVM RBF apresentou resultados promissores**, mas não foi o melhor em todas as configurações.
-- **Ainda não:** não podemos afirmar que a V2 superou o **pipeline global original**, pois ele tinha **outros segmentos, seleção por K-Means e outra avaliação**. Acurácia histórica **0,87** e F1-macro novo **não são a mesma métrica**.
-- **Também não:** como não existem alturas reais medidas nem geometria de cabos, os dados não comprovam risco elétrico. A proximidade calculada é horizontal em relação aos **postes**.
+**Conseguimos:** contornar a limitação de memória pela segmentação em partes, comparar **oito classificadores** em condições homogêneas dentro de cada teste, avaliar o efeito de janelas de **512 e 256 pixels** e identificar resultados promissores, principalmente do **SVM RBF**.
 
-**Código e evidências:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código para comparar 512 e 256 pixels](experimentos/e9_reproduzir_512_256.py) · [Resultados dos oito classificadores](docs/harmonizacao_protocolos_2026-11-01.md) · [Resultados da comparação entre janelas](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
+**Ainda não conseguimos comprovar:** que a V2 supera o **Quickshift global + K-Means + Random Forest** original. O método global selecionava outros segmentos, usava outro treinamento/teste e foi reportado em **acurácia**, não no mesmo F1-macro da V2. Também **não medimos a memória total do pipeline original**.
 
-*As tabelas acima vêm dos experimentos já documentados. A nova célula para repetir a comparação das janelas foi acrescentada à V2 para reproduzi-los; ela ainda precisa ser executada e conferida antes de substituir os resultados publicados.*
+As análises de porte e proximidade são **exploratórias**: sem alturas medidas, classe de fundo urbano e geometria dos cabos, **não comprovam risco elétrico**.
+
+**Onde estão os códigos e os resultados:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código para comparar 512 e 256 pixels](experimentos/e9_reproduzir_512_256.py) · [Comparação dos oito algoritmos](docs/harmonizacao_protocolos_2026-11-01.md) · [Comparação das janelas](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
+
+*As tabelas foram obtidas em experimentos já documentados. O código atual da V2 foi reorganizado para reexecutá-los, mas essa versão simplificada ainda precisa ser executada e comparada aos resultados publicados.*
 
