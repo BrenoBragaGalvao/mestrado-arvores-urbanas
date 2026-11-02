@@ -216,7 +216,7 @@ Depois aplica o filtro `Power_tree_size_C3 > 7` e calcula a proximidade dos obje
 
 ## 4. Imagem completa — as 17 etapas do código original
 
-A ilustração horizontal abaixo apresenta as **17 etapas do código original**, com a **Proposta 1** (classificação) e a **Proposta 2** (índice de porte e proximidade com postes) identificadas. Os resultados exibidos na etapa 12 são os valores **históricos da rodada maior**: acurácia **0,87** e F1 de árvores **0,85**.
+A ilustração horizontal abaixo apresenta as **17 etapas do código original**, com a **Proposta 1** (classificação) e a **Proposta 2** (índice de porte e proximidade com postes) identificadas. Os resultados exibidos na etapa 12 são os valores **históricos da aplicação inicial**: acurácia **0,87** e F1 de árvores **0,85**.
 
 <p align="center">
   <a href="docs/fluxo_17_etapas_horizontal_corrigido.png">
