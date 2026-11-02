@@ -22,7 +22,7 @@ Por isso, a V2 adotou processamento por **janelas de pixels**, sem diminuir a re
 | **512 × 512 px** (cada recorte inteiro) | **467,19 MiB** | Processamento concluído |
 | **4 × 256 × 256 px** (mesmo recorte dividido) | **456,80 MiB** | Processamento concluído |
 
-A divisão apresentou **10,38 MiB a menos de pico de RAM (2,22%)** nesse teste. São valores de **memória residente do processo inteiro**, não somente do Quickshift. O teste global e o E9 têm tamanhos e protocolos diferentes: **512 pixels por recorte não significa processar a imagem globalmente**. [Medição detalhada de memória](docs/e9_medicao_memoria_2026-11-02.md) · [Tentativa do Quickshift global](docs/e10_teste_execucao_local_2026-11-02.md).
+A divisão apresentou **10,38 MiB a menos de pico de RAM (2,22%)** nesse teste. São valores de **memória residente do processo inteiro**, não somente do Quickshift. O teste global e a comparação entre tamanhos de janela têm dimensões e protocolos diferentes: **512 pixels por recorte não significa processar a imagem globalmente**. [Medição detalhada de memória](docs/e9_medicao_memoria_2026-11-02.md) · [Tentativa do Quickshift global](docs/e10_teste_execucao_local_2026-11-02.md).
 
 ---
 
@@ -236,8 +236,8 @@ O problema para ampliar os testes foi **repetir a segmentação global com a mem
 | Estudo | Como a imagem foi segmentada | O que foi avaliado? |
 |---|---|---|
 | **Original** | Quickshift **global** na imagem inteira + K-Means, cluster 3 | Random Forest; acurácia histórica **0,87** |
-| **V2 — comparação de modelos (E3c)** | Quickshift em **janelas de 256 × 256 px**; base derivada com **505 segmentos rotulados únicos** | Oito classificadores nas mesmas partições |
-| **V2 — comparação de janelas (E9)** | Os mesmos **119 recortes de até 512 × 512 px**, processados inteiros **ou** divididos em quatro partes de até 256 × 256 px | Oito classificadores nas **mesmas referências** e divisões, comparando também o tamanho das janelas |
+| **V2 — comparação dos algoritmos** | Quickshift em **janelas de 256 × 256 px**; base derivada com **505 segmentos rotulados únicos** | Oito classificadores nas mesmas partições |
+| **V2 — comparação dos tamanhos das janelas** | Os mesmos **119 recortes de até 512 × 512 px**, processados inteiros **ou** divididos em quatro partes de até 256 × 256 px | Oito classificadores nas **mesmas referências** e divisões, comparando também o tamanho das janelas |
 
 **Não criamos imagens de menor resolução:** dividimos a imagem original em regiões menores para conseguir processá-la. A V2 por quadrantes é um **método experimental diferente** do Quickshift global original.
 
@@ -246,15 +246,15 @@ O problema para ampliar os testes foi **repetir a segmentação global com a mem
 
 <p align="center">
   <a href="docs/infografico_area1_812_quadrantes_119_recortes_final.webp">
-    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Area1 original, 812 quadrantes de até 256 pixels e 119 recortes de até 512 pixels usados no E9" width="100%">
+    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Area1 original, 812 quadrantes de até 256 pixels e 119 recortes de até 512 pixels usados na comparação entre janelas" width="100%">
   </a>
 </p>
 
-A grade completa tem **812 quadrantes** (28 colunas × 29 linhas), com janelas menores nas bordas. Os **119 recortes do E9** foram escolhidos por conter os pontos de referência e **não representam cobertura integral da AOI**.
+A grade completa tem **812 quadrantes** (28 colunas × 29 linhas), com janelas menores nas bordas. Os **119 recortes do teste de tamanhos de janela** foram escolhidos por conter os pontos de referência e **não representam cobertura integral da AOI**.
 
 </details>
 
-### 6.2. Comparação principal: oito classificadores na mesma base (E3c)
+### 6.2. Qual algoritmo identificou melhor árvores e gramíneas?
 
 A avaliação utiliza **505 segmentos rotulados únicos**, extraídos da Area1 por janelas de **256 × 256 px**. Todos os modelos recebem os **mesmos três atributos** (NDVI, brilho HSV e bordas Canny), os **mesmos exemplos de treino/teste** e as mesmas métricas **dentro de cada protocolo**.
 
@@ -273,7 +273,7 @@ A avaliação utiliza **505 segmentos rotulados únicos**, extraídos da Area1 p
 
 **O que encontramos:** nessas duas configurações, **SVM RBF obteve o maior F1-macro médio**, superando o Random Forest. Isso é um resultado **descritivo dentro da base derivada de 256 px**, não prova de superioridade universal.
 
-### 6.3. E se usarmos 512 pixels em vez de quatro partes de 256? (E9)
+### 6.3. O tamanho das janelas muda a classificação?
 
 Esse é **outro teste**, separado da tabela anterior. Usamos os **mesmos 119 recortes** e os **mesmos 505 pontos de referência comuns**. Em cada recorte, comparamos:
 
@@ -294,7 +294,7 @@ flowchart TD
     class E resultado;
 ```
 
-**F1-macro médio do E9**, com cinco divisões por escala e embargo de **25 m entre pontos de referência**:
+**F1-macro médio da comparação entre janelas**, com cinco divisões por escala e embargo de **25 m entre pontos de referência**:
 
 | Classificador | 250 m / 512 px | 250 m / 4 × 256 px | 500 m / 512 px | 500 m / 4 × 256 px |
 |---|---:|---:|---:|---:|
@@ -318,7 +318,7 @@ A memória também foi medida nesses 119 recortes: **467,19 MiB em 512 contínuo
 - **Ainda não:** não podemos afirmar que a V2 superou o **pipeline global original**, pois ele tinha **outros segmentos, seleção por K-Means e outra avaliação**. Acurácia histórica **0,87** e F1-macro novo **não são a mesma métrica**.
 - **Também não:** como não existem alturas reais medidas nem geometria de cabos, os dados não comprovam risco elétrico. A proximidade calculada é horizontal em relação aos **postes**.
 
-**Código e evidências:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código executável do E9 (512 × 256)](experimentos/e9_reproduzir_512_256.py) · [Resultados dos oito classificadores](docs/harmonizacao_protocolos_2026-11-01.md) · [Resultados comparativos E9](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
+**Código e evidências:** [Notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) · [Código para comparar 512 e 256 pixels](experimentos/e9_reproduzir_512_256.py) · [Resultados dos oito classificadores](docs/harmonizacao_protocolos_2026-11-01.md) · [Resultados da comparação entre janelas](docs/comparacao_controlada_segmentacao_512_vs_256_2026-11-01.md) · [Medição de memória](docs/e9_medicao_memoria_2026-11-02.md).
 
-*As tabelas acima vêm dos experimentos já documentados. A nova célula de reexecução E9 foi acrescentada à V2 para reproduzi-los; ela ainda precisa ser executada e conferida antes de substituir os resultados publicados.*
+*As tabelas acima vêm dos experimentos já documentados. A nova célula para repetir a comparação das janelas foi acrescentada à V2 para reproduzi-los; ela ainda precisa ser executada e conferida antes de substituir os resultados publicados.*
 
