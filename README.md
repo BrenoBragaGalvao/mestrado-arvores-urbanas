@@ -276,8 +276,8 @@ Para isso, escolhemos **119 recortes que contêm pontos conhecidos de árvores e
 ```mermaid
 %%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 70, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["119 recortes<br/>da Area1<br/>(até 512 × 512 px)"] --> B["A: Quickshift<br/>recorte contínuo"]
-    A --> C["B: Quickshift<br/>4 partes de<br/>256 × 256 px"]
+    A["119 recortes<br/>da Area1<br/>(até 512 × 512 px)"] --> B["A: Quickshift<br/>contínuo em cada<br/>recorte de até<br/>512 × 512 px"]
+    A --> C["B: Quickshift<br/>em quatro partes<br/>de até<br/>256 × 256 px"]
     B --> D["Mesmas<br/>referências<br/>e divisões<br/>de teste"]
     C --> D
     D --> E["Comparar<br/>F1-macro<br/>com os mesmos<br/>modelos"]
@@ -289,6 +289,8 @@ flowchart TD
     class B,C metodo;
     class E resultado;
 ```
+
+**Importante:** neste fluxograma, “contínuo” significa processar **cada recorte de até 512 × 512 px inteiro**, e **não** aplicar Quickshift global à imagem completa do método original com K-Means.
 
 **Medição de memória no E9 (Area1 real, 119 recortes):** além da comparação de classificação, executamos novamente as duas formas de segmentação para registrar o **pico de memória residente (RSS) de cada processo**, incluindo leitura das janelas RGB/NIR, mapas de NDVI, brilho HSV, bordas Canny, Quickshift e médias dos atributos. Cada configuração foi medida em um processo separado, percorrendo as 119 regiões sequencialmente.
 
