@@ -77,5 +77,15 @@ Saídas previstas, **somente depois de executar com sucesso**: `v3_alturas_dosse
 
 **Interpretação:** altura do dossel em um pixel georreferenciado **não comprova a altura da árvore individual** à qual o ponto foi associado. A comparação entre a C3 e os produtos Meta/ETH é uma análise de **concordância com outras estimativas modeladas**, não uma validação de campo ou certificação de exatidão (MAE/RMSE perante observações reais). As datas, diferenças de resolução, alinhamento geográfico e trechos sem cobertura devem ser documentados antes de tirar conclusões.
 
+## Comparação externa concluída: Meta/WRI versus ETH Zurich (257 pontos)
+
+A [comparação pareada da V3](v3_alturas_publicas/v3_meta_eth_comparacao_257.md) foi **executada e documentada**, usando o GeoTIFF oficial da ETH Zurich 2020 e as estimativas da Meta/WRI CHMv2 previamente obtidas. Ambas foram amostradas nas coordenadas dos **mesmos 257 pontos** da Area1. O [CSV por ponto](v3_alturas_publicas/v3_meta_eth_alturas_estimadas_257_arvores.csv) contém as duas fontes e indica ausências.
+
+- **Meta/WRI:** 257 pontos com valor no pixel (~1 m).
+- **ETH Zurich:** 139 pontos com valor no pixel (~10 m); **118 sem dados válidos**, não imputados como zero.
+- **Nos 139 pontos comuns:** medianas de **6 m (Meta)** e **14 m (ETH)**; diferença mediana ponto a ponto ETH − Meta de **+8 m**, correlação de Pearson de **0,399**.
+
+A diferença importante indica **discordância entre previsões**, não erro de medição nem comprovação de que a fonte ETH seja mais precisa. Os produtos têm escalas, fontes de informação e máscaras diferentes. As alturas reais dos 257 indivíduos **continuam sem medição de campo**; a C3 permanece um índice não calibrado e não deve ser comparada em metros como se fosse altura validada. [Consulte os dados e as limitações](v3_alturas_publicas/v3_meta_eth_comparacao_257.md).
+
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
