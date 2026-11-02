@@ -252,6 +252,12 @@ Este esquema representa o **notebook original**. Os experimentos posteriores da 
 
 **O que foi reaproveitado do método original?** **A imagem da Area1 e os 510 pontos de referência** dos arquivos `Arvores.gpkg` (257 árvores) e `Grama.gpkg` (253 gramíneas), que já existiam **antes** das previsões do modelo. **O que NÃO foi reaproveitado?** O resultado do K-Means, os 458 pares objeto–rótulo da rodada histórica, o modelo Random Forest treinado e suas previsões. Na V2, os segmentos e atributos foram calculados novamente com Quickshift por janelas; depois treinamos e avaliamos os classificadores. **Os 119 recortes foram encontrados pelas coordenadas dos pontos de referência, e não selecionados pelos acertos ou erros do Random Forest.**
 
+<p align="center">
+  <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="Infográfico da Area1: imagem original, cobertura integral por 812 quadrantes de 256 pixels e seleção de 119 recortes de 512 pixels com pontos de referência" width="100%">
+</p>
+
+*Figura — Organização espacial da Area1: imagem original, cobertura integral por 812 quadrantes e seleção de 119 recortes contendo pontos de referência.*
+
 **Perguntas que orientaram os testes**
 
 | Pergunta | Como investigamos? |
@@ -298,17 +304,6 @@ Na V2, usamos a **mesma imagem da Area1**, mas **segmentamos cada janela separad
 Nos 119 recortes existem **510 pontos originais**, mas, após agrupar referências que compartilham um mesmo segmento, a comparação controlada utiliza **505 referências únicas comuns**. **Pontos, recortes e segmentos são contagens diferentes.**
 
 **Isso é diferente de comparar com o método original:** na execução histórica, a segmentação era global, havia seleção do **cluster 3 do K-Means** e foram obtidos **458 pares objeto–rótulo** para treinar/testar o Random Forest. Na comparação dos 119 recortes, a segmentação foi **refeita localmente**; por isso, os exemplos resultantes e o protocolo não são idênticos. **Os 119 recortes servem para comparar os novos algoritmos e os tamanhos de janela entre si, não para provar que um deles superou a acurácia histórica de 0,87.**
-
-<details>
-<summary>Ver a imagem mostrando a diferença entre 812 quadrantes e 119 recortes</summary>
-
-<p align="center">
-  <a href="docs/infografico_area1_812_quadrantes_119_recortes_final.webp">
-    <img src="docs/infografico_area1_812_quadrantes_119_recortes_final.webp" alt="A imagem retangular inteira dividida em 812 quadrantes de 256 pixels, e a seleção de 119 janelas de 512 pixels contendo pontos conhecidos" width="100%">
-  </a>
-</p>
-
-</details>
 
 ### 6.3. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4/E4b)
 
