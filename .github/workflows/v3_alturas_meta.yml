@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/v3_alturas_meta.yml'
       - 'dados_v3/pontos_area1_257.csv'
+      - 'experimentos/v3_amostrar_altura_publica.py'
   workflow_dispatch:
 
 permissions:
