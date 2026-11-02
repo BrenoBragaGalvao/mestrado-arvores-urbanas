@@ -147,9 +147,9 @@ flowchart TD
 
 O método original processa aproximadamente 50 milhões de pixels, agrupando-os em segmentos por meio do Quickshift. A classificação pelo Random Forest utiliza características desses segmentos, e não os pixels individualmente. Na execução histórica, foram utilizados 458 registros rotulados, divididos aleatoriamente entre treinamento (366) e teste (92). Entretanto, o código não separava geograficamente os exemplos de treinamento e teste, o que pode influenciar a avaliação do desempenho do modelo.
 
-### Resultados históricos da Proposta 1
+### Resultados da Proposta 1
 
-Os valores abaixo foram **registrados em execuções anteriores**, não recalculados por uma nova execução integral comprovada.
+Os valores abaixo foram **registrados em execuções anteriores**:
 
 | Indicador | Experimento inicial | Experimento com área maior |
 |---|---:|---:|
