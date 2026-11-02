@@ -310,7 +310,28 @@ Nos 119 recortes existem **510 pontos originais**, mas, após agrupar referênci
 
 **Isso é diferente de comparar com o método original:** na execução histórica, a segmentação era global, havia seleção do **cluster 3 do K-Means** e foram obtidos **458 pares objeto–rótulo** para treinar/testar o Random Forest. Na comparação dos 119 recortes, a segmentação foi **refeita localmente**; por isso, os exemplos resultantes e o protocolo não são idênticos. **Os 119 recortes servem para comparar os novos algoritmos e os tamanhos de janela entre si, não para provar que um deles superou a acurácia histórica de 0,87.**
 
-### 6.3. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4/E4b)
+### 6.3. Primeiro resultado: quais algoritmos funcionaram melhor?
+
+Com os segmentos derivados das **janelas de 256 × 256 pixels**, comparamos **oito classificadores** usando os **mesmos 505 segmentos rotulados únicos**, três atributos (**NDVI, brilho HSV e bordas Canny**) e divisões de treinamento e teste equivalentes.
+
+A tabela mostra o **F1-macro médio**: quanto **maior**, melhor o equilíbrio da classificação das duas classes. Os blocos de **250 e 500 metros** servem para separar espacialmente treinamento e teste; **não são tamanhos de recortes em pixels**. Foi usado embargo de 25 m e cinco divisões por escala.
+
+| Classificador | Blocos de 250 m | Blocos de 500 m |
+|---|---:|---:|
+| **SVM RBF** | **0,8987** | **0,8668** |
+| Regressão logística | 0,8928 | 0,8664 |
+| Extra Trees | 0,8790 | 0,8629 |
+| KNN (7) | 0,8874 | 0,8502 |
+| **Random Forest** | **0,8656** | **0,8530** |
+| HistGradientBoosting | 0,8556 | 0,8524 |
+| Gaussian Naive Bayes | 0,8555 | 0,8398 |
+| Dummy (referência simples) | 0,2980 | 0,2799 |
+
+**Ordem dos modelos:** F1-macro médio decrescente da **média aritmética das duas escalas** (250 m e 500 m). Essa média foi usada apenas para ordenar as linhas, sem substituir os resultados por escala nem constituir uma nova avaliação estatística.
+
+**Resultado:** o **SVM RBF** teve o **maior F1-macro médio** nas duas configurações desse teste. Isso mostra um desempenho promissor **nessa nova base**; não é comparação direta com a acurácia histórica 0,87 do método global.
+
+### 6.4. NDVI + brilho HSV + bordas Canny: os três juntos são melhores? (E4/E4b)
 
 Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
 
@@ -361,27 +382,6 @@ A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrante
 A [V2](Segmentacao_area_completa_v2_experimentos.ipynb) foi ampliada na **Etapa 2** para gerar `E4b_oito_modelos_rodadas.csv` e `E4b_oito_modelos_HSV_Canny_vs_tres.csv` quando o processamento dos 812 quadrantes for executado e concluído. **A versão atual do notebook ainda não foi reexecutada para validar esses novos arquivos.** Além disso, a implementação progressiva atual emprega embargo por **centroides**, enquanto o E4b acima utilizou **geometrias completas**; os números não devem ser anunciados como uma reprodução idêntica dessa nova execução até conferir o protocolo.
 
 **Limites científicos:** os testes reutilizam exemplos da **mesma Area1**, sem dados rotulados de fundo urbano e sem validação externa. As cinco divisões por escala também não são observações independentes. O resultado sustenta que **acrescentar NDVI melhorou o F1-macro médio nos protocolos avaliados**, mas não prova desempenho superior em outras regiões ou significância estatística.
-
-### 6.4. Primeiro resultado: quais algoritmos funcionaram melhor?
-
-Com os segmentos derivados das **janelas de 256 × 256 pixels**, comparamos **oito classificadores** usando os **mesmos 505 segmentos rotulados únicos**, três atributos (**NDVI, brilho HSV e bordas Canny**) e divisões de treinamento e teste equivalentes.
-
-A tabela mostra o **F1-macro médio**: quanto **maior**, melhor o equilíbrio da classificação das duas classes. Os blocos de **250 e 500 metros** servem para separar espacialmente treinamento e teste; **não são tamanhos de recortes em pixels**. Foi usado embargo de 25 m e cinco divisões por escala.
-
-| Classificador | Blocos de 250 m | Blocos de 500 m |
-|---|---:|---:|
-| **SVM RBF** | **0,8987** | **0,8668** |
-| Regressão logística | 0,8928 | 0,8664 |
-| Extra Trees | 0,8790 | 0,8629 |
-| KNN (7) | 0,8874 | 0,8502 |
-| **Random Forest** | **0,8656** | **0,8530** |
-| HistGradientBoosting | 0,8556 | 0,8524 |
-| Gaussian Naive Bayes | 0,8555 | 0,8398 |
-| Dummy (referência simples) | 0,2980 | 0,2799 |
-
-**Ordem dos modelos:** F1-macro médio decrescente da **média aritmética das duas escalas** (250 m e 500 m). Essa média foi usada apenas para ordenar as linhas, sem substituir os resultados por escala nem constituir uma nova avaliação estatística.
-
-**Resultado:** o **SVM RBF** teve o **maior F1-macro médio** nas duas configurações desse teste. Isso mostra um desempenho promissor **nessa nova base**; não é comparação direta com a acurácia histórica 0,87 do método global.
 
 ### 6.5. Segundo resultado: 512 × 512 é melhor que quatro partes de 256 × 256?
 
