@@ -24,12 +24,14 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 
 ### Dimensões e cobertura — imagem completa × área de estudo (AOI)
 
-| Área / arquivo | Largura × altura em pixels | Pixels na área | Área no terreno |
+| Área / arquivo | Dimensões da grade (largura × altura) | Pixels na área | Área no terreno |
 |---|---|---:|---:|
-| **Imagem RGB completa** (`AOI_RGB_NEW.tif`) | **6.942 × 7.294** (real) | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
-| **Imagem RGB + NIR completa** (`AOI_NEW_MULTI.tif`) | **6.942 × 7.294** (real) | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
-| **Polígono AOI sobre o RGB** (área efetiva de estudo) | **≈ 6.797 × 7.142** (retângulo de área equivalente) | **48.548.811** | **≈ 12,1372 km²** (≈ 12,14 km²) |
-| **Polígono AOI sobre o RGB + NIR** (mesma área de estudo) | **≈ 6.797 × 7.142** (retângulo de área equivalente) | **48.548.645** | **≈ 12,1372 km²** (≈ 12,14 km²) |
+| **Imagem RGB completa** (`AOI_RGB_NEW.tif`) | **6.942 × 7.294 pixels** | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
+| **Imagem RGB + NIR completa** (`AOI_NEW_MULTI.tif`) | **6.942 × 7.294 pixels** | **50.634.948** | **12,658737 km²** (≈ 12,66 km²) |
+| **Polígono AOI sobre o RGB** (área efetiva de estudo) | **6.942 × 7.294 pixels** (mesma grade) | **48.548.811** | **≈ 12,1372 km²** (≈ 12,14 km²) |
+| **Polígono AOI sobre o RGB + NIR** (mesma área de estudo) | **6.942 × 7.294 pixels** (mesma grade) | **48.548.645** | **≈ 12,1372 km²** (≈ 12,14 km²) |
+
+**Observação:** a **AOI usa a mesma grade de 6.942 × 7.294 pixels** das imagens. Como o polígono da área de estudo é irregular, **nem todos os pixels da grade pertencem à AOI**; por isso, a quantidade de pixels incluídos e a área em km² são menores.
 
 ### Resolução espacial e referência geográfica
 
@@ -262,7 +264,7 @@ Abaixo está o caminho dos dados. **Uma mesma Area1 dá origem a bases supervisi
 | **Comparação de classificadores na V2** | **Toda a extensão retangular** do raster, inclusive fora da AOI, percorrida em **812 quadrantes** | **Até 256 × 256 pixels por quadrante** — cada pedaço foi segmentado separadamente |
 | **Comparação da escala de segmentação na V2 (E9)** | Somente **119 regiões contendo referências de árvores/gramíneas**, sem cobrir necessariamente toda a AOI | **Até 512 × 512 pixels por região**, comparados aos **mesmos pixels divididos em quatro quadrantes de até 256 × 256** |
 
-*As dimensões ≈ **6.797 × 7.142 pixels** da seção 1 representam apenas um **retângulo de área equivalente à AOI**; nenhum desses três procedimentos usou uma imagem recortada com esse tamanho.*
+
 
 **Por que a grade de 256 × 256 pixels parece incompleta na imagem?** Na verdade, **o processamento em 812 quadrantes cobriu todo o retângulo do raster**. Isso ocorre porque a largura de 6.942 pixels exige **28 colunas de quadrantes** e a altura de 7.294 pixels exige **29 linhas**: **28 × 29 = 812**. Os quadrantes das bordas são menores (última coluna com **30 pixels** de largura; última linha com **126 pixels** de altura).
 
