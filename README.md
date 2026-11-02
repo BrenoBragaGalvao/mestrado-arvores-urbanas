@@ -270,12 +270,13 @@ Depois de conhecer a imagem original e as janelas de processamento, investigamos
 Para isso, escolhemos **119 recortes que contêm pontos conhecidos de árvores e gramíneas**. Cada região de **até 512 × 512 pixels** foi analisada das duas formas, **sobre os mesmos pixels**:
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 65, "rankSpacing": 70, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["119 recortes da Area1<br/>até 512 × 512 px"] --> B["A: Quickshift no<br/>recorte contínuo"]
-    A --> C["B: Quickshift em<br/>4 partes de 256 × 256"]
-    B --> D["Mesmas referências<br/>e divisões de teste"]
+    A["119 recortes<br/>da Area1<br/>(até 512 × 512 px)"] --> B["A: Quickshift<br/>recorte contínuo"]
+    A --> C["B: Quickshift<br/>4 partes de<br/>256 × 256 px"]
+    B --> D["Mesmas<br/>referências<br/>e divisões<br/>de teste"]
     C --> D
-    D --> E["Comparar F1-macro<br/>com os mesmos modelos"]
+    D --> E["Comparar<br/>F1-macro<br/>com os mesmos<br/>modelos"]
 
     classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d;
     classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35;
@@ -311,16 +312,17 @@ O **Random Forest teve maior média com 512 contínuo** nos resultados exibidos,
 Os mesmos **510 pontos de referência existentes** foram usados como ponto de partida, mas os caminhos de processamento **não produzem bases idênticas**:
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 72, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["Area1 e referências<br/>de árvores/gramíneas"] --> B["Método original<br/>Quickshift global"]
-    B --> C["K-Means: 6 grupos<br/>seleção do cluster 3"]
-    C --> D["458 pares objeto–rótulo<br/>92 testes aleatórios"]
+    A["Area1<br/>referências de<br/>árvores e<br/>gramíneas"] --> B["Método original<br/>Quickshift<br/>global"]
+    B --> C["K-Means<br/>6 grupos<br/>seleção do<br/>cluster 3"]
+    C --> D["458 pares<br/>objeto–rótulo<br/>92 testes<br/>aleatórios"]
 
-    A --> E["V2: 812 quadrantes<br/>Quickshift independente"]
-    E --> F["Associação e deduplicação<br/>505 segmentos rotulados"]
+    A --> E["V2<br/>812 quadrantes<br/>Quickshift<br/>independente"]
+    E --> F["Associação<br/>e deduplicação<br/>505 segmentos<br/>rotulados"]
 
-    A --> G["E9: 119 recortes<br/>512 contínuo ou 4 × 256"]
-    G --> H["505 referências comuns<br/>aos dois modos de segmentar"]
+    A --> G["E9<br/>119 recortes<br/>512 contínuo<br/>ou 4 partes<br/>de 256 × 256"]
+    G --> H["505 referências<br/>comuns aos<br/>dois modos de<br/>segmentar"]
 
     classDef origem fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
     classDef historico fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
@@ -393,13 +395,14 @@ Também repetimos a **configuração histórica** do Random Forest (500 árvores
 A partir da base derivada de **505 segmentos**, testamos **oito classificadores**. Em cada partição, os modelos receberam **os mesmos exemplos, as mesmas características e a mesma divisão de treino e teste**. Alterou-se o algoritmo de classificação, para tornar a comparação válida *dentro do protocolo*.
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 70, "rankSpacing": 70, "htmlLabels": false}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "16px"}}}%%
 flowchart TD
-    A["505 segmentos rotulados"] --> B["NDVI, brilho HSV<br/>e bordas Canny"]
-    B --> C["Mesma partição<br/>de treino e teste"]
+    A["505 segmentos<br/>rotulados"] --> B["NDVI<br/>brilho HSV<br/>bordas Canny"]
+    B --> C["Mesma partição<br/>de treino<br/>e teste"]
     C --> D["Random Forest"]
     C --> E["SVM RBF"]
-    C --> F["Outros 6 modelos"]
-    D --> G["Comparação de<br/>F1-macro e acurácia"]
+    C --> F["Outros<br/>6 modelos"]
+    D --> G["Comparar<br/>F1-macro<br/>e acurácia"]
     E --> G
     F --> G
 
