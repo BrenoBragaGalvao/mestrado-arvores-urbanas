@@ -15,7 +15,7 @@ import pandas as pd
 ETH_TILE = "ETH_GlobalCanopyHeight_10m_2020_S30W054_Map.tif"
 ETH_URL = (
     "https://libdrive.ethz.ch/index.php/s/cO8or7iOe5dT2Rt/download"
-    "?path=%2F%203deg_cogs&files=" + ETH_TILE
+    "?path=%2F3deg_cogs&files=" + ETH_TILE
 )
 ARCGIS = ("https://tiledimageservices.arcgis.com/P3ePLMYs2RVChkJx/"
           "arcgis/rest/services/10m_Tree_Canopy_Height/ImageServer")
