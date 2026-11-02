@@ -318,6 +318,10 @@ As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto mai
   <img src="docs/configuracoes_1_2_3_resumo.webp" alt="Esquema conjunto das configurações 1, 2 e 3, com 812 quadrantes e 119 recortes inteiros ou subdivididos." width="100%">
 </p>
 
+<p align="center">
+  <img src="docs/infografico_validacao_espacial_256px_250m_500m.webp" alt="Diferença entre segmentação em quadrantes de 256 × 256 pixels e validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros." width="100%">
+</p>
+
 #### 6.3.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
 
 Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
@@ -335,10 +339,6 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 | Dummy (referência simples) | 0,2980 | 0,2799 |
 
 **Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
-
-<p align="center">
-  <img src="docs/infografico_validacao_espacial_256px_250m_500m.webp" alt="Diferença entre segmentação em quadrantes de 256 × 256 pixels e validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros." width="100%">
-</p>
 
 #### 6.3.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
 
