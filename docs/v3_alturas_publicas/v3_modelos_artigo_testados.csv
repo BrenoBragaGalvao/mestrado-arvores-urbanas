@@ -1,0 +1,6 @@
+﻿modelo,especie,cidade,CW_original_em_funcao_de_H,H_inversa,n_sem_extrapolacao,CW_min,CW_max,H_min,H_max,referencia
+Magnolia_Kavala_log,Magnolia grandiflora,Kavala,CW=-1.906+3.691ln(H),H=exp((CW+1.906)/3.691),22,0.35,8.14,1.8,13.4,Chatziathanasiou et al. (2024) Land 13 1579
+Magnolia_Orestiada_log,Magnolia grandiflora,Orestiada,CW=-1.440+3.375ln(H),H=exp((CW+1.440)/3.375),19,0.35,8.14,1.8,13.4,Chatziathanasiou et al. (2024) Land 13 1579
+Magnolia_Xanthi_inverse,Magnolia grandiflora,Xanthi,CW=7.280-16.672/H,H=16.672/(7.280-CW),5,0.35,8.14,1.8,13.4,Chatziathanasiou et al. (2024) Land 13 1579
+Magnolia_Komotini_inverse,Magnolia grandiflora,Komotini,CW=7.394-14.882/H,H=14.882/(7.394-CW),7,0.35,8.14,1.8,13.4,Chatziathanasiou et al. (2024) Land 13 1579
+Acer_total_compound,Acer negundo,4 cidades,CW=0.676*(1.123**H),H=ln(CW/0.676)/ln(1.123),0,0.79,17.3,1.6,15.6,Chatziathanasiou et al. (2024) Land 13 1579
