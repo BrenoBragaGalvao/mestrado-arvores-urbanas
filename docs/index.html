@@ -10,9 +10,13 @@
   <title>Atlas Urbano | Portal do Mestrado</title>
   <link rel="stylesheet" href="./mestrado-site/styles.css">
   <link rel="stylesheet" href="./mestrado-site/portal.css">
-  <link rel="stylesheet" href="./mestrado-site/unb-theme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./mestrado-site/research-dashboard.css?v=20261103-2">
   <script src="./mestrado-site/readme-content.js" defer></script>
   <script src="./mestrado-site/portal.js" defer></script>
+  <script src="./mestrado-site/search.js?v=20261103-2" defer></script>
   <script src="./mestrado-site/app.js" defer></script>
 </head>
 <body>
@@ -21,15 +25,19 @@
     <div id="sidebar-scrim" class="sidebar-scrim" hidden></div>
     <aside class="portal-sidebar" id="sidebar" aria-label="Menu lateral da pesquisa">
       <div class="sidebar-head">
-        <a href="#inicio" class="portal-brand portal-brand-unb" aria-label="Página inicial do portal do mestrado">
+        <a href="#inicio" class="portal-brand portal-brand-unb" aria-label="Voltar ao início do portal do mestrado">
           <span class="unb-brand-lockup">
-            <img class="unb-logo-original" src="https://upload.wikimedia.org/wikipedia/commons/9/9e/Webysther_20160322_-_Logo_UnB.svg" alt="Logo azul e verde da Universidade de Brasília — UnB" width="86" height="79" loading="eager">
+            <img class="unb-logo-original" src="./mestrado-site/unb-logo-local.svg" alt="Símbolo azul e verde da Universidade de Brasília — UnB" width="130" height="120" loading="eager">
           </span>
           <span class="unb-project-label">PORTAL DO MESTRADO</span>
         </a>
         <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Fechar menu lateral">×</button>
       </div>
       <div class="sidebar-scroll">
+        <div class="sidebar-tools">
+          <div class="sidebar-progress" aria-label="Situação do projeto"><span class="sidebar-progress-icon" aria-hidden="true">◉</span> Pesquisa em desenvolvimento</div>
+          <button type="button" id="open-command-search" class="sidebar-search-trigger" aria-haspopup="dialog" aria-controls="command-search" aria-label="Buscar página ou tópico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.6" cy="10.6" r="6.1"/><path d="m15.5 15.5 5 5"/></svg><span>Buscar tópico</span><kbd>Ctrl K</kbd></button>
+        </div>
         <p class="sidebar-caption">NAVEGAÇÃO DO PROJETO</p>
         <nav id="sidebar-nav" class="sidebar-nav" aria-label="Capítulos e subtópicos">
           <a href="#inicio" class="sidebar-home-link">Início</a>
@@ -57,14 +65,14 @@
       <main id="area-principal" class="portal-main" tabindex="-1">
         <section id="page-inicio" class="portal-view home-view" data-view="inicio">
           <div class="page-overview-header">
-            <span class="page-overview-icon" aria-hidden="true">⌂</span>
+            <span class="page-overview-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg></span>
             <div><h2>Início</h2><p>Conheça a pesquisa, a metodologia e os resultados do mestrado</p></div>
           </div>
           <div class="home-hero">
             <div class="home-hero-copy">
               <span class="home-overline">VISÃO GERAL DA PESQUISA</span>
-              <h1>Dados e tecnologia para compreender a <em>vegetação urbana.</em></h1>
-              <p>Uma apresentação navegável do projeto de mestrado sobre identificação de árvores e gramíneas, segmentação de imagens, validação espacial, alometria e proximidade com postes.</p>
+              <h1>Vegetação urbana, dados e tecnologia</h1>
+              <p>Explore a identificação de árvores e gramíneas, os experimentos de segmentação, a validação espacial e a análise alométrica da Area1 em Caxias do Sul.</p>
               <div class="home-chips"><span>Ciência de dados</span><span>Geotecnologias</span><span>Aprendizado de máquina</span></div>
               <a class="portal-primary-button" href="#topico-1">Conhecer a pesquisa <span aria-hidden="true">→</span></a>
             </div>
@@ -81,7 +89,7 @@
             <div class="home-stat"><span>AVALIAÇÃO ALOMÉTRICA</span><strong>257</strong><small>Pontos com referência Meta/WRI</small></div>
           </div>
 
-          <div class="home-section-caption"><span>ESCOLHA UM TÓPICO PARA EXPLORAR</span><span>Menu lateral com capítulos e subtópicos</span></div>
+          <div class="home-section-caption"><span>CAPÍTULOS DA PESQUISA</span><span>Selecione uma área para explorar seus subtópicos</span></div>
           <div id="home-chapters" class="home-chapter-grid"></div>
 
           <div class="home-insight">
@@ -137,6 +145,14 @@
       <div class="table-footer"><span id="point-count">257 pontos</span><button type="button" id="point-more" class="text-button">Mostrar mais ↓</button></div>
       <p class="widget-note" id="points-note">As alturas Meta/WRI não são medidas em campo; as versões C1–C6 são índices exploratórios.</p>
     </section>
+  </div>
+  <div id="command-search" class="command-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="command-search-title">
+    <div class="command-dialog">
+      <div class="command-input-row"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg><label id="command-search-title" for="command-input" class="visually-hidden">Buscar páginas da pesquisa</label><input type="search" id="command-input" placeholder="Buscar capítulo ou subtópico..." autocomplete="off" aria-controls="command-results"><button type="button" id="close-command-search" aria-label="Fechar busca">Esc</button></div>
+      <div class="command-results-title">PÁGINAS DA PESQUISA</div>
+      <div id="command-results" class="command-results"></div>
+      <div class="command-help"><span>↵ Selecionar</span><span>Esc Fechar</span><span>Ctrl K Abrir</span></div>
+    </div>
   </div>
 </body>
 </html>
