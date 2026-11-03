@@ -1,0 +1,7 @@
+﻿n,mae_m,rmse_m,vies_m,mediana_residual_abs_m,nome,alvo,coef_a,coef_b,metodo
+257,11.552754909466282,13.2229584870769,10.433290995882746,10.744348926173354,C1_potencial,altura_meta_pixel_m,0.5,0.7,"Coeficientes originais fixos, SEM validacao de ajuste"
+257,9.772431140674733,11.638816674026065,8.122006949190137,8.785362441632481,C1_potencial,altura_meta_max_5m_m,0.5,0.7,"Coeficientes originais fixos, SEM validacao de ajuste"
+257,25.395333957249292,28.98258765708473,25.12159357546111,23.98192827656602,C2_potencial,altura_meta_pixel_m,0.6,0.8,"Coeficientes originais fixos, SEM validacao de ajuste"
+257,23.210119742326224,27.08362466037498,22.8103095287685,21.683393019536695,C2_potencial,altura_meta_max_5m_m,0.6,0.8,"Coeficientes originais fixos, SEM validacao de ajuste"
+257,13.067373282673074,14.291176834667487,12.537175564488535,13.524036170218661,C3_potencial,altura_meta_pixel_m,2.5,0.4,"Coeficientes originais fixos, SEM validacao de ajuste"
+257,11.058897947678195,12.44190143905316,10.22589151779593,11.1201376590924,C3_potencial,altura_meta_max_5m_m,2.5,0.4,"Coeficientes originais fixos, SEM validacao de ajuste"

@@ -1,0 +1,170 @@
+{
+  "altura_meta_pixel_m": {
+    "250": {
+      "folds": 5,
+      "selecionados": [
+        "constante",
+        "constante",
+        "constante",
+        "constante",
+        "constante"
+      ],
+      "n_grupos": 75
+    },
+    "500": {
+      "folds": 5,
+      "selecionados": [
+        "constante",
+        "constante",
+        "constante",
+        "constante",
+        "constante"
+      ],
+      "n_grupos": 34
+    },
+    "formula_final": {
+      "constante": {
+        "params": [
+          2.0
+        ],
+        "formula": "H_modelada=2"
+      },
+      "potencia": {
+        "params": [
+          1.368380763284268,
+          0.17089463528951795
+        ],
+        "formula": "H_modelada=1.3684 * A^0.17089"
+      },
+      "potencia_offset": {
+        "params": [
+          2.558019447142438,
+          0.00031337068872757567,
+          1.499999964433168
+        ],
+        "formula": "H_modelada=2.558 + 0.00031337 * A^1.5"
+      },
+      "raiz_offset": {
+        "params": [
+          1.9269377677473118,
+          0.10476442979238783
+        ],
+        "formula": "H_modelada=1.9269 + 0.10476 * sqrt(A)"
+      },
+      "logaritmica": {
+        "params": [
+          1.0206106229069836,
+          0.4361155269014614
+        ],
+        "formula": "H_modelada=1.0206 + 0.43612 * ln(1+A)"
+      },
+      "linear": {
+        "params": [
+          2.3796133035770697,
+          0.00535017145635341
+        ],
+        "formula": "H_modelada=2.3796 + 0.0053502 * A"
+      },
+      "saturacao": {
+        "params": [
+          2.37152056236336,
+          14.002648554384177,
+          2499.9974634520922
+        ],
+        "formula": "H_modelada=2.3715 + 14.003 * (1-exp(-A/2500))"
+      }
+    }
+  },
+  "altura_meta_max_5m_m": {
+    "250": {
+      "folds": 5,
+      "selecionados": [
+        "constante",
+        "constante",
+        "constante",
+        "constante",
+        "constante"
+      ],
+      "n_grupos": 75
+    },
+    "500": {
+      "folds": 5,
+      "selecionados": [
+        "constante",
+        "constante",
+        "constante",
+        "constante",
+        "constante"
+      ],
+      "n_grupos": 34
+    },
+    "formula_final": {
+      "constante": {
+        "params": [
+          6.0
+        ],
+        "formula": "H_modelada=6"
+      },
+      "potencia": {
+        "params": [
+          4.903874315337917,
+          0.046082218890244
+        ],
+        "formula": "H_modelada=4.9039 * A^0.046082"
+      },
+      "potencia_offset": {
+        "params": [
+          5.707228064015865,
+          0.00023377949825619754,
+          1.4999570054051425
+        ],
+        "formula": "H_modelada=5.7072 + 0.00023378 * A^1.5"
+      },
+      "raiz_offset": {
+        "params": [
+          5.347082624665082,
+          0.06798080227684389
+        ],
+        "formula": "H_modelada=5.3471 + 0.067981 * sqrt(A)"
+      },
+      "logaritmica": {
+        "params": [
+          4.834063892431311,
+          0.26716928019492286
+        ],
+        "formula": "H_modelada=4.8341 + 0.26717 * ln(1+A)"
+      },
+      "linear": {
+        "params": [
+          5.60468158924312,
+          0.003748973338148959
+        ],
+        "formula": "H_modelada=5.6047 + 0.003749 * A"
+      },
+      "saturacao": {
+        "params": [
+          5.637245224346776,
+          9.134378031205825,
+          2492.411866230546
+        ],
+        "formula": "H_modelada=5.6372 + 9.1344 * (1-exp(-A/2492.4))"
+      }
+    }
+  },
+  "resumo": {
+    "altura_meta_pixel_m": {
+      "menor_mae_exploratorio": "constante",
+      "menor_mae_exploratorio_m": 4.5778210116731515,
+      "mae_constante": 4.5778210116731515,
+      "mae_selecao_aninhada": 4.5778210116731515
+    },
+    "altura_meta_max_5m_m": {
+      "menor_mae_exploratorio": "constante",
+      "menor_mae_exploratorio_m": 4.778210116731517,
+      "mae_constante": 4.778210116731517,
+      "mae_selecao_aninhada": 4.778210116731517
+    }
+  },
+  "ressalva": "Criterio mede concordancia com modelo Meta/WRI, NAO acuracia de altura medida.",
+  "modelo_selecionado_em_novo_local": "Requer teste externo independente antes de afirmar generalizacao"
+}
