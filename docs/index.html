@@ -14,10 +14,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./mestrado-site/research-dashboard.css?v=20261103-5">
-  <script src="./mestrado-site/readme-content.js" defer></script>
-  <script src="./mestrado-site/portal.js" defer></script>
+  <script src="./mestrado-site/readme-content.js?v=20261103-sync1" defer></script>
+  <script src="./mestrado-site/portal.js?v=20261103-sync1" defer></script>
   <script src="./mestrado-site/search.js?v=20261103-2" defer></script>
-  <script src="./mestrado-site/app.js" defer></script>
+  <script src="./mestrado-site/app.js?v=20261103-sync1" defer></script>
   <script type="module" src="./mestrado-site/diagrams.js?v=20261103-3"></script>
 </head>
 <body>
@@ -113,21 +113,21 @@
 
   <div id="widget-store" hidden>
     <section class="portal-widget" id="widget-features">
-      <div class="widget-heading"><span>PAINEL DE RESULTADOS · E4B</span><h3>Contribuição do NDVI</h3><p>F1-macro médio dos classificadores: comparação entre HSV + Canny e NDVI + HSV + Canny.</p></div>
+      <div class="widget-heading"><span>PAINEL DE RESULTADOS · ATRIBUTOS</span><h3>Contribuição do NDVI</h3><p>F1-macro médio dos classificadores: comparação entre HSV + Canny e NDVI + HSV + Canny.</p></div>
       <div class="widget-controls"><label>Escala espacial<select id="feature-block"><option value="250">Blocos de 250 m</option><option value="500">Blocos de 500 m</option></select></label></div>
       <div class="chart-legend"><span><i class="legend-line first"></i>HSV + Canny</span><span><i class="legend-line second"></i>NDVI + HSV + Canny</span></div>
       <div id="feature-chart" class="feature-chart" aria-live="polite"></div>
-      <p class="widget-note">A dupla HSV + Canny é a condição fixa dessa comparação; o Dummy não utiliza os atributos para aprender.</p>
+      <p class="widget-note">As duas combinações de atributos foram avaliadas com as mesmas divisões espaciais; a regularização foi selecionada separadamente dentro do treino. O Dummy é a referência.</p>
     </section>
 
     <section class="portal-widget" id="widget-classifiers">
-      <div class="widget-heading"><span>PAINEL DE RESULTADOS · E9</span><h3>Oito classificadores em comparação</h3><p>Os mesmos 119 recortes e as mesmas divisões espaciais; apenas a forma de segmentação muda entre as configurações 2 e 3.</p></div>
+      <div class="widget-heading"><span>PAINEL DE RESULTADOS · SEGMENTAÇÃO</span><h3>Oito classificadores em comparação</h3><p>Os mesmos 119 recortes e as mesmas divisões espaciais; apenas a forma de segmentação muda entre as configurações 2 e 3.</p></div>
       <div class="widget-controls two">
         <label>Escala espacial<select id="classification-block"><option value="250">Blocos de 250 m</option><option value="500">Blocos de 500 m</option></select></label>
         <label>Tamanho da segmentação<select id="classification-size"><option value="256">256 × 256 px</option><option value="512">512 × 512 px</option></select></label>
       </div>
       <div id="classification-chart" class="bar-chart" aria-live="polite"></div>
-      <p class="widget-note" id="classification-note">Fonte: comparação controlada E9.</p>
+      <p class="widget-note" id="classification-note">Comparação controlada dos 119 recortes, com avaliação espacial e escolha de regularização apenas no treinamento.</p>
       <details class="data-details"><summary>Ver tabela numérica detalhada <span>+</span></summary><div class="table-scroll"><table><thead><tr><th>Classificador</th><th>F1-macro</th></tr></thead><tbody id="classification-table"></tbody></table></div></details>
     </section>
 
