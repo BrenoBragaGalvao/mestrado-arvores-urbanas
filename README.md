@@ -58,17 +58,13 @@ Clique no título para abrir diretamente a seção correspondente.
 | [3.6.2. Configuração 2](#sec-3-6-2) | 119 recortes inteiros de até 512 × 512 pixels. |
 | [3.6.3. Configuração 3](#sec-3-6-3) | 119 recortes subdivididos em partes de 256 × 256 pixels. |
 | [3.7. Memória RAM](#sec-3-7) | Comparação dos picos de memória. |
-| [4. Alometria Meta/WRI](#sec-4) | Estimativas de altura do dossel nos 257 pontos da Area1. |
-| [4.1. Satélite e método](#sec-4-1) | Imagens Maxar e IA DINOv3 para a altura do dossel. |
-| [4.2. Precisão publicada](#sec-4-2) | MAE do produto e diferença entre resolução e precisão. |
-| [4.3. Alturas dos 257 pontos](#sec-4-3) | Distribuição das previsões da Meta/WRI na Area1. |
-| [4.4. C1–C3 × Meta e equações do artigo](#sec-4-4) | Seis fórmulas originais e cinco inversões do artigo testadas. |
-| [4.4. Calibração de coeficientes](#sec-4-4-calibracao) | Ajuste de a e b e avaliação espacial das fórmulas com Meta/WRI. |
-| [4.4. Logarítmica × Meta nos 257 pontos](#sec-4-4-logaritmica) | Tabela de alturas por ponto, diferenças e validação espacial. |
-| [4.4. Tabela Meta pixel e 5 m, C1–C6, log e potência](#sec-4-4-tabela-257) | Contagem das 257 árvores e estimativas lado a lado. |
-| [4.4. Tabela única — todos os modelos](#sec-4-4-todos-modelos-tabela) | 257 árvores, Meta pixel e 5 m, C1–C6 e 11 famílias na mesma tabela. |
-| [4.4. Onze famílias do artigo × Meta](#sec-4-4-onze-modelos) | Resultados das 11 famílias com validação espacial nos dois alvos. |
-| [4.5. Dados e reprodução](#sec-4-5) | Raster, notebook V3, CSV, script e referências. |
+| [4. Alometria, Meta/WRI e espécies locais](#sec-4) | Contexto regional, fontes e resultados da V3. |
+| [4.1. Fonte das alturas Meta/WRI](#sec-4-1) | Raster original, resolução, método e precisão publicada. |
+| [4.2. Inventário e espécies de Caxias do Sul](#sec-4-2) | PDAU municipal, referências de porte e limites. |
+| [4.3. Alturas nos 257 pontos](#sec-4-3) | Meta pixel, Meta 5 m e valores zero. |
+| [4.4. Onze famílias do artigo (2024)](#sec-4-4) | Equações, C1–C6 e testes espaciais comparativos. |
+| [4.5. Comparação das 15 primeiras árvores](#sec-4-4-tabela-257) | Meta pixel e 5 m, logarítmica, inversa, curva-S, C1 e C3. |
+| [4.6. Documentação e dados](#sec-4-5) | Links dos artigos, raster, notebook, CSVs e relatório. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
 
@@ -519,274 +515,150 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
 <a id="sec-4"></a>
-## 4. Alometria de árvores de Caxias do Sul — estimativas de altura Meta/WRI CHMv2
+## 4. Alometria em Caxias do Sul — Meta/WRI, espécies locais e testes das equações
 
-Na qualificação, a banca sugeriu verificar se as alturas atribuídas às árvores eram plausíveis diante das características da arborização de **Caxias do Sul (RS)**. Para aprofundar essa questão, criamos a **V3 independente**, que utiliza os **257 pontos de referência de árvores da Area1**, as fórmulas experimentais C1–C6 do método original e **uma única fonte externa de estimativas de altura: Meta/WRI CHMv2**.
+Durante a qualificação foi sugerido investigar se as alturas estimadas para árvores de **Caxias do Sul (RS)** são plausíveis diante do porte das espécies da região. Para responder à observação da banca, a versão [`Alometria_caxias_v3.ipynb`](Alometria_caxias_v3.ipynb) reúne: **(i)** uma referência externa de altura da vegetação, **(ii)** espécies e faixas de porte documentadas pelo município, **(iii)** testes das **11 famílias de regressão do artigo Chatziathanasiou et al. (2024)** e **(iv)** comparações para os **257 pontos de árvores existentes na Area1**.
 
-**Distinção fundamental:** as alturas Meta/WRI são **estimativas de dossel produzidas por aprendizado de máquina**. Já C3 (`2,5 × A^0,4`) é um **índice empírico calculado a partir da área de um superpixel Quickshift**, que não representa necessariamente a copa individual. Não existe altura medida de campo dessas árvores nos arquivos da Area1; portanto, não é possível confirmar a altura real de cada indivíduo nem validar a C3 em metros.
+**Limite da pesquisa:** não possuímos alturas medidas em campo nem identificação das espécies dos 257 pontos. Assim, os valores da Meta são **previsões de altura do dossel**, não a altura comprovada de cada árvore. Os modelos testados procuram aproximar essas previsões, e **não validam altura real**.
 
 <a id="sec-4-1"></a>
-### 4.1. De qual satélite vêm os dados Meta/WRI?
+### 4.1. Meta/WRI CHMv2 — de onde foram retiradas as alturas?
 
-O **Meta/WRI CHMv2 (2026)** foi produzido a partir de imagens ópticas comerciais RGB de alta resolução fornecidas pela **Maxar**, cujo mosaico pode reunir diferentes sensores e satélites (incluindo a família **WorldView**). As estimativas são geradas por um modelo de inteligência artificial com representações **DINOv3**, treinado com referências de altura derivadas de **LiDAR aerotransportado**. O GeoTIFF de alturas da Area1 **não informa o satélite exato de cada cena**, por isso não atribuímos um único WorldView às 257 árvores.
+A única fonte externa de altura utilizada na V3 é o **Meta/WRI Canopy Height Map v2 (CHMv2)**, publicado em **2026** por Meta e World Resources Institute. O produto fornece **altura estimada do dossel, em metros**, com resolução espacial nominal de aproximadamente **1 metro**. Foi produzido por um modelo de inteligência artificial baseado em **DINOv3**, com imagens ópticas de alta resolução **Vantor/Maxar** e referências de altura provenientes de **LiDAR aerotransportado**. O raster de altura não permite identificar qual satélite específico originou cada pixel da Area1; os mosaicos de entrada podem combinar datas diferentes.
 
-| Característica | Meta/WRI CHMv2 |
+| Informação | Fonte ou descrição |
 |---|---|
-| Instituições | Meta e World Resources Institute (WRI) |
-| Imagens de base | Mosaicos RGB comerciais de alta resolução da Maxar |
-| Referência de alturas no treinamento | LiDAR aerotransportado |
-| Método | Modelo de IA baseado em DINOv3 |
-| Resolução espacial nominal | Aproximadamente **1 m** |
-| Período das imagens | Mosaicos de datas diversas, grande parte com imagens de 2018–2020 |
+| **Arquivo original efetivamente consultado na Area1** | [GeoTIFF `2103121330.tif` — abrir raster de altura](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) |
+| **Distribuição oficial do conjunto CHMv2** | [Meta/WRI — catálogo AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) |
+| **Artigo de apresentação e avaliação** | [Brandt et al. (2026), *CHMv2: Improvements in Global Canopy Height Mapping using DINOv3*](https://doi.org/10.1038/s41597-026-07882-0) |
+| **Código usado para extrair as alturas da Area1** | [`experimentos/v3_amostrar_altura_publica.py`](experimentos/v3_amostrar_altura_publica.py) |
+| **Resolução espacial nominal** | Aproximadamente **1 m por pixel**, o que não corresponde a erro vertical de 1 m |
 
-**Importante:** resolução de 1 m significa maior detalhamento espacial, **não** erro garantido de 1 m na altura. A aquisição de cenas e a idade da arborização podem diferir da imagem original da Area1.
-
-Referências: [Catálogo Meta/WRI no AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Brandt et al. (2026), artigo científico](https://doi.org/10.1038/s41597-026-07882-0).
+**Precisão publicada:** Brandt et al. (2026) relatam aproximadamente **3,0 m de erro absoluto médio (MAE)** e **R² ≈ 0,86** em uma avaliação com referência LiDAR externa (**SatLidar v2**). Esses indicadores se referem à avaliação do produto em outros locais e **não estabelecem uma precisão de ±3 m para cada árvore de Caxias do Sul**.
 
 <a id="sec-4-2"></a>
-### 4.2. Qual é a precisão publicada do Meta/WRI?
+### 4.2. Inventário e espécies de árvores documentadas para Caxias do Sul
 
-No conjunto independente de teste **SatLidar v2**, relatado por **Brandt et al. (2026)**, o **Meta/WRI CHMv2** apresentou **erro absoluto médio (MAE) de aproximadamente 3,0 metros** em relação às alturas de referência do teste. Na mesma avaliação, foi informado **R² de 0,86**.
+A fonte regional consultada foi o **[Plano Diretor de Arborização Urbana — PDAU de Caxias do Sul](https://caxias.rs.gov.br/servicos/meio-ambiente/plano-diretor-de-arborizacao-urbana-pdau)**, estabelecido em 2020, elaborado com base em inventários do município, inclusive levantamentos associados à conservação da Mata Atlântica. Seu **[Anexo 1 — Espécies arbóreas para uso na arborização urbana](https://gcpstorage.caxias.rs.gov.br/documents/2020/09/c2d2ec2b-dfb4-4646-aadd-01eced79a722.pdf)** apresenta nomes, características e faixas de porte. Como referência adicional sobre a organização do inventário local, ver [Rech e Martins, *Desenvolvimento de um sistema de gerenciamento de arborização urbana para o município de Caxias do Sul*](https://doi.org/10.5380/revsbau.v11i4.63473).
 
-O **MAE** resume a diferença absoluta média entre as previsões de altura e as referências do conjunto avaliado. **Não** significa que todas as árvores tenham margem de ±3 metros, nem que esse desempenho se repita nas ruas de Caxias do Sul. Não calculamos MAE/RMSE de altura real para a Area1, pois **não dispomos de alturas medidas dos mesmos 257 indivíduos**.
+**Exemplos documentados no PDAU (não são um ranking das espécies mais abundantes):**
 
-Fonte: [Brandt et al. (2026) — descrição, experimentos e limitações do CHMv2](https://doi.org/10.1038/s41597-026-07882-0).
+| Espécie (nome comum e científico) | Altura de referência no PDAU | Localização no Anexo 1 |
+|---|---:|---|
+| **Pitangueira** — *Eugenia uniflora* | **6–12 m** | pág. 30/81 |
+| **Araucária** — *Araucaria angustifolia* | **20–50 m** | pág. 6/81 |
+| **Quaresmeira** — *Tibouchina sellowiana* | **4–15 m**; no município raramente acima de **8 m** | pág. 77/81 |
+| **Caroba** — *Jacaranda micrantha* | **10–25 m** | pág. 41/81 |
+| **Ácer-negundo** — *Acer negundo* | **8–12 m** | pág. 2/81 |
+| **Magnólia-branca** — *Magnolia grandiflora* | **12–15 m**, podendo atingir **30 m** | pág. 48/81 |
+| **Abrunheiro-de-jardim** — *Prunus cerasifera* | **4–6 m** | pág. 65/81 |
+
+As últimas três espécies também são estudadas no artigo de Chatziathanasiou et al. (2024). **Isso não significa que os 257 pontos correspondam a essas espécies**: não possuímos identificação botânica ponto a ponto. As alturas do PDAU são **faixas gerais de porte de espécies**, e não alturas medidas dos indivíduos da Area1. Portanto, servem para discutir a plausibilidade regional e orientar futuras validações, mas **não podem ser usadas como verdade de campo**.
 
 <a id="sec-4-3"></a>
-### 4.3. Quais foram as alturas estimadas para os 257 pontos da Area1?
+### 4.3. O que a Meta/WRI estimou nos 257 pontos da Area1?
 
-Extraímos valores diretamente do GeoTIFF público **Meta/WRI CHMv2**, associando cada previsão às coordenadas de `Arvores.gpkg`. Para verificar o efeito do posicionamento, registramos **a previsão no pixel exato** e, como teste complementar, **a maior previsão em um raio de 5 m**.
+Consultamos o GeoTIFF nas coordenadas dos **257 pontos de `Arvores.gpkg`**, registrando duas formas de amostragem **do mesmo produto**:
 
-| Indicador | Resultado na Area1 |
+- **Meta pixel:** altura estimada exatamente no pixel correspondente à coordenada do ponto;
+- **Meta 5 m:** maior altura estimada em uma vizinhança de **5 metros** em torno do ponto; este máximo **pode pertencer à copa de outra árvore**.
+
+| Indicador | Resultado |
 |---|---:|
-| Pontos originais com previsão no pixel | **257/257** |
-| Mediana da altura modelada no pixel exato | **2,0 m** |
-| Média da altura modelada no pixel exato | **4,61 m** |
-| Mediana do máximo modelado no raio de 5 m | **6,0 m** |
-| Pixels exatos com valor zero | **107/257 (41,6%)** |
-| Pontos com valor zero em toda a vizinhança de 5 m | **42/257 (16,3%)** |
-| Maior valor modelado observado no raio de 5 m | **30 m** |
+| Pontos consultados na Meta | **257/257** |
+| **Mediana da altura estimada no pixel** | **2 m** |
+| **Mediana do máximo estimado no raio de 5 m** | **6 m** |
+| Pixels exatos com valor zero | **107 (41,6%)** |
+| Pontos com valor zero em todo o raio de 5 m | **42 (16,3%)** |
+| Maior valor estimado na vizinhança de 5 m | **30 m** |
 
-**Por que há tantos zeros?** O valor 0 aparece efetivamente no produto raster, mas pode corresponder a solo, borda da copa, sombra, deslocamento da coordenada, desatualização da imagem ou ausência de vegetação detectada. **Não significa necessariamente que a árvore cadastrada não existe.**
-
-**O máximo em 5 m não é automaticamente a altura da mesma árvore:** pode captar outra copa próxima. Por isso apresentamos as duas medidas separadamente e sem afirmar altura individual confirmada.
+O valor **zero** em um pixel pode refletir solo, sombra, copa fora da coordenada, diferenças temporais ou vegetação não detectada; **não prova que a árvore do cadastro inexista**. Esses aspectos precisam ser considerados ao interpretar os modelos alométricos.
 
 <a id="sec-4-4"></a>
-### 4.4. Como as configurações C1, C2 e C3 se comparam às alturas da Meta/WRI?
+### 4.4. Equações alométricas do artigo e como foram testadas na V3
 
-O [notebook original](Segmentacao_area_completa.ipynb) contém **seis configurações C1–C6**, cada uma com **duas formas**, potencial e linear. Para esta etapa da V3, o escopo selecionado foi **C1, C2 e C3 nas duas formas**, ou seja, **seis cálculos** aplicados aos mesmos 257 pontos originais.
+**Artigo utilizado como referência:** **`Chatziathanasiou et al. (2024).pdf`**, correspondente a [Chatziathanasiou, Kitikidou e Milios (2024), *Crown Width–Tree Height Models for Magnolia grandiflora, Prunus cerasifera, and Acer negundo Growing in Cities in Northeastern Greece*](https://doi.org/10.3390/land13101579), publicado em *Land*, vol. 13, artigo 1579. A **Tabela 1** do artigo reúne **11 famílias de regressão** relacionando a **largura da copa (`CW`) em função da altura (`H`)**, com medições em árvores de cidades gregas. Existe uma [**correção publicada em 2026**](https://doi.org/10.3390/land15030473), que deve acompanhar a citação científica dessas equações.
 
-A fórmula potencial é **I = a × A^b** e a linear é **I = a + b × A**, sendo **A a área do superpixel Quickshift (m²)** e **I um índice empírico não calibrado como altura em metros**.
+**As onze famílias matemáticas retiradas do artigo e testadas foram:** **linear, logarítmica, inversa, quadrática, cúbica, potencial, composta, curva-S, logística, crescimento e exponencial**.
 
-| Configuração original | a | b | Potencial | Linear |
-|---|---:|---:|---|---|
-| **C1** | 0,5 | 0,7 | **0,5 × A^0,7** | **0,5 + 0,7 × A** |
-| **C2** | 0,6 | 0,8 | **0,6 × A^0,8** | **0,6 + 0,8 × A** |
-| **C3** | 2,5 | 0,4 | **2,5 × A^0,4** | **2,5 + 0,4 × A** |
+**O que realmente foi executado:** o artigo ajusta `CW = f(H)` com medidas de copa e altura de campo; nós **adaptamos as mesmas famílias funcionais para `H_Meta = g(D_eq)`**, com **`D_eq = 2 × √(A/π)`**, em que `A` é a área de um **superpixel Quickshift**, não a área confirmada de uma copa individual. Os **coeficientes foram ajustados nos pontos de treino da Area1**. Portanto, as famílias de regressão vieram do artigo, mas **não reproduzimos literalmente as equações com os coeficientes das espécies gregas** e **não podemos alegar validação local de altura real**. Além disso, composta, crescimento e exponencial representam parametrizações equivalentes de uma família exponencial.
 
-**Origem correta das equações:** os **coeficientes a e b acima são escolhas experimentais do notebook original**, não coeficientes encontrados no artigo de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579). O artigo apresenta **relações de largura de copa (CW) em função da altura (H)**, estimadas com árvores medidas na Grécia; isso é conceitualmente diferente de usar a **área de um superpixel** para produzir um índice.
+O notebook original possui ainda os índices exploratórios **C1–C6**, cada um na forma potencial `I = a × A^b` (e uma variante linear `I = a + b × A`). **Seus coeficientes a e b não foram retirados do artigo de 2024**; são parâmetros experimentais do projeto.
 
-#### Resultados das seis fórmulas nos 257 pontos
-
-Aplicamos as seis alternativas sobre **as mesmas áreas de superpixels** e comparamos numericamente seus valores às alturas **modeladas** pelo Meta/WRI CHMv2. A tabela está ordenada pela menor diferença numérica média na análise de sensibilidade da Meta no raio de 5 m, apenas para os 215 pontos com valor Meta acima de zero.
-
-| Configuração | Diferença absoluta média vs. Meta no pixel (257 pontos) | Diferença absoluta média vs. Meta raio 5 m (215 positivos) | Pearson vs. Meta raio 5 m |
-|---|---:|---:|---:|
-| **C1 — potencial** | **11,553** | **8,711** | 0,036 |
-| C3 — potencial | 13,067 | 9,846 | 0,027 |
-| C2 — potencial | 25,395 | 21,869 | 0,038 |
-| C3 — linear | 52,173 | 48,433 | 0,044 |
-| C1 — linear | 90,796 | 86,908 | 0,044 |
-| C2 — linear | 104,454 | 100,534 | 0,044 |
-
-**Resultado:** entre as seis fórmulas originais, **C1 potencial apresentou a menor divergência numérica em relação à Meta**, tanto no pixel quanto no máximo em 5 m. **Isso NÃO comprova que C1 é a melhor fórmula para altura real.** Essas diferenças são entre **índices sem calibração física** e **previsões em metros de outro modelo**, portanto **não constituem MAE de altura real**. Além disso, as correlações foram próximas de zero. A fonte Meta no raio de 5 m pode captar vegetação de outra árvore.
+| Índice original | a | b | Fórmula potencial |
+|---|---:|---:|---|
+| C1 | 0,5 | 0,7 | `I = 0,5 × A^0,7` |
+| C2 | 0,6 | 0,8 | `I = 0,6 × A^0,8` |
+| C3 | 2,5 | 0,4 | `I = 2,5 × A^0,4` |
+| C4 | 4,0 | 0,5 | `I = 4,0 × A^0,5` |
+| C5 | 0,4 | 0,9 | `I = 0,4 × A^0,9` |
+| C6 | 1,35 | 0,72 | `I = 1,35 × A^0,72` |
 
 <a id="sec-4-4-calibracao"></a>
-#### Calibração de novos coeficientes e avaliação espacial sem vazamento
+**Como comparamos:** as 11 famílias adaptadas foram ajustadas nos **257 pontos** e avaliadas com **cinco divisões espaciais**, em blocos de **250 m e 500 m**, mantendo **25 m de exclusão entre os pontos de treino e teste**. Foram avaliadas separadamente as referências Meta pixel e Meta 5 m. As previsões usadas para medir o erro são **fora do treinamento (OOF)**. O critério é **MAE, em metros, em relação às alturas modeladas pela Meta/WRI**, e não MAE contra alturas reais.
 
-**Os coeficientes a e b podem ser modificados**. Em uma nova etapa, calibramos a família **H = a × A^b** para se aproximar das alturas **modeladas pelo Meta/WRI CHMv2**, usando os mesmos 257 pontos originais. Além da potência, testamos potência com intercepto, modelos com raiz quadrada, logaritmo, relação linear e função de saturação. **A é a área do superpixel Quickshift, não uma copa delimitada.**
-
-**Duas fórmulas potenciais ajustadas nos 257 pontos** (coeficientes estimados sobre todo o conjunto; usar a validação espacial abaixo para avaliar desempenho):
-
-| Alvo de previsão Meta/WRI | Fórmula potencial recalibrada |
-|---|---|
-| Altura prevista no pixel exato | **H = 1,3684 × A^0,17089** |
-| Maior altura prevista no raio de 5 m | **H = 4,9039 × A^0,04608** |
-
-Esses números **substituem apenas os coeficientes nas fórmulas experimentais calibradas da V3**. Não modificamos os coeficientes C1–C3 históricos do notebook original. O expoente muito pequeno, principalmente no raio de 5 m, mostra que a potência calibrada quase não varia com a área.
-
-Para não escolher coeficientes por memorização, avaliamos os modelos em **5 divisões espaciais com blocos de 250 m e 500 m, exclusão de 25 m entre treino e teste e seleção interna de família de modelo**. Todos os 257 pontos foram avaliados fora do respectivo treino de cada divisão, tanto para o alvo pixel quanto para o alvo máximo em 5 m. O resultado abaixo é o **MAE contra a previsão da Meta/WRI** (em metros): **não é o MAE contra altura real de campo**.
-
-| Modelo calibrado | MAE Meta pixel (250 m) | MAE Meta raio de 5 m (250 m) | MAE Meta pixel (500 m) | MAE Meta raio de 5 m (500 m) |
-|---|---:|---:|---:|---:|
-| **Constante — referência de controle** | **4,578** | **4,778** | **4,451** | **4,665** |
-| Potência (a e b livres) | 4,593 | 4,810 | 4,510 | 4,734 |
-| Potência + intercepto | 4,584 | 4,822 | 4,532 | 4,756 |
-| Raiz quadrada + intercepto | 4,591 | 4,814 | 4,509 | 4,735 |
-| Logarítmico + intercepto | 4,581 | 4,808 | 4,504 | 4,733 |
-| Linear + intercepto | 4,589 | 4,819 | 4,519 | 4,739 |
-| Saturação | 4,590 | 4,818 | 4,530 | 4,759 |
-
-**Resultado metodológico:** em **ambos os alvos e ambas as escalas espaciais**, a referência **constante teve o menor erro absoluto médio**. A seleção interna dos modelos também escolheu a constante nos 5 folds de cada cenário. Portanto, **não há evidência nesta avaliação de que somente a área do superpixel seja suficiente para prever alturas individuais da Meta com confiabilidade**. Não seria correto eleger a potência ajustada como uma fórmula de altura validada só porque os coeficientes mudaram.
-
-A referência constante é útil como **controle científico**, mas **não** como estimativa individual de porte de árvore. Na etapa seguinte, a melhoria com maior justificativa física seria substituir a área do superpixel por **área ou diâmetro de copa verdadeiramente individualizados**, e, quando disponíveis, usar espécies e alturas medidas. Também precisamos considerar que o valor zero no pixel Meta pode não representar ausência real de árvore e que o máximo de 5 m pode pertencer a outra copa.
-
-**Arquivos:** [script de calibração](experimentos/v3_calibrar_altura_meta.py) · [resultados da validação espacial](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) · [coeficientes finais e modelos](docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json) · [previsões em todos os 257 pontos](docs/v3_alturas_publicas/v3_meta_calibracao_257_pontos.csv) · [gráfico MAE](docs/v3_alturas_publicas/v3_meta_calibracao_mae_250m.png).
-
-<a id="sec-4-4-logaritmica"></a>
-#### Fórmula escolhida para aprofundar: alturas logarítmicas lado a lado com a Meta/WRI (257 pontos)
-
-A fórmula **logarítmica** foi escolhida como **candidata principal para estudar na V3**, mesmo sem superar a referência constante na validação espacial. Usamos **somente a Meta/WRI CHMv2**, em duas formas independentes de consulta do mesmo produto: o pixel exato do ponto e o máximo em raio de 5 m.
-
-**Coeficientes calibrados sobre os 257 pontos** (para gerar uma estimativa demonstrativa em cada linha, **não** para medir a precisão no conjunto utilizado no ajuste):
-
-| Alvo Meta/WRI | Fórmula logarítmica selecionada |
-|---|---|
-| **Pixel exato** | **H = 1,02061062 + 0,43611553 × ln(1 + A)** |
-| **Máximo no raio de 5 m** | **H = 4,83406389 + 0,26716928 × ln(1 + A)** |
-
-Onde **A é a área do superpixel Quickshift em m², não a área individual de copa confirmada**. A operação `ln` é o logaritmo natural. Os coeficientes são resultados da calibração local **contra alturas modeladas pela Meta**, e não coeficientes retirados dos artigos ou de medições reais de campo.
-
-**Exemplos reais da tabela gerada**, com os IDs fixos 0 a 5 (sem seleção dos casos pelo tamanho do erro). Todas as alturas estão em metros.
-
-| Ponto | Área do superpixel (m²) | Meta pixel | Log ajustada ao pixel | Meta máximo 5 m | Log ajustada ao raio de 5 m |
-|---:|---:|---:|---:|---:|---:|
-| 0 | 251,50 | 16,00 | 3,43 | 17,00 | 6,31 |
-| 1 | 261,50 | 0,00 | 3,45 | 6,00 | 6,32 |
-| 2 | 68,75 | 10,00 | 2,87 | 13,00 | 5,97 |
-| 3 | 369,25 | 19,00 | 3,60 | 20,00 | 6,41 |
-| 4 | 130,50 | 0,00 | 3,15 | 2,00 | 6,14 |
-| 5 | 35,00 | 0,00 | 2,58 | 2,00 | 5,79 |
-
-**Importante:** a fórmula logarítmica não reproduz individualmente alturas mais elevadas da Meta nos exemplos acima. A tabela completa fornece **as 257 linhas** com a altura Meta, a altura logarítmica ajustada usando os 257 dados, e também as **previsões fora do treinamento (OOF)** das divisões espaciais de 250 m e 500 m, acompanhadas das diferenças ponto a ponto.
-
-**Testes espaciais efetivos (previsões OOF):**
-
-| Referência Meta | Blocos | MAE log vs. Meta | RMSE log vs. Meta | MAE da referência constante |
-|---|---:|---:|---:|---:|
-| Pixel exato | 250 m | **4,581 m** | 6,021 m | 4,578 m |
-| Pixel exato | 500 m | **4,504 m** | 5,929 m | 4,451 m |
-| Máximo no raio de 5 m | 250 m | **4,808 m** | 6,124 m | 4,778 m |
-| Máximo no raio de 5 m | 500 m | **4,733 m** | 6,060 m | 4,665 m |
-
-O erro é calculado **contra o produto Meta/WRI, não contra alturas reais em campo**. Em todos os quatro cenários, a fórmula logarítmica ficou **ligeiramente pior que o controle constante**, evidência de que a **área do superpixel sozinha é insuficiente** para estimar alturas individuais. A versão ajustada com todos os 257 pontos é útil para mostrar as alturas produzidas pela equação, mas sua avaliação correta exige as previsões OOF, que não tiveram acesso aos respectivos alvos de teste.
-
-**Arquivos efetivamente executados:** [CSV — altura logarítmica e Meta nos 257 pontos](docs/v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [relatório com amostra e limites](docs/v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [métricas espaciais](docs/v3_alturas_publicas/v3_logaritmica_resumo_validacao.csv) · [gráfico pixel](docs/v3_alturas_publicas/v3_logaritmica_meta_pixel.png) · [gráfico raio de 5 m](docs/v3_alturas_publicas/v3_logaritmica_meta_raio5.png) · [script reprodutível](experimentos/v3_comparar_logaritmica_meta.py) · [notebook V3](Alometria_caxias_v3.ipynb).
-
-<a id="sec-4-4-tabela-257"></a>
-#### Tabela unificada das 257 árvores — Meta/WRI pixel e 5 m, C1–C6, logarítmica e potência ajustada
-
-A tabela foi montada com **as 257 árvores de referência da Area1** em sua ordem original. A **primeira coluna contém a contagem de árvores de 1 a 257**; a **segunda traz a altura Meta/WRI CHMv2 no pixel exato**; a **terceira traz o máximo da Meta/WRI em um raio de 5 m**. Nas colunas seguintes ficam C1–C6, a logarítmica e a potência ajustada **H = 1,3684 × A^0,17089**.
-
-| **Árvore** | **Meta pixel (m)** | **Meta 5 m (m)** | C1 pot. | C2 pot. | C3 pot. | C4 pot. | C5 pot. | C6 pot. | Log. ajustada | Pot. ajustada |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | **16,00** | **17,00** | 23,95 | 49,96 | 22,81 | 63,44 | 57,88 | 72,23 | 3,43 | 3,52 |
-| 2 | **0,00** | **6,00** | 24,62 | 51,54 | 23,17 | 64,68 | 59,95 | 74,29 | 3,45 | 3,54 |
-| 3 | **10,00** | **13,00** | 9,66 | 17,70 | 13,58 | 33,17 | 18,01 | 28,39 | 2,87 | 2,82 |
-| 4 | **19,00** | **20,00** | 31,34 | 67,92 | 26,60 | 76,86 | 81,78 | 95,24 | 3,60 | 3,76 |
-| 5 | **0,00** | **2,00** | 15,13 | 29,56 | 17,55 | 45,69 | 32,07 | 45,04 | 3,15 | 3,15 |
-| 6 | **0,00** | **2,00** | 6,02 | 10,31 | 10,36 | 23,66 | 9,81 | 17,46 | 2,58 | 2,51 |
-
-**Consulte os 257 registros completos:** [tabela de leitura no GitHub](docs/v3_alturas_publicas/v3_tabela_meta_c1_c6_log_pot_257.md) · [CSV principal com essa mesma ordem de colunas](docs/v3_alturas_publicas/v3_comparacao_c1_c6_log_pot_meta_257.csv) · [CSV ampliado com as seis variantes lineares e as fórmulas ajustadas também ao alvo Meta de 5 m](docs/v3_alturas_publicas/v3_comparacao_completa_c1_c6_pot_linear_log_meta_257.csv) · [script reprodutível](experimentos/v3_tabela_meta_c1_c6_log_pot.py).
-
-**Interpretação:** C1–C6 são índices empíricos potenciais **não calibrados como altura real em metros**; logarítmica e potência ajustada foram calibradas **contra o mapa Meta/WRI**, não contra altura medida em campo. **A é a área de um superpixel Quickshift**, não de copa confirmada. A coluna de 5 m é o máximo dentro da vizinhança e pode corresponder a outra árvore. A relação anteriormente proposta com **diâmetro individual de copa** não foi calculada porque esses diâmetros não foram medidos. Os modelos calibrados usando todos os 257 pontos **não constituem uma avaliação de teste independente**; [validação espacial está aqui](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv).
-
-<a id="sec-4-4-todos-modelos-tabela"></a>
-#### Tabela única com os 257 pontos — Meta pixel, Meta 5 m e todos os modelos
-
-Consolidamos **uma linha para cada uma das 257 árvores** da Area1. **As três primeiras colunas são, nesta ordem, (1) Árvore (1 a 257), (2) Meta/WRI no pixel e (3) Meta/WRI máximo no raio de 5 m**. Depois vêm as seis versões potenciais **C1–C6**, a **logarítmica**, a **potência ajustada** e as previsões individuais das **11 famílias de regressão do artigo** (linear, logarítmica, inversa, quadrática, cúbica, potencial, composta, curva-S, logística, crescimento e exponencial). Para cada uma das 11 famílias existem **duas colunas**, uma para o alvo Meta pixel e outra para Meta máximo em 5 m; foram geradas por **validação espacial fora do treino (OOF) com blocos de 250 m e embargo de 25 m**. A tabela ainda inclui controle constante e seleção aninhada.
-
-Abaixo está uma **prévia reduzida das seis primeiras árvores e de algumas colunas**. Para conferir **todos os modelos e as 257 linhas na mesma tabela**, use o link logo depois.
-
-| Árvore | Meta pixel | Meta 5 m | C1 pot. | C2 pot. | C3 pot. | C4 pot. | C5 pot. | C6 pot. | Log. ajustada | Pot. ajustada | Cúbico OOF pixel | Curva-S OOF pixel | Inverso OOF 5 m |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 16,00 | 17,00 | 23,95 | 49,96 | 22,81 | 63,44 | 57,88 | 72,23 | 3,43 | 3,52 | 3,21 | 2,98 | 5,97 |
-| 2 | 0,00 | 6,00 | 24,62 | 51,54 | 23,17 | 64,68 | 59,95 | 74,29 | 3,45 | 3,54 | 3,24 | 2,98 | 5,97 |
-| 3 | 10,00 | 13,00 | 9,66 | 17,70 | 13,58 | 33,17 | 18,01 | 28,39 | 2,87 | 2,82 | 3,25 | 3,46 | 6,58 |
-| 4 | 19,00 | 20,00 | 31,34 | 67,92 | 26,60 | 76,86 | 81,78 | 95,24 | 3,60 | 3,76 | 3,51 | 2,98 | 5,97 |
-| 5 | 0,00 | 2,00 | 15,13 | 29,56 | 17,55 | 45,69 | 32,07 | 45,04 | 3,15 | 3,15 | 3,66 | 3,87 | 6,89 |
-| 6 | 0,00 | 2,00 | 6,02 | 10,31 | 10,36 | 23,66 | 9,81 | 17,46 | 2,58 | 2,51 | 3,08 | 2,94 | 6,13 |
-
-**Tabela completa:** [257 árvores × 39 colunas, Meta pixel e Meta 5 m nas posições 2 e 3](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_tabela.md) · [CSV principal](docs/v3_alturas_publicas/v3_todos_modelos_meta_257.csv) · [CSV ampliado com 74 colunas, variantes lineares e validação espacial de 500 m](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) · [script de consolidação](experimentos/v3_gerar_tabela_todos_modelos.py) · [execução na V3](Alometria_caxias_v3.ipynb).
-
-**Como interpretar:** C1–C6 são **índices históricos sem altura validada**; a logarítmica e a potência foram **ajustadas nos próprios 257 pontos**; já as onze famílias do artigo foram **adaptadas e recalibradas** para os alvos Meta e apresentam **previsões de teste espacial**, não os coeficientes originais de Chatziathanasiou et al. (2024). O máximo Meta em 5 m pode ser de outra árvore. **Nenhuma altura foi medida em campo** e a área de superpixel não corresponde necessariamente à copa individual. Não compare diferenças entre índices e alturas da Meta como precisão real em metros.
-
-<a id="sec-4-4-onze-modelos"></a>
-#### Teste das 11 famílias do artigo — comparação com a Meta/WRI pixel e 5 m
-
-Para não restringir a análise aos modelos anteriores, testamos **as onze famílias matemáticas da Tabela 1 de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579)**: linear, logarítmica, inversa, quadrática, cúbica, potencial, composta, curva-S, logística, crescimento e exponencial.
-
-**Distinção científica obrigatória:** no artigo, os autores ajustaram **largura de copa medida como função de altura medida (`CW=f(H)`)** para árvores de espécies gregas. Na Area1 **não temos largura de copa individualizada nem alturas medidas em campo**. Portanto, **adaptamos essas onze famílias para estimar a altura *modelada* da Meta a partir do diâmetro circular equivalente de um superpixel** (`D_eq = 2√(A_superpixel/π)`). Os coeficientes foram reajustados nos exemplos de treino da Area1: **não são as equações do artigo com seus coeficientes publicados**, nem resultados de validação de altura real.
-
-Também verificamos que os autores publicaram uma **[correção em março de 2026](https://doi.org/10.3390/land15030473)**, que retifica a apresentação de algumas equações do trabalho de 2024. A correção integra a referência bibliográfica desta comparação. Modelos **composto, crescimento e exponencial são parametrizações equivalentes**, não três técnicas independentes.
-
-**Desenho experimental:** **257 pontos de árvores**; dois alvos do mesmo produto Meta/WRI (pixel exato e máximo em raio de 5 m); **cinco divisões geográficas com blocos de 250 e 500 m**, exclusão de **25 m** entre treino e teste e **escolha interna de modelo**. Os resultados abaixo são **MAE frente à estimativa Meta/WRI em metros**: quanto menor, maior a proximidade com essa fonte, mas **não é MAE contra altura real medida em campo**.
-
-| Família adaptada | Meta pixel, 250 m | Meta pixel, 500 m | Meta máximo 5 m, 250 m | Meta máximo 5 m, 500 m |
+| Modelo/família | Meta pixel, blocos 250 m | Meta pixel, blocos 500 m | Meta 5 m, blocos 250 m | Meta 5 m, blocos 500 m |
 |---|---:|---:|---:|---:|
 | Linear | 4,591 | 4,509 | 4,814 | 4,735 |
-| Logarítmica | 4,588 | 4,506 | 4,808 | 4,733 |
-| Inversa | 4,589 | 4,506 | **4,802** | 4,731 |
-| Quadrática | 4,589 | 4,522 | 4,819 | 4,743 |
-| Cúbica | **4,584** | 4,529 | 4,820 | 4,751 |
+| Logaritmica | 4,588 | 4,506 | 4,808 | 4,733 |
+| Inversa | 4,589 | 4,506 | 4,802 | 4,731 |
+| Quadratica | 4,589 | 4,522 | 4,819 | 4,743 |
+| Cubica | 4,584 | 4,529 | 4,820 | 4,751 |
 | Potencial | 4,593 | 4,510 | 4,810 | 4,734 |
 | Composta | 4,598 | 4,520 | 4,818 | 4,738 |
-| Curva-S | 4,587 | **4,505** | 4,803 | **4,731** |
-| Logística | 4,597 | 4,519 | 4,817 | 4,737 |
+| Curva-S | 4,587 | 4,505 | 4,803 | 4,731 |
+| Logistica | 4,597 | 4,519 | 4,817 | 4,737 |
 | Crescimento | 4,598 | 4,520 | 4,818 | 4,738 |
 | Exponencial | 4,598 | 4,520 | 4,818 | 4,738 |
-| **Controle constante** | **4,578** | **4,451** | **4,778** | **4,665** |
-| **Seleção aninhada** | **4,578** | **4,451** | **4,778** | **4,665** |
+| Controle constante | 4,578 | 4,451 | 4,778 | 4,665 |
 
-**Qual chegou mais perto?** Entre as onze famílias, a **cúbica** apresentou a menor divergência para **pixel Meta com blocos de 250 m**; a **curva-S** foi a menor para pixel com 500 m e para o alvo de 5 m com 500 m; a **inversa** foi a menor para o alvo de 5 m com 250 m. **Porém, nenhuma das onze superou o controle constante em MAE**. O procedimento de **seleção interna escolheu o controle constante em todos os cinco folds de cada cenário**, e o desempenho de sua seleção foi calculado em testes externos.
+**Resultado:** entre as onze famílias, a **cúbica** foi a mais próxima da Meta pixel em blocos de **250 m**, a **curva-S** liderou para pixel em **500 m** e Meta 5 m em **500 m**, e a **inversa** liderou para Meta 5 m em **250 m**. **Entretanto, nenhuma superou o controle constante** nas quatro condições, indicando que somente a geometria de superpixel ainda não explica bem as diferenças individuais das estimativas Meta.
 
-**O que isso significa?** A **área do superpixel**, mesmo expressa como diâmetro circular equivalente, **não mostrou informação suficiente para prever adequadamente a altura individual estimada pelo Meta/WRI**. Não seria científico declarar a cúbica, inversa ou curva-S como altura correta da região por pequenas diferenças no ranking. Além disso, a **melhor das onze foi identificada depois de comparar os erros de teste**, o que torna sua seleção exploratória, não uma comprovação de superioridade em dados inéditos.
+<a id="sec-4-4-logaritmica"></a>
+**Fórmulas simples também investigadas:** `H = 1,02061062 + 0,43611553 × ln(1 + A)` (logarítmica ajustada à Meta pixel) e `H = 1,36838076 × A^0,17089464` (potencial ajustada à Meta pixel). Esses parâmetros foram ajustados **com todos os 257 pontos**, portanto as alturas calculadas com eles na tabela são **descritivas, não predições independentes**. A avaliação dessas fórmulas com validação espacial permanece disponível no [relatório de calibração](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv).
 
-**Resultados reproduzíveis:** [tabela detalhada e equações adaptadas](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) · [CSV dos 11 modelos, controle e seleção nas quatro condições](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv) · [previsões fora do treinamento dos 257 pontos](docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) · [detalhes dos folds](docs/v3_alturas_publicas/v3_11_familias_meta_folds.csv) · [gráfico](docs/v3_alturas_publicas/v3_11_familias_meta_mae.png) · [script](experimentos/v3_testar_11_modelos_artigo_meta.py) · [notebook V3](Alometria_caxias_v3.ipynb).
+<a id="sec-4-4-tabela-257"></a>
+<a id="sec-4-4-todos-modelos-tabela"></a>
+### 4.5. Tabela comparativa — primeiras 15 árvores
 
-<a id="sec-4-4-artigo"></a>
-#### Testes com modelos de regressão do artigo científico
+A tabela apresenta as **15 primeiras árvores na ordem original**, sem selecionar exemplos pelos resultados. As **três primeiras colunas** são a contagem, a **Meta pixel** e a **Meta 5 m**; depois vêm as previsões da **logarítmica, inversa e curva-S** em blocos de **250 m** e os índices históricos **C1 e C3**. As previsões das três famílias são **OOF (teste espacial)**; C1 e C3 **não são alturas calibradas em metros**.
 
-**Observação cronológica:** os cinco ensaios de inversão apresentados a seguir são experimentos exploratórios anteriores. A bateria completa das onze famílias está na subseção acima, incluindo a referência à [correção publicada pelos autores em 2026](https://doi.org/10.3390/land15030473). Os dois conjuntos de resultados têm procedimentos diferentes e não devem ser misturados em uma classificação única.
+| Árvore | **Meta pixel (m)** | **Meta 5 m (m)** | Log. pixel (m) | Log. 5 m (m) | Inversa pixel (m) | Inversa 5 m (m) | Curva-S pixel (m) | Curva-S 5 m (m) | C1 (índice) | C3 (índice) |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 16,00 | 17,00 | 3,02 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 23,95 | 22,81 |
+| 2 | 0,00 | 6,00 | 3,02 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 24,62 | 23,17 |
+| 3 | 10,00 | 13,00 | 3,40 | 6,50 | 3,56 | 6,58 | 3,46 | 6,57 | 9,66 | 13,58 |
+| 4 | 19,00 | 20,00 | 3,04 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 31,34 | 26,60 |
+| 5 | 0,00 | 2,00 | 3,86 | 6,87 | 3,87 | 6,89 | 3,87 | 6,89 | 15,13 | 17,55 |
+| 6 | 0,00 | 2,00 | 2,93 | 6,11 | 3,11 | 6,13 | 2,94 | 6,13 | 6,02 | 10,36 |
+| 7 | 0,00 | 0,00 | 3,98 | 6,98 | 3,93 | 6,96 | 3,97 | 6,96 | 17,15 | 18,84 |
+| 8 | 0,00 | 0,00 | 3,98 | 6,97 | 3,93 | 6,96 | 3,97 | 6,96 | 17,09 | 18,81 |
+| 9 | 3,00 | 6,00 | 4,17 | 7,13 | 4,03 | 7,05 | 4,11 | 7,06 | 20,65 | 20,96 |
+| 10 | 6,00 | 9,00 | 3,73 | 6,77 | 3,79 | 6,82 | 3,77 | 6,81 | 13,38 | 16,36 |
+| 11 | 0,00 | 3,00 | 4,14 | 7,11 | 4,01 | 7,04 | 4,09 | 7,05 | 19,99 | 20,57 |
+| 12 | 5,00 | 6,00 | 3,35 | 6,45 | 3,52 | 6,54 | 3,41 | 6,53 | 9,14 | 13,15 |
+| 13 | 10,00 | 10,00 | 2,15 | 5,14 | 2,24 | 5,13 | 2,17 | 5,13 | 5,72 | 10,06 |
+| 14 | 1,00 | 8,00 | 2,39 | 5,40 | 2,50 | 5,47 | 2,44 | 5,46 | 8,13 | 12,31 |
+| 15 | 6,00 | 9,00 | 2,77 | 5,83 | 2,79 | 5,86 | 2,79 | 5,85 | 14,23 | 16,94 |
 
-A [Tabela 1 do artigo](https://doi.org/10.3390/land13101579) apresenta **11 famílias de regressão CW–H**. Testamos **cinco equações com coeficientes efetivamente publicados** nas Tabelas 4–9, escolhendo formas com inversão algébrica explícita para tentar estimar **H a partir de CW**.
+**Para consultar os 257 pontos com todos os modelos (não apenas os 15 exemplos):** [**tabela completa de 257 árvores e 39 colunas**](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_tabela.md) · [CSV principal, com Meta nas posições 2 e 3](docs/v3_alturas_publicas/v3_todos_modelos_meta_257.csv) · [CSV ampliado, com 74 colunas e testes em blocos de 500 m](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv).
 
-Para calcular uma largura a partir do que já temos, usamos apenas como **hipótese de sensibilidade** o diâmetro de um círculo de área igual ao superpixel (**CW hipotética = √(4A/π)**). **Uma área de superpixel não é uma copa individual medida**, e não conhecemos a espécie dos 257 pontos. Portanto, os modelos estrangeiros **não foram calibrados nem validados para a Area1**. Também restringimos as saídas às amplitudes de largura e altura observadas para cada espécie na amostra do artigo, sem extrapolar.
-
-| Modelo publicado (espécie e local) | H calculada pela inversão da equação publicada | Pontos dentro dos limites do artigo |
-|---|---|---:|
-| *Magnolia grandiflora* — Kavala (logarítmico) | H = exp((CW + 1,906)/3,691) | **22/257** |
-| *Magnolia grandiflora* — Orestiada (logarítmico) | H = exp((CW + 1,440)/3,375) | **19/257** |
-| *Magnolia grandiflora* — Xanthi (inverso) | H = 16,672/(7,280 − CW) | **5/257** |
-| *Magnolia grandiflora* — Komotini (inverso) | H = 14,882/(7,394 − CW) | **7/257** |
-| *Acer negundo* — conjunto de cidades (composto) | H = ln(CW/0,676)/ln(1,123) | **0/257** |
-
-**Interpretação:** a baixa quantidade de pontos nos domínios admissíveis revela a **incompatibilidade da largura derivada de superpixel com as amplitudes dessas regressões**, e não falha comprovada das equações para árvores com copas realmente medidas. Comparar divergências numéricas entre 5, 7, 19 ou 22 pontos distintos seria cientificamente inadequado para eleger uma fórmula vencedora.
-
-A [comparação executada, com todas as diferenças e correlações](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md), o [CSV completo dos 257 pontos e todas as fórmulas](docs/v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) e a [tabela de modelos publicados testados](docs/v3_alturas_publicas/v3_modelos_artigo_testados.csv) permitem reproduzir e auditar os resultados.
+Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5 m**, enquanto os modelos logarítmico, inverso e curva-S retornam valores bastante inferiores nos testes espaciais. Isso mostra que, apesar de terem sido testadas diversas famílias, **os modelos ainda não recuperam de forma confiável a variação individual das alturas modeladas pela Meta**. Os índices C1 e C3 apresentam valores maiores, mas não equivalem automaticamente a metros de altura real.
 
 <a id="sec-4-5"></a>
-### 4.5. De onde foram obtidas as alturas? Código e arquivos
+### 4.6. Documentação, arquivos para reprodução e limites
 
-A **única fonte externa de altura ativa** neste estudo é o mapa de dossel **Meta/WRI CHMv2**.
-
-| Recurso | Link e finalidade |
+| Material | Link |
 |---|---|
-| **GeoTIFF original da Meta** | [Quadrante da Area1 — 2103121330.tif](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) |
-| **Catálogo da Meta** | [Meta/WRI — AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) |
-| **Artigo do mapa de alturas** | [Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
-| **Artigo dos modelos CW–H** | [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579) |
-| **Notebook alometria V3** | [Alometria_caxias_v3.ipynb](Alometria_caxias_v3.ipynb) |
-| **Fórmulas originais C1–C6** | [experimentos/v3_alometria_caxias.py](experimentos/v3_alometria_caxias.py) |
-| **Novos testes C1–C3 e equações do artigo** | [Script reprodutível da comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) |
-| **Calibração a e b + novos modelos** | [Script de ajuste](experimentos/v3_calibrar_altura_meta.py) · [validação espacial (CSV)](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) · [coeficientes ajustados (JSON)](docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json) |
-| **Estimativa de altura com a fórmula logarítmica** | [Tabela das 257 alturas logarítmicas × Meta](docs/v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [relatório com métricas e exemplos](docs/v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [script](experimentos/v3_comparar_logaritmica_meta.py) |
-| **Onze famílias do artigo: Meta pixel e 5 m** | [Relatório completo](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) · [resumo CSV de todas as famílias](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv) · [predições de 257 pontos](docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) · [código](experimentos/v3_testar_11_modelos_artigo_meta.py). Testa famílias adaptadas, **não os coeficientes originais do artigo**. |
-| **Dados das 257 árvores, C1–C3 e Meta** | [CSV completo por ponto](docs/v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) |
-| **Resumo e gráfico** | [Tabela das 11 alternativas testadas](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) · [Gráfico](docs/v3_alturas_publicas/v3_c1_c3_meta_comparacao.png) |
-| **Relatório metodológico** | [Comparação detalhada C1–C3 × Meta e modelos do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) |
+| **Fonte Meta/WRI CHMv2** | [Raster `2103121330.tif`](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) · [Catálogo AWS](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Artigo de Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
+| **Fonte regional de espécies e porte** | [PDAU de Caxias do Sul](https://caxias.rs.gov.br/servicos/meio-ambiente/plano-diretor-de-arborizacao-urbana-pdau) · [Anexo 1 do PDAU](https://gcpstorage.caxias.rs.gov.br/documents/2020/09/c2d2ec2b-dfb4-4646-aadd-01eced79a722.pdf) |
+| **Artigo das 11 famílias alométricas** | [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579) · [Correção (2026)](https://doi.org/10.3390/land15030473) |
+| **Código central da V3** | [`Alometria_caxias_v3.ipynb`](Alometria_caxias_v3.ipynb) |
+| **Código do teste das 11 famílias** | [`experimentos/v3_testar_11_modelos_artigo_meta.py`](experimentos/v3_testar_11_modelos_artigo_meta.py) |
+| **Resultados consolidados dos 11 modelos** | [Relatório completo](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) · [métricas CSV](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv) · [previsões para os 257 pontos](docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) |
+| **Tabela final de todos os modelos** | [Tabela Markdown das 257 árvores](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_tabela.md) · [CSV completo](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) |
 
-**Conclusão científica:** nenhuma das equações foi validada para altura real de árvore individual. O estudo identifica **proximidade numérica com outro modelo** e limitações de transferibilidade dos modelos de espécies gregas, sem inferir risco elétrico.
+**Conclusão e limitação central:** o PDAU documenta **faixas plausíveis de altura para espécies da cidade**, a Meta fornece **previsões externas de dossel** e as onze famílias fornecem **modelos experimentais de aproximação**. Nenhum desses elementos identifica as espécies ou mede a altura real das 257 árvores da Area1. Como a área do **superpixel Quickshift não representa necessariamente a copa de cada indivíduo**, os resultados atuais **não permitem afirmar qual equação alométrica estima melhor a altura real das árvores de Caxias do Sul**. A análise de proximidade a postes continua exploratória e não comprova risco elétrico.
 
 ---
 
