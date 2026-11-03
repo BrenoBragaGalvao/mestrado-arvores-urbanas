@@ -1,0 +1,42 @@
+name: "V3 - Comparar alturas logaritmicas e Meta nos 257 pontos"
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/v3_logaritmica_vs_meta.yml"
+      - "experimentos/v3_comparar_logaritmica_meta.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  comparar_log_meta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dependencias
+        run: python -m pip install numpy pandas matplotlib
+      - name: Calcular todas as alturas e conferir resultados OOF
+        run: |
+          python -u experimentos/v3_comparar_logaritmica_meta.py \
+            --pontos docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv \
+            --predicoes docs/v3_alturas_publicas/v3_meta_calibracao_257_pontos.csv \
+            --parametros docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json \
+            --validacao docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv \
+            --out docs/v3_alturas_publicas
+      - name: Registrar arquivos completos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/v3_alturas_publicas/v3_logaritmica_*
+          git diff --cached --quiet || (git commit -m "data(v3): registra alturas logaritmicas vs Meta em 257 pontos" && git push)
+      - name: Anexar resultados da comparacao
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-alturas-logaritmicas-meta-257-pontos
+          path: docs/v3_alturas_publicas/v3_logaritmica_*
+          if-no-files-found: ignore
