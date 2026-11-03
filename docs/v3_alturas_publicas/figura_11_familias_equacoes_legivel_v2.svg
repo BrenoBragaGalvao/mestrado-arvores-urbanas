@@ -61,8 +61,7 @@
 <text x="196" y="689" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Composta</text>
 <text x="585" y="689" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ × b₁<tspan font-size="19" baseline-shift="super">H</tspan><tspan baseline-shift="baseline"></tspan></text>
 <path d="M 40 712 H 1400" stroke="#DDE5ED" stroke-width="1"/>
-<rect x="40" y="712" width="1360" height="66" fill="#E7F0F9"/>
-<rect x="40" y="712" width="5" height="66" fill="#3971AA"/>
+<rect x="40" y="712" width="1360" height="66" fill="#F4F7FB"/>
 <rect x="75" y="727" width="65" height="37" rx="8" fill="#134B79"/>
 <text x="107.5" y="752" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">08</text>
 <text x="196" y="755" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Curva-S</text>
