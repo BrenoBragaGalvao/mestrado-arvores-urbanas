@@ -600,7 +600,7 @@ O notebook original possui ainda os índices exploratórios **C1–C6**, cada um
 **Como comparamos:** as 11 famílias adaptadas foram ajustadas nos **257 pontos** e avaliadas com **cinco divisões espaciais**, em blocos de **250 m e 500 m**, mantendo **25 m de exclusão entre os pontos de treino e teste**. Foram avaliadas separadamente as referências Meta pixel e Meta 5 m. As previsões usadas para medir o erro são **fora do treinamento (OOF)**. O critério é **MAE, em metros, em relação às alturas modeladas pela Meta/WRI**, e não MAE contra alturas reais.
 
 <p align="center">
-  <img src="docs/v3_alturas_publicas/figura_11_familias_equacoes.svg" alt="Onze famílias de fórmulas alométricas estudadas: linear, logarítmica, inversa, quadrática, cúbica, potência, composta, curva-S, logística, crescimento e exponencial." width="100%">
+  <img src="docs/v3_alturas_publicas/figura_11_familias_equacoes_legivel_v2.svg" alt="Onze famílias de fórmulas alométricas estudadas: linear, logarítmica, inversa, quadrática, cúbica, potência, composta, curva-S, logística, crescimento e exponencial." width="100%">
 </p>
 
 **Modelo que mais se aproximou:** entre as onze famílias, a **curva-S** obteve o menor MAE na condição **Meta pixel, blocos de 500 m (4,505 m)**, e empatou com a inversa em **Meta 5 m, blocos de 500 m (4,731 m)**. Não houve uma vencedora em todas as condições: a cúbica liderou em Meta pixel/250 m e a inversa em Meta 5 m/250 m. **Nenhuma superou o controle constante**, e a comparação mede apenas proximidade com estimativas Meta/WRI, não a altura real das árvores.
