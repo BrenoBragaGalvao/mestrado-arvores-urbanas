@@ -106,5 +106,34 @@ Selecionamos cinco equações com coeficientes publicados que permitem inversão
 
 **Materiais finais:** [notebook V3 atualizado](../Alometria_caxias_v3.ipynb) · [script reprodutível](../experimentos/v3_comparar_c1_c3_meta_e_artigo.py) · [CSV com os 257 registros e todos os índices](v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) · [resumo das 11 alternativas](v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) · [gráfico](v3_alturas_publicas/v3_c1_c3_meta_comparacao.png) · [relatório com tabelas e limites](v3_alturas_publicas/v3_c1_c3_meta_relatorio.md).
 
+## Calibração dos coeficientes a e b com as estimativas Meta/WRI — avaliação espacial
+
+A V3 foi ampliada para que **os coeficientes das fórmulas de altura possam ser ajustados**, em vez de fixar permanentemente os valores C1–C3. O código histórico **não foi modificado**. No [script de calibração](../experimentos/v3_calibrar_altura_meta.py), testamos uma potência simples (a × A^b), potência com intercepto, raiz quadrada, logarítmica, linear, saturação e um controle constante.
+
+A variável A continua sendo **área de superpixel Quickshift**; a resposta é o **valor de altura estimado pela Meta/WRI**. Foram utilizados somente os 257 pontos originais, em duas análises distintas: Meta no pixel exato e maior valor Meta a 5 m.
+
+**Fórmulas potenciais ajustadas nos 257 pontos:**
+
+| Alvo Meta/WRI | Fórmula recalibrada, com A em m² |
+|---|---|
+| Pixel exato | **H = 1,3684 × A^0,17089** |
+| Maior valor em 5 m | **H = 4,9039 × A^0,04608** |
+
+**Validação espacial:** cinco folds em blocos de **250 m e 500 m**, com exclusão de **25 m** entre treino e teste e seleção interna de modelos. As previsões de teste são feitas apenas em pontos não usados no respectivo ajuste. Abaixo, o MAE frente às **alturas modeladas Meta**, não frente a alturas medidas em campo:
+
+| Modelo | MAE pixel (250 m) | MAE máx. 5 m (250 m) | MAE pixel (500 m) | MAE máx. 5 m (500 m) |
+|---|---:|---:|---:|---:|
+| **Controle constante** | **4,578** | **4,778** | **4,451** | **4,665** |
+| Potência a × A^b | 4,593 | 4,810 | 4,510 | 4,734 |
+| Potência com intercepto | 4,584 | 4,822 | 4,532 | 4,756 |
+| Logarítmica | 4,581 | 4,808 | 4,504 | 4,733 |
+| Linear | 4,589 | 4,819 | 4,519 | 4,739 |
+
+**Resultado:** embora o ajuste de a e b reduza a divergência numérica em relação às fórmulas históricas não calibradas, **nenhuma família que utiliza A superou o controle constante na validação espacial em MAE**. A seleção interna escolheu o controle em todos os folds. A referência constante **não é um modelo de porte individual**; demonstra que os dados atuais não sustentam a predição individual baseada apenas na área do superpixel.
+
+A [tabela completa de todos os sete modelos](v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv), as [fórmulas ajustadas](v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json), as [previsões de 257 pontos](v3_alturas_publicas/v3_meta_calibracao_257_pontos.csv) e os [detalhes de treinamento/teste](v3_alturas_publicas/v3_meta_calibracao_folds.csv) permitem auditar os resultados.
+
+**Recomendação metodológica:** a estimativa de alturas reais deve considerar a **copa da árvore individualizada** (e não um superpixel genérico), outras variáveis relacionadas à vegetação e, para validação efetiva, observações reais de altura. Até então, o **Meta/WRI CHMv2 é uma previsão externa independente**, não verdade de campo. Copiar diretamente os valores da Meta para os 257 pontos seria reproduzir o produto, e não demonstrar uma nova equação alométrica.
+
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
