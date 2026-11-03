@@ -62,7 +62,7 @@ Clique no título para abrir diretamente a seção correspondente.
 | [4.1. Satélite e método](#sec-4-1) | Imagens Maxar e IA DINOv3 para a altura do dossel. |
 | [4.2. Precisão publicada](#sec-4-2) | MAE do produto e diferença entre resolução e precisão. |
 | [4.3. Alturas dos 257 pontos](#sec-4-3) | Distribuição das previsões da Meta/WRI na Area1. |
-| [4.4. Alometria C3 × Meta](#sec-4-4) | Relação dos índices C1–C6 com as estimativas externas. |
+| [4.4. C1–C3 × Meta e equações do artigo](#sec-4-4) | Seis fórmulas originais e cinco inversões do artigo testadas. |
 | [4.5. Dados e reprodução](#sec-4-5) | Raster, notebook V3, CSV, script e referências. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
@@ -567,38 +567,73 @@ Extraímos valores diretamente do GeoTIFF público **Meta/WRI CHMv2**, associand
 **O máximo em 5 m não é automaticamente a altura da mesma árvore:** pode captar outra copa próxima. Por isso apresentamos as duas medidas separadamente e sem afirmar altura individual confirmada.
 
 <a id="sec-4-4"></a>
-### 4.4. Como o índice alométrico C3 se relaciona com a altura Meta/WRI?
+### 4.4. Como as configurações C1, C2 e C3 se comparam às alturas da Meta/WRI?
 
-A versão original do método utiliza **C3 = 2,5 × A^0,4**, com `A` correspondendo à área do segmento analisado. Na V3 aplicamos a fórmula aos superpixels associados aos 257 pontos originais para avaliar sua plausibilidade.
+O [notebook original](Segmentacao_area_completa.ipynb) contém **seis configurações C1–C6**, cada uma com **duas formas**, potencial e linear. Para esta etapa da V3, o escopo selecionado foi **C1, C2 e C3 nas duas formas**, ou seja, **seis cálculos** aplicados aos mesmos 257 pontos originais.
 
-| Indicador da comparação exploratória | Valor |
-|---|---:|
-| Mediana de **C3**, índice sem altura validada | **16,98** |
-| Correlação Pearson entre C3 e altura Meta no pixel | **0,019** |
-| Correlação Pearson entre C3 e máximo Meta em 5 m | **0,014** |
-| Superpixels que tocam a borda da janela | **79/257 (30,7%)** |
+A fórmula potencial é **I = a × A^b** e a linear é **I = a + b × A**, sendo **A a área do superpixel Quickshift (m²)** e **I um índice empírico não calibrado como altura em metros**.
 
-As correlações próximas de zero indicam que **não identificamos associação linear relevante** entre o índice C3 e as previsões Meta para esses pontos. Isso **não demonstra, isoladamente, que uma fórmula de altura baseada em copas bem delimitadas seja inválida**: nossos superpixels não são copas confirmadas, e as próprias alturas Meta são estimativas modeladas.
+| Configuração original | a | b | Potencial | Linear |
+|---|---:|---:|---|---|
+| **C1** | 0,5 | 0,7 | **0,5 × A^0,7** | **0,5 + 0,7 × A** |
+| **C2** | 0,6 | 0,8 | **0,6 × A^0,8** | **0,6 + 0,8 × A** |
+| **C3** | 2,5 | 0,4 | **2,5 × A^0,4** | **2,5 + 0,4 × A** |
 
-A V3 também compara as seis formulações **C1–C6** e consulta faixas de porte de espécies citadas no **Plano Diretor de Arborização Urbana de Caxias do Sul**. Essas faixas dão **contexto regional**, mas **não permitem identificar a espécie nem atribuir uma altura real a cada um dos 257 indivíduos**.
+**Origem correta das equações:** os **coeficientes a e b acima são escolhas experimentais do notebook original**, não coeficientes encontrados no artigo de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579). O artigo apresenta **relações de largura de copa (CW) em função da altura (H)**, estimadas com árvores medidas na Grécia; isso é conceitualmente diferente de usar a **área de um superpixel** para produzir um índice.
+
+#### Resultados das seis fórmulas nos 257 pontos
+
+Aplicamos as seis alternativas sobre **as mesmas áreas de superpixels** e comparamos numericamente seus valores às alturas **modeladas** pelo Meta/WRI CHMv2. A tabela está ordenada pela menor diferença numérica média na análise de sensibilidade da Meta no raio de 5 m, apenas para os 215 pontos com valor Meta acima de zero.
+
+| Configuração | Diferença absoluta média vs. Meta no pixel (257 pontos) | Diferença absoluta média vs. Meta raio 5 m (215 positivos) | Pearson vs. Meta raio 5 m |
+|---|---:|---:|---:|
+| **C1 — potencial** | **11,553** | **8,711** | 0,036 |
+| C3 — potencial | 13,067 | 9,846 | 0,027 |
+| C2 — potencial | 25,395 | 21,869 | 0,038 |
+| C3 — linear | 52,173 | 48,433 | 0,044 |
+| C1 — linear | 90,796 | 86,908 | 0,044 |
+| C2 — linear | 104,454 | 100,534 | 0,044 |
+
+**Resultado:** entre as seis fórmulas originais, **C1 potencial apresentou a menor divergência numérica em relação à Meta**, tanto no pixel quanto no máximo em 5 m. **Isso NÃO comprova que C1 é a melhor fórmula para altura real.** Essas diferenças são entre **índices sem calibração física** e **previsões em metros de outro modelo**, portanto **não constituem MAE de altura real**. Além disso, as correlações foram próximas de zero. A fonte Meta no raio de 5 m pode captar vegetação de outra árvore.
+
+<a id="sec-4-4-artigo"></a>
+#### Testes com modelos de regressão do artigo científico
+
+A [Tabela 1 do artigo](https://doi.org/10.3390/land13101579) apresenta **11 famílias de regressão CW–H**. Testamos **cinco equações com coeficientes efetivamente publicados** nas Tabelas 4–9, escolhendo formas com inversão algébrica explícita para tentar estimar **H a partir de CW**.
+
+Para calcular uma largura a partir do que já temos, usamos apenas como **hipótese de sensibilidade** o diâmetro de um círculo de área igual ao superpixel (**CW hipotética = √(4A/π)**). **Uma área de superpixel não é uma copa individual medida**, e não conhecemos a espécie dos 257 pontos. Portanto, os modelos estrangeiros **não foram calibrados nem validados para a Area1**. Também restringimos as saídas às amplitudes de largura e altura observadas para cada espécie na amostra do artigo, sem extrapolar.
+
+| Modelo publicado (espécie e local) | H calculada pela inversão da equação publicada | Pontos dentro dos limites do artigo |
+|---|---|---:|
+| *Magnolia grandiflora* — Kavala (logarítmico) | H = exp((CW + 1,906)/3,691) | **22/257** |
+| *Magnolia grandiflora* — Orestiada (logarítmico) | H = exp((CW + 1,440)/3,375) | **19/257** |
+| *Magnolia grandiflora* — Xanthi (inverso) | H = 16,672/(7,280 − CW) | **5/257** |
+| *Magnolia grandiflora* — Komotini (inverso) | H = 14,882/(7,394 − CW) | **7/257** |
+| *Acer negundo* — conjunto de cidades (composto) | H = ln(CW/0,676)/ln(1,123) | **0/257** |
+
+**Interpretação:** a baixa quantidade de pontos nos domínios admissíveis revela a **incompatibilidade da largura derivada de superpixel com as amplitudes dessas regressões**, e não falha comprovada das equações para árvores com copas realmente medidas. Comparar divergências numéricas entre 5, 7, 19 ou 22 pontos distintos seria cientificamente inadequado para eleger uma fórmula vencedora.
+
+A [comparação executada, com todas as diferenças e correlações](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md), o [CSV completo dos 257 pontos e todas as fórmulas](docs/v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) e a [tabela de modelos publicados testados](docs/v3_alturas_publicas/v3_modelos_artigo_testados.csv) permitem reproduzir e auditar os resultados.
 
 <a id="sec-4-5"></a>
 ### 4.5. De onde foram obtidas as alturas? Código e arquivos
 
-A fonte externa de altura adotada neste trabalho é **somente Meta/WRI CHMv2**.
+A **única fonte externa de altura ativa** neste estudo é o mapa de dossel **Meta/WRI CHMv2**.
 
 | Recurso | Link e finalidade |
 |---|---|
-| **GeoTIFF original** | [`2103121330.tif` — quadrante de Caxias do Sul](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) |
-| **Catálogo da fonte** | [Meta/WRI — AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) |
-| **Artigo científico** | [Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
-| **Notebook da alometria V3** | [`Alometria_caxias_v3.ipynb`](Alometria_caxias_v3.ipynb) |
-| **Cálculo dos índices C1–C6** | [`experimentos/v3_alometria_caxias.py`](experimentos/v3_alometria_caxias.py) |
-| **Extração de alturas Meta/WRI** | [`experimentos/v3_amostrar_altura_publica.py`](experimentos/v3_amostrar_altura_publica.py) |
-| **Dados das 257 árvores, C3 e Meta** | [CSV com os 257 pontos](docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv) |
-| **Metodologia e limites** | [Análise exploratória Meta/WRI × C3](docs/v3_alturas_publicas/v3_analise_comparativa.md) |
+| **GeoTIFF original da Meta** | [Quadrante da Area1 — 2103121330.tif](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) |
+| **Catálogo da Meta** | [Meta/WRI — AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) |
+| **Artigo do mapa de alturas** | [Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
+| **Artigo dos modelos CW–H** | [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579) |
+| **Notebook alometria V3** | [Alometria_caxias_v3.ipynb](Alometria_caxias_v3.ipynb) |
+| **Fórmulas originais C1–C6** | [experimentos/v3_alometria_caxias.py](experimentos/v3_alometria_caxias.py) |
+| **Novos testes C1–C3 e equações do artigo** | [Script reprodutível da comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) |
+| **Dados das 257 árvores, C1–C3 e Meta** | [CSV completo por ponto](docs/v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) |
+| **Resumo e gráfico** | [Tabela das 11 alternativas testadas](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) · [Gráfico](docs/v3_alturas_publicas/v3_c1_c3_meta_comparacao.png) |
+| **Relatório metodológico** | [Comparação detalhada C1–C3 × Meta e modelos do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) |
 
-**Síntese:** a análise com Meta/WRI ajuda a investigar a plausibilidade dos índices experimentais, **mas nenhuma das 257 alturas foi medida diretamente em campo**. Não inferimos risco elétrico pela proximidade de postes.
+**Conclusão científica:** nenhuma das equações foi validada para altura real de árvore individual. O estudo identifica **proximidade numérica com outro modelo** e limitações de transferibilidade dos modelos de espécies gregas, sem inferir risco elétrico.
 
 ---
 
@@ -628,8 +663,8 @@ A fonte externa de altura adotada neste trabalho é **somente Meta/WRI CHMv2**.
 
 | Material | Conteúdo |
 |---|---|
-| [Notebook V3 — alometria e altura Meta/WRI](Alometria_caxias_v3.ipynb) | V3 independente: índices experimentais **C1–C6**, contexto regional e comparação com **alturas estimadas Meta/WRI CHMv2** nos 257 pontos. [Script de alometria](experimentos/v3_alometria_caxias.py) · [Metodologia](docs/v3_alometria_caxias.md). |
-| [V3 — resultados de altura Meta/WRI CHMv2 nos 257 pontos](docs/v3_alturas_publicas/v3_analise_comparativa.md) | **Única fonte externa de altura ativa na V3:** estimativa de dossel Meta/WRI (~1 m), com [CSV de 257 pontos e índice C3](docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv), [script de amostragem](experimentos/v3_amostrar_altura_publica.py) e documentação das limitações. Não são alturas medidas em campo. |
+| [Notebook V3 — alometria C1–C3 e altura Meta/WRI](Alometria_caxias_v3.ipynb) | Calcula os índices **C1–C6** originais e apresenta a **comparação C1–C3 nas formas potencial e linear**, além de cinco modelos invertidos de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579), com as 257 previsões **Meta/WRI**. [Código de comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) · [Resultados](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md). |
+| [V3 — comparação dos índices alométricos C1–C3 com Meta/WRI](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) | **Análise executada nos 257 pontos**: [6 fórmulas originais e 5 inversões do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) com diferenças numéricas, correlações e limitações. A única referência externa de altura é **Meta/WRI CHMv2**; **não são alturas medidas em campo**. |
 | [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
 | [Notebook V2](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa_v2_experimentos.ipynb) | **Versão experimental com três configurações de processamento**, todas usando a imagem e os pontos de referência originais, **sem reduzir a resolução dos pixels**: <br><br> **(1) Área completa em 812 quadrantes de até 256 × 256 pixels:** aplica Quickshift por quadrante, em lotes com resultados intermediários salvos para controlar o consumo de memória RAM; depois permite avaliar **oito classificadores pelo F1-macro** e investigar combinações de **NDVI, brilho HSV e bordas Canny**. <br><br> **(2) Os 119 recortes de até 512 × 512 pixels:** entre 210 janelas possíveis, seleciona as 119 com pontos conhecidos, aplica Quickshift ao recorte inteiro e avalia **o F1-macro dos oito classificadores**. <br><br> **(3) Os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels:** aplica Quickshift separadamente em cada parte e avalia novamente **os oito classificadores**, para comparar **F1-macro e pico de memória RAM** com a configuração 2, usando as mesmas referências e divisões espaciais de treino/teste. <br><br> **Organização no notebook:** a configuração 1 é um caminho progressivo independente; as configurações 2 e 3 são os dois testes de uma mesma comparação controlada. A rota progressiva oferece ainda análises opcionais de porte e proximidade com postes. **O código está implementado, mas a publicação do notebook não comprova uma nova execução integral dos 812 quadrantes.** O método original com Quickshift global permanece preservado em outro notebook. |
 | [Dados Area1](data/README.md) | Arquivos, coordenadas e estrutura do Drive |
