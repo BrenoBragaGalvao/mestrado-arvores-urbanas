@@ -1,0 +1,39 @@
+name: "V3 - Calibrar formulas de altura com Meta e validar espacialmente"
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/v3_calibracao_altura_meta.yml"
+      - "experimentos/v3_calibrar_altura_meta.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  calibrar_v3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependencias
+        run: python -m pip install numpy pandas scipy scikit-learn pyproj matplotlib
+      - name: Calibrar e testar em blocos geograficos 250m e 500m com exclusao de 25m
+        run: |
+          python -u experimentos/v3_calibrar_altura_meta.py \
+            --csv docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv \
+            --out docs/v3_alturas_publicas
+      - name: Salvar resultados verificaveis no GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/v3_alturas_publicas/v3_meta_calibracao_*
+          git diff --cached --quiet || (git commit -m "data(v3): registra formulas calibradas e validacao espacial Meta" && git push)
+      - name: Anexar arquivos da calibracao
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-meta-calibracao-espacial
+          path: docs/v3_alturas_publicas/v3_meta_calibracao_*
+          if-no-files-found: ignore
