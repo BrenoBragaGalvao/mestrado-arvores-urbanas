@@ -76,5 +76,35 @@ Abra [`Alometria_caxias_v3.ipynb`](../Alometria_caxias_v3.ipynb). Execute os ín
 
 Referências externas: [Meta/WRI — AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Brandt et al. (2026), *Scientific Data*](https://doi.org/10.1038/s41597-026-07882-0). O artigo relata **MAE aproximado de 3,0 m** no protocolo de validação SatLidar v2; esse erro **não é uma estimativa de precisão local para a Area1**.
 
+## Novos testes: C1, C2 e C3 (potencial e linear) versus Meta/WRI
+
+Conferimos as **seis configurações C1–C6** presentes no [notebook original](../Segmentacao_area_completa.ipynb). O escopo desta bateria é deliberadamente **C1, C2 e C3, com duas formas cada**, sem reestimar seus coeficientes ou alterar o código original.
+
+| Configuração | Parâmetros originais | Forma potencial | Forma linear |
+|---|---|---|---|
+| C1 | a=0,5; b=0,7 | 0,5 × A^0,7 | 0,5 + 0,7 × A |
+| C2 | a=0,6; b=0,8 | 0,6 × A^0,8 | 0,6 + 0,8 × A |
+| C3 | a=2,5; b=0,4 | 2,5 × A^0,4 | 2,5 + 0,4 × A |
+
+**Proveniência:** esses coeficientes são escolhas exploratórias **do notebook original** e **não são os coeficientes publicados** em [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579). O artigo modela **largura de copa CW=f(H)** com medições de **700 árvores de três espécies**, realizadas em cinco cidades da Grécia. A inversão de algumas equações para obter H a partir de CW **não torna a relação diretamente transferível para Caxias do Sul**.
+
+A análise **foi executada com os 257 pontos e somente a Meta/WRI CHMv2 como referência externa**, tanto no pixel exato (257 valores) como na sensibilidade do máximo do raio de 5 m (215 valores positivos). A menor **divergência numérica** em ambos os recortes foi da **C1 potencial**, porém as correlações com Meta foram próximas de zero (por exemplo, r≈0,036 para C1 potencial e o máximo positivo no raio de 5 m). Não atribuímos validade biológica ou acurácia em metros a esse resultado: **índice empírico não é altura real**, e o mapa Meta também é previsão.
+
+### Modelos efetivamente publicados: teste com inversões matemáticas
+
+Selecionamos cinco equações com coeficientes publicados que permitem inversão matemática de CW=f(H): duas equações logarítmicas de *Magnolia grandiflora*, duas inversas da mesma espécie, e uma composta de *Acer negundo*. Para testar, assumimos **apenas como simulação**, sem suporte geométrico individual, que a largura de copa seria **CW = √(4A/π)**, com A a área do **superpixel**, não a área de uma copa delimitada. Sem dados de espécie de cada ponto, foram mantidos apenas valores dentro dos intervalos observados por espécie no artigo.
+
+| Equação publicada invertida | Pontos sem extrapolação |
+|---|---:|
+| *Magnolia grandiflora*, Kavala (logarítmica) | 22/257 |
+| *Magnolia grandiflora*, Orestiada (logarítmica) | 19/257 |
+| *Magnolia grandiflora*, Xanthi (inversa) | 5/257 |
+| *Magnolia grandiflora*, Komotini (inversa) | 7/257 |
+| *Acer negundo*, conjunto de quatro cidades (composta) | 0/257 |
+
+**Não se deve comparar essas divergências para eleger um melhor modelo de altura**: as quantidades válidas diferem entre fórmulas, as espécies são desconhecidas e os superpixels não são copas reais. O modelo de *Acer* teve **zero pontos elegíveis** dentro dos intervalos impostos; isso não significa que seja um modelo errado para *Acer negundo*.
+
+**Materiais finais:** [notebook V3 atualizado](../Alometria_caxias_v3.ipynb) · [script reprodutível](../experimentos/v3_comparar_c1_c3_meta_e_artigo.py) · [CSV com os 257 registros e todos os índices](v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) · [resumo das 11 alternativas](v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) · [gráfico](v3_alturas_publicas/v3_c1_c3_meta_comparacao.png) · [relatório com tabelas e limites](v3_alturas_publicas/v3_c1_c3_meta_relatorio.md).
+
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
