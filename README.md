@@ -60,6 +60,7 @@ Clique no título para abrir diretamente a seção correspondente.
 | [3.6.2. Configuração 2](#sec-3-6-2) | 119 recortes inteiros de até 512 × 512 pixels. |
 | [3.6.3. Configuração 3](#sec-3-6-3) | 119 recortes subdivididos em partes de 256 × 256 pixels. |
 | [3.7. Memória RAM](#sec-3-7) | Comparação dos picos de memória. |
+| [3.8. Auditoria de overfitting e regularização](#sec-3-8) | Resultados E2, E3A, E3B, limites científicos e reprodução no notebook V2. |
 | [4. Alometria, Meta/WRI e espécies locais](#sec-4) | Contexto regional, fontes e resultados da V3. |
 | [4.1. Fonte das alturas Meta/WRI](#sec-4-1) | Raster original, resolução, método e precisão publicada. |
 | [4.2. Inventário e espécies de Caxias do Sul](#sec-4-2) | PDAU municipal, referências de porte e limites. |
@@ -515,6 +516,40 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 **Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 3.6).
 
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
+
+<a id="sec-3-8"></a>
+### 3.8. Auditoria de overfitting e regularização — experimentos 2, 3A e 3B
+
+**Por que refizemos os testes?** Alguns classificadores, especialmente o Random Forest, apresentaram F1-macro de treinamento próximo de 1,0, porém desempenho inferior nos testes espaciais. Para investigar sobreajuste, avaliamos duas receitas explícitas de regularização (**moderada** e **forte**), sem apagar os resultados originais das seções 3.5 e 3.6.
+
+**Como foi executada a auditoria (03/11/2026):** reutilizamos as bases derivadas da Area1, com **505 exemplos rotulados por configuração**, dez divisões espaciais por experimento (cinco com blocos de 250 m; cinco com blocos de 500 m), exclusão de 25 m entre treino e teste e os oito classificadores. Foram **480 ajustes finais** (3 experimentos × 2 receitas × 8 classificadores × 10 divisões). Verificamos **zero IDs de exemplo compartilhados entre treinamento e teste** nas 30 divisões. O embargo foi aplicado **entre geometrias dos segmentos** na bateria E2 e **entre pontos de referência** nas baterias E3A e E3B.
+
+**Resultados da receita moderada — F1-macro médio no teste:**
+
+| Classificador | E2 (250 m) | E2 (500 m) | E3A (250 m) | E3A (500 m) | E3B (250 m) | E3B (500 m) |
+|---|---:|---:|---:|---:|---:|---:|
+| Regressão logística | 0,8879 | **0,8666** | **0,9110** | 0,8546 | **0,9219** | **0,8688** |
+| SVM RBF | 0,8908 | 0,8619 | 0,9055 | **0,8572** | 0,9179 | 0,8621 |
+| KNN (25) | **0,8972** | 0,8533 | 0,8950 | 0,8440 | 0,9110 | 0,8571 |
+| Extra Trees | 0,8266 | 0,8335 | 0,8454 | 0,8195 | 0,8577 | 0,8352 |
+| Random Forest | 0,8220 | 0,8240 | 0,8415 | 0,8393 | 0,8356 | 0,8286 |
+| HistGradientBoosting | 0,8325 | 0,8246 | 0,8352 | 0,8214 | 0,8610 | 0,8194 |
+| Gaussian Naive Bayes | 0,7986 | 0,7400 | 0,8234 | 0,7472 | 0,8251 | 0,7514 |
+| Dummy | 0,2980 | 0,2799 | 0,2847 | 0,2791 | 0,2847 | 0,2791 |
+
+**Receita forte — desempenho da regressão logística no treino e no teste** (médias das dez divisões por experimento):
+
+| Experimento | F1-macro treino | F1-macro teste | Diferença |
+|---|---:|---:|---:|
+| E2 — 812 quadrantes de 256 px | 0,8987 | 0,8748 | 0,0239 |
+| E3A — 119 recortes de 512 px | 0,8915 | 0,8850 | 0,0065 |
+| E3B — 119 recortes subdivididos em 256 px | 0,8954 | 0,8921 | 0,0033 |
+
+**Interpretação:** a regressão logística apresentou equilíbrio entre desempenho de treinamento e teste em diversas condições, mas **diferença média pequena não prova ausência de overfitting**. O Random Forest manteve sinais de sobreajuste residual; quando recebeu regularização excessiva, o F1 caiu no treino e no teste. As receitas foram avaliadas depois que resultados anteriores já eram conhecidos, portanto esta é **uma comparação exploratória e não um teste externo cego**. Todas as divisões pertencem à mesma imagem da Area1; não há demonstração de generalização para outra região. As tabelas originais das seções 3.5 e 3.6 **não foram substituídas** por estas.
+
+**Reprodução e limites:** o script [`experimentos/v2_auditoria_regularizacao.py`](experimentos/v2_auditoria_regularizacao.py) foi integrado como **duas células opcionais** ao [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb). O modo `evidencias` usa as bases e geometrias do pacote de 03/11/2026 e **reproduziu numericamente as médias** apresentadas. O modo `v2` lê diretamente os arquivos gerados pelo notebook atual: nessa rota, o embargo de E2 é **entre centroides**, não entre geometrias completas. Logo, uma nova execução dessa rota pode gerar números diferentes e não deve ser confundida com os resultados publicados acima. Leia a [auditoria e o protocolo de reprodução completos](docs/auditoria_regularizacao_e2_e3a_e3b_2026-11-03.md).
+
+---
 
 <a id="sec-4"></a>
 ## 4. Alometria em Caxias do Sul — Meta/WRI, espécies locais e testes das equações
