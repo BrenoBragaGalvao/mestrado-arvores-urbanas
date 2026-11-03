@@ -6,8 +6,8 @@ ENTRADA:
 - 257 pontos com area de superpixel e Meta/WRI no pixel exato e no raio 5m;
 - parametros de formulas ajustadas existentes no repositorio.
 SAIDA:
-- planilha principal (Meta na PRIMEIRA coluna);
-- tabela integral com variantes lineares e segunda referencia Meta.
+- planilha principal: Arvore (contagem 1-257) na PRIMEIRA coluna, Meta pixel na SEGUNDA, Meta maximo 5m na TERCEIRA;
+- tabela integral com variantes lineares e as duas referencias Meta lado a lado.
 LIMITES:
 - C1-C6 originais sao INDICES EMPIRICOS, nao alturas calibradas em metros.
 - A e area de superpixel, nao area confirmada de copa.
@@ -59,7 +59,8 @@ def main():
     m5=df.altura_meta_max_5m_m.astype(float).to_numpy()
     if not np.isfinite(meta).all() or not np.isfinite(m5).all():
         raise ValueError("Meta possui valores ausentes; revisar fonte.")
-    tab=pd.DataFrame({"Meta_WRI_pixel_m":meta})
+    tab=pd.DataFrame({"Arvore":np.arange(1,len(df)+1,dtype=int),
+                      "Meta_WRI_pixel_m":meta,"Meta_WRI_maximo_5m_m":m5})
     for name,(c,d) in COEFS.items():
         tab[name+"_potencial"]=c*a**d
     for name,(c,d) in COEFS.items():
@@ -72,14 +73,14 @@ def main():
     tab["Logaritmica_ajustada_5m_m"]=log(p_5m)
     tab["Potencial_ajustada_5m_m"]=power(p_5m)
     tab["Superpixel_toca_borda"]=df.toca_borda_tile.astype(bool)
-    maincols=["Meta_WRI_pixel_m"]+[name+"_potencial" for name in COEFS]+[
+    maincols=["Arvore","Meta_WRI_pixel_m","Meta_WRI_maximo_5m_m"]+[
+        name+"_potencial" for name in COEFS]+[
         "Logaritmica_ajustada_pixel_m","Potencial_ajustada_pixel_m","Ponto_ID","Area_superpixel_m2"]
-    fullcols=["Meta_WRI_pixel_m"]+[name+"_potencial" for name in COEFS]+[
-        name+"_linear" for name in COEFS]+[
+    fullcols=["Arvore","Meta_WRI_pixel_m","Meta_WRI_maximo_5m_m"]+[
+        name+"_potencial" for name in COEFS]+[name+"_linear" for name in COEFS]+[
         "Logaritmica_ajustada_pixel_m","Potencial_ajustada_pixel_m",
-        "Ponto_ID","Area_superpixel_m2","Meta_WRI_maximo_5m_m",
         "Logaritmica_ajustada_5m_m","Potencial_ajustada_5m_m",
-        "Superpixel_toca_borda"]
+        "Ponto_ID","Area_superpixel_m2","Superpixel_toca_borda"]
     x.out.mkdir(parents=True,exist_ok=True)
     mainpath=x.out/"v3_comparacao_c1_c6_log_pot_meta_257.csv"
     fullpath=x.out/"v3_comparacao_completa_c1_c6_pot_linear_log_meta_257.csv"
@@ -98,7 +99,7 @@ def main():
                             else "predicao calibrada ao produto Meta/WRI; nao campo")})
     metricpath=x.out/"v3_comparacao_c1_c6_log_pot_resumo.csv"
     pd.DataFrame(metrics).to_csv(metricpath,index=False,encoding="utf-8",float_format="%.6f")
-    print(json.dumps({"pontos":len(tab),"primeira_coluna":maincols[0],
+    print(json.dumps({"pontos":len(tab),"colunas_iniciais":maincols[:3],
           "modelo_potencia_ajustada_pixel":p_pixel["potencia"]["formula"],
           "modelo_logaritmico_pixel":p_pixel["logaritmica"]["formula"],
           "tabela_principal":str(mainpath),"tabela_ampliada":str(fullpath)},
