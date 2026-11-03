@@ -66,6 +66,7 @@ Clique no título para abrir diretamente a seção correspondente.
 | [4.4. Calibração de coeficientes](#sec-4-4-calibracao) | Ajuste de a e b e avaliação espacial das fórmulas com Meta/WRI. |
 | [4.4. Logarítmica × Meta nos 257 pontos](#sec-4-4-logaritmica) | Tabela de alturas por ponto, diferenças e validação espacial. |
 | [4.4. Tabela Meta pixel e 5 m, C1–C6, log e potência](#sec-4-4-tabela-257) | Contagem das 257 árvores e estimativas lado a lado. |
+| [4.4. Onze famílias do artigo × Meta](#sec-4-4-onze-modelos) | Resultados das 11 famílias com validação espacial nos dois alvos. |
 | [4.5. Dados e reprodução](#sec-4-5) | Raster, notebook V3, CSV, script e referências. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
@@ -689,8 +690,43 @@ A tabela foi montada com **as 257 árvores de referência da Area1** em sua orde
 
 **Interpretação:** C1–C6 são índices empíricos potenciais **não calibrados como altura real em metros**; logarítmica e potência ajustada foram calibradas **contra o mapa Meta/WRI**, não contra altura medida em campo. **A é a área de um superpixel Quickshift**, não de copa confirmada. A coluna de 5 m é o máximo dentro da vizinhança e pode corresponder a outra árvore. A relação anteriormente proposta com **diâmetro individual de copa** não foi calculada porque esses diâmetros não foram medidos. Os modelos calibrados usando todos os 257 pontos **não constituem uma avaliação de teste independente**; [validação espacial está aqui](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv).
 
+<a id="sec-4-4-onze-modelos"></a>
+#### Teste das 11 famílias do artigo — comparação com a Meta/WRI pixel e 5 m
+
+Para não restringir a análise aos modelos anteriores, testamos **as onze famílias matemáticas da Tabela 1 de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579)**: linear, logarítmica, inversa, quadrática, cúbica, potencial, composta, curva-S, logística, crescimento e exponencial.
+
+**Distinção científica obrigatória:** no artigo, os autores ajustaram **largura de copa medida como função de altura medida (`CW=f(H)`)** para árvores de espécies gregas. Na Area1 **não temos largura de copa individualizada nem alturas medidas em campo**. Portanto, **adaptamos essas onze famílias para estimar a altura *modelada* da Meta a partir do diâmetro circular equivalente de um superpixel** (`D_eq = 2√(A_superpixel/π)`). Os coeficientes foram reajustados nos exemplos de treino da Area1: **não são as equações do artigo com seus coeficientes publicados**, nem resultados de validação de altura real.
+
+Também verificamos que os autores publicaram uma **[correção em março de 2026](https://doi.org/10.3390/land15030473)**, que retifica a apresentação de algumas equações do trabalho de 2024. A correção integra a referência bibliográfica desta comparação. Modelos **composto, crescimento e exponencial são parametrizações equivalentes**, não três técnicas independentes.
+
+**Desenho experimental:** **257 pontos de árvores**; dois alvos do mesmo produto Meta/WRI (pixel exato e máximo em raio de 5 m); **cinco divisões geográficas com blocos de 250 e 500 m**, exclusão de **25 m** entre treino e teste e **escolha interna de modelo**. Os resultados abaixo são **MAE frente à estimativa Meta/WRI em metros**: quanto menor, maior a proximidade com essa fonte, mas **não é MAE contra altura real medida em campo**.
+
+| Família adaptada | Meta pixel, 250 m | Meta pixel, 500 m | Meta máximo 5 m, 250 m | Meta máximo 5 m, 500 m |
+|---|---:|---:|---:|---:|
+| Linear | 4,591 | 4,509 | 4,814 | 4,735 |
+| Logarítmica | 4,588 | 4,506 | 4,808 | 4,733 |
+| Inversa | 4,589 | 4,506 | **4,802** | 4,731 |
+| Quadrática | 4,589 | 4,522 | 4,819 | 4,743 |
+| Cúbica | **4,584** | 4,529 | 4,820 | 4,751 |
+| Potencial | 4,593 | 4,510 | 4,810 | 4,734 |
+| Composta | 4,598 | 4,520 | 4,818 | 4,738 |
+| Curva-S | 4,587 | **4,505** | 4,803 | **4,731** |
+| Logística | 4,597 | 4,519 | 4,817 | 4,737 |
+| Crescimento | 4,598 | 4,520 | 4,818 | 4,738 |
+| Exponencial | 4,598 | 4,520 | 4,818 | 4,738 |
+| **Controle constante** | **4,578** | **4,451** | **4,778** | **4,665** |
+| **Seleção aninhada** | **4,578** | **4,451** | **4,778** | **4,665** |
+
+**Qual chegou mais perto?** Entre as onze famílias, a **cúbica** apresentou a menor divergência para **pixel Meta com blocos de 250 m**; a **curva-S** foi a menor para pixel com 500 m e para o alvo de 5 m com 500 m; a **inversa** foi a menor para o alvo de 5 m com 250 m. **Porém, nenhuma das onze superou o controle constante em MAE**. O procedimento de **seleção interna escolheu o controle constante em todos os cinco folds de cada cenário**, e o desempenho de sua seleção foi calculado em testes externos.
+
+**O que isso significa?** A **área do superpixel**, mesmo expressa como diâmetro circular equivalente, **não mostrou informação suficiente para prever adequadamente a altura individual estimada pelo Meta/WRI**. Não seria científico declarar a cúbica, inversa ou curva-S como altura correta da região por pequenas diferenças no ranking. Além disso, a **melhor das onze foi identificada depois de comparar os erros de teste**, o que torna sua seleção exploratória, não uma comprovação de superioridade em dados inéditos.
+
+**Resultados reproduzíveis:** [tabela detalhada e equações adaptadas](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) · [CSV dos 11 modelos, controle e seleção nas quatro condições](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv) · [previsões fora do treinamento dos 257 pontos](docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) · [detalhes dos folds](docs/v3_alturas_publicas/v3_11_familias_meta_folds.csv) · [gráfico](docs/v3_alturas_publicas/v3_11_familias_meta_mae.png) · [script](experimentos/v3_testar_11_modelos_artigo_meta.py) · [notebook V3](Alometria_caxias_v3.ipynb).
+
 <a id="sec-4-4-artigo"></a>
 #### Testes com modelos de regressão do artigo científico
+
+**Observação cronológica:** os cinco ensaios de inversão apresentados a seguir são experimentos exploratórios anteriores. A bateria completa das onze famílias está na subseção acima, incluindo a referência à [correção publicada pelos autores em 2026](https://doi.org/10.3390/land15030473). Os dois conjuntos de resultados têm procedimentos diferentes e não devem ser misturados em uma classificação única.
 
 A [Tabela 1 do artigo](https://doi.org/10.3390/land13101579) apresenta **11 famílias de regressão CW–H**. Testamos **cinco equações com coeficientes efetivamente publicados** nas Tabelas 4–9, escolhendo formas com inversão algébrica explícita para tentar estimar **H a partir de CW**.
 
@@ -724,6 +760,7 @@ A **única fonte externa de altura ativa** neste estudo é o mapa de dossel **Me
 | **Novos testes C1–C3 e equações do artigo** | [Script reprodutível da comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) |
 | **Calibração a e b + novos modelos** | [Script de ajuste](experimentos/v3_calibrar_altura_meta.py) · [validação espacial (CSV)](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) · [coeficientes ajustados (JSON)](docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json) |
 | **Estimativa de altura com a fórmula logarítmica** | [Tabela das 257 alturas logarítmicas × Meta](docs/v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [relatório com métricas e exemplos](docs/v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [script](experimentos/v3_comparar_logaritmica_meta.py) |
+| **Onze famílias do artigo: Meta pixel e 5 m** | [Relatório completo](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) · [resumo CSV de todas as famílias](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv) · [predições de 257 pontos](docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) · [código](experimentos/v3_testar_11_modelos_artigo_meta.py). Testa famílias adaptadas, **não os coeficientes originais do artigo**. |
 | **Dados das 257 árvores, C1–C3 e Meta** | [CSV completo por ponto](docs/v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) |
 | **Resumo e gráfico** | [Tabela das 11 alternativas testadas](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) · [Gráfico](docs/v3_alturas_publicas/v3_c1_c3_meta_comparacao.png) |
 | **Relatório metodológico** | [Comparação detalhada C1–C3 × Meta e modelos do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) |
