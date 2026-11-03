@@ -63,6 +63,7 @@ Clique no título para abrir diretamente a seção correspondente.
 | [4.2. Precisão publicada](#sec-4-2) | MAE do produto e diferença entre resolução e precisão. |
 | [4.3. Alturas dos 257 pontos](#sec-4-3) | Distribuição das previsões da Meta/WRI na Area1. |
 | [4.4. C1–C3 × Meta e equações do artigo](#sec-4-4) | Seis fórmulas originais e cinco inversões do artigo testadas. |
+| [4.4. Calibração de coeficientes](#sec-4-4-calibracao) | Ajuste de a e b e avaliação espacial das fórmulas com Meta/WRI. |
 | [4.5. Dados e reprodução](#sec-4-5) | Raster, notebook V3, CSV, script e referências. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
@@ -596,6 +597,38 @@ Aplicamos as seis alternativas sobre **as mesmas áreas de superpixels** e compa
 
 **Resultado:** entre as seis fórmulas originais, **C1 potencial apresentou a menor divergência numérica em relação à Meta**, tanto no pixel quanto no máximo em 5 m. **Isso NÃO comprova que C1 é a melhor fórmula para altura real.** Essas diferenças são entre **índices sem calibração física** e **previsões em metros de outro modelo**, portanto **não constituem MAE de altura real**. Além disso, as correlações foram próximas de zero. A fonte Meta no raio de 5 m pode captar vegetação de outra árvore.
 
+<a id="sec-4-4-calibracao"></a>
+#### Calibração de novos coeficientes e avaliação espacial sem vazamento
+
+**Os coeficientes a e b podem ser modificados**. Em uma nova etapa, calibramos a família **H = a × A^b** para se aproximar das alturas **modeladas pelo Meta/WRI CHMv2**, usando os mesmos 257 pontos originais. Além da potência, testamos potência com intercepto, modelos com raiz quadrada, logaritmo, relação linear e função de saturação. **A é a área do superpixel Quickshift, não uma copa delimitada.**
+
+**Duas fórmulas potenciais ajustadas nos 257 pontos** (coeficientes estimados sobre todo o conjunto; usar a validação espacial abaixo para avaliar desempenho):
+
+| Alvo de previsão Meta/WRI | Fórmula potencial recalibrada |
+|---|---|
+| Altura prevista no pixel exato | **H = 1,3684 × A^0,17089** |
+| Maior altura prevista no raio de 5 m | **H = 4,9039 × A^0,04608** |
+
+Esses números **substituem apenas os coeficientes nas fórmulas experimentais calibradas da V3**. Não modificamos os coeficientes C1–C3 históricos do notebook original. O expoente muito pequeno, principalmente no raio de 5 m, mostra que a potência calibrada quase não varia com a área.
+
+Para não escolher coeficientes por memorização, avaliamos os modelos em **5 divisões espaciais com blocos de 250 m e 500 m, exclusão de 25 m entre treino e teste e seleção interna de família de modelo**. Todos os 257 pontos foram avaliados fora do respectivo treino de cada divisão, tanto para o alvo pixel quanto para o alvo máximo em 5 m. O resultado abaixo é o **MAE contra a previsão da Meta/WRI** (em metros): **não é o MAE contra altura real de campo**.
+
+| Modelo calibrado | MAE Meta pixel (250 m) | MAE Meta raio de 5 m (250 m) | MAE Meta pixel (500 m) | MAE Meta raio de 5 m (500 m) |
+|---|---:|---:|---:|---:|
+| **Constante — referência de controle** | **4,578** | **4,778** | **4,451** | **4,665** |
+| Potência (a e b livres) | 4,593 | 4,810 | 4,510 | 4,734 |
+| Potência + intercepto | 4,584 | 4,822 | 4,532 | 4,756 |
+| Raiz quadrada + intercepto | 4,591 | 4,814 | 4,509 | 4,735 |
+| Logarítmico + intercepto | 4,581 | 4,808 | 4,504 | 4,733 |
+| Linear + intercepto | 4,589 | 4,819 | 4,519 | 4,739 |
+| Saturação | 4,590 | 4,818 | 4,530 | 4,759 |
+
+**Resultado metodológico:** em **ambos os alvos e ambas as escalas espaciais**, a referência **constante teve o menor erro absoluto médio**. A seleção interna dos modelos também escolheu a constante nos 5 folds de cada cenário. Portanto, **não há evidência nesta avaliação de que somente a área do superpixel seja suficiente para prever alturas individuais da Meta com confiabilidade**. Não seria correto eleger a potência ajustada como uma fórmula de altura validada só porque os coeficientes mudaram.
+
+A referência constante é útil como **controle científico**, mas **não** como estimativa individual de porte de árvore. Na etapa seguinte, a melhoria com maior justificativa física seria substituir a área do superpixel por **área ou diâmetro de copa verdadeiramente individualizados**, e, quando disponíveis, usar espécies e alturas medidas. Também precisamos considerar que o valor zero no pixel Meta pode não representar ausência real de árvore e que o máximo de 5 m pode pertencer a outra copa.
+
+**Arquivos:** [script de calibração](experimentos/v3_calibrar_altura_meta.py) · [resultados da validação espacial](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) · [coeficientes finais e modelos](docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json) · [previsões em todos os 257 pontos](docs/v3_alturas_publicas/v3_meta_calibracao_257_pontos.csv) · [gráfico MAE](docs/v3_alturas_publicas/v3_meta_calibracao_mae_250m.png).
+
 <a id="sec-4-4-artigo"></a>
 #### Testes com modelos de regressão do artigo científico
 
@@ -629,6 +662,7 @@ A **única fonte externa de altura ativa** neste estudo é o mapa de dossel **Me
 | **Notebook alometria V3** | [Alometria_caxias_v3.ipynb](Alometria_caxias_v3.ipynb) |
 | **Fórmulas originais C1–C6** | [experimentos/v3_alometria_caxias.py](experimentos/v3_alometria_caxias.py) |
 | **Novos testes C1–C3 e equações do artigo** | [Script reprodutível da comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) |
+| **Calibração a e b + novos modelos** | [Script de ajuste](experimentos/v3_calibrar_altura_meta.py) · [validação espacial (CSV)](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) · [coeficientes ajustados (JSON)](docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json) |
 | **Dados das 257 árvores, C1–C3 e Meta** | [CSV completo por ponto](docs/v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) |
 | **Resumo e gráfico** | [Tabela das 11 alternativas testadas](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) · [Gráfico](docs/v3_alturas_publicas/v3_c1_c3_meta_comparacao.png) |
 | **Relatório metodológico** | [Comparação detalhada C1–C3 × Meta e modelos do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) |
@@ -663,7 +697,7 @@ A **única fonte externa de altura ativa** neste estudo é o mapa de dossel **Me
 
 | Material | Conteúdo |
 |---|---|
-| [Notebook V3 — alometria C1–C3 e altura Meta/WRI](Alometria_caxias_v3.ipynb) | Calcula os índices **C1–C6** originais e apresenta a **comparação C1–C3 nas formas potencial e linear**, além de cinco modelos invertidos de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579), com as 257 previsões **Meta/WRI**. [Código de comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) · [Resultados](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md). |
+| [Notebook V3 — alometria, calibração e altura Meta/WRI](Alometria_caxias_v3.ipynb) | Calcula os índices **C1–C6** originais e apresenta a **comparação C1–C3 nas formas potencial e linear**, além de cinco modelos invertidos de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579), com as 257 previsões **Meta/WRI**, além de calibração de coeficientes e validação espacial. [Código de comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) · [Resultados](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md). |
 | [V3 — comparação dos índices alométricos C1–C3 com Meta/WRI](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) | **Análise executada nos 257 pontos**: [6 fórmulas originais e 5 inversões do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) com diferenças numéricas, correlações e limitações. A única referência externa de altura é **Meta/WRI CHMv2**; **não são alturas medidas em campo**. |
 | [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
 | [Notebook V2](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa_v2_experimentos.ipynb) | **Versão experimental com três configurações de processamento**, todas usando a imagem e os pontos de referência originais, **sem reduzir a resolução dos pixels**: <br><br> **(1) Área completa em 812 quadrantes de até 256 × 256 pixels:** aplica Quickshift por quadrante, em lotes com resultados intermediários salvos para controlar o consumo de memória RAM; depois permite avaliar **oito classificadores pelo F1-macro** e investigar combinações de **NDVI, brilho HSV e bordas Canny**. <br><br> **(2) Os 119 recortes de até 512 × 512 pixels:** entre 210 janelas possíveis, seleciona as 119 com pontos conhecidos, aplica Quickshift ao recorte inteiro e avalia **o F1-macro dos oito classificadores**. <br><br> **(3) Os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels:** aplica Quickshift separadamente em cada parte e avalia novamente **os oito classificadores**, para comparar **F1-macro e pico de memória RAM** com a configuração 2, usando as mesmas referências e divisões espaciais de treino/teste. <br><br> **Organização no notebook:** a configuração 1 é um caminho progressivo independente; as configurações 2 e 3 são os dois testes de uma mesma comparação controlada. A rota progressiva oferece ainda análises opcionais de porte e proximidade com postes. **O código está implementado, mas a publicação do notebook não comprova uma nova execução integral dos 812 quadrantes.** O método original com Quickshift global permanece preservado em outro notebook. |
