@@ -2,7 +2,7 @@
 
 Site público: https://brenobragagalvao.github.io/mestrado-arvores-urbanas/
 
-O site funciona como um **portal com menu lateral**, contendo uma página de **Início**, os **seis capítulos do README** e **19 subtópicos navegáveis**. Cada seleção abre seu conteúdo na área principal, sem exigir percorrer uma única página extensa.
+O site funciona como um **portal com menu lateral**, contendo uma página de **Início**, os **seis capítulos do README** e **20 subtópicos navegáveis**. Cada seleção abre seu conteúdo na área principal, sem exigir percorrer uma única página extensa.
 
 ## Estrutura atual
 
@@ -12,7 +12,7 @@ O site funciona como um **portal com menu lateral**, contendo uma página de **I
 - `docs/mestrado-site/search.js`: busca funcional por páginas e subtópicos (botão lateral e atalho Ctrl K);
 - `docs/mestrado-site/unb-mark-horizontal.svg`: símbolo azul e verde da UnB armazenado localmente, apresentado com a inscrição “UnB” em branco no menu lateral;
 - `docs/mestrado-site/portal.js`: navegação por capítulos/subtópicos e renderização de tabelas, textos e figuras do README;
-- `docs/mestrado-site/readme-content.js`: cópia estruturada das seis seções científicas do `README.md`, com os 19 subtópicos;
+- `docs/mestrado-site/readme-content.js`: cópia estruturada das seis seções científicas do `README.md`, com os 20 subtópicos;
 - `docs/mestrado-site/styles.css`: estilos de visualização para gráficos e tabelas;
 - `docs/mestrado-site/app.js`: gráficos interativos e exploração dos 257 registros.
 
@@ -23,7 +23,7 @@ O site funciona como um **portal com menu lateral**, contendo uma página de **I
 - **Início:** objetivo da pesquisa, números e acesso a cada capítulo.
 - **1 — Área de estudo:** dimensões, georreferenciamento e dados de referência.
 - **2 — Método original:** classificação, proximidade a postes e pipeline.
-- **3 — Evolução metodológica:** validação espacial, recortes, atributos, oito classificadores, F1-macro, memória e controle de sobreajuste.
+- **3 — Evolução metodológica:** quatro fluxos ilustrados, validação espacial, recortes, atributos, oito classificadores, F1-macro, memória e controle de sobreajuste.
 - **4 — Alometria:** Meta/WRI, espécies locais, fórmulas, MAE e explorador de 257 pontos.
 - **5 — Conclusões:** resultados e restrições de interpretação.
 - **6 — Código e documentação:** notebooks e materiais reprodutíveis.
