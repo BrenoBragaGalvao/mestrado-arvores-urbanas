@@ -75,12 +75,24 @@
   flush();stop();if(code)out.push("<pre><code>"+esc(codeLines.join("\n"))+"</code></pre>");
   return out.join("\n");
  }
+ const ICONS={
+  0:'<path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/>',
+  1:'<path d="M3 19V6l7-3 7 3v13"/><path d="m10 3 0 16M17 8l4-2v13M3 19h18"/>',
+  2:'<path d="M12 22v-7"/><path d="M5 22h14M5 15l7-12 7 12H5Z"/><path d="M7 18h10"/>',
+  3:'<path d="m3 17 6-6 4 3 8-9"/><path d="M15 5h6v6"/><path d="M3 21h18"/>',
+  4:'<path d="M12 22v-7"/><path d="M12 15C6 15 4 12 4 7c6 0 8 3 8 8Z"/><path d="M12 15c0-5 2-8 8-8 0 5-2 8-8 8Z"/>',
+  5:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+  6:'<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m9 9-3 3 3 3m6-6 3 3-3 3"/>'
+ };
+ function icon(number){
+  return '<svg class="nav-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[number]||ICONS[0])+'</svg>';
+ }
  function navigation(){
-  const blocks=['<a class="sidebar-home-link portal-nav-link" href="#inicio" data-link="inicio"><span class="home-icon" aria-hidden="true">⌂</span><span>Início</span></a>'];
+  const blocks=['<a class="sidebar-home-link portal-nav-link" href="#inicio" data-link="inicio"><span class="home-icon" aria-hidden="true">'+icon(0)+'</span><span>Início</span></a>'];
   const home=[];
   for(const [i,ch] of data.chapters.entries()){
    const id=ch.id,num=String(ch.number).padStart(2,"0");
-   blocks.push('<div class="sidebar-group" data-group="'+num+'"><div class="sidebar-group-head"><a class="sidebar-chapter-link portal-nav-link" data-link="'+id+'" href="#'+id+'"><span class="chapter-index">'+num+'</span><span class="chapter-label">'+esc(labels[ch.number])+'</span></a>'+(ch.pages.length?'<button type="button" class="chapter-toggle" aria-label="Mostrar subtópicos de '+esc(labels[ch.number])+'" aria-expanded="false">⌄</button>':'')+'</div>');
+   blocks.push('<div class="sidebar-group" data-group="'+num+'"><div class="sidebar-group-head"><a class="sidebar-chapter-link portal-nav-link" data-link="'+id+'" href="#'+id+'"><span class="chapter-index">'+icon(ch.number)+'</span><span class="chapter-label">'+esc(labels[ch.number])+'</span></a>'+(ch.pages.length?'<button type="button" class="chapter-toggle" aria-label="Mostrar subtópicos de '+esc(labels[ch.number])+'" aria-expanded="false">⌄</button>':'')+'</div>');
    if(ch.pages.length){blocks.push('<div class="sidebar-subtopics">');for(const p of ch.pages)blocks.push('<a href="#'+p.id+'" class="sidebar-subtopic-link portal-nav-link" data-link="'+p.id+'"><span>'+esc(p.number)+'</span><b>'+esc(children[p.id]||p.title)+'</b></a>');blocks.push("</div>");}
    blocks.push("</div>");
    home.push('<a class="home-chapter-card" href="#'+id+'"><div class="chapter-card-head"><span>'+num+' / CAPÍTULO</span><i aria-hidden="true">'+symbols[i]+'</i></div><h3>'+esc(labels[ch.number])+'</h3><p>'+esc(summaries[ch.number])+'</p><div class="chapter-card-foot"><span>'+(ch.pages.length?ch.pages.length+" subtópicos":"Abrir capítulo")+'</span><strong aria-hidden="true">→</strong></div></a>');
