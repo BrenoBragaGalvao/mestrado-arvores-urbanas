@@ -216,6 +216,7 @@
 
   function setupMobileMenu(){
     const button=$("menu-button"),nav=$("main-nav");
+    if(!button || !nav)return; // Menu atual controlado pelo portal lateral.
     button.addEventListener("click",()=>{
       const isOpen=nav.classList.toggle("open");
       button.setAttribute("aria-expanded",String(isOpen));
@@ -228,7 +229,7 @@
     }));
   }
   function setupActiveNav(){
-    if(!("IntersectionObserver" in window))return;
+    if(!$("main-nav") || !("IntersectionObserver" in window))return;
     const links=Array.from(document.querySelectorAll(".main-nav a"));
     const lookup=Object.fromEntries(links.map(link=>[link.getAttribute("href").slice(1),link]));
     const observer=new IntersectionObserver(entries=>{
