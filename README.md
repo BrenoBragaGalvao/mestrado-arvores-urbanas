@@ -50,6 +50,7 @@ Clique no título para abrir diretamente a seção correspondente.
 | [2.2. Fluxo de porte e postes](#sec-2-2-fluxo) | Área dos segmentos, equações C1–C6 e distância. |
 | [2.3. Pipeline original](#sec-2-3) | Infográfico com as 17 etapas do código original. |
 | [3. Evolução metodológica](#sec-3) | Três novas configurações e oito classificadores. |
+| [3.X. Visão geral dos quatro fluxos](#sec-3-x) | Diagrama comparativo e principais diferenças metodológicas. |
 | [3.1. Processamento em partes](#sec-3-1) | Por que não repetimos o Quickshift global. |
 | [3.2. Seleção dos 119 recortes](#sec-3-2) | Como os pontos conhecidos definiram as regiões. |
 | [3.3. Quickshift, rótulos e atributos](#sec-3-3) | Como os segmentos se tornam exemplos rotulados. |
@@ -283,12 +284,6 @@ Partimos da **imagem original da Area1 (6.942 × 7.294 pixels)** e dos **510 pon
 
 **Importante:** as formas **3 e 4 são os dois testes de uma mesma comparação controlada**. Nos experimentos novos, reutilizamos **a imagem e os pontos originais**, mas não os segmentos do K-Means, o Random Forest treinado ou suas previsões. Os **119 recortes foram escolhidos pelas coordenadas das referências**, nunca pelos acertos do modelo. Há resultados documentados para baterias derivadas de quadrantes de 256 pixels; isso não comprova a conclusão de uma nova execução integral da rotina progressiva dos 812 quadrantes no notebook de experimentos.
 
-<p align="center">
-  <img src="docs/infografico_tres_experimentos_area1.webp" alt="Infográfico dos três experimentos da Area1: Quickshift global do método original; 812 quadrantes de 256 pixels; comparação de 119 recortes em 512 e 256 pixels" width="100%">
-</p>
-
-*Figura — Visão geral dos três experimentos da Area1: método original, processamento por 812 quadrantes de 256 × 256 pixels e comparação controlada dos 119 recortes de até 512 × 512 pixels, também segmentados em partes de 256 × 256 pixels.*
-
 **Perguntas que orientaram os testes**
 
 | Pergunta | Como investigamos? |
@@ -298,6 +293,23 @@ Partimos da **imagem original da Area1 (6.942 × 7.294 pixels)** e dos **510 pon
 | **3. Qual algoritmo classifica melhor?** | Comparamos **oito classificadores**: **(1)** Random Forest; **(2)** SVM com kernel RBF; **(3)** regressão logística; **(4)** Extra Trees; **(5)** KNN (com 25 ou 35 vizinhos, conforme a seleção de parâmetros); **(6)** HistGradientBoosting; **(7)** Gaussian Naive Bayes; e **(8)** Dummy (modelo de referência simples). Em cada configuração experimental, os classificadores foram avaliados utilizando **os mesmos exemplos rotulados, atributos e divisões espaciais de treinamento e teste**, permitindo comparar seus desempenhos pelo **F1-macro**. Os parâmetros dos modelos foram selecionados por validação interna, utilizando exclusivamente os dados de treinamento, para reduzir o risco de sobreajuste. |
 | **4. Dividir cada recorte em quatro partes muda os resultados ou a memória?** | Usamos as **mesmas 119 regiões** para descobrir se o tamanho da janela influencia os resultados. Primeiro, aplicamos o Quickshift nos recortes inteiros de **até 512 × 512 pixels**; depois, dividimos esses mesmos recortes em até quatro partes de **256 × 256 pixels**. Assim, podemos verificar **qual estratégia oferece melhor F1-macro para os oito classificadores e qual consome menos memória RAM**, mantendo as mesmas referências e condições de avaliação. |
 | **5. NDVI, brilho HSV e bordas Canny funcionam melhor juntos?** | Comparamos **sete combinações** dos três atributos: **(1)** apenas NDVI; **(2)** apenas brilho HSV; **(3)** apenas bordas Canny; **(4)** NDVI + brilho HSV; **(5)** NDVI + bordas Canny; **(6)** brilho HSV + bordas Canny; e **(7)** NDVI + brilho HSV + bordas Canny. Todas as combinações foram avaliadas com os mesmos classificadores e as mesmas divisões espaciais de treinamento e teste, para identificar quais características proporcionam melhores resultados na classificação de árvores e gramíneas. |
+
+<a id="sec-3-x"></a>
+### 3.X. Visão geral dos quatro fluxos metodológicos
+
+A figura apresenta, lado a lado, as **quatro formas de processar e classificar árvores e gramíneas**. Elas usam as imagens da mesma **Area1** e as referências originais de vegetação, mas não constituem quatro aplicações idênticas: a segmentação, a seleção dos exemplos e a validação podem mudar.
+
+<p align="center">
+  <img src="docs/quatro_fluxos_metodologicos_area1.svg" alt="Fluxograma em quatro painéis: método original com Quickshift global, K-Means e Random Forest; 812 quadrantes de 256 pixels; 119 recortes inteiros de 512 pixels; e os mesmos 119 recortes subdivididos em 256 pixels, mostrando diferenças de treino, teste e classificação." width="100%">
+</p>
+
+*Figura — Comparação dos quatro fluxos de segmentação, extração de atributos, treinamento e avaliação utilizados na Area1.*
+
+**Quais são as principais diferenças?** No **método original**, o Quickshift é aplicado à imagem inteira, o K-Means seleciona o cluster 3 e o **Random Forest** é avaliado por uma divisão aleatória de **80% para treino e 20% para teste**, com **458 pares segmento–rótulo**. Na configuração com **812 quadrantes**, o Quickshift é aplicado em partes de **256 × 256 pixels**; a comparação documentada utiliza **505 segmentos rotulados únicos**, **oito classificadores** e separação espacial em blocos de **250 e 500 m**, com exclusão de **25 m** entre geometrias.
+
+**O que muda entre os dois métodos com 119 recortes?** Ambos usam **os mesmos 119 locais, as mesmas 505 referências e as mesmas divisões de treinamento e teste**. A diferença controlada está na **segmentação**: uma estratégia aplica Quickshift ao recorte inteiro de até **512 × 512 pixels**; a outra subdivide o recorte em partes de **256 × 256 pixels**. Isso pode produzir segmentos diferentes e, consequentemente, **médias diferentes de NDVI, brilho HSV e bordas Canny**, mesmo partindo da mesma imagem.
+
+**O que permanece igual?** Os atributos são **calculados antes da classificação** e fornecidos aos algoritmos como entradas. O **F1-macro é calculado depois das previsões**, para medir o desempenho. Assim, o mesmo conjunto de atributos pode gerar resultados de F1-macro diferentes em classificadores distintos. As estratégias com validação espacial não devem ter seus valores comparados diretamente com a avaliação aleatória do método original.
 
 <a id="sec-3-1"></a>
 ### 3.1. Por que deixamos de processar a imagem inteira?
