@@ -1,0 +1,110 @@
+{
+  "pixel": {
+    "coeficientes": {
+      "a": 1.0206106229069836,
+      "b": 0.4361155269014614
+    },
+    "formula": "H_estimada=a+b*ln(1+A)",
+    "dados": "altura modelada Meta/WRI, nao medida de campo",
+    "ajuste_total_apenas_descritivo": {
+      "n": 257,
+      "media_referencia_meta_m": 4.610894941634241,
+      "mediana_referencia_meta_m": 2.0,
+      "media_formula_m": 3.094226774574708,
+      "mediana_formula_m": 3.113029479174946,
+      "mae_vs_meta_m": 4.472083353237897,
+      "rmse_vs_meta_m": 5.883254834202456,
+      "vies_formula_menos_meta_m": -1.5166681670595332,
+      "mediana_erro_abs_vs_meta_m": 3.174958137909096,
+      "fracao_diferenca_ate_2m": 0.1828793774319066,
+      "fracao_diferenca_ate_5m": 0.7587548638132295,
+      "pearson": 0.0053809394377660625
+    },
+    "validacao_espacial_250m": {
+      "n": 257,
+      "media_referencia_meta_m": 4.610894941634241,
+      "mediana_referencia_meta_m": 2.0,
+      "media_formula_m": 3.112026617826511,
+      "mediana_formula_m": 3.0159297348616114,
+      "mae_vs_meta_m": 4.580680707641162,
+      "rmse_vs_meta_m": 6.021248886115467,
+      "vies_formula_menos_meta_m": -1.4988683238077303,
+      "mediana_erro_abs_vs_meta_m": 3.334331997436132,
+      "fracao_diferenca_ate_2m": 0.16342412451361868,
+      "fracao_diferenca_ate_5m": 0.7509727626459144,
+      "pearson": -0.2678138888823789,
+      "mae_baseline_constante_m": 4.5778210116731515,
+      "log_supera_baseline_mae": false
+    },
+    "validacao_espacial_500m": {
+      "n": 257,
+      "media_referencia_meta_m": 4.610894941634241,
+      "mediana_referencia_meta_m": 2.0,
+      "media_formula_m": 3.1201397311012324,
+      "mediana_formula_m": 3.0459420377529547,
+      "mae_vs_meta_m": 4.504285082691217,
+      "rmse_vs_meta_m": 5.929205814593639,
+      "vies_formula_menos_meta_m": -1.4907552105330089,
+      "mediana_erro_abs_vs_meta_m": 3.1439417824141787,
+      "fracao_diferenca_ate_2m": 0.16342412451361868,
+      "fracao_diferenca_ate_5m": 0.7626459143968871,
+      "pearson": -0.1207420431362876,
+      "mae_baseline_constante_m": 4.45136186770428,
+      "log_supera_baseline_mae": false
+    }
+  },
+  "raio5": {
+    "coeficientes": {
+      "a": 4.834063892431311,
+      "b": 0.26716928019492286
+    },
+    "formula": "H_estimada=a+b*ln(1+A)",
+    "dados": "altura modelada Meta/WRI, nao medida de campo",
+    "ajuste_total_apenas_descritivo": {
+      "n": 257,
+      "media_referencia_meta_m": 6.9221789883268485,
+      "mediana_referencia_meta_m": 6.0,
+      "media_formula_m": 6.104384485182891,
+      "mediana_formula_m": 6.1159032336426264,
+      "mae_vs_meta_m": 4.678412473843556,
+      "rmse_vs_meta_m": 5.993566071202025,
+      "vies_formula_menos_meta_m": -0.8177945031439579,
+      "mediana_erro_abs_vs_meta_m": 4.200232050904941,
+      "fracao_diferenca_ate_2m": 0.26459143968871596,
+      "fracao_diferenca_ate_5m": 0.5797665369649806,
+      "pearson": 0.005438575498239029
+    },
+    "validacao_espacial_250m": {
+      "n": 257,
+      "media_referencia_meta_m": 6.9221789883268485,
+      "mediana_referencia_meta_m": 6.0,
+      "media_formula_m": 6.118770908096711,
+      "mediana_formula_m": 6.035625703976472,
+      "mae_vs_meta_m": 4.807961914279223,
+      "rmse_vs_meta_m": 6.123578124077957,
+      "vies_formula_menos_meta_m": -0.8034080802301379,
+      "mediana_erro_abs_vs_meta_m": 4.268688926448433,
+      "fracao_diferenca_ate_2m": 0.24124513618677043,
+      "fracao_diferenca_ate_5m": 0.5719844357976653,
+      "pearson": -0.24826962490084073,
+      "mae_baseline_constante_m": 4.778210116731517,
+      "log_supera_baseline_mae": false
+    },
+    "validacao_espacial_500m": {
+      "n": 257,
+      "media_referencia_meta_m": 6.9221789883268485,
+      "mediana_referencia_meta_m": 6.0,
+      "media_formula_m": 6.119799186117584,
+      "mediana_formula_m": 6.169405813850626,
+      "mae_vs_meta_m": 4.732775521100686,
+      "rmse_vs_meta_m": 6.059950899459914,
+      "vies_formula_menos_meta_m": -0.8023798022092639,
+      "mediana_erro_abs_vs_meta_m": 4.371701639459564,
+      "fracao_diferenca_ate_2m": 0.2490272373540856,
+      "fracao_diferenca_ate_5m": 0.5797665369649806,
+      "pearson": -0.1536792289637895,
+      "mae_baseline_constante_m": 4.665369649805448,
+      "log_supera_baseline_mae": false
+    }
+  }
+}
