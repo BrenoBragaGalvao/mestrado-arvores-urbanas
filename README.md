@@ -1,6 +1,6 @@
 # Projeto de mestrado: Combinação de Características de Brilho, Bordas e NDVI para Detecção de Árvores Urbanas e Avaliação de Proximidade com Linhas de Energia
 
-**Portal interativo da pesquisa:** [código do site acadêmico](docs/index.html) · [instruções para publicar no GitHub Pages](docs/mestrado-site/README.md). O site apresenta gráficos, metodologia e um explorador dos 257 pontos, sem alterar os notebooks ou os dados.
+**Portal interativo da pesquisa:** [**Acessar o site do mestrado**](https://brenobragagalvao.github.io/mestrado-arvores-urbanas/) · [código do portal](docs/index.html) · [documentação do site](docs/mestrado-site/README.md). Navegação lateral por capítulos e subtópicos do README, gráficos de classificação e alometria e consulta aos 257 pontos, sem alterar notebooks ou dados.
 
 **Pesquisa de mestrado — Breno Braga Galvão | Em desenvolvimento**
 
