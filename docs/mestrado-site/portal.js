@@ -46,12 +46,32 @@
  function divider(s){return /^\s*\|?\s*:?-{2,}:?\s*(?:\|\s*:?-{2,}:?\s*)+\|?\s*$/.test(s);}
  function rawHtml(s){return s.replace(/\b(src|href)=(["'])(.*?)\2/g,(_,key,q,value)=>key+"="+q+esc(urlRewrite(value))+q);}
  function md(markdown){
-  const lines=String(markdown||"").replace(/\r/g,"").split("\n"),out=[];let para=[],list=null,code=false,codeLines=[];
+  const lines=String(markdown||"").replace(/\r/g,"").split("\n"),out=[];let para=[],list=null,code=false,codeLines=[],codeLanguage="";
   const flush=()=>{if(para.length){out.push("<p>"+inline(para.join(" ").trim())+"</p>");para=[];}};
   const stop=()=>{if(list){out.push("</"+list+">");list=null;}};
   for(let i=0;i<lines.length;i++){
    const line=lines[i],t=line.trim();
-   if(/^\x60{3}/.test(t)){flush();stop();if(!code){code=true;codeLines=[];}else{out.push("<pre><code>"+esc(codeLines.join("\n"))+"</code></pre>");code=false;codeLines=[];}continue;}
+   if(/^\x60{3}/.test(t)){
+    flush();stop();
+    if(!code){
+      code=true;codeLines=[];codeLanguage=t.slice(3).trim().split(/\s+/)[0].toLowerCase();
+    } else {
+      const raw=codeLines.join("\n");
+      if(codeLanguage==="mermaid"){
+        out.push('<figure class="research-diagram" data-diagram-status="loading">'+
+          '<figcaption class="diagram-heading"><span class="diagram-heading-icon" aria-hidden="true">◇</span><span><strong>Fluxograma da metodologia</strong><small>Diagrama original da pesquisa · renderização vetorial</small></span>'+
+          '<button type="button" class="diagram-expand" aria-label="Ampliar ou reduzir fluxograma" aria-expanded="false" disabled>Ampliar ↗</button></figcaption>'+
+          '<div class="diagram-surface"><pre class="mermaid">'+esc(raw)+'</pre></div>'+
+          '<div class="diagram-message" role="status">Preparando fluxograma interativo…</div>'+
+          '<details class="diagram-source"><summary>Consultar o código Mermaid original</summary><pre><code>'+esc(raw)+'</code></pre></details></figure>');
+      } else {
+        const safeLang=/^[a-z0-9_+-]{1,32}$/.test(codeLanguage)?codeLanguage:"texto";
+        out.push('<div class="source-code-block"><div class="source-code-caption">Código · '+esc(safeLang)+'</div><pre><code>'+esc(raw)+'</code></pre></div>');
+      }
+      code=false;codeLines=[];codeLanguage="";
+    }
+    continue;
+   }
    if(code){codeLines.push(line);continue;}
    if(!t){flush();stop();continue;}
    if(/^<!--/.test(t)||/^<a\s+id=/.test(t))continue;
@@ -72,7 +92,7 @@
    if(/^\s*<\w+/.test(t)&&/<[^>]+>/.test(t)){flush();stop();out.push(rawHtml(line));continue;}
    para.push(t);
   }
-  flush();stop();if(code)out.push("<pre><code>"+esc(codeLines.join("\n"))+"</code></pre>");
+  flush();stop();if(code)out.push('<div class="source-code-block"><pre><code>'+esc(codeLines.join("\n"))+'</code></pre></div>');
   return out.join("\n");
  }
  const ICONS={
@@ -133,6 +153,7 @@
   const text=next==="inicio"?"Início":entry.kind==="chapter"?labels[entry.number]:entry.number+" · "+(children[next]||entry.title);
   $("breadcrumb-current").textContent=text;document.title=text+" | Atlas Urbano";
   window.scrollTo({top:0,behavior:"instant"});closeMenu();
+  window.dispatchEvent(new CustomEvent("atlas:page-change",{detail:{id:next}}));
  }
  function route(){activate(decodeURIComponent(location.hash.replace(/^#/,"")).trim()||"inicio");}
  function init(){
