@@ -342,3 +342,220 @@ body.command-open{overflow:hidden}
   .command-result-info small{max-width:220px}
 }
 @media(prefers-reduced-motion:reduce){.home-chapter-card,.command-result{transition:none}}
+
+
+/* v3 — home page without external images, aligned to the content in the README. */
+.home-hero{
+  grid-template-columns:minmax(0,1fr) minmax(245px,320px);
+  align-items:center;
+  gap:28px;
+}
+.home-hero-steps{
+  min-width:0;
+  background:#f8fafc;
+  border:1px solid #e0e8f1;
+  border-radius:10px;
+  padding:18px 19px;
+}
+.home-steps-eyebrow{
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.13em;
+  color:#0e508c;
+  margin:0 0 6px;
+}
+.home-step{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:11px 0;
+  border-bottom:1px solid #e6ecf3;
+}
+.home-step:last-child{padding-bottom:2px;border:0}
+.home-step-number{
+  flex:0 0 28px;height:28px;
+  display:grid;place-items:center;
+  border-radius:7px;
+  background:#e5eef8;
+  color:#14538c;
+  font-size:10px;font-weight:850;
+}
+.home-step>span:last-child{min-width:0;display:flex;flex-direction:column;gap:2px}
+.home-step strong{font-size:11px;line-height:1.4;color:#263d57;font-weight:750}
+.home-step small{font-size:10px;line-height:1.48;color:#73879d}
+/* Single main GitHub access action, as requested. */
+.sidebar-tools{margin-bottom:12px}
+.sidebar-github-button{
+  display:flex;align-items:center;gap:10px;
+  border-radius:9px;
+  padding:12px 12px;
+  margin:0 0 8px;
+  border:1px solid #416d9e;
+  background:#19518b;
+  color:#fff;
+  font-size:11px;
+  font-weight:750;
+  box-shadow:0 1px 2px rgba(0,25,60,.12);
+  transition:background .15s,border-color .15s;
+}
+.sidebar-github-button svg{display:block;flex-shrink:0}
+.sidebar-github-button .github-external{margin-left:auto;font-size:15px;color:#b5d2ed}
+.sidebar-github-button:hover{background:#2a6299;border-color:#7397bf;color:#fff}
+.sidebar-github-button:focus-visible{outline:2px solid #a8d4ff;outline-offset:3px}
+/* Proper diagram rendering, with readable vectors and collapsible original source. */
+.readme-article .research-diagram{
+  display:block;
+  margin:23px 0 27px;
+  padding:0;
+  border:1px solid #dbe5ef;
+  border-radius:11px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 1px 3px rgba(13,48,75,.035);
+}
+.readme-article .diagram-heading{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin:0;
+  padding:14px 16px;
+  border-bottom:1px solid #e0e8f0;
+  background:#f8fafc;
+}
+.diagram-heading-icon{
+  flex:0 0 35px;width:35px;height:35px;
+  display:grid;place-items:center;
+  border-radius:8px;
+  background:#e8f0f8;color:#0b4b88;
+  font-size:24px;font-weight:600;
+}
+.diagram-heading>span:nth-child(2){display:flex;flex-direction:column;gap:1px;min-width:0}
+.diagram-heading strong{font-size:12px;font-weight:770;color:#273f59}
+.diagram-heading small{font-size:10px;color:#7f91a5}
+.diagram-expand{
+  margin-left:auto;min-width:84px;
+  border:1px solid #ccdae8;
+  border-radius:7px;
+  background:#fff;
+  color:#19558e;
+  padding:8px 10px;
+  white-space:nowrap;
+  font-size:10px;font-weight:750;
+}
+.diagram-expand:not(:disabled):hover{background:#eaf2fa}
+.diagram-expand:disabled{opacity:.48;cursor:default}
+.readme-article .diagram-surface{
+  position:relative;
+  overflow:auto;
+  max-height:760px;
+  min-height:140px;
+  padding:18px 16px 22px;
+  background:#fff;
+  scrollbar-width:thin;
+}
+.readme-article .diagram-surface[hidden]{display:none}
+.readme-article .diagram-surface .mermaid{
+  margin:0 auto;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  color:#1f3d5b;
+  font-size:14px;
+  line-height:1.4;
+  text-align:center;
+  width:100%;
+  max-width:100%;
+}
+.readme-article .research-diagram[data-diagram-status="loading"] .mermaid{
+  visibility:hidden;
+  max-height:14px;
+  overflow:hidden;
+}
+.readme-article .research-diagram .mermaid svg{
+  display:block;
+  width:auto;
+  max-width:100%;
+  height:auto;
+  margin:0 auto;
+  border:0;
+  background:#fff;
+  border-radius:4px;
+}
+.readme-article .diagram-message{
+  padding:16px 18px 20px;
+  color:#758da2;
+  background:#fff;
+  font-size:11px;
+  line-height:1.6;
+}
+.readme-article .diagram-message[hidden]{display:none}
+.readme-article .diagram-message a{color:#0c5797;text-decoration:underline;font-size:11px}
+.readme-article .diagram-source{
+  background:#f7f9fc;
+  border-top:1px solid #e6ecf2;
+}
+.readme-article .diagram-source summary{
+  padding:12px 17px;
+  cursor:pointer;
+  color:#4c6c88;
+  font-size:10px;
+  font-weight:750;
+}
+.readme-article .diagram-source summary:hover{color:#105690}
+.readme-article .diagram-source pre{
+  margin:0 14px 15px;
+  background:#0e2842;
+  color:#dbe9f6;
+  border-radius:6px;
+  padding:17px;
+  max-height:380px;
+  overflow:auto;
+  white-space:pre;
+}
+.readme-article .diagram-source pre code{
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  color:#dbe9f6;background:transparent;font-size:11px;
+  padding:0;line-height:1.6;
+}
+body.diagram-mode{overflow:hidden}
+.readme-article .research-diagram.diagram-expanded{
+  position:fixed;
+  z-index:290;
+  inset:3vh 3vw;
+  margin:0;
+  box-shadow:0 10px 0 100vmax rgba(6,25,46,.66),0 20px 85px rgba(0,20,40,.3);
+  display:flex;
+  flex-direction:column;
+  border-radius:13px;
+}
+.readme-article .research-diagram.diagram-expanded .diagram-heading{flex-shrink:0}
+.readme-article .research-diagram.diagram-expanded .diagram-surface{
+  flex:1;
+  min-height:0;
+  max-height:none;
+  overflow:auto;
+  padding:20px;
+}
+.readme-article .research-diagram.diagram-expanded .diagram-source{flex-shrink:0}
+.readme-article .source-code-block{margin:20px 0;border:1px solid #e0e8f1;border-radius:8px;overflow:hidden}
+.readme-article .source-code-caption{padding:9px 13px;background:#eff4f9;font-size:10px;font-weight:760;color:#42617d}
+.readme-article .source-code-block pre{margin:0;max-height:550px;overflow:auto;border-radius:0}
+@media(max-width:1010px){
+  .home-hero{grid-template-columns:1fr}
+  .home-hero-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 19px}
+  .home-steps-eyebrow{grid-column:1/-1}
+  .home-step:nth-child(4){border-bottom:0}
+}
+@media(max-width:600px){
+  .home-hero-steps{grid-template-columns:1fr;padding:14px 15px}
+  .home-step:nth-child(4){border-bottom:1px solid #e6ecf3}
+  .readme-article .diagram-heading{padding:11px;gap:8px}
+  .diagram-heading small{display:none}
+  .diagram-heading-icon{width:29px;height:29px;flex-basis:29px}
+  .diagram-heading strong{font-size:11px}
+  .diagram-expand{font-size:10px;min-width:70px;padding:7px}
+  .readme-article .diagram-surface{padding:10px 7px 15px;max-height:640px}
+  .readme-article .research-diagram.diagram-expanded{inset:2vh 2vw}
+}
