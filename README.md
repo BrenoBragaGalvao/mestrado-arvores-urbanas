@@ -499,6 +499,8 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 | Gaussian Naive Bayes | 0,8251 | 0,7514 |
 | Dummy | 0,2847 | 0,2791 |
 
+**Por que o F1-macro muda entre blocos de 250 m e 500 m?** Esses valores definem o tamanho das regiões usadas para separar treinamento e teste, e não o tamanho dos recortes da imagem. Ao mudar a escala dos blocos, mudam também os exemplos de cada conjunto e a dificuldade da avaliação, fazendo o F1-macro variar mesmo com o mesmo método de segmentação.
+
 **Como interpretar os resultados?** Em cada configuração, os oito classificadores estão organizados pela média do F1-macro nos blocos espaciais de 250 e 500 metros. Essa média serve apenas para ordenar a tabela; os melhores valores de cada coluna estão destacados em negrito.
 
 **O que descobrimos?** Na comparação dos mesmos 119 recortes, os resultados variaram conforme o tamanho da segmentação e o classificador. Com blocos de **250 m**, o melhor resultado foi da **regressão logística com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,9198)**. Com blocos de **500 m**, destacou-se a **regressão logística com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,8688)**. Portanto, **não existe uma única estratégia superior em todas as condições**.
