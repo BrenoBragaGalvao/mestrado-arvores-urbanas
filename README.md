@@ -452,13 +452,13 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
-| SVM RBF | **0,8987** | **0,8668** |
-| Regressão logística | 0,8928 | 0,8664 |
-| Extra Trees | 0,8790 | 0,8629 |
-| KNN (7) | 0,8874 | 0,8502 |
-| Random Forest | 0,8656 | 0,8530 |
-| HistGradientBoosting | 0,8556 | 0,8524 |
-| Gaussian Naive Bayes | 0,8555 | 0,8398 |
+| Regressão logística | 0,8879 | **0,8666** |
+| SVM RBF | 0,8908 | 0,8619 |
+| KNN (25/35) | **0,8931** | 0,8481 |
+| Extra Trees | 0,8266 | 0,8335 |
+| HistGradientBoosting | 0,8325 | 0,8246 |
+| Random Forest | 0,8220 | 0,8240 |
+| Gaussian Naive Bayes | 0,7986 | 0,7400 |
 | Dummy (referência simples) | 0,2980 | 0,2799 |
 
 **Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
@@ -471,13 +471,13 @@ Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
-| Extra Trees | 0,9064 | **0,8747** |
-| SVM RBF | **0,9157** | 0,8518 |
-| Regressão logística | 0,9153 | 0,8484 |
-| Random Forest | 0,8906 | 0,8657 |
-| Gaussian Naive Bayes | 0,8894 | 0,8573 |
-| KNN (7) | 0,8940 | 0,8377 |
-| HistGradientBoosting | 0,8738 | 0,8390 |
+| Regressão logística | **0,9111** | 0,8546 |
+| SVM RBF | 0,9055 | **0,8572** |
+| KNN (25/35) | 0,9012 | 0,8390 |
+| Random Forest | 0,8415 | 0,8393 |
+| Extra Trees | 0,8454 | 0,8195 |
+| HistGradientBoosting | 0,8352 | 0,8214 |
+| Gaussian Naive Bayes | 0,8234 | 0,7472 |
 | Dummy | 0,2847 | 0,2791 |
 
 <a id="sec-3-6-3"></a>
@@ -488,13 +488,13 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
-| SVM RBF | **0,9341** | 0,8641 |
-| Regressão logística | 0,9157 | **0,8685** |
-| Extra Trees | 0,8968 | 0,8545 |
-| KNN (7) | 0,9009 | 0,8486 |
-| Random Forest | 0,8835 | 0,8566 |
-| Gaussian Naive Bayes | 0,8875 | 0,8464 |
-| HistGradientBoosting | 0,8714 | 0,8411 |
+| Regressão logística | **0,9198** | **0,8688** |
+| SVM RBF | 0,9179 | 0,8621 |
+| KNN (25/35) | 0,9170 | 0,8551 |
+| Extra Trees | 0,8577 | 0,8352 |
+| HistGradientBoosting | 0,8610 | 0,8194 |
+| Random Forest | 0,8356 | 0,8286 |
+| Gaussian Naive Bayes | 0,8251 | 0,7514 |
 | Dummy | 0,2847 | 0,2791 |
 
 **Como interpretar os resultados?** Em cada configuração, os oito classificadores estão organizados pela média do F1-macro nos blocos espaciais de 250 e 500 metros. Essa média serve apenas para ordenar a tabela; os melhores valores de cada coluna estão destacados em negrito.
@@ -518,72 +518,48 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
 <a id="sec-3-8"></a>
-### 3.8. Por que surgiu overfitting? O que fizemos para reduzir o sobreajuste?
+### 3.8. Por que fizemos novos testes para controlar o overfitting?
 
-**Pergunta:** se o classificador foi treinado e testado em exemplos diferentes, por que ainda pode ocorrer *overfitting* (sobreajuste)?
+**O que é overfitting?** É o sobreajuste: um classificador aprende particularidades do treinamento e pode ter desempenho menor quando recebe exemplos que não participaram do ajuste. Isso **não é a mesma coisa** que vazamento de dados (*data leakage*). Vazamento ocorre quando informações que deveriam ficar reservadas para avaliação influenciam indevidamente o treinamento ou a seleção.
 
-**Resposta:** porque **não basta separar identificadores de amostras**. Um classificador pode aprender particularidades dos exemplos de treinamento — iluminação, textura, contexto geográfico e características de uma mesma imagem — que não funcionam igualmente bem nos exemplos de teste. **Overfitting não significa necessariamente que os rótulos de teste foram fornecidos ao algoritmo**. Isso seria vazamento direto de dados (*data leakage*), um problema diferente.
+**Por que a auditoria foi necessária?** Nas versões anteriores, classificadores como Random Forest obtiveram F1-macro de treinamento muito alto, chegando próximo de 1,0, enquanto o F1 do teste era menor. Isso sinalizou possível memorização de particularidades dos exemplos. Além disso, as referências de árvores e gramíneas vêm **de uma única imagem da Area1**: segmentos distintos podem apresentar características espaciais semelhantes. As **505 referências supervisionadas de cada configuração** não equivalem a 505 imagens independentes.
 
-**Como identificamos o problema:** nas avaliações anteriores o Random Forest alcançou F1-macro de treinamento próximo de **1,0**, enquanto os resultados de teste ficaram sensivelmente abaixo desse valor. Uma diferença entre treino e teste é um **sinal de possível sobreajuste**, não uma medição exata da sua causa nem prova isolada de que o modelo memorizou as respostas.
+**Como reduzimos os riscos e geramos novamente os dados das tabelas da seção 3.6?**
 
-#### 3.8.1. Por que isso pode acontecer na Area1?
+1. **Deduplicação:** mantivemos 505 exemplos rotulados por configuração e verificamos que nenhum identificador ficou simultaneamente em treino e teste na mesma divisão.
+2. **Separação espacial:** repetimos a avaliação com **cinco divisões por blocos de 250 m e cinco por blocos de 500 m**, com **embargo de 25 m**. Em E2 (bateria derivada dos 812 quadrantes), o embargo foi verificado **entre geometrias dos segmentos**; em E3A e E3B (119 recortes), **entre pontos de referência**.
+3. **Escolha de parâmetros sem consultar o teste:** para cada um dos **oito classificadores** e para cada divisão externa, comparamos regularização **moderada e forte** usando **três divisões internas, feitas apenas sobre os exemplos de treinamento**. O Dummy mantém uma única receita de referência. Escolhemos a regularização pelo F1-macro médio de validação interna, ajustamos novamente com todo o treinamento externo e somente então medimos o F1 do teste externo. SVM, KNN e regressão logística usam `Pipeline` para ajustar a padronização só no treino.
+4. **Avaliação das diferenças treino–teste:** conservamos os resultados de todas as divisões e de todas as receitas, inclusive os menos favoráveis. A bateria gerou **1.350 avaliações internas**, **240 avaliações externas** e **48 médias** para as tabelas (3 configurações × 2 escalas × 8 classificadores).
+5. **Resultados originais preservados:** a extração Quickshift e a comparação E4b de atributos (**seção 3.5**) não foram refeitas nesta rodada. Reexecutamos **somente a etapa supervisionada de classificação**, sobre as características e geometrias já extraídas da Area1. Não se deve misturar os valores da nova seção 3.6 com os experimentos antigos como se fossem o mesmo protocolo.
 
-1. **Poucos objetos com rótulos conhecidos:** o processamento da imagem gerou dezenas de milhares de segmentos, mas os testes supervisionados recentes utilizaram **505 exemplos rotulados únicos na bateria E2** e **505 referências comuns na comparação E3A/E3B**. Não são 168 mil exemplos independentes de treinamento.
-2. **Uma única imagem e uma única área geográfica:** as referências de árvores e gramíneas vêm da **mesma Area1, em Caxias do Sul**. Mesmo sem compartilhar IDs, exemplos próximos podem ter condições visuais semelhantes. Assim, um desempenho alto não comprova que o classificador reconhecerá vegetação em outra imagem, cidade, estação ou sensor.
-3. **Complexidade excessiva de alguns modelos:** árvores de decisão profundas, florestas e modelos com muitas divisões conseguem se ajustar fortemente a particularidades do treinamento. Isso explica por que uma pontuação de treino excelente **pode** acompanhar um teste inferior; não é uma garantia de maior capacidade de generalização.
-4. **Escolha repetida do melhor resultado:** quando testamos muitos classificadores, combinações de atributos e regularizações e usamos os **próprios resultados de teste** para escolher a configuração vencedora, a melhor pontuação observada pode ficar otimista por acaso. Esse é o **viés de seleção**. Evitá-lo exige decidir os parâmetros sem consultar o teste reservado.
-5. **Escala da separação espacial:** resultados podem mudar entre blocos de **250 e 500 m**, porque mudam as regiões e os exemplos avaliados. O embargo de **25 m** reduz a influência de vizinhos imediatos, mas não torna toda a imagem estatisticamente independente.
+#### 3.8.1. O que aconteceu com o overfitting?
 
-**Diferença importante:** o método original utilizou divisão aleatória de registros e não tinha deduplicação explícita. Os novos protocolos de E2/E3A/E3B fazem auditoria de IDs e separação espacial, mas **não devem ser descritos como testes externos em outras imagens**.
+A tabela abaixo mostra a média do F1-macro no treinamento e no teste de três configurações de classificadores representativos. As médias são de **dez divisões espaciais por experimento**, considerando as duas escalas.
 
-#### 3.8.2. O que alteramos para reduzir o problema?
+| Experimento | Classificador | F1 treino | F1 teste | Diferença |
+|---|---|---:|---:|---:|
+| **E2** | Regressão logística | 0,9011 | 0,8773 | +0,0239 |
+| **E2** | SVM RBF | 0,9110 | 0,8764 | +0,0347 |
+| **E2** | Random Forest | 0,8861 | 0,8230 | +0,0630 |
+| **E2** | HistGradientBoosting | 0,8998 | 0,8286 | +0,0712 |
+| **E3A** | Regressão logística | 0,8945 | 0,8828 | +0,0117 |
+| **E3A** | SVM RBF | 0,9059 | 0,8814 | +0,0245 |
+| **E3A** | Random Forest | 0,8864 | 0,8404 | +0,0460 |
+| **E3A** | HistGradientBoosting | 0,8922 | 0,8283 | +0,0639 |
+| **E3B** | Regressão logística | 0,9004 | 0,8943 | +0,0061 |
+| **E3B** | SVM RBF | 0,9085 | 0,8900 | +0,0185 |
+| **E3B** | Random Forest | 0,8888 | 0,8321 | +0,0568 |
+| **E3B** | HistGradientBoosting | 0,8955 | 0,8402 | +0,0552 |
 
-| Medida | Por que ajuda? | Limite |
-|---|---|---|
-| **Deduplicação de exemplos** | Evita o mesmo segmento nos dois conjuntos dentro de uma rodada | Não elimina semelhanças visuais entre objetos diferentes |
-| **Divisão geográfica em blocos de 250/500 m** | Separa conjuntos por localização, em vez de sortear somente registros | Todos os blocos ainda estão na mesma Area1 |
-| **Embargo de 25 m** | Remove do treino objetos muito próximos do teste | Em E2 histórico usa **geometrias**; em E3A/E3B, **pontos**; na rota progressiva atual da V2, E2 usa **centroides** |
-| **Regularização** | Restringe a capacidade de memorizar peculiaridades do treinamento | Regularização excessiva pode provocar **subajuste** e reduzir o F1 |
-| **Validação espacial aninhada** | Escolhe algoritmos e parâmetros **dentro do conjunto de treinamento**, sem consultar o teste externo da mesma rodada | Os testes externos dessa reexecução já tinham sido utilizados em estudos anteriores; não são um novo conjunto cego |
-| **F1 de treino e teste por divisão** | Permite revelar diferenças e analisar sua variação entre rodadas | Diferença pequena, isoladamente, não certifica ausência de sobreajuste |
+**Interpretação:** a regressão logística apresentou diferenças médias pequenas, principalmente em E3A e E3B. SVM também apresentou bom equilíbrio. Entretanto, **Random Forest e HistGradientBoosting ainda apresentaram diferenças relevantes entre treinamento e teste**, e existem divisões individuais com diferenças superiores à média. A diferença F1 treino–teste, por si só, não constitui teste estatístico definitivo de sobreajuste; deve ser interpretada junto à validação espacial e à estabilidade entre divisões.
 
-**Fluxo da avaliação aninhada:** reservamos blocos geográficos para **teste externo** → dividimos somente o **treinamento externo** em **três pares treino/validação interna** → comparamos seis configurações pré-definidas → escolhemos pelo **F1-macro médio da validação interna** → reajustamos a configuração escolhida no treinamento externo → avaliamos **uma vez no teste externo daquela rodada**. O escalonamento do SVM, KNN e regressão logística é ajustado **somente no treino** por meio de `Pipeline`.
+**Então, por que não podemos dizer que eliminamos todo o overfitting?** Porque regularizar e separar corretamente os conjuntos **reduz o risco**, mas não garante que o modelo generalize para uma nova imagem. Todos os dados continuam vindo da **mesma Area1**, e esses conjuntos externos já foram examinados em avaliações anteriores. Assim, não são um conjunto de teste independente nunca visto. Escolher retrospectivamente o classificador vencedor com base nos maiores F1 externos ainda pode gerar viés de seleção.
 
-Os seis candidatos foram **regressão logística** (`C=0,02` e `0,1`), **SVM RBF** (`C=0,05` e `0,2`) e **KNN** (25 ou 35 vizinhos). Essa nova seleção aninhada **não incluiu o Random Forest**: ele e os demais classificadores continuam documentados na auditoria de oito modelos, sem alegação de que seu sobreajuste tenha desaparecido.
+**O que podemos afirmar com segurança:** nesta reexecução **não identificamos vazamento direto de IDs nem compartilhamento de blocos** nas divisões auditadas; o embargo espacial previsto foi respeitado e a regularização foi escolhida **sem usar o teste externo da respectiva rodada**. Isso melhora a validade metodológica. **Não há evidência suficiente para afirmar ausência total de overfitting**, especialmente nos classificadores baseados em árvores.
 
-#### 3.8.3. O que os experimentos realmente mostraram?
+**Observação sobre os textos históricos preservados:** a pedido de manutenção dos demais textos, as frases interpretativas anteriores da seção 3.6 que citam os antigos vencedores e valores (como SVM 0,9341 e Extra Trees 0,8747) **não foram reescritas**. Esses números e afirmações descrevem **a execução histórica**, não os novos valores apresentados nas tabelas substituídas. Para a comparação regularizada atual, devem prevalecer os dados das tabelas da seção 3.6 e esta auditoria; os estudos históricos permanecem úteis para comparação metodológica, mas **não são numericamente intercambiáveis**.
 
-**Reexecução anterior com regularização forte — regressão logística:**
-
-| Experimento | F1-macro treino | F1-macro teste | Diferença |
-|---|---:|---:|---:|
-| E2 — 812 quadrantes de 256 px | 0,8987 | 0,8748 | +0,0239 |
-| E3A — 119 recortes de 512 px | 0,8915 | 0,8850 | +0,0065 |
-| E3B — 119 recortes subdivididos em 256 px | 0,8954 | 0,8921 | +0,0033 |
-
-Essa regularização reduziu diferenças médias em comparação com alguns modelos mais flexíveis, **mas não zerou o sobreajuste**. No Random Forest, a regularização forte também causou quedas importantes no F1 de treinamento e de teste, mostrando que diminuir a complexidade não garante melhora.
-
-**Nova validação espacial aninhada — escolha de algoritmo e parâmetros somente no treino:**
-
-| Experimento | F1-macro treino | F1-macro teste | Diferença média | Divisões com diferença maior que 0,05 |
-|---|---:|---:|---:|---:|
-| **E2 — 812 quadrantes** | 0,9057 | 0,8788 | +0,0269 | **3 de 10** |
-| **E3A — 119 recortes de 512** | 0,8980 | 0,8873 | +0,0107 | **3 de 10** |
-| **E3B — 119 recortes subdivididos em 256** | 0,9038 | 0,8919 | +0,0120 | **2 de 10** |
-
-Foram feitas **540 avaliações internas** (seis candidatos × três divisões internas × 30 divisões externas) e **30 ajustes finais externos** (dez por configuração). Em cada experimento, cinco divisões externas usaram blocos de 250 m e outras cinco usaram blocos de 500 m, com embargo de 25 m. Os conjuntos externos foram auditados quanto à repetição de **IDs, blocos e vizinhança**.
-
-**A escala de 500 m ainda revelou diferenças expressivas** na seleção aninhada: E2 (treino 0,9114 / teste 0,8664), E3A (0,9068 / 0,8580) e E3B (0,9087 / 0,8670). Como os exemplos de teste mudam entre divisões e escalas, essas diferenças não identificam sozinhas a causa do sobreajuste.
-
-#### 3.8.4. Afinal, eliminamos todo o overfitting?
-
-**Não é possível afirmar isso cientificamente com os dados atuais.** A validação ficou mais rigorosa e a seleção dos parâmetros passou a ser feita sem consultar o teste da mesma rodada, mas **oito das 30 divisões externas** ainda apresentaram uma diferença positiva treino–teste superior a 0,05. As rodadas não são independentes entre si: compartilham partes da mesma base e, portanto, suas médias não equivalem a uma amostra de 30 áreas diferentes.
-
-Além disso, **o mesmo conjunto Area1 e suas avaliações já vinham sendo examinados ao longo do projeto**. Isso impede chamar os testes usados na reexecução de “teste externo nunca visto”. Não podemos apagar ou substituir resultados desfavoráveis para produzir a aparência de inexistência de sobreajuste: isso tornaria a pesquisa menos confiável.
-
-**Formulação apropriada para a dissertação:** *“Adotamos deduplicação dos exemplos, separação espacial, embargo de 25 m, regularização e validação espacial aninhada para reduzir o risco de sobreajuste e de viés na seleção dos classificadores. Persistiram diferenças entre treinamento e teste em algumas partições. As estimativas descrevem generalização espacial interna à Area1, sem validação independente em outra imagem.”*
-
-**Reprodutibilidade:** mantivemos os resultados originais de E2, E3A e E3B e criamos uma etapa adicional no [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb), com o script [`validacao_aninhada_espacial_v2.py`](experimentos/validacao_aninhada_espacial_v2.py). As [30 avaliações externas](docs/validacao_aninhada_2026_11_03/avaliacoes_externas_aninhadas.csv), [540 avaliações internas](docs/validacao_aninhada_2026_11_03/avaliacoes_validacao_interna.csv), [decisões de seleção](docs/validacao_aninhada_2026_11_03/selecao_apenas_treino.csv) e [relatório metodológico](docs/validacao_aninhada_2026_11_03/RELATORIO_VALIDACAO_ANINHADA.md) estão registrados separadamente. **A nova reexecução documentada foi feita sobre as bases derivadas e geometrias históricas**; a rota progressiva `--modo v2` deverá ser executada no Colab para produzir seus próprios números, porque utiliza **centroides** em E2 e pode produzir métricas diferentes.
+**Código e reprodução:** a nova etapa foi integrada ao [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). A rota de evidências usa os mesmos 505 exemplos e as mesmas geometrias das avaliações anteriores; a rota `--modo v2` lê as saídas progressivas do notebook e usa **centroides** no embargo de E2, podendo gerar resultados diferentes. Em ambas, registrar todos os resultados por divisão é obrigatório para que o diagnóstico de sobreajuste continue verificável.
 
 ---
 
