@@ -575,6 +575,8 @@ Consultamos o GeoTIFF nas coordenadas dos **257 pontos de `Arvores.gpkg`**, regi
 O valor **zero** em um pixel pode refletir solo, sombra, copa fora da coordenada, diferenças temporais ou vegetação não detectada; **não prova que a árvore do cadastro inexista**. Esses aspectos precisam ser considerados ao interpretar os modelos alométricos.
 
 <a id="sec-4-4"></a>
+<a id="sec-4-4-onze-modelos"></a>
+<a id="sec-4-4-artigo"></a>
 ### 4.4. Equações alométricas do artigo e como foram testadas na V3
 
 **Artigo utilizado como referência:** **`Chatziathanasiou et al. (2024).pdf`**, correspondente a [Chatziathanasiou, Kitikidou e Milios (2024), *Crown Width–Tree Height Models for Magnolia grandiflora, Prunus cerasifera, and Acer negundo Growing in Cities in Northeastern Greece*](https://doi.org/10.3390/land13101579), publicado em *Land*, vol. 13, artigo 1579. A **Tabela 1** do artigo reúne **11 famílias de regressão** relacionando a **largura da copa (`CW`) em função da altura (`H`)**, com medições em árvores de cidades gregas. Existe uma [**correção publicada em 2026**](https://doi.org/10.3390/land15030473), que deve acompanhar a citação científica dessas equações.
