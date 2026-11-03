@@ -30,7 +30,7 @@ body{font-size:13px;line-height:1.58;color:#26364a;background:#f9fafb}
 h1,h2,h3{letter-spacing:-.035em}
 .portal-sidebar{background:#003a79;border-right:1px solid #164d89;box-shadow:none;color:#ecf4fc}
 .sidebar-head{
-  height:79px;min-height:79px;flex:0 0 79px;
+  height:87px;min-height:87px;flex:0 0 87px;
   padding:12px 12px 11px 17px;
   border-bottom:1px solid rgba(255,255,255,.17);
   align-items:center;
@@ -47,11 +47,11 @@ h1,h2,h3{letter-spacing:-.035em}
 }
 .unb-brand-lockup{
   display:flex;flex-direction:row;align-items:center;justify-content:flex-start;
-  gap:9px;width:auto;height:42px;background:none;border:0;padding:0;
+  gap:10px;width:auto;height:46px;background:none;border:0;padding:0;
 }
 .unb-symbol-panel{
   display:flex;align-items:center;justify-content:center;
-  flex:0 0 59px;width:59px;height:40px;padding:4px;
+  flex:0 0 71px;width:71px;height:46px;padding:4px;
   border-radius:6px;background:#fff;border:1px solid rgba(255,255,255,.55);
 }
 .unb-symbol-panel .unb-symbol{
@@ -60,7 +60,7 @@ h1,h2,h3{letter-spacing:-.035em}
   object-fit:contain;
 }
 .unb-wordmark{
-  color:#fff;font-size:34px;font-weight:850;letter-spacing:-.075em;
+  color:#fff;font-size:38px;font-weight:850;letter-spacing:-.075em;
   line-height:1;white-space:nowrap;
 }
 .unb-project-label{
@@ -314,7 +314,7 @@ body.command-open{overflow:hidden}
   .portal-workspace{width:100%;margin-left:0}
   .portal-topbar{display:flex;height:63px;background:#fff;padding:0 20px}
   .sidebar-toggle{display:flex}
-  .sidebar-head{height:79px;min-height:79px}
+  .sidebar-head{height:87px;min-height:87px}
   .portal-main{padding:20px 21px 58px}
 }
 @media(max-width:600px){
