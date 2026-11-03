@@ -11,7 +11,7 @@
   "topico-1-1":"Dimensões e cobertura","topico-1-2":"Resolução e arquivos",
   "topico-2-1":"Árvores e gramíneas","topico-2-2":"Porte e postes","topico-2-3":"Pipeline original",
   "topico-3-1":"Memória RAM","topico-3-2":"Os 119 recortes","topico-3-3":"Quickshift e atributos","topico-3-4":"Treino e teste espaciais","topico-3-5":"NDVI, brilho e bordas","topico-3-6":"Resultados dos modelos","topico-3-7":"Consumo de RAM","topico-3-8":"Controle do sobreajuste",
-  "topico-4-1":"Meta/WRI CHMv2","topico-4-2":"Inventário e espécies","topico-4-3":"Alturas nos 257 pontos","topico-4-4":"Equações alométricas","topico-4-5":"Comparação das 15 árvores","topico-4-6":"Fontes e limites"
+  "topico-4-1":"Meta/WRI CHMv2","topico-4-2":"Inventário e espécies","topico-4-3":"Alturas nos 257 pontos","topico-4-4":"Equações alométricas","topico-4-5":"Comparação das 15 árvores","topico-4-6":"Limites da análise"
  };
  const widgets={"topico-3-5":"widget-features","topico-3-6":"widget-classifiers","topico-4-4":"widget-mae","topico-4-5":"widget-points"};
  const symbols=["◈","◇","▤","∿","✓","▣"];
