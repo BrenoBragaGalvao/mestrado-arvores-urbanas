@@ -653,3 +653,121 @@ body.diagram-mode{overflow:hidden}
     border-top:1px solid #e2e8f0;
   }
 }
+
+
+/* v5 — escala tipográfica de leitura, alinhada à referência de dashboard.
+   Somente apresentação; nenhum texto, dado ou cálculo é modificado. */
+:root{--portal-sidebar-width:236px}
+body{font-size:14px;line-height:1.66}
+.portal-sidebar{font-size:13px}
+.sidebar-head{padding-left:17px;padding-right:15px}
+.sidebar-search-trigger{font-size:12px;height:43px}
+.sidebar-search-trigger kbd{font-size:10px}
+.sidebar-caption-secondary{font-size:11px}
+.sidebar-home-link,.sidebar-chapter-link{font-size:13px;min-height:45px}
+.sidebar-chapter-link .chapter-label{font-size:12.5px;line-height:1.4}
+.sidebar-home-link{font-size:12.5px}
+.sidebar-subtopic-link{grid-template-columns:32px minmax(0,1fr);min-height:37px}
+.sidebar-subtopic-link b{font-size:12px;line-height:1.43}
+.sidebar-subtopic-link span{font-size:11px}
+.sidebar-github-button{font-size:12px;min-height:43px}
+.sidebar-bottom strong{font-size:12px}
+.sidebar-bottom small{font-size:11px}
+.unb-project-label{font-size:10px}
+.page-overview-header h2{font-size:23px}
+.page-overview-header p{font-size:13px}
+.project-statement-featured .statement-marker{font-size:11px}
+.project-statement-featured .statement-category{font-size:11px}
+.project-statement-featured h1{font-size:clamp(29px,2.8vw,39px);line-height:1.29}
+.project-statement-featured .academic-label{font-size:11px}
+.project-statement-featured .project-academic strong{font-size:15px}
+.home-section-caption{font-size:12px}
+.home-section-caption span:last-child{font-size:12px}
+.home-stat{min-height:145px}
+.home-stat>span{font-size:11px;line-height:1.45}
+.home-stat strong{font-size:38px}
+.home-stat small{font-size:12px;line-height:1.5}
+.home-chapter-card{min-height:195px}
+.chapter-card-head{font-size:10px}
+.home-chapter-card h3{font-size:19px}
+.home-chapter-card p{font-size:12.5px;line-height:1.67}
+.chapter-card-foot{font-size:11px}
+.home-insight-kicker{font-size:11px}
+.home-insight h2{font-size:22px}
+.home-insight p{font-size:13px}
+.home-insight a{font-size:12px}
+.portal-footer{font-size:11px}
+.chapter-eyebrow{font-size:11px}
+.chapter-title-block h1{font-size:clamp(27px,2.7vw,35px)}
+.chapter-title-block p{font-size:13px}
+.chapter-source,.chapter-source a{font-size:12px}
+.subtopic-lead span{font-size:11px}
+.subtopic-lead p{font-size:12px}
+.readme-article{font-size:14px;line-height:1.77}
+.readme-article p,.readme-article li{font-size:14px;line-height:1.8}
+.readme-article h2{font-size:24px}
+.readme-article h3{font-size:20px}
+.readme-article h4,.readme-article h5{font-size:16px}
+.readme-article th,.readme-article td{font-size:12px;line-height:1.65;padding:11px 13px}
+.readme-article code{font-size:.94em}
+.readme-article pre code{font-size:13px}
+.chapter-index-heading{font-size:11px}
+.chapter-subcard{min-height:68px}
+.chapter-subcard strong{font-size:13px}
+.chapter-subcard span{font-size:12px}
+.chapter-feature-banner span{font-size:11px}
+.chapter-feature-banner h3{font-size:21px}
+.chapter-feature-banner p,.chapter-feature-banner a{font-size:13px}
+.widget-heading>span{font-size:11px}
+.widget-heading h3{font-size:24px}
+.widget-heading p{font-size:13px}
+.widget-controls label{font-size:12px}
+.widget-controls label select,.widget-controls label input{font-size:13px}
+.widget-note{font-size:12px}
+.widget-actions a{font-size:12px}
+.portal-widget .bar-label,.portal-widget .feature-bar-label,.portal-widget .mae-label{font-size:12px}
+.portal-widget .bar-value,.portal-widget .feature-delta,.portal-widget .mae-value{font-size:12px}
+.portal-widget .points-table td,.portal-widget .points-table th{font-size:12px}
+.portal-widget .table-footer,.portal-widget .text-button{font-size:12px}
+.readme-article .diagram-heading strong{font-size:13px}
+.readme-article .diagram-heading small{font-size:11px}
+.readme-article .diagram-message{font-size:12px}
+.diagram-expand{font-size:11px}
+.command-input-row input{font-size:15px}
+.command-result-info strong{font-size:13px}
+.command-result-info small{font-size:11px}
+.command-no-result{font-size:13px}
+@media(max-width:1190px){
+  :root{--portal-sidebar-width:228px}
+  .home-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:820px){
+  .portal-sidebar{width:264px}
+  .portal-workspace{width:100%;margin-left:0}
+  .project-statement-featured h1{font-size:clamp(27px,4vw,35px)}
+}
+@media(max-width:600px){
+  body{font-size:13px}
+  .portal-main{padding:16px 13px 45px}
+  .page-overview-header h2{font-size:21px}
+  .page-overview-header p{font-size:12px}
+  .project-statement-featured h1{font-size:26px;line-height:1.34}
+  .project-statement-featured .project-academic strong{font-size:14px}
+  .home-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-stat{min-height:127px}
+  .home-stat>span{font-size:10px}
+  .home-stat strong{font-size:33px}
+  .home-stat small{font-size:11px}
+  .home-chapter-card{min-height:168px}
+  .home-chapter-card h3{font-size:18px}
+  .home-chapter-card p{font-size:12px}
+  .chapter-title-block h1{font-size:28px}
+  .readme-article p,.readme-article li{font-size:13px}
+  .readme-article h2{font-size:21px}
+  .readme-article h3{font-size:18px}
+  .readme-article th,.readme-article td{font-size:11px}
+  .widget-heading h3{font-size:21px}
+  .widget-heading p{font-size:12px}
+  .portal-widget .bar-label,.portal-widget .feature-bar-label,.portal-widget .mae-label{font-size:11px}
+  .portal-widget .bar-value,.portal-widget .feature-delta,.portal-widget .mae-value{font-size:11px}
+}
