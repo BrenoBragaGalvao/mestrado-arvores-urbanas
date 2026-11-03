@@ -60,8 +60,8 @@ Clique no título para abrir diretamente a seção correspondente.
 | [3.6.2. Configuração 2](#sec-3-6-2) | 119 recortes inteiros de até 512 × 512 pixels. |
 | [3.6.3. Configuração 3](#sec-3-6-3) | 119 recortes subdivididos em partes de 256 × 256 pixels. |
 | [3.7. Memória RAM](#sec-3-7) | Comparação dos picos de memória. |
-| [3.8. Auditoria de overfitting e regularização](#sec-3-8) | Resultados E2, E3A, E3B, limites científicos e reprodução no notebook V2. |
-| [4. Alometria, Meta/WRI e espécies locais](#sec-4) | Contexto regional, fontes e resultados da V3. |
+| [3.8. Auditoria de overfitting e regularização](#sec-3-8) | Resultados das três configurações, limites científicos e reprodução dos testes de validação espacial. |
+| [4. Alometria, Meta/WRI e espécies locais](#sec-4) | Contexto regional, fontes e resultados dos modelos de altura das árvores. |
 | [4.1. Fonte das alturas Meta/WRI](#sec-4-1) | Raster original, resolução, método e precisão publicada. |
 | [4.2. Inventário e espécies de Caxias do Sul](#sec-4-2) | PDAU municipal, referências de porte e limites. |
 | [4.3. Alturas nos 257 pontos](#sec-4-3) | Meta pixel, Meta 5 m e valores zero. |
@@ -121,7 +121,7 @@ A Area1 utiliza **dois arquivos raster referentes essencialmente à mesma regiã
 
 Portanto, existem **510 pontos de referência**. Isso **não significa 510 objetos ou 510 registros de treinamento**: o Quickshift cria segmentos, que depois são associados aos pontos conhecidos.
 
-**Esses pontos são dados originais da Area1:** já existiam nos arquivos `Arvores.gpkg` e `Grama.gpkg` e também foram utilizados no estudo inicial. Na V2 **reutilizamos somente a localização e a classe conhecida desses pontos**, não os segmentos escolhidos pelo K-Means, o Random Forest treinado, as previsões nem a acurácia de 0,87 do estudo inicial.
+**Esses pontos são dados originais da Area1:** já existiam nos arquivos `Arvores.gpkg` e `Grama.gpkg` e também foram utilizados no estudo inicial. Nos testes com segmentação em janelas **reutilizamos somente a localização e a classe conhecida desses pontos**, não os segmentos escolhidos pelo K-Means, o Random Forest treinado, as previsões nem a acurácia de 0,87 do estudo inicial.
 
 Os dez arquivos originais permanecem no [Google Drive — Area1](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6). Veja o [detalhamento dos arquivos e coordenadas](data/README.md).
 
@@ -269,7 +269,7 @@ A ilustração horizontal abaixo apresenta as **17 etapas do código original**,
 
 [**Abrir o infográfico horizontal ampliado (17 etapas)**](docs/fluxo_17_etapas_horizontal_corrigido.png)
 
-Este esquema representa o **notebook original**. Os experimentos posteriores da V2, com segmentação em quadrantes, têm protocolos próprios e estão explicados **na seção 3**.
+Este esquema representa o **notebook original**. Os experimentos posteriores, com segmentação em quadrantes, têm protocolos próprios e estão explicados **na seção 3**.
 
 <a id="sec-3"></a>
 ## 3. Evolução metodológica — três novas configurações de processamento
@@ -281,7 +281,7 @@ Partimos da **imagem original da Area1 (6.942 × 7.294 pixels)** e dos **510 pon
 3. **Recortes inteiros de 512 × 512 pixels — 119 regiões:** entre **210 janelas possíveis**, selecionamos as **119 que contêm pontos de referência conhecidos** e aplicamos Quickshift em cada recorte inteiro. **Por quê?** Avaliar os oito classificadores pelo **F1-macro** nessa escala de segmentação.
 4. **Os mesmos 119 recortes subdivididos em 256 × 256 pixels:** dividimos cada recorte em até quatro partes e aplicamos Quickshift separadamente, avaliando os mesmos oito classificadores. **Por quê?** Comparar diretamente com a forma 3 o **F1-macro** e o consumo de memória RAM, mantendo os mesmos pontos e divisões espaciais de treino e teste.
 
-**Importante:** as formas **3 e 4 são os dois testes de uma mesma comparação controlada**. Nos experimentos novos, reutilizamos **a imagem e os pontos originais**, mas não os segmentos do K-Means, o Random Forest treinado ou suas previsões. Os **119 recortes foram escolhidos pelas coordenadas das referências**, nunca pelos acertos do modelo. Há resultados documentados para baterias derivadas de quadrantes de 256 pixels; isso não comprova a conclusão de uma nova execução integral da rotina progressiva dos 812 quadrantes na V2.
+**Importante:** as formas **3 e 4 são os dois testes de uma mesma comparação controlada**. Nos experimentos novos, reutilizamos **a imagem e os pontos originais**, mas não os segmentos do K-Means, o Random Forest treinado ou suas previsões. Os **119 recortes foram escolhidos pelas coordenadas das referências**, nunca pelos acertos do modelo. Há resultados documentados para baterias derivadas de quadrantes de 256 pixels; isso não comprova a conclusão de uma nova execução integral da rotina progressiva dos 812 quadrantes no notebook de experimentos.
 
 <p align="center">
   <img src="docs/infografico_tres_experimentos_area1.webp" alt="Infográfico dos três experimentos da Area1: Quickshift global do método original; 812 quadrantes de 256 pixels; comparação de 119 recortes em 512 e 256 pixels" width="100%">
@@ -306,7 +306,7 @@ Partimos da **imagem original da Area1 (6.942 × 7.294 pixels)** e dos **510 pon
 
 **Por que mudamos?** Ao tentar repetir a segmentação global, faltou memória RAM antes das etapas de K-Means e Random Forest. O erro indicou uma tentativa de alocação **adicional de 1,13 GiB** — **não** o consumo total do método. Como a imagem tem cerca de **50,6 milhões de pixels**, passamos a executar o Quickshift em partes menores, **sem reduzir a resolução dos pixels**.
 
-Na **V2**, investigamos três configurações de segmentação:
+No **notebook de experimentos**, investigamos três configurações de segmentação:
 
 | Configuração | Área processada | Objetivo |
 |---|---|---|
@@ -386,7 +386,7 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
   <img src="docs/exclusao_25m_treinamento_teste.webp" alt="Esquema mostrando os blocos de treinamento e teste, o problema de exemplos vizinhos e a exclusão de exemplos de treino a até 25 metros do teste." width="100%">
 </p>
 
-**O que podemos comparar diretamente?** Os **oito classificadores** usam as mesmas divisões de treinamento e teste **dentro de cada avaliação**. Porém, somente as **formas 3 e 4** (os mesmos 119 recortes, inteiros ou subdivididos) compartilham exatamente as referências e divisões entre as duas formas de segmentação. Assim, podemos analisar mais diretamente o efeito de dividir os recortes, sem trocar também os locais de teste. A **forma 1**, do método original, usou divisão aleatória e outra métrica, portanto não é diretamente comparável aos F1-macro atuais. Os resultados documentados da **forma 2** vieram de uma bateria anterior: **a execução integral da rotina progressiva atual dos 812 quadrantes no Notebook V2 ainda não foi confirmada**, e essa rotina usa distâncias entre **centroides**, em vez de geometrias completas.
+**O que podemos comparar diretamente?** Os **oito classificadores** usam as mesmas divisões de treinamento e teste **dentro de cada avaliação**. Porém, somente as **formas 3 e 4** (os mesmos 119 recortes, inteiros ou subdivididos) compartilham exatamente as referências e divisões entre as duas formas de segmentação. Assim, podemos analisar mais diretamente o efeito de dividir os recortes, sem trocar também os locais de teste. A **forma 1**, do método original, usou divisão aleatória e outra métrica, portanto não é diretamente comparável aos F1-macro atuais. Os resultados documentados da **forma 2** vieram de uma bateria anterior: **a execução integral da rotina progressiva atual dos 812 quadrantes no notebook de experimentos ainda não foi confirmada**, e essa rotina usa distâncias entre **centroides**, em vez de geometrias completas.
 
 <a id="sec-3-5"></a>
 ### 3.5. Qual é a contribuição do NDVI, brilho HSV e bordas Canny para o desempenho dos classificadores?
@@ -399,7 +399,7 @@ Os atributos descritos na **seção 3.3 são calculados antes do treinamento**. 
 - **Brilho HSV (`mean_intensity`):** medida média de intensidade/valor da cor no segmento.
 - **Bordas Canny (`mean_edges`):** média do mapa de bordas detectadas, relacionada às transições locais de intensidade/contorno.
 
-A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrantes de 256 × 256 pixels**. Ela reutiliza a base já rotulada de **505 segmentos únicos**, formada a partir dos **510 pontos de referência existentes** da Area1. Foram realizados **900 ajustes de validação interna** para escolha da regularização e **160 avaliações externas pareadas** (8 modelos × 2 conjuntos de atributos × 2 escalas espaciais × 5 divisões), com blocos de **250 m e 500 m** e **embargo espacial de 25 m entre as geometrias de teste e os objetos de treinamento**. As médias abaixo são de **F1-macro**, dando o mesmo peso a árvores e gramíneas.
+A comparação das combinações de atributos foi realizada a partir da **bateria derivada de 812 quadrantes de 256 × 256 pixels**. Ela reutiliza a base já rotulada de **505 segmentos únicos**, formada a partir dos **510 pontos de referência existentes** da Area1. Foram realizados **900 ajustes de validação interna** para escolha da regularização e **160 avaliações externas pareadas** (8 modelos × 2 conjuntos de atributos × 2 escalas espaciais × 5 divisões), com blocos de **250 m e 500 m** e **embargo espacial de 25 m entre as geometrias de teste e os objetos de treinamento**. As médias abaixo são de **F1-macro**, dando o mesmo peso a árvores e gramíneas.
 
 **Controle do sobreajuste:** em cada combinação de atributos, a regularização foi selecionada separadamente, usando três divisões internas formadas exclusivamente com o treinamento. Foram mantidos os mesmos exemplos, classificadores, divisões externas e critérios da seção 3.6.1. Assim, o ganho atribuído à inclusão do NDVI compara *pipelines* ajustados pelo mesmo procedimento, não necessariamente com os mesmos hiperparâmetros.
 
@@ -449,7 +449,7 @@ As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto mai
 <a id="sec-3-6-1"></a>
 #### 3.6.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
 
-Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do Notebook V2**.
+Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do notebook de experimentos**.
 
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
@@ -468,7 +468,7 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 <a id="sec-3-6-2"></a>
 #### 3.6.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
 
-Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada E9, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
+Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada entre recortes inteiros e subdivididos, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
 
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
@@ -508,7 +508,7 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 <a id="sec-3-7"></a>
 ### 3.7. Qual configuração consome menos memória RAM?
 
-A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o processamento sequencial dos **mesmos 119 recortes** nas duas estratégias:
+A comparação controlada entre recortes inteiros e subdivididos mediu o **pico de memória RAM (RSS)** durante o processamento sequencial dos **mesmos 119 recortes** nas duas estratégias:
 
 | Estratégia de segmentação | Pico de memória RAM |
 |---|---:|
@@ -517,7 +517,7 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 
 **Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 3.6).
 
-**Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
+**Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual do notebook de experimentos.**
 
 <a id="sec-3-8"></a>
 ### 3.8. Como controlamos o overfitting na avaliação dos classificadores?
@@ -527,28 +527,28 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 **Quais cuidados utilizamos para gerar os dados atuais da seção 3.6?**
 
 1. **Deduplicação e controle das partições:** mantivemos **505 exemplos rotulados por configuração** e verificamos a ausência de IDs coincidentes entre treinamento e teste nas 30 divisões espaciais avaliadas.
-2. **Separação espacial e embargo:** utilizamos cinco divisões com blocos de **250 m** e cinco com blocos de **500 m**, por configuração, com exclusão de **25 m**. Em E2, o embargo dos resultados publicados foi verificado entre **geometrias dos segmentos**; em E3A e E3B, entre **pontos de referência**. Isso reduz a influência de amostras vizinhas, sem tornar todos os exemplos independentes.
+2. **Separação espacial e embargo:** utilizamos cinco divisões com blocos de **250 m** e cinco com blocos de **500 m**, por configuração, com exclusão de **25 m**. Na configuração dos **812 quadrantes**, o embargo foi verificado entre **geometrias dos segmentos**; nas duas configurações com **119 recortes inteiros ou subdivididos**, entre **pontos de referência**. Isso reduz a influência de amostras vizinhas, sem tornar todos os exemplos independentes.
 3. **Regularização e seleção somente no treinamento:** comparamos receitas **moderada e forte** nas **três divisões internas** de cada treinamento externo. Escolhemos os parâmetros pelo **F1-macro médio de validação interna**, reajustamos o classificador usando o treinamento externo e só depois calculamos seu desempenho no teste reservado. O Dummy foi mantido como referência. Os modelos com padronização utilizam `Pipeline`, que aprende a escala somente com os dados de treino.
 4. **Auditoria de desempenho:** foram realizadas **1.350 avaliações internas** e **240 avaliações externas**, que originaram as **48 médias** apresentadas nas três tabelas da seção 3.6. Mantivemos os resultados de treino e teste, inclusive nos casos em que a regularização não produziu o mesmo desempenho.
 
 #### 3.8.1. O que os resultados mostram?
 
-A tabela apresenta o **F1-macro médio do treinamento e do teste** de quatro classificadores representativos em E2, E3A e E3B. Cada linha corresponde à média de dez divisões espaciais. A diferença positiva treino–teste é um **indicador de possível sobreajuste**, mas não constitui, isoladamente, um teste estatístico definitivo.
+A tabela apresenta o **F1-macro médio do treinamento e do teste** de quatro classificadores representativos nas três configurações: 812 quadrantes, 119 recortes inteiros e 119 recortes subdivididos. Cada linha corresponde à média de dez divisões espaciais. A diferença positiva treino–teste é um **indicador de possível sobreajuste**, mas não constitui, isoladamente, um teste estatístico definitivo.
 
 | Experimento | Classificador | F1 treino | F1 teste | Diferença |
 |---|---|---:|---:|---:|
-| **E2** | Regressão logística | 0,9011 | 0,8773 | +0,0239 |
-| **E2** | SVM RBF | 0,9110 | 0,8764 | +0,0347 |
-| **E2** | Random Forest | 0,8861 | 0,8230 | +0,0630 |
-| **E2** | HistGradientBoosting | 0,8998 | 0,8286 | +0,0712 |
-| **E3A** | Regressão logística | 0,8945 | 0,8828 | +0,0117 |
-| **E3A** | SVM RBF | 0,9059 | 0,8814 | +0,0245 |
-| **E3A** | Random Forest | 0,8864 | 0,8404 | +0,0460 |
-| **E3A** | HistGradientBoosting | 0,8922 | 0,8283 | +0,0639 |
-| **E3B** | Regressão logística | 0,9004 | 0,8943 | +0,0061 |
-| **E3B** | SVM RBF | 0,9085 | 0,8900 | +0,0185 |
-| **E3B** | Random Forest | 0,8888 | 0,8321 | +0,0568 |
-| **E3B** | HistGradientBoosting | 0,8955 | 0,8402 | +0,0552 |
+| **812 quadrantes de 256 px** | Regressão logística | 0,9011 | 0,8773 | +0,0239 |
+| **812 quadrantes de 256 px** | SVM RBF | 0,9110 | 0,8764 | +0,0347 |
+| **812 quadrantes de 256 px** | Random Forest | 0,8861 | 0,8230 | +0,0630 |
+| **812 quadrantes de 256 px** | HistGradientBoosting | 0,8998 | 0,8286 | +0,0712 |
+| **119 recortes inteiros de 512 px** | Regressão logística | 0,8945 | 0,8828 | +0,0117 |
+| **119 recortes inteiros de 512 px** | SVM RBF | 0,9059 | 0,8814 | +0,0245 |
+| **119 recortes inteiros de 512 px** | Random Forest | 0,8864 | 0,8404 | +0,0460 |
+| **119 recortes inteiros de 512 px** | HistGradientBoosting | 0,8922 | 0,8283 | +0,0639 |
+| **119 recortes subdivididos em 256 px** | Regressão logística | 0,9004 | 0,8943 | +0,0061 |
+| **119 recortes subdivididos em 256 px** | SVM RBF | 0,9085 | 0,8900 | +0,0185 |
+| **119 recortes subdivididos em 256 px** | Random Forest | 0,8888 | 0,8321 | +0,0568 |
+| **119 recortes subdivididos em 256 px** | HistGradientBoosting | 0,8955 | 0,8402 | +0,0552 |
 
 **Interpretação:** a **regressão logística** e o **SVM RBF** tiveram diferenças médias relativamente pequenas em diversas condições. Por outro lado, **Random Forest** e **HistGradientBoosting** ainda apresentam diferenças maiores, mesmo com regularização. Assim, as medidas adotadas **reduzem o risco de sobreajuste**, mas os resultados **não permitem afirmar que os oito classificadores estão completamente livres de overfitting**.
 
@@ -556,7 +556,7 @@ A tabela apresenta o **F1-macro médio do treinamento e do teste** de quatro cla
 
 **Por que essa distinção é importante?** Os 505 exemplos de cada configuração pertencem à **mesma imagem da Area1**, e os conjuntos de teste externos já foram analisados em etapas anteriores do projeto. Portanto, os F1 apresentados medem **generalização espacial interna**, não desempenho comprovado numa imagem de outra região. A seleção retrospectiva de modelos com base em testes já conhecidos pode introduzir viés de seleção.
 
-**Reprodução:** a reexecução supervisionada dos oito classificadores está incorporada ao [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). O **Quickshift e as características extraídas não foram recalculados nesta rodada**. A comparação de atributos da **seção 3.5** foi reexecutada com o mesmo protocolo supervisionado da configuração E2 na **seção 3.6.1**; os demais dados da pesquisa foram preservados. A rota `--modo v2` calcula o embargo de E2 por **centroides** e pode produzir valores diferentes dos resultados publicados, que utilizaram **geometrias completas**.
+**Reprodução:** a reexecução supervisionada dos oito classificadores está incorporada ao [notebook de experimentos](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). O **Quickshift e as características extraídas não foram recalculados nesta rodada**. A comparação de atributos da **seção 3.5** foi reexecutada com o mesmo protocolo supervisionado da configuração com **812 quadrantes** na **seção 3.6.1**; os demais dados da pesquisa foram preservados. A rota de execução direta do notebook (`--modo v2`) calcula o embargo da configuração com **812 quadrantes** por **centroides** e pode produzir valores diferentes dos resultados publicados, que utilizaram **geometrias completas**.
 
 ---
 
@@ -570,7 +570,7 @@ Durante a qualificação foi sugerido investigar se as alturas estimadas para á
 <a id="sec-4-1"></a>
 ### 4.1. Meta/WRI CHMv2 — de onde foram retiradas as alturas?
 
-A única fonte externa de altura utilizada na V3 é o **Meta/WRI Canopy Height Map v2 (CHMv2)**, publicado em **2026** por Meta e World Resources Institute. O produto fornece **altura estimada do dossel, em metros**, com resolução espacial nominal de aproximadamente **1 metro**. Foi produzido por um modelo de inteligência artificial baseado em **DINOv3**, com imagens ópticas de alta resolução **Vantor/Maxar** e referências de altura provenientes de **LiDAR aerotransportado**. O raster de altura não permite identificar qual satélite específico originou cada pixel da Area1; os mosaicos de entrada podem combinar datas diferentes.
+A única fonte externa de altura utilizada no estudo de estimativa de alturas é o **Meta/WRI Canopy Height Map v2 (CHMv2)**, publicado em **2026** por Meta e World Resources Institute. O produto fornece **altura estimada do dossel, em metros**, com resolução espacial nominal de aproximadamente **1 metro**. Foi produzido por um modelo de inteligência artificial baseado em **DINOv3**, com imagens ópticas de alta resolução **Vantor/Maxar** e referências de altura provenientes de **LiDAR aerotransportado**. O raster de altura não permite identificar qual satélite específico originou cada pixel da Area1; os mosaicos de entrada podem combinar datas diferentes.
 
 | Informação | Fonte ou descrição |
 |---|---|
@@ -696,7 +696,7 @@ Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5
 | **Fonte Meta/WRI CHMv2** | [Raster `2103121330.tif`](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif) · [Catálogo AWS](https://registry.opendata.aws/dataforgood-fb-forestsv2/) · [Artigo de Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0) |
 | **Fonte regional de espécies e porte** | [PDAU de Caxias do Sul](https://caxias.rs.gov.br/servicos/meio-ambiente/plano-diretor-de-arborizacao-urbana-pdau) · [Anexo 1 do PDAU](https://gcpstorage.caxias.rs.gov.br/documents/2020/09/c2d2ec2b-dfb4-4646-aadd-01eced79a722.pdf) |
 | **Artigo das 11 famílias alométricas** | [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579) · [Correção (2026)](https://doi.org/10.3390/land15030473) |
-| **Código central da V3** | [`Alometria_caxias_v3.ipynb`](Alometria_caxias_v3.ipynb) |
+| **Código principal do estudo de alturas** | [`Alometria_caxias_v3.ipynb`](Alometria_caxias_v3.ipynb) |
 | **Código do teste das 11 famílias** | [`experimentos/v3_testar_11_modelos_artigo_meta.py`](experimentos/v3_testar_11_modelos_artigo_meta.py) |
 | **Resultados consolidados dos 11 modelos** | [Relatório completo](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) · [métricas CSV](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv) · [previsões para os 257 pontos](docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) |
 | **Tabela final de todos os modelos** | [Tabela Markdown das 257 árvores](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_tabela.md) · [CSV completo](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) |
@@ -716,7 +716,7 @@ Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5
 
 **A nova metodologia tornou a avaliação mais rigorosa?** No método original, utilizamos uma divisão aleatória de **80% dos dados para treinamento e 20% para teste**. Nos novos experimentos, adotamos uma **validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros** entre exemplos de treinamento e teste. Essa estratégia busca reduzir a influência da proximidade geográfica, evitando avaliações excessivamente otimistas e permitindo testar os classificadores em locais espacialmente separados.
 
-**Quais comparações são cientificamente válidas?** As configurações **2 e 3 podem ser comparadas diretamente**, pois usam as mesmas regiões, referências, atributos e divisões de treino e teste, mudando a forma de segmentação. A configuração **1 utiliza outro protocolo de avaliação** e seus valores não devem ser tratados como uma comparação controlada com as demais. Da mesma forma, **não podemos afirmar que a V2 superou o método original**: no experimento histórico, a acurácia foi **0,87**, enquanto as tabelas atuais apresentam **F1-macro** e foram produzidas com segmentos e estratégias de validação diferentes.
+**Quais comparações são cientificamente válidas?** As configurações **2 e 3 podem ser comparadas diretamente**, pois usam as mesmas regiões, referências, atributos e divisões de treino e teste, mudando a forma de segmentação. A configuração **1 utiliza outro protocolo de avaliação** e seus valores não devem ser tratados como uma comparação controlada com as demais. Da mesma forma, **não podemos afirmar que as novas configurações superaram o método original**: no experimento histórico, a acurácia foi **0,87**, enquanto as tabelas atuais apresentam **F1-macro** e foram produzidas com segmentos e estratégias de validação diferentes.
 
 **O que ainda precisa ser validado?** Os resultados foram obtidos exclusivamente na **Area1**, sendo necessária a realização de testes em outras regiões para verificar se os modelos apresentam desempenho semelhante em diferentes áreas de estudo.
 
@@ -733,13 +733,13 @@ Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5
 
 | Material | Conteúdo |
 |---|---|
-| [Notebook V3 — alometria, calibração e altura Meta/WRI](Alometria_caxias_v3.ipynb) | Calcula os índices **C1–C6** originais e apresenta a **comparação C1–C3 nas formas potencial e linear**, além de cinco modelos invertidos de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579), com as 257 previsões **Meta/WRI**, além de calibração de coeficientes e validação espacial. [Código de comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) · [Resultados](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md). |
+| [Notebook de alometria — calibração e altura Meta/WRI](Alometria_caxias_v3.ipynb) | Calcula os índices **C1–C6** originais e apresenta a **comparação C1–C3 nas formas potencial e linear**, além de cinco modelos invertidos de [Chatziathanasiou et al. (2024)](https://doi.org/10.3390/land13101579), com as 257 previsões **Meta/WRI**, além de calibração de coeficientes e validação espacial. [Código de comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) · [Resultados](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md). |
 | [V3 — comparação dos índices alométricos C1–C3 com Meta/WRI](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) | **Análise executada nos 257 pontos**: [6 fórmulas originais e 5 inversões do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) com diferenças numéricas, correlações e limitações. A única referência externa de altura é **Meta/WRI CHMv2**; **não são alturas medidas em campo**. |
-| [V3 — código de avaliação das 11 famílias alométricas](experimentos/v3_testar_11_modelos_artigo_meta.py) | Executa a comparação das **11 famílias de curvas** adaptadas ao problema `H_Meta = g(D_eq)`, com validação espacial; usa a **área de superpixel**, não medições de copas ou alturas em campo. |
+| [Código de avaliação das 11 famílias alométricas](experimentos/v3_testar_11_modelos_artigo_meta.py) | Executa a comparação das **11 famílias de curvas** adaptadas ao problema `H_Meta = g(D_eq)`, com validação espacial; usa a **área de superpixel**, não medições de copas ou alturas em campo. |
 | [V3 — resultados completos da alometria: 257 pontos e 74 colunas](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) | **Tabela única com todos os modelos e resultados por ponto**: Meta/WRI pixel e raio de 5 m, índices **C1–C6 potenciais e lineares**, ajustes complementares, onze famílias de regressão e controles, incluindo avaliações com blocos espaciais de **250 m e 500 m**. |
-| [V3 — relatório dos modelos alométricos](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) | Interpretação dos resultados, limitações e comparação dos erros das 11 famílias com a **Meta/WRI**. As métricas por modelo estão no [resumo CSV](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv), e o [relatório de calibração e validação espacial](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) reúne indicadores dos ajustes. **Não corresponde à validação com alturas medidas em campo.** |
+| [Relatório dos modelos alométricos](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) | Interpretação dos resultados, limitações e comparação dos erros das 11 famílias com a **Meta/WRI**. As métricas por modelo estão no [resumo CSV](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv), e o [relatório de calibração e validação espacial](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) reúne indicadores dos ajustes. **Não corresponde à validação com alturas medidas em campo.** |
 | [Notebook original](Segmentacao_area_completa.ipynb) | Quickshift global, K-Means, Random Forest e proximidade |
-| [Notebook V2](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa_v2_experimentos.ipynb) | **Versão experimental com três configurações de processamento**, todas usando a imagem e os pontos de referência originais, **sem reduzir a resolução dos pixels**: <br><br> **(1) Área completa em 812 quadrantes de até 256 × 256 pixels:** aplica Quickshift por quadrante, em lotes com resultados intermediários salvos para controlar o consumo de memória RAM; depois permite avaliar **oito classificadores pelo F1-macro** e investigar combinações de **NDVI, brilho HSV e bordas Canny**. <br><br> **(2) Os 119 recortes de até 512 × 512 pixels:** entre 210 janelas possíveis, seleciona as 119 com pontos conhecidos, aplica Quickshift ao recorte inteiro e avalia **o F1-macro dos oito classificadores**. <br><br> **(3) Os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels:** aplica Quickshift separadamente em cada parte e avalia novamente **os oito classificadores**, para comparar **F1-macro e pico de memória RAM** com a configuração 2, usando as mesmas referências e divisões espaciais de treino/teste. <br><br> **Organização no notebook:** a configuração 1 é um caminho progressivo independente; as configurações 2 e 3 são os dois testes de uma mesma comparação controlada. A rota progressiva oferece ainda análises opcionais de porte e proximidade com postes. **O código está implementado, mas a publicação do notebook não comprova uma nova execução integral dos 812 quadrantes.** O método original com Quickshift global permanece preservado em outro notebook. |
+| [Notebook de experimentos de segmentação](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/Segmentacao_area_completa_v2_experimentos.ipynb) | **Versão experimental com três configurações de processamento**, todas usando a imagem e os pontos de referência originais, **sem reduzir a resolução dos pixels**: <br><br> **(1) Área completa em 812 quadrantes de até 256 × 256 pixels:** aplica Quickshift por quadrante, em lotes com resultados intermediários salvos para controlar o consumo de memória RAM; depois permite avaliar **oito classificadores pelo F1-macro** e investigar combinações de **NDVI, brilho HSV e bordas Canny**. <br><br> **(2) Os 119 recortes de até 512 × 512 pixels:** entre 210 janelas possíveis, seleciona as 119 com pontos conhecidos, aplica Quickshift ao recorte inteiro e avalia **o F1-macro dos oito classificadores**. <br><br> **(3) Os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels:** aplica Quickshift separadamente em cada parte e avalia novamente **os oito classificadores**, para comparar **F1-macro e pico de memória RAM** com a configuração 2, usando as mesmas referências e divisões espaciais de treino/teste. <br><br> **Organização no notebook:** a configuração 1 é um caminho progressivo independente; as configurações 2 e 3 são os dois testes de uma mesma comparação controlada. A rota progressiva oferece ainda análises opcionais de porte e proximidade com postes. **O código está implementado, mas a publicação do notebook não comprova uma nova execução integral dos 812 quadrantes.** O método original com Quickshift global permanece preservado em outro notebook. |
 | [Dados Area1](data/README.md) | Arquivos, coordenadas e estrutura do Drive |
 | [Registro do método original](docs/experimento_area_completa.md) | Parâmetros, resultados históricos e limitações |
 | [Detalhes da tentativa com imagem completa](docs/e10_teste_execucao_local.md) | Execução do Quickshift global e erro por insuficiência de memória |
