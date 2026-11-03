@@ -93,6 +93,9 @@ p{color:var(--muted)}
 .section-heading>p{flex:.75;max-width:390px;font-size:14px;line-height:1.85;margin-bottom:6px}
 .section-heading h2{font-size:clamp(35px,3.9vw,55px);color:var(--navy);margin:15px 0 0;font-weight:800}
 .section-heading h2 span{color:var(--blue)}
+.research-title{border-left:3px solid var(--red);background:#f6f9fb;padding:18px 24px;margin:-6px 0 22px;border-radius:0 8px 8px 0}
+.research-title span{font-size:9px;font-weight:850;letter-spacing:.14em;color:var(--red)}
+.research-title p{font-size:14px;font-weight:750;color:var(--navy);line-height:1.6;margin:9px 0 0;max-width:950px}
 .proposal-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .proposal-card{padding:37px 40px 30px;background:#f4f8fa;border:1px solid #e5edf2;border-radius:12px;min-height:415px;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
 .proposal-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
