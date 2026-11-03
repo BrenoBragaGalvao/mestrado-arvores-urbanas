@@ -177,5 +177,26 @@ A [planilha CSV principal](v3_alturas_publicas/v3_comparacao_c1_c6_log_pot_meta_
 
 **Nota científica:** a área do superpixel não foi validada como área da copa de cada árvore. Meta/WRI é estimativa modelada, não observação de campo; modelos calibrados nos mesmos 257 pontos não constituem avaliação independente. A equação hipotética dependente do diâmetro real da copa não foi calculada porque não temos diâmetros de copas individuais medidos.
 
+## Teste das onze famílias de regressão de Chatziathanasiou et al. (2024) — com correção de 2026
+
+Testamos **todas as onze famílias matemáticas da Tabela 1** do estudo de [Chatziathanasiou, Kitikidou e Milios (2024)](https://doi.org/10.3390/land13101579) em uma nova bateria da V3: linear, logarítmica, inversa, quadrática, cúbica, potencial, composta, curva-S, logística, crescimento e exponencial. Os autores publicaram uma [correção em 2026](https://doi.org/10.3390/land15030473) para algumas equações e modelos; essa correção deve acompanhar a citação do artigo.
+
+**Não se aplicaram coeficientes estrangeiros às árvores da Area1.** O artigo apresenta `CW=f(H)`, com **largura de copa e altura medidas em campo** de espécies gregas. Nosso experimento testa as **onze famílias adaptadas a `H_Meta=f(D_eq)`**, onde `D_eq=2√(A_superpixel/π)` é diâmetro circular equivalente de **superpixel Quickshift**, que **não comprova medida de copa**. Os coeficientes foram ajustados com os próprios exemplos de treino e as alturas são provenientes do produto **Meta/WRI CHMv2**, não de medições reais.
+
+**Validação:** 257 pontos originais, cinco folds espaciais de **250 e 500 m**, **25 m de embargo** entre treino e teste, duas referências de altura do mesmo mapa (Meta no pixel exato e máximo no raio de 5 m), e seleção interna entre as famílias com referência constante.
+
+| Alvo Meta e divisão | Menor MAE entre as 11 famílias | MAE dessa família | MAE do controle constante |
+|---|---|---:|---:|
+| Pixel exato, 250 m | **Cúbica** | **4,584 m** | **4,578 m** |
+| Pixel exato, 500 m | **Curva-S** | **4,505 m** | **4,451 m** |
+| Máximo no raio de 5 m, 250 m | **Inversa** | **4,802 m** | **4,778 m** |
+| Máximo no raio de 5 m, 500 m | **Curva-S** | **4,731 m** | **4,665 m** |
+
+**Conclusão experimental:** o **controle constante venceu todas as onze famílias** nos quatro cenários. A seleção aninhada escolheu o constante em todos os 20 folds externos dos quatro cenários (cinco por cenário). O melhor modelo entre os onze **varia com a referência de altura e com a divisão espacial**, e nenhuma diferença apresentada permite alegar altura real de árvore medida. **Composta, crescimento e exponencial são a mesma família exponencial sob reparametrizações**, portanto não somamos seus resultados como evidências independentes.
+
+**Arquivos da execução:** [relatório com os 11 modelos e equações](v3_alturas_publicas/v3_11_familias_meta_relatorio.md) · [resumo com os quatro cenários e todas as métricas](v3_alturas_publicas/v3_11_familias_meta_resumo.csv) · [257 linhas de previsões fora do treino para cada família](v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) · [folds e seleção interna](v3_alturas_publicas/v3_11_familias_meta_folds.csv) · [gráfico](v3_alturas_publicas/v3_11_familias_meta_mae.png) · [script reprodutível](../experimentos/v3_testar_11_modelos_artigo_meta.py) · [notebook V3](../Alometria_caxias_v3.ipynb).
+
+**Próximo desafio metodológico:** melhorar a **delimitação real de copas individuais** e a correspondência entre árvores e as estimativas Meta (principalmente pontos com zero); mesmo assim, verificar altura real exigiria medições independentes no campo. Nenhuma equação deve ser adotada como altura correta das 257 árvores sem essa etapa.
+
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
