@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f7fa">
+  <meta name="theme-color" content="#063b77">
   <meta name="description" content="Portal acadêmico do mestrado de Breno Braga Galvão: classificação de vegetação urbana, análise espacial, aprendizagem de máquina e alometria em Caxias do Sul.">
   <meta property="og:title" content="Atlas Urbano | Portal do Mestrado">
   <meta property="og:description" content="Explore capítulos, resultados, gráficos e os 257 pontos da pesquisa.">
   <title>Atlas Urbano | Portal do Mestrado</title>
   <link rel="stylesheet" href="./mestrado-site/styles.css">
   <link rel="stylesheet" href="./mestrado-site/portal.css">
+  <link rel="stylesheet" href="./mestrado-site/unb-theme.css">
   <script src="./mestrado-site/readme-content.js" defer></script>
   <script src="./mestrado-site/portal.js" defer></script>
   <script src="./mestrado-site/app.js" defer></script>
@@ -20,9 +21,12 @@
     <div id="sidebar-scrim" class="sidebar-scrim" hidden></div>
     <aside class="portal-sidebar" id="sidebar" aria-label="Menu lateral da pesquisa">
       <div class="sidebar-head">
-        <a href="#inicio" class="portal-brand">
-          <span class="portal-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-          <span><strong>ATLAS URBANO</strong><small>PORTAL DO MESTRADO</small></span>
+        <a href="#inicio" class="portal-brand portal-brand-unb" aria-label="Página inicial do portal do mestrado">
+          <span class="unb-brand-lockup">
+            <span class="unb-brand-fallback" aria-hidden="true">UnB</span>
+            <img src="https://marca.unb.br/img/assinatura_neg/as_bas_neg.gif" alt="Marca da Universidade de Brasília (UnB)" loading="eager" onerror="this.style.display='none'">
+          </span>
+          <span class="unb-project-label">PORTAL DO MESTRADO</span>
         </a>
         <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Fechar menu lateral">×</button>
       </div>
@@ -53,7 +57,10 @@
 
       <main id="area-principal" class="portal-main" tabindex="-1">
         <section id="page-inicio" class="portal-view home-view" data-view="inicio">
-          <div class="home-kicker"><span class="accent-line"></span> PORTAL ACADÊMICO · PESQUISA APLICADA</div>
+          <div class="page-overview-header">
+            <span class="page-overview-icon" aria-hidden="true">⌂</span>
+            <div><h2>Início</h2><p>Conheça a pesquisa, a metodologia e os resultados do mestrado</p></div>
+          </div>
           <div class="home-hero">
             <div class="home-hero-copy">
               <span class="home-overline">VISÃO GERAL DA PESQUISA</span>
@@ -82,7 +89,7 @@
             <div><span class="home-insight-kicker">CRITÉRIOS DE INTERPRETAÇÃO</span><h2>O que os resultados permitem concluir?</h2><p>Os experimentos com classificadores e modelos alométricos seguem protocolos diferentes. As alturas Meta/WRI são estimativas, não medições em campo; a distância a postes não comprova risco elétrico.</p></div>
             <a href="#topico-5">Ler as conclusões <span aria-hidden="true">→</span></a>
           </div>
-          <footer class="portal-footer"><span>Pesquisa em desenvolvimento · Não é um site oficial da FGV</span><span>Dados e código disponíveis no repositório</span></footer>
+          <footer class="portal-footer"><span>Pesquisa independente em desenvolvimento · Este não é um portal institucional da UnB nem da FGV.</span><span>Dados e código disponíveis no repositório</span></footer>
         </section>
         <div id="chapter-pages" class="chapter-pages"></div>
       </main>
