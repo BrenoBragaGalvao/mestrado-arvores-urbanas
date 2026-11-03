@@ -8,7 +8,9 @@ O site funciona como um **portal com menu lateral**, contendo uma página de **I
 
 - `docs/index.html`: estrutura do portal, tela inicial, componentes de gráficos e explorador;
 - `docs/mestrado-site/portal.css`: estrutura responsiva do portal e navegação por capítulos;
-- `docs/mestrado-site/unb-theme.css`: tema visual azul e branco inspirado no painel de referência fornecido, sem alteração em qualquer projeto da FGV;
+- `docs/mestrado-site/research-dashboard.css`: tema atual de painéis azul e branco, tipografia Inter, cartões compactos e menu lateral, inspirado na referência visual apresentada pelo autor;
+- `docs/mestrado-site/search.js`: busca funcional por páginas e subtópicos (botão lateral e atalho Ctrl K);
+- `docs/mestrado-site/unb-mark-horizontal.svg`: símbolo azul e verde da UnB armazenado localmente, apresentado com a inscrição “UnB” em branco no menu lateral;
 - `docs/mestrado-site/portal.js`: navegação por capítulos/subtópicos e renderização de tabelas, textos e figuras do README;
 - `docs/mestrado-site/readme-content.js`: cópia estruturada das seis seções científicas do `README.md`, com os 18 subtópicos;
 - `docs/mestrado-site/styles.css`: estilos de visualização para gráficos e tabelas;
@@ -41,4 +43,4 @@ Para conferir ou alterar a configuração: **Settings → Pages** no repositóri
 - C1–C6 são índices exploratórios, não alturas reais validadas.
 - Proximidade bidimensional com postes não demonstra risco elétrico.
 - O portal é um projeto independente: **não pertence à FGV nem é um portal institucional da UnB**. Seu tema segue a referência visual fornecida pelo autor e não utiliza código ou infraestrutura da FGV.
-- O cabeçalho utiliza a [logo azul e verde da UnB disponibilizada no Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Webysther_20160322_-_Logo_UnB.svg), indicada pelo autor do projeto. A imagem é carregada por URL externa, e a utilização de símbolo institucional não indica vínculo ou endosso da universidade; observe as regras de uso de marca aplicáveis.
+- O cabeçalho usa uma versão vetorial local do símbolo azul e verde da UnB, baseada na imagem fornecida pelo autor e associada à [marca registrada na Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Webysther_20160322_-_Logo_UnB.svg). O uso da marca não indica vínculo ou endosso da universidade, e deve observar as regras de uso aplicáveis.
