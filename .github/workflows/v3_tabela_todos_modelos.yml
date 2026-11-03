@@ -1,0 +1,40 @@
+name: "V3 - Tabela unica 257 arvores e todos modelos"
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/v3_tabela_todos_modelos.yml"
+      - "experimentos/v3_gerar_tabela_todos_modelos.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  consolidar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependencias
+        run: python -m pip install numpy pandas
+      - name: Gerar a tabela completa das 257 arvores
+        run: |
+          python -u experimentos/v3_gerar_tabela_todos_modelos.py \
+            --formulas docs/v3_alturas_publicas/v3_comparacao_completa_c1_c6_pot_linear_log_meta_257.csv \
+            --modelos docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv \
+            --out docs/v3_alturas_publicas
+      - name: Publicar CSVs e tabela Markdown
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/v3_alturas_publicas/v3_todos_modelos_meta_257*
+          git diff --cached --quiet || (git commit -m "data(v3): tabela unica de 257 arvores com todas as familias" && git push)
+      - name: Anexar tabelas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-257-arvores-todos-modelos
+          path: docs/v3_alturas_publicas/v3_todos_modelos_meta_257*
+          if-no-files-found: ignore
