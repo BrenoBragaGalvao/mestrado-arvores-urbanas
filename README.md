@@ -62,8 +62,8 @@ Clique no título para abrir diretamente a seção correspondente.
 | [4.1. Fonte das alturas Meta/WRI](#sec-4-1) | Raster original, resolução, método e precisão publicada. |
 | [4.2. Inventário e espécies de Caxias do Sul](#sec-4-2) | PDAU municipal, referências de porte e limites. |
 | [4.3. Alturas nos 257 pontos](#sec-4-3) | Meta pixel, Meta 5 m e valores zero. |
-| [4.4. Onze famílias do artigo (2024)](#sec-4-4) | Equações, C1–C6 e testes espaciais comparativos. |
-| [4.5. Comparação das 15 primeiras árvores](#sec-4-4-tabela-257) | Meta pixel e 5 m, logarítmica, inversa, curva-S, C1 e C3. |
+| [4.4. Famílias do artigo e C1–C6](#sec-4-4) | Distinção entre as 11 famílias adaptadas e as 12 expressões originais: seis potenciais e seis lineares. |
+| [4.5. Comparação das 15 primeiras árvores](#sec-4-4-tabela-257) | Meta pixel e 5 m, logarítmica, inversa, curva-S, cúbica e índices C1/C3 potenciais. |
 | [4.6. Documentação e dados](#sec-4-5) | Links dos artigos, raster, notebook, CSVs e relatório. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
@@ -577,7 +577,7 @@ O valor **zero** em um pixel pode refletir solo, sombra, copa fora da coordenada
 <a id="sec-4-4"></a>
 <a id="sec-4-4-onze-modelos"></a>
 <a id="sec-4-4-artigo"></a>
-### 4.4. Equações alométricas do artigo e como foram testadas na V3
+### 4.4. Onze famílias do artigo e equações potenciais e lineares C1–C6
 
 **Artigo utilizado como referência:** **`Chatziathanasiou et al. (2024).pdf`**, correspondente a [Chatziathanasiou, Kitikidou e Milios (2024), *Crown Width–Tree Height Models for Magnolia grandiflora, Prunus cerasifera, and Acer negundo Growing in Cities in Northeastern Greece*](https://doi.org/10.3390/land13101579), publicado em *Land*, vol. 13, artigo 1579. A **Tabela 1** do artigo reúne **11 famílias de regressão** relacionando a **largura da copa (`CW`) em função da altura (`H`)**, com medições em árvores de cidades gregas. Existe uma [**correção publicada em 2026**](https://doi.org/10.3390/land15030473), que deve acompanhar a citação científica dessas equações.
 
@@ -585,16 +585,21 @@ O valor **zero** em um pixel pode refletir solo, sombra, copa fora da coordenada
 
 **O que realmente foi executado:** o artigo ajusta `CW = f(H)` com medidas de copa e altura de campo; nós **adaptamos as mesmas famílias funcionais para `H_Meta = g(D_eq)`**, com **`D_eq = 2 × √(A/π)`**, em que `A` é a área de um **superpixel Quickshift**, não a área confirmada de uma copa individual. Os **coeficientes foram ajustados nos pontos de treino da Area1**. Portanto, as famílias de regressão vieram do artigo, mas **não reproduzimos literalmente as equações com os coeficientes das espécies gregas** e **não podemos alegar validação local de altura real**. Além disso, composta, crescimento e exponencial representam parametrizações equivalentes de uma família exponencial.
 
-O notebook original possui ainda os índices exploratórios **C1–C6**, cada um na forma potencial `I = a × A^b` (e uma variante linear `I = a + b × A`). **Seus coeficientes a e b não foram retirados do artigo de 2024**; são parâmetros experimentais do projeto.
+**Como as configurações C1–C6 do notebook original se relacionam com essas famílias?** São **seis configurações experimentais**, com pares diferentes de coeficientes `a` e `b`. **Todas as seis expressões C1–C6 mostradas originalmente na tabela pertencem à mesma família matemática: a potencial**, definida por `I = a × A^b`. Portanto, **C1, C2, C3, C4, C5 e C6 não são seis famílias de regressão diferentes**.
 
-| Índice original | a | b | Fórmula potencial |
-|---|---:|---:|---|
-| C1 | 0,5 | 0,7 | `I = 0,5 × A^0,7` |
-| C2 | 0,6 | 0,8 | `I = 0,6 × A^0,8` |
-| C3 | 2,5 | 0,4 | `I = 2,5 × A^0,4` |
-| C4 | 4,0 | 0,5 | `I = 4,0 × A^0,5` |
-| C5 | 0,4 | 0,9 | `I = 0,4 × A^0,9` |
-| C6 | 1,35 | 0,72 | `I = 1,35 × A^0,72` |
+Entretanto, como confirma o código de `Segmentacao_area_completa.ipynb`, **cada configuração também foi implementada na forma linear** `I = a + b × A`. Assim, o método original contém **12 expressões ao todo: seis potenciais e seis lineares**, usando os mesmos pares de coeficientes. Na tabela, `A` representa a área do segmento analisado, em m², e `I` representa um **índice exploratório**, não uma altura individual validada em metros.
+
+| Configuração original | a | b | Expressão potencial (`I = a × A^b`) | Expressão linear (`I = a + b × A`) |
+|---|---:|---:|---|---|
+| C1 | 0,5 | 0,7 | `I = 0,5 × A^0,7` | `I = 0,5 + 0,7 × A` |
+| C2 | 0,6 | 0,8 | `I = 0,6 × A^0,8` | `I = 0,6 + 0,8 × A` |
+| C3 | 2,5 | 0,4 | `I = 2,5 × A^0,4` | `I = 2,5 + 0,4 × A` |
+| C4 | 4,0 | 0,5 | `I = 4,0 × A^0,5` | `I = 4,0 + 0,5 × A` |
+| C5 | 0,4 | 0,9 | `I = 0,4 × A^0,9` | `I = 0,4 + 0,9 × A` |
+| C6 | 1,35 | 0,72 | `I = 1,35 × A^0,72` | `I = 1,35 + 0,72 × A` |
+
+**Origem e interpretação:** os coeficientes de C1–C6 são parâmetros experimentais do projeto, **não foram extraídos do artigo de Chatziathanasiou et al. (2024)**. As **11 famílias apresentadas na figura abaixo** vêm do artigo e foram posteriormente adaptadas e recalibradas para a Area1; elas constituem uma investigação **distinta** das 12 expressões C1–C6 do método original. Em particular, a família **potencial** do artigo e as seis configurações **C1–C6 potenciais** compartilham uma estrutura matemática, mas **não correspondem aos mesmos ajustes e coeficientes**.
+
 
 <a id="sec-4-4-calibracao"></a>
 **Como comparamos:** as 11 famílias adaptadas foram ajustadas nos **257 pontos** e avaliadas com **cinco divisões espaciais**, em blocos de **250 m e 500 m**, mantendo **25 m de exclusão entre os pontos de treino e teste**. Foram avaliadas separadamente as referências Meta pixel e Meta 5 m. As previsões usadas para medir o erro são **fora do treinamento (OOF)**. O critério é **MAE, em metros, em relação às alturas modeladas pela Meta/WRI**, e não MAE contra alturas reais.
@@ -612,9 +617,9 @@ O notebook original possui ainda os índices exploratórios **C1–C6**, cada um
 <a id="sec-4-4-todos-modelos-tabela"></a>
 ### 4.5. Tabela comparativa — primeiras 15 árvores
 
-A tabela apresenta as **15 primeiras árvores na ordem original**, sem selecionar exemplos pelos resultados. As **três primeiras colunas** são a contagem, a **Meta pixel** e a **Meta 5 m**; depois vêm as previsões da **logarítmica, inversa, curva-S e cúbica** em blocos de **250 m** e os índices históricos **C1 e C3**. As previsões das quatro famílias são **OOF (teste espacial)**; C1 e C3 **não são alturas calibradas em metros**.
+A tabela apresenta as **15 primeiras árvores na ordem original**, sem selecionar exemplos pelos resultados. As **três primeiras colunas** são a contagem, a **Meta pixel** e a **Meta 5 m**; depois vêm as previsões da **logarítmica, inversa, curva-S e cúbica** em blocos de **250 m** e os índices históricos **C1 potencial e C3 potencial** (as versões `I = a × A^b` do notebook original). As previsões das quatro famílias são **OOF (teste espacial)**; C1 e C3 **não são alturas calibradas em metros** e não representam as variantes lineares.
 
-| Árvore | **Meta pixel (m)** | **Meta 5 m (m)** | Log. pixel (m) | Log. 5 m (m) | Inversa pixel (m) | Inversa 5 m (m) | Curva-S pixel (m) | Curva-S 5 m (m) | Cúbica pixel (m) | Cúbica 5 m (m) | C1 (índice) | C3 (índice) |
+| Árvore | **Meta pixel (m)** | **Meta 5 m (m)** | Log. pixel (m) | Log. 5 m (m) | Inversa pixel (m) | Inversa 5 m (m) | Curva-S pixel (m) | Curva-S 5 m (m) | Cúbica pixel (m) | Cúbica 5 m (m) | C1 potencial (índice) | C3 potencial (índice) |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 | 16,00 | 17,00 | 3,02 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 3,21 | 5,97 | 23,95 | 22,81 |
 | 2 | 0,00 | 6,00 | 3,02 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 3,24 | 5,97 | 24,62 | 23,17 |
@@ -634,7 +639,7 @@ A tabela apresenta as **15 primeiras árvores na ordem original**, sem seleciona
 
 **Para consultar os 257 pontos com todos os modelos (não apenas os 15 exemplos):** [**tabela completa de 257 árvores e 39 colunas**](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_tabela.md) · [CSV principal, com Meta nas posições 2 e 3](docs/v3_alturas_publicas/v3_todos_modelos_meta_257.csv) · [CSV ampliado, com 74 colunas e testes em blocos de 500 m](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv).
 
-Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5 m**, enquanto os modelos logarítmico, inverso, curva-S e cúbico retornam valores bastante inferiores nos testes espaciais. Isso mostra que, apesar de terem sido testadas diversas famílias, **os modelos ainda não recuperam de forma confiável a variação individual das alturas modeladas pela Meta**. Os índices C1 e C3 apresentam valores maiores, mas não equivalem automaticamente a metros de altura real.
+Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5 m**, enquanto os modelos logarítmico, inverso, curva-S e cúbico retornam valores bastante inferiores nos testes espaciais. Isso mostra que, apesar de terem sido testadas diversas famílias, **os modelos ainda não recuperam de forma confiável a variação individual das alturas modeladas pela Meta**. Os índices **C1 potencial** e **C3 potencial** apresentam valores maiores, mas não equivalem automaticamente a metros de altura real; as variantes lineares existem no notebook original e não são as colunas desta tabela.
 
 <a id="sec-4-5"></a>
 ### 4.6. Documentação, arquivos para reprodução e limites
