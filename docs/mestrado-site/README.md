@@ -1,39 +1,42 @@
-# Atlas Urbano — site público da pesquisa
+# Atlas Urbano — portal acadêmico do mestrado
 
-Portal estático de divulgação científica do projeto de mestrado. Os arquivos deste site são independentes dos notebooks, experimentos e projetos da FGV.
+Site público: https://brenobragagalvao.github.io/mestrado-arvores-urbanas/
 
-## Organização
+O site funciona como um **portal com menu lateral**, contendo uma página de **Início**, os **seis capítulos do README** e **18 subtópicos navegáveis**. Cada seleção abre seu conteúdo na área principal, sem exigir percorrer uma única página extensa.
 
-- `docs/index.html` — página principal, com sete seções de pesquisa;
-- `docs/mestrado-site/styles.css` — interface responsiva acadêmico-institucional (design próprio);
-- `docs/mestrado-site/app.js` — gráficos interativos e explorador dos 257 pontos;
-- `docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv` — fonte do gráfico de MAE;
-- `docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv` — fonte da tabela interativa;
-- imagens e relatórios em `docs/` já existentes no repositório.
+## Estrutura atual
 
-Os dados de F1-macro da comparação E9 (recortes 512/256) e da ablação E4b estão representados no JavaScript conforme as tabelas do README, mantendo suas escalas espaciais e protocolos distintos. Quando esses experimentos forem atualizados, atualizar também os números transcritos em `app.js`.
+- `docs/index.html`: estrutura do portal, tela inicial, componentes de gráficos e explorador;
+- `docs/mestrado-site/portal.css`: layout institucional independente, navegação lateral e versão para celular;
+- `docs/mestrado-site/portal.js`: navegação por capítulos/subtópicos e renderização de tabelas, textos e figuras do README;
+- `docs/mestrado-site/readme-content.js`: cópia estruturada das seis seções científicas do `README.md`, com os 18 subtópicos;
+- `docs/mestrado-site/styles.css`: estilos de visualização para gráficos e tabelas;
+- `docs/mestrado-site/app.js`: gráficos interativos e exploração dos 257 registros.
 
-## Publicar pelo GitHub Pages
+**Atualização dos textos:** quando o README científico for modificado, a cópia `readme-content.js` deve ser regenerada para refletir o novo conteúdo. Este arquivo não é atualizado automaticamente pelo GitHub Pages.
 
-**O Pages ainda precisa estar habilitado nas configurações do repositório**, pois criar os arquivos não publica automaticamente o site.
+## Navegação e gráficos
 
-1. Abra o repositório `BrenoBragaGalvao/mestrado-arvores-urbanas` no GitHub.
-2. Vá em **Settings → Pages**.
-3. Em **Build and deployment**, selecione **Deploy from a branch**.
-4. Defina **Branch: main** e **Folder: /docs**; clique em **Save**.
-5. Depois que o GitHub confirmar a publicação, o endereço esperado será:
-   `https://brenobragagalvao.github.io/mestrado-arvores-urbanas/`
+- **Início:** objetivo da pesquisa, números e acesso a cada capítulo.
+- **1 — Área de estudo:** dimensões, georreferenciamento e dados de referência.
+- **2 — Método original:** classificação, proximidade a postes e pipeline.
+- **3 — Evolução metodológica:** validação espacial, recortes, atributos, oito classificadores, F1-macro e memória.
+- **4 — Alometria:** Meta/WRI, espécies locais, fórmulas, MAE e explorador de 257 pontos.
+- **5 — Conclusões:** resultados e restrições de interpretação.
+- **6 — Código e documentação:** notebooks e materiais reprodutíveis.
 
-O site não precisa de Node, Python, bundler nem biblioteca externa para funcionar. Gráficos de alometria e a tabela exigem acesso HTTP aos CSVs do próprio diretório; ao abrir o HTML via `file://`, o navegador pode bloquear essa leitura. Para um teste local, na raiz do repositório execute `python -m http.server 8000` e abra `http://localhost:8000/docs/`.
+Os gráficos de MAE e a tabela de 257 pontos leem os CSVs versionados neste mesmo repositório. Os dados dos gráficos de F1-macro foram transcritos das tabelas científicas do README, preservando os protocolos correspondentes.
 
-## Transparência científica
+## Publicação
 
-- As estimativas da Meta/WRI CHMv2 não substituem medições em campo.
-- Os índices C1–C6 não são alturas individuais validadas.
-- O experimento histórico e os novos protocolos não podem ser comparados diretamente por acurácia versus F1-macro.
-- Proximidade bidimensional a postes não comprova risco elétrico.
-- O projeto utiliza um visual original inspirado em portais acadêmicos; não utiliza marca, logotipo, arquivo, identidade visual oficial nem infraestrutura da Fundação Getulio Vargas.
+O GitHub Pages utiliza a branch `main` e a pasta `/docs`. Alterações de HTML, CSS e JavaScript nestes arquivos são publicadas pelo fluxo de implantação do Pages.
 
-## Manutenção
+Para conferir ou alterar a configuração: **Settings → Pages** no repositório GitHub, fonte **Deploy from a branch**, branch **main**, pasta **/docs**.
 
-O README do repositório permanece a documentação científica principal. Este portal é um resumo navegável com acesso às fontes, métricas e notebooks. Nenhuma métrica é calculada sobre arquivos privados; os gráficos utilizam apenas os CSVs públicos versionados.
+## Observações científicas e institucionais
+
+- O desempenho do método original (acurácia histórica) não pode ser comparado diretamente com o F1-macro das avaliações espaciais atuais.
+- A Meta/WRI fornece estimativas de altura de dossel, não medições de campo.
+- C1–C6 são índices exploratórios, não alturas reais validadas.
+- Proximidade bidimensional com postes não demonstra risco elétrico.
+- O portal tem identidade visual própria inspirada em portais acadêmicos, **não pertence à FGV** e não utiliza sua marca, logotipo ou infraestrutura.
