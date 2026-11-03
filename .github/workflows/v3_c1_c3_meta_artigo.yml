@@ -1,0 +1,41 @@
+name: "V3 - C1 a C3 e modelos do artigo versus Meta"
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/v3_c1_c3_meta_artigo.yml"
+      - "experimentos/v3_comparar_c1_c3_meta_e_artigo.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  testar_alometria:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dependencias
+        run: python -m pip install pandas numpy matplotlib
+      - name: Testar seis formulas originais e modelos do artigo
+        run: |
+          python -u experimentos/v3_comparar_c1_c3_meta_e_artigo.py \
+            --input docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv \
+            --out docs/v3_alturas_publicas
+      - name: Registrar os resultados verificados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/v3_alturas_publicas/v3_c1_c3_meta* docs/v3_alturas_publicas/v3_modelos_artigo_testados.csv
+          git diff --cached --quiet || (git commit -m "data(v3): compara C1-C3 e modelos do artigo com alturas Meta" && git push)
+      - name: Anexar resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-c1-c3-meta-artigo
+          path: |
+            docs/v3_alturas_publicas/v3_c1_c3_meta*
+            docs/v3_alturas_publicas/v3_modelos_artigo_testados.csv
+          if-no-files-found: ignore
