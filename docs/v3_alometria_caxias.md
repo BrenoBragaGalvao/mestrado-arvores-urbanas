@@ -163,5 +163,19 @@ A fórmula logarítmica **não superou a referência constante** em nenhum desse
 
 **Dados rastreáveis:** [tabela das 257 alturas por fórmula e Meta/WRI](v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [análise com exemplos](v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [resumo JSON](v3_alturas_publicas/v3_logaritmica_resumo.json) · [código reprodutível](../experimentos/v3_comparar_logaritmica_meta.py) · [V3 notebook](../Alometria_caxias_v3.ipynb).
 
+## Tabela consolidada das 257 árvores — Meta pixel e Meta em 5 m nas primeiras colunas
+
+Para facilitar a comparação visual na V3, [reorganizamos uma tabela com todos os 257 pontos](v3_alturas_publicas/v3_tabela_meta_c1_c6_log_pot_257.md), cujas colunas começam por:
+
+1. **Árvore** — contagem de 1 a 257, preservando o `Ponto_ID` original de 0 a 256.
+2. **Meta/WRI no pixel exato** — valor modelado na coordenada do ponto.
+3. **Meta/WRI máximo em um raio de 5 m** — maior estimativa na vizinhança (pode pertencer a outra árvore).
+4. **C1–C6 potenciais** — índices históricos da versão original, sem equivalência validada a metros.
+5. **Logarítmica** e **potência ajustada** — modelos calibrados contra Meta/WRI a partir das áreas dos superpixels.
+
+A [planilha CSV principal](v3_alturas_publicas/v3_comparacao_c1_c6_log_pot_meta_257.csv) preserva essa ordem, e o [CSV expandido](v3_alturas_publicas/v3_comparacao_completa_c1_c6_pot_linear_log_meta_257.csv) acrescenta as seis variantes **lineares** de C1–C6 e as fórmulas ajustadas ao valor Meta em 5 m. Ambos podem ser reproduzidos pelo [script independente](../experimentos/v3_tabela_meta_c1_c6_log_pot.py). O [notebook V3](../Alometria_caxias_v3.ipynb) apresenta a visualização na seção 10.
+
+**Nota científica:** a área do superpixel não foi validada como área da copa de cada árvore. Meta/WRI é estimativa modelada, não observação de campo; modelos calibrados nos mesmos 257 pontos não constituem avaliação independente. A equação hipotética dependente do diâmetro real da copa não foi calculada porque não temos diâmetros de copas individuais medidos.
+
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
