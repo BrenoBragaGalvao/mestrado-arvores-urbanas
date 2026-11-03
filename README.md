@@ -599,22 +599,11 @@ O notebook original possui ainda os índices exploratórios **C1–C6**, cada um
 <a id="sec-4-4-calibracao"></a>
 **Como comparamos:** as 11 famílias adaptadas foram ajustadas nos **257 pontos** e avaliadas com **cinco divisões espaciais**, em blocos de **250 m e 500 m**, mantendo **25 m de exclusão entre os pontos de treino e teste**. Foram avaliadas separadamente as referências Meta pixel e Meta 5 m. As previsões usadas para medir o erro são **fora do treinamento (OOF)**. O critério é **MAE, em metros, em relação às alturas modeladas pela Meta/WRI**, e não MAE contra alturas reais.
 
-| Modelo/família | Meta pixel, blocos 250 m | Meta pixel, blocos 500 m | Meta 5 m, blocos 250 m | Meta 5 m, blocos 500 m |
-|---|---:|---:|---:|---:|
-| Linear | 4,591 | 4,509 | 4,814 | 4,735 |
-| Logaritmica | 4,588 | 4,506 | 4,808 | 4,733 |
-| Inversa | 4,589 | 4,506 | 4,802 | 4,731 |
-| Quadratica | 4,589 | 4,522 | 4,819 | 4,743 |
-| Cubica | 4,584 | 4,529 | 4,820 | 4,751 |
-| Potencial | 4,593 | 4,510 | 4,810 | 4,734 |
-| Composta | 4,598 | 4,520 | 4,818 | 4,738 |
-| Curva-S | 4,587 | 4,505 | 4,803 | 4,731 |
-| Logistica | 4,597 | 4,519 | 4,817 | 4,737 |
-| Crescimento | 4,598 | 4,520 | 4,818 | 4,738 |
-| Exponencial | 4,598 | 4,520 | 4,818 | 4,738 |
-| Controle constante | 4,578 | 4,451 | 4,778 | 4,665 |
+<p align="center">
+  <img src="docs/v3_alturas_publicas/figura_11_familias_equacoes.svg" alt="Onze famílias de fórmulas alométricas estudadas: linear, logarítmica, inversa, quadrática, cúbica, potência, composta, curva-S, logística, crescimento e exponencial." width="100%">
+</p>
 
-**Resultado:** entre as onze famílias, a **cúbica** foi a mais próxima da Meta pixel em blocos de **250 m**, a **curva-S** liderou para pixel em **500 m** e Meta 5 m em **500 m**, e a **inversa** liderou para Meta 5 m em **250 m**. **Entretanto, nenhuma superou o controle constante** nas quatro condições, indicando que somente a geometria de superpixel ainda não explica bem as diferenças individuais das estimativas Meta.
+**Modelo que mais se aproximou:** entre as onze famílias, a **curva-S** obteve o menor MAE na condição **Meta pixel, blocos de 500 m (4,505 m)**, e empatou com a inversa em **Meta 5 m, blocos de 500 m (4,731 m)**. Não houve uma vencedora em todas as condições: a cúbica liderou em Meta pixel/250 m e a inversa em Meta 5 m/250 m. **Nenhuma superou o controle constante**, e a comparação mede apenas proximidade com estimativas Meta/WRI, não a altura real das árvores.
 
 <a id="sec-4-4-logaritmica"></a>
 **Fórmulas simples também investigadas:** `H = 1,02061062 + 0,43611553 × ln(1 + A)` (logarítmica ajustada à Meta pixel) e `H = 1,36838076 × A^0,17089464` (potencial ajustada à Meta pixel). Esses parâmetros foram ajustados **com todos os 257 pontos**, portanto as alturas calculadas com eles na tabela são **descritivas, não predições independentes**. A avaliação dessas fórmulas com validação espacial permanece disponível no [relatório de calibração](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv).
