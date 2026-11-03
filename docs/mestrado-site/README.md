@@ -41,4 +41,4 @@ Para conferir ou alterar a configuração: **Settings → Pages** no repositóri
 - C1–C6 são índices exploratórios, não alturas reais validadas.
 - Proximidade bidimensional com postes não demonstra risco elétrico.
 - O portal é um projeto independente: **não pertence à FGV nem é um portal institucional da UnB**. Seu tema segue a referência visual fornecida pelo autor e não utiliza código ou infraestrutura da FGV.
-- A assinatura UnB em negativo usada no cabeçalho é carregada diretamente do [portal oficial da marca UnB](https://marca.unb.br/marca.php). O uso da marca segue as orientações e condições estabelecidas pela Universidade; em caso de restrição, remova a imagem externa do cabeçalho.
+- O cabeçalho utiliza a [logo azul e verde da UnB disponibilizada no Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Webysther_20160322_-_Logo_UnB.svg), indicada pelo autor do projeto. A imagem é carregada por URL externa, e a utilização de símbolo institucional não indica vínculo ou endosso da universidade; observe as regras de uso de marca aplicáveis.
