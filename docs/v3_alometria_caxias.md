@@ -135,5 +135,33 @@ A [tabela completa de todos os sete modelos](v3_alturas_publicas/v3_meta_calibra
 
 **Recomendação metodológica:** a estimativa de alturas reais deve considerar a **copa da árvore individualizada** (e não um superpixel genérico), outras variáveis relacionadas à vegetação e, para validação efetiva, observações reais de altura. Até então, o **Meta/WRI CHMv2 é uma previsão externa independente**, não verdade de campo. Copiar diretamente os valores da Meta para os 257 pontos seria reproduzir o produto, e não demonstrar uma nova equação alométrica.
 
+## Escolha de estudo: fórmula logarítmica e comparação individual com a Meta/WRI
+
+Por decisão metodológica, a V3 mantém a **fórmula logarítmica como candidata principal** para investigar a relação entre a área do superpixel e a altura do dossel **modelada pelo Meta/WRI CHMv2**, apesar de não superar um controle constante em testes espaciais.
+
+Os dois experimentos **não são duas fontes**: são duas amostragens do mesmo produto Meta/WRI para cada um dos 257 pontos originais.
+
+| Alvo Meta | Fórmula recalibrada nos 257 pontos |
+|---|---|
+| Pixel exato | **H = 1,02061062 + 0,43611553 × ln(1 + A)** |
+| Máximo no raio de 5 m | **H = 4,83406389 + 0,26716928 × ln(1 + A)** |
+
+A corresponde à **área do superpixel Quickshift** em m². Essas fórmulas foram ajustadas contra **previsões de altura Meta/WRI**, não contra alturas medidas em campo. A referência do raio de 5 m pode captar outra árvore, enquanto o pixel exato da Meta pode mostrar zero por diferenças geométricas ou temporais.
+
+Para separar a demonstração de previsão individual da avaliação, geramos **três valores logarítmicos por ponto e por alvo**: (1) fórmula ajustada aos 257 pontos, apresentada somente para **ilustração da equação**; (2) previsão espacial **fora de treinamento** com blocos de 250 m; (3) previsão espacial **fora de treinamento** com blocos de 500 m. Os testes usam **25 m de embargo** entre treino e teste.
+
+**Resultados dos testes espaciais:**
+
+| Referência Meta | Bloco espacial | MAE da logarítmica frente à Meta | MAE do controle constante |
+|---|---:|---:|---:|
+| Pixel exato | 250 m | **4,581 m** | **4,578 m** |
+| Pixel exato | 500 m | **4,504 m** | **4,451 m** |
+| Máximo em 5 m | 250 m | **4,808 m** | **4,778 m** |
+| Máximo em 5 m | 500 m | **4,733 m** | **4,665 m** |
+
+A fórmula logarítmica **não superou a referência constante** em nenhum desses cenários. Os testes demonstram dificuldades para prever a variabilidade individual das alturas do produto Meta usando apenas a área de superpixel. **MAE contra o mapa Meta não equivale a MAE de altura verdadeira**, e o cálculo calibrado em todos os pontos não deve ser usado como estimativa independente de precisão.
+
+**Dados rastreáveis:** [tabela das 257 alturas por fórmula e Meta/WRI](v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [análise com exemplos](v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [resumo JSON](v3_alturas_publicas/v3_logaritmica_resumo.json) · [código reprodutível](../experimentos/v3_comparar_logaritmica_meta.py) · [V3 notebook](../Alometria_caxias_v3.ipynb).
+
 ## Conclusão permitida
 A V3 examina **sensibilidade e plausibilidade numérica exploratória**, pesquisando faixas de porte locais. Sem **copas individualizadas, espécies identificadas e alturas de referência dos mesmos indivíduos**, **não é possível validar o acerto das alturas** (nem calcular MAE, RMSE, R²). Altura não foi medida. A análise de proximidade a postes continua horizontal e exploratória; não comprova risco elétrico.
