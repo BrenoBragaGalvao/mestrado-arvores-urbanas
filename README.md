@@ -638,7 +638,7 @@ A tabela apresenta as **15 primeiras árvores na ordem original**, sem seleciona
 | 14 | 1,00 | 8,00 | 2,39 | 5,40 | 2,50 | 5,47 | 2,44 | 5,46 | 2,29 | 5,39 | 8,13 | 12,31 |
 | 15 | 6,00 | 9,00 | 2,77 | 5,83 | 2,79 | 5,86 | 2,79 | 5,85 | 2,60 | 5,67 | 14,23 | 16,94 |
 
-**Para consultar os 257 pontos com todos os modelos (não apenas os 15 exemplos):** [**tabela completa de 257 árvores e 39 colunas**](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_tabela.md) · [CSV principal, com Meta nas posições 2 e 3](docs/v3_alturas_publicas/v3_todos_modelos_meta_257.csv) · [CSV ampliado, com 74 colunas e testes em blocos de 500 m](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv).
+**Resultados completos:** A tabela acima apresenta as 15 primeiras árvores. Para consultar os **257 pontos avaliados e os resultados de todos os modelos**, incluindo os testes com blocos espaciais de 250 m e 500 m, acesse a [**tabela completa — 257 pontos e 74 colunas**](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv).
 
 Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5 m**, enquanto os modelos logarítmico, inverso, curva-S e cúbico retornam valores bastante inferiores nos testes espaciais. Isso mostra que, apesar de terem sido testadas diversas famílias, **os modelos ainda não recuperam de forma confiável a variação individual das alturas modeladas pela Meta**. Os índices **C1 potencial** e **C3 potencial** apresentam valores maiores, mas não equivalem automaticamente a metros de altura real; as variantes lineares existem no notebook original e não são as colunas desta tabela.
 
