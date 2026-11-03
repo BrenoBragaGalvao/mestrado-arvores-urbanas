@@ -461,7 +461,7 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 | Gaussian Naive Bayes | 0,7986 | 0,7400 |
 | Dummy (referência simples) | 0,2980 | 0,2799 |
 
-**Resultado:** o **SVM RBF** teve o maior F1-macro médio nas duas escalas de blocos dessa bateria.
+**Resultado:** o **KNN (25/35)** teve o maior F1-macro médio nos blocos de **250 m (0,8931)**, enquanto a **regressão logística** liderou nos blocos de **500 m (0,8666)**.
 
 <a id="sec-3-6-2"></a>
 #### 3.6.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
@@ -499,7 +499,7 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 
 **Como interpretar os resultados?** Em cada configuração, os oito classificadores estão organizados pela média do F1-macro nos blocos espaciais de 250 e 500 metros. Essa média serve apenas para ordenar a tabela; os melhores valores de cada coluna estão destacados em negrito.
 
-**O que descobrimos?** Na comparação dos mesmos 119 recortes, os resultados variaram conforme o tamanho da segmentação e o classificador. Com blocos de **250 m**, o melhor resultado foi do **SVM RBF com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,9341)**. Com blocos de **500 m**, destacou-se o **Extra Trees com recortes inteiros de 512 × 512 pixels (F1-macro = 0,8747)**. Portanto, **não existe uma única estratégia superior em todas as condições**.
+**O que descobrimos?** Na comparação dos mesmos 119 recortes, os resultados variaram conforme o tamanho da segmentação e o classificador. Com blocos de **250 m**, o melhor resultado foi da **regressão logística com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,9198)**. Com blocos de **500 m**, destacou-se a **regressão logística com recortes subdivididos em 256 × 256 pixels (F1-macro = 0,8688)**. Portanto, **não existe uma única estratégia superior em todas as condições**.
 
 **Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
 
@@ -518,23 +518,20 @@ A comparação controlada E9 mediu o **pico de memória RAM (RSS)** durante o pr
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual da V2.**
 
 <a id="sec-3-8"></a>
-### 3.8. Por que fizemos novos testes para controlar o overfitting?
+### 3.8. Como controlamos o overfitting na avaliação dos classificadores?
 
-**O que é overfitting?** É o sobreajuste: um classificador aprende particularidades do treinamento e pode ter desempenho menor quando recebe exemplos que não participaram do ajuste. Isso **não é a mesma coisa** que vazamento de dados (*data leakage*). Vazamento ocorre quando informações que deveriam ficar reservadas para avaliação influenciam indevidamente o treinamento ou a seleção.
+**O que é overfitting?** É o sobreajuste: um classificador aprende características muito específicas dos exemplos utilizados no treinamento e pode apresentar desempenho inferior nos exemplos reservados para avaliação. O objetivo do protocolo foi **reduzir esse risco**, sem confundir um F1 elevado no treinamento com comprovação de generalização.
 
-**Por que a auditoria foi necessária?** Nas versões anteriores, classificadores como Random Forest obtiveram F1-macro de treinamento muito alto, chegando próximo de 1,0, enquanto o F1 do teste era menor. Isso sinalizou possível memorização de particularidades dos exemplos. Além disso, as referências de árvores e gramíneas vêm **de uma única imagem da Area1**: segmentos distintos podem apresentar características espaciais semelhantes. As **505 referências supervisionadas de cada configuração** não equivalem a 505 imagens independentes.
+**Quais cuidados utilizamos para gerar os dados atuais da seção 3.6?**
 
-**Como reduzimos os riscos e geramos novamente os dados das tabelas da seção 3.6?**
+1. **Deduplicação e controle das partições:** mantivemos **505 exemplos rotulados por configuração** e verificamos a ausência de IDs coincidentes entre treinamento e teste nas 30 divisões espaciais avaliadas.
+2. **Separação espacial e embargo:** utilizamos cinco divisões com blocos de **250 m** e cinco com blocos de **500 m**, por configuração, com exclusão de **25 m**. Em E2, o embargo dos resultados publicados foi verificado entre **geometrias dos segmentos**; em E3A e E3B, entre **pontos de referência**. Isso reduz a influência de amostras vizinhas, sem tornar todos os exemplos independentes.
+3. **Regularização e seleção somente no treinamento:** comparamos receitas **moderada e forte** nas **três divisões internas** de cada treinamento externo. Escolhemos os parâmetros pelo **F1-macro médio de validação interna**, reajustamos o classificador usando o treinamento externo e só depois calculamos seu desempenho no teste reservado. O Dummy foi mantido como referência. Os modelos com padronização utilizam `Pipeline`, que aprende a escala somente com os dados de treino.
+4. **Auditoria de desempenho:** foram realizadas **1.350 avaliações internas** e **240 avaliações externas**, que originaram as **48 médias** apresentadas nas três tabelas da seção 3.6. Mantivemos os resultados de treino e teste, inclusive nos casos em que a regularização não produziu o mesmo desempenho.
 
-1. **Deduplicação:** mantivemos 505 exemplos rotulados por configuração e verificamos que nenhum identificador ficou simultaneamente em treino e teste na mesma divisão.
-2. **Separação espacial:** repetimos a avaliação com **cinco divisões por blocos de 250 m e cinco por blocos de 500 m**, com **embargo de 25 m**. Em E2 (bateria derivada dos 812 quadrantes), o embargo foi verificado **entre geometrias dos segmentos**; em E3A e E3B (119 recortes), **entre pontos de referência**.
-3. **Escolha de parâmetros sem consultar o teste:** para cada um dos **oito classificadores** e para cada divisão externa, comparamos regularização **moderada e forte** usando **três divisões internas, feitas apenas sobre os exemplos de treinamento**. O Dummy mantém uma única receita de referência. Escolhemos a regularização pelo F1-macro médio de validação interna, ajustamos novamente com todo o treinamento externo e somente então medimos o F1 do teste externo. SVM, KNN e regressão logística usam `Pipeline` para ajustar a padronização só no treino.
-4. **Avaliação das diferenças treino–teste:** conservamos os resultados de todas as divisões e de todas as receitas, inclusive os menos favoráveis. A bateria gerou **1.350 avaliações internas**, **240 avaliações externas** e **48 médias** para as tabelas (3 configurações × 2 escalas × 8 classificadores).
-5. **Resultados originais preservados:** a extração Quickshift e a comparação E4b de atributos (**seção 3.5**) não foram refeitas nesta rodada. Reexecutamos **somente a etapa supervisionada de classificação**, sobre as características e geometrias já extraídas da Area1. Não se deve misturar os valores da nova seção 3.6 com os experimentos antigos como se fossem o mesmo protocolo.
+#### 3.8.1. O que os resultados mostram?
 
-#### 3.8.1. O que aconteceu com o overfitting?
-
-A tabela abaixo mostra a média do F1-macro no treinamento e no teste de três configurações de classificadores representativos. As médias são de **dez divisões espaciais por experimento**, considerando as duas escalas.
+A tabela apresenta o **F1-macro médio do treinamento e do teste** de quatro classificadores representativos em E2, E3A e E3B. Cada linha corresponde à média de dez divisões espaciais. A diferença positiva treino–teste é um **indicador de possível sobreajuste**, mas não constitui, isoladamente, um teste estatístico definitivo.
 
 | Experimento | Classificador | F1 treino | F1 teste | Diferença |
 |---|---|---:|---:|---:|
@@ -551,15 +548,13 @@ A tabela abaixo mostra a média do F1-macro no treinamento e no teste de três c
 | **E3B** | Random Forest | 0,8888 | 0,8321 | +0,0568 |
 | **E3B** | HistGradientBoosting | 0,8955 | 0,8402 | +0,0552 |
 
-**Interpretação:** a regressão logística apresentou diferenças médias pequenas, principalmente em E3A e E3B. SVM também apresentou bom equilíbrio. Entretanto, **Random Forest e HistGradientBoosting ainda apresentaram diferenças relevantes entre treinamento e teste**, e existem divisões individuais com diferenças superiores à média. A diferença F1 treino–teste, por si só, não constitui teste estatístico definitivo de sobreajuste; deve ser interpretada junto à validação espacial e à estabilidade entre divisões.
+**Interpretação:** a **regressão logística** e o **SVM RBF** tiveram diferenças médias relativamente pequenas em diversas condições. Por outro lado, **Random Forest** e **HistGradientBoosting** ainda apresentam diferenças maiores, mesmo com regularização. Assim, as medidas adotadas **reduzem o risco de sobreajuste**, mas os resultados **não permitem afirmar que os oito classificadores estão completamente livres de overfitting**.
 
-**Então, por que não podemos dizer que eliminamos todo o overfitting?** Porque regularizar e separar corretamente os conjuntos **reduz o risco**, mas não garante que o modelo generalize para uma nova imagem. Todos os dados continuam vindo da **mesma Area1**, e esses conjuntos externos já foram examinados em avaliações anteriores. Assim, não são um conjunto de teste independente nunca visto. Escolher retrospectivamente o classificador vencedor com base nos maiores F1 externos ainda pode gerar viés de seleção.
+**O que a auditoria confirmou?** Não foram identificados **IDs compartilhados entre treino e teste, compartilhamento de blocos nem violações do embargo previsto** nas divisões verificadas. Além disso, a escolha dos parâmetros de cada rodada foi feita exclusivamente dentro do treinamento externo. Isso é evidência de **separação correta dos exemplos na rodada**, e não prova de ausência absoluta de sobreajuste.
 
-**O que podemos afirmar com segurança:** nesta reexecução **não identificamos vazamento direto de IDs nem compartilhamento de blocos** nas divisões auditadas; o embargo espacial previsto foi respeitado e a regularização foi escolhida **sem usar o teste externo da respectiva rodada**. Isso melhora a validade metodológica. **Não há evidência suficiente para afirmar ausência total de overfitting**, especialmente nos classificadores baseados em árvores.
+**Por que essa distinção é importante?** Os 505 exemplos de cada configuração pertencem à **mesma imagem da Area1**, e os conjuntos de teste externos já foram analisados em etapas anteriores do projeto. Portanto, os F1 apresentados medem **generalização espacial interna**, não desempenho comprovado numa imagem de outra região. A seleção retrospectiva de modelos com base em testes já conhecidos pode introduzir viés de seleção.
 
-**Observação sobre os textos históricos preservados:** a pedido de manutenção dos demais textos, as frases interpretativas anteriores da seção 3.6 que citam os antigos vencedores e valores (como SVM 0,9341 e Extra Trees 0,8747) **não foram reescritas**. Esses números e afirmações descrevem **a execução histórica**, não os novos valores apresentados nas tabelas substituídas. Para a comparação regularizada atual, devem prevalecer os dados das tabelas da seção 3.6 e esta auditoria; os estudos históricos permanecem úteis para comparação metodológica, mas **não são numericamente intercambiáveis**.
-
-**Código e reprodução:** a nova etapa foi integrada ao [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). A rota de evidências usa os mesmos 505 exemplos e as mesmas geometrias das avaliações anteriores; a rota `--modo v2` lê as saídas progressivas do notebook e usa **centroides** no embargo de E2, podendo gerar resultados diferentes. Em ambas, registrar todos os resultados por divisão é obrigatório para que o diagnóstico de sobreajuste continue verificável.
+**Reprodução:** a reexecução supervisionada dos oito classificadores está incorporada ao [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). O **Quickshift e as características extraídas não foram recalculados nesta rodada**. A comparação de atributos da **seção 3.5** e os demais dados da pesquisa foram preservados. A rota `--modo v2` calcula o embargo de E2 por **centroides** e pode produzir valores diferentes dos resultados publicados, que utilizaram **geometrias completas**.
 
 ---
 
