@@ -65,6 +65,7 @@ Clique no título para abrir diretamente a seção correspondente.
 | [4.4. C1–C3 × Meta e equações do artigo](#sec-4-4) | Seis fórmulas originais e cinco inversões do artigo testadas. |
 | [4.4. Calibração de coeficientes](#sec-4-4-calibracao) | Ajuste de a e b e avaliação espacial das fórmulas com Meta/WRI. |
 | [4.4. Logarítmica × Meta nos 257 pontos](#sec-4-4-logaritmica) | Tabela de alturas por ponto, diferenças e validação espacial. |
+| [4.4. Tabela Meta pixel e 5 m, C1–C6, log e potência](#sec-4-4-tabela-257) | Contagem das 257 árvores e estimativas lado a lado. |
 | [4.5. Dados e reprodução](#sec-4-5) | Raster, notebook V3, CSV, script e referências. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
@@ -669,6 +670,24 @@ Onde **A é a área do superpixel Quickshift em m², não a área individual de 
 O erro é calculado **contra o produto Meta/WRI, não contra alturas reais em campo**. Em todos os quatro cenários, a fórmula logarítmica ficou **ligeiramente pior que o controle constante**, evidência de que a **área do superpixel sozinha é insuficiente** para estimar alturas individuais. A versão ajustada com todos os 257 pontos é útil para mostrar as alturas produzidas pela equação, mas sua avaliação correta exige as previsões OOF, que não tiveram acesso aos respectivos alvos de teste.
 
 **Arquivos efetivamente executados:** [CSV — altura logarítmica e Meta nos 257 pontos](docs/v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [relatório com amostra e limites](docs/v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [métricas espaciais](docs/v3_alturas_publicas/v3_logaritmica_resumo_validacao.csv) · [gráfico pixel](docs/v3_alturas_publicas/v3_logaritmica_meta_pixel.png) · [gráfico raio de 5 m](docs/v3_alturas_publicas/v3_logaritmica_meta_raio5.png) · [script reprodutível](experimentos/v3_comparar_logaritmica_meta.py) · [notebook V3](Alometria_caxias_v3.ipynb).
+
+<a id="sec-4-4-tabela-257"></a>
+#### Tabela unificada das 257 árvores — Meta/WRI pixel e 5 m, C1–C6, logarítmica e potência ajustada
+
+A tabela foi montada com **as 257 árvores de referência da Area1** em sua ordem original. A **primeira coluna contém a contagem de árvores de 1 a 257**; a **segunda traz a altura Meta/WRI CHMv2 no pixel exato**; a **terceira traz o máximo da Meta/WRI em um raio de 5 m**. Nas colunas seguintes ficam C1–C6, a logarítmica e a potência ajustada **H = 1,3684 × A^0,17089**.
+
+| **Árvore** | **Meta pixel (m)** | **Meta 5 m (m)** | C1 pot. | C2 pot. | C3 pot. | C4 pot. | C5 pot. | C6 pot. | Log. ajustada | Pot. ajustada |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | **16,00** | **17,00** | 23,95 | 49,96 | 22,81 | 63,44 | 57,88 | 72,23 | 3,43 | 3,52 |
+| 2 | **0,00** | **6,00** | 24,62 | 51,54 | 23,17 | 64,68 | 59,95 | 74,29 | 3,45 | 3,54 |
+| 3 | **10,00** | **13,00** | 9,66 | 17,70 | 13,58 | 33,17 | 18,01 | 28,39 | 2,87 | 2,82 |
+| 4 | **19,00** | **20,00** | 31,34 | 67,92 | 26,60 | 76,86 | 81,78 | 95,24 | 3,60 | 3,76 |
+| 5 | **0,00** | **2,00** | 15,13 | 29,56 | 17,55 | 45,69 | 32,07 | 45,04 | 3,15 | 3,15 |
+| 6 | **0,00** | **2,00** | 6,02 | 10,31 | 10,36 | 23,66 | 9,81 | 17,46 | 2,58 | 2,51 |
+
+**Consulte os 257 registros completos:** [tabela de leitura no GitHub](docs/v3_alturas_publicas/v3_tabela_meta_c1_c6_log_pot_257.md) · [CSV principal com essa mesma ordem de colunas](docs/v3_alturas_publicas/v3_comparacao_c1_c6_log_pot_meta_257.csv) · [CSV ampliado com as seis variantes lineares e as fórmulas ajustadas também ao alvo Meta de 5 m](docs/v3_alturas_publicas/v3_comparacao_completa_c1_c6_pot_linear_log_meta_257.csv) · [script reprodutível](experimentos/v3_tabela_meta_c1_c6_log_pot.py).
+
+**Interpretação:** C1–C6 são índices empíricos potenciais **não calibrados como altura real em metros**; logarítmica e potência ajustada foram calibradas **contra o mapa Meta/WRI**, não contra altura medida em campo. **A é a área de um superpixel Quickshift**, não de copa confirmada. A coluna de 5 m é o máximo dentro da vizinhança e pode corresponder a outra árvore. A relação anteriormente proposta com **diâmetro individual de copa** não foi calculada porque esses diâmetros não foram medidos. Os modelos calibrados usando todos os 257 pontos **não constituem uma avaliação de teste independente**; [validação espacial está aqui](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv).
 
 <a id="sec-4-4-artigo"></a>
 #### Testes com modelos de regressão do artigo científico
