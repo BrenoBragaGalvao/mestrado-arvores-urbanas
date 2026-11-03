@@ -1,0 +1,9 @@
+modelo,n,desvio_abs_medio_vs_meta_pixel,mediana_indice_ou_predicao,interpretacao
+C1,257,11.552755,14.289912,indice original SEM unidade de altura validada
+C2,257,25.395334,27.683393,indice original SEM unidade de altura validada
+C3,257,13.067373,16.981422,indice original SEM unidade de altura validada
+C4,257,40.162533,43.863424,indice original SEM unidade de altura validada
+C5,257,28.415750,29.794532,indice original SEM unidade de altura validada
+C6,257,40.286890,42.461470,indice original SEM unidade de altura validada
+Logaritmica,257,4.472083,3.113029,predicao calibrada ao produto Meta/WRI; nao campo
+Potencial ajustada,257,4.469238,3.102290,predicao calibrada ao produto Meta/WRI; nao campo
