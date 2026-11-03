@@ -64,6 +64,7 @@ Clique no título para abrir diretamente a seção correspondente.
 | [4.3. Alturas dos 257 pontos](#sec-4-3) | Distribuição das previsões da Meta/WRI na Area1. |
 | [4.4. C1–C3 × Meta e equações do artigo](#sec-4-4) | Seis fórmulas originais e cinco inversões do artigo testadas. |
 | [4.4. Calibração de coeficientes](#sec-4-4-calibracao) | Ajuste de a e b e avaliação espacial das fórmulas com Meta/WRI. |
+| [4.4. Logarítmica × Meta nos 257 pontos](#sec-4-4-logaritmica) | Tabela de alturas por ponto, diferenças e validação espacial. |
 | [4.5. Dados e reprodução](#sec-4-5) | Raster, notebook V3, CSV, script e referências. |
 | [5. Conclusão](#sec-5) | Principais resultados e limites científicos. |
 | [6. Código e documentação técnica](#sec-6) | Notebooks, scripts, CSVs e documentação. |
@@ -629,6 +630,46 @@ A referência constante é útil como **controle científico**, mas **não** com
 
 **Arquivos:** [script de calibração](experimentos/v3_calibrar_altura_meta.py) · [resultados da validação espacial](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) · [coeficientes finais e modelos](docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json) · [previsões em todos os 257 pontos](docs/v3_alturas_publicas/v3_meta_calibracao_257_pontos.csv) · [gráfico MAE](docs/v3_alturas_publicas/v3_meta_calibracao_mae_250m.png).
 
+<a id="sec-4-4-logaritmica"></a>
+#### Fórmula escolhida para aprofundar: alturas logarítmicas lado a lado com a Meta/WRI (257 pontos)
+
+A fórmula **logarítmica** foi escolhida como **candidata principal para estudar na V3**, mesmo sem superar a referência constante na validação espacial. Usamos **somente a Meta/WRI CHMv2**, em duas formas independentes de consulta do mesmo produto: o pixel exato do ponto e o máximo em raio de 5 m.
+
+**Coeficientes calibrados sobre os 257 pontos** (para gerar uma estimativa demonstrativa em cada linha, **não** para medir a precisão no conjunto utilizado no ajuste):
+
+| Alvo Meta/WRI | Fórmula logarítmica selecionada |
+|---|---|
+| **Pixel exato** | **H = 1,02061062 + 0,43611553 × ln(1 + A)** |
+| **Máximo no raio de 5 m** | **H = 4,83406389 + 0,26716928 × ln(1 + A)** |
+
+Onde **A é a área do superpixel Quickshift em m², não a área individual de copa confirmada**. A operação `ln` é o logaritmo natural. Os coeficientes são resultados da calibração local **contra alturas modeladas pela Meta**, e não coeficientes retirados dos artigos ou de medições reais de campo.
+
+**Exemplos reais da tabela gerada**, com os IDs fixos 0 a 5 (sem seleção dos casos pelo tamanho do erro). Todas as alturas estão em metros.
+
+| Ponto | Área do superpixel (m²) | Meta pixel | Log ajustada ao pixel | Meta máximo 5 m | Log ajustada ao raio de 5 m |
+|---:|---:|---:|---:|---:|---:|
+| 0 | 251,50 | 16,00 | 3,43 | 17,00 | 6,31 |
+| 1 | 261,50 | 0,00 | 3,45 | 6,00 | 6,32 |
+| 2 | 68,75 | 10,00 | 2,87 | 13,00 | 5,97 |
+| 3 | 369,25 | 19,00 | 3,60 | 20,00 | 6,41 |
+| 4 | 130,50 | 0,00 | 3,15 | 2,00 | 6,14 |
+| 5 | 35,00 | 0,00 | 2,58 | 2,00 | 5,79 |
+
+**Importante:** a fórmula logarítmica não reproduz individualmente alturas mais elevadas da Meta nos exemplos acima. A tabela completa fornece **as 257 linhas** com a altura Meta, a altura logarítmica ajustada usando os 257 dados, e também as **previsões fora do treinamento (OOF)** das divisões espaciais de 250 m e 500 m, acompanhadas das diferenças ponto a ponto.
+
+**Testes espaciais efetivos (previsões OOF):**
+
+| Referência Meta | Blocos | MAE log vs. Meta | RMSE log vs. Meta | MAE da referência constante |
+|---|---:|---:|---:|---:|
+| Pixel exato | 250 m | **4,581 m** | 6,021 m | 4,578 m |
+| Pixel exato | 500 m | **4,504 m** | 5,929 m | 4,451 m |
+| Máximo no raio de 5 m | 250 m | **4,808 m** | 6,124 m | 4,778 m |
+| Máximo no raio de 5 m | 500 m | **4,733 m** | 6,060 m | 4,665 m |
+
+O erro é calculado **contra o produto Meta/WRI, não contra alturas reais em campo**. Em todos os quatro cenários, a fórmula logarítmica ficou **ligeiramente pior que o controle constante**, evidência de que a **área do superpixel sozinha é insuficiente** para estimar alturas individuais. A versão ajustada com todos os 257 pontos é útil para mostrar as alturas produzidas pela equação, mas sua avaliação correta exige as previsões OOF, que não tiveram acesso aos respectivos alvos de teste.
+
+**Arquivos efetivamente executados:** [CSV — altura logarítmica e Meta nos 257 pontos](docs/v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [relatório com amostra e limites](docs/v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [métricas espaciais](docs/v3_alturas_publicas/v3_logaritmica_resumo_validacao.csv) · [gráfico pixel](docs/v3_alturas_publicas/v3_logaritmica_meta_pixel.png) · [gráfico raio de 5 m](docs/v3_alturas_publicas/v3_logaritmica_meta_raio5.png) · [script reprodutível](experimentos/v3_comparar_logaritmica_meta.py) · [notebook V3](Alometria_caxias_v3.ipynb).
+
 <a id="sec-4-4-artigo"></a>
 #### Testes com modelos de regressão do artigo científico
 
@@ -663,6 +704,7 @@ A **única fonte externa de altura ativa** neste estudo é o mapa de dossel **Me
 | **Fórmulas originais C1–C6** | [experimentos/v3_alometria_caxias.py](experimentos/v3_alometria_caxias.py) |
 | **Novos testes C1–C3 e equações do artigo** | [Script reprodutível da comparação](experimentos/v3_comparar_c1_c3_meta_e_artigo.py) |
 | **Calibração a e b + novos modelos** | [Script de ajuste](experimentos/v3_calibrar_altura_meta.py) · [validação espacial (CSV)](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv) · [coeficientes ajustados (JSON)](docs/v3_alturas_publicas/v3_meta_calibracao_parametros_e_limites.json) |
+| **Estimativa de altura com a fórmula logarítmica** | [Tabela das 257 alturas logarítmicas × Meta](docs/v3_alturas_publicas/v3_logaritmica_257_alturas_vs_meta.csv) · [relatório com métricas e exemplos](docs/v3_alturas_publicas/v3_logaritmica_comparacao_meta.md) · [script](experimentos/v3_comparar_logaritmica_meta.py) |
 | **Dados das 257 árvores, C1–C3 e Meta** | [CSV completo por ponto](docs/v3_alturas_publicas/v3_c1_c3_meta_257_pontos.csv) |
 | **Resumo e gráfico** | [Tabela das 11 alternativas testadas](docs/v3_alturas_publicas/v3_c1_c3_meta_resumo_comparativo.csv) · [Gráfico](docs/v3_alturas_publicas/v3_c1_c3_meta_comparacao.png) |
 | **Relatório metodológico** | [Comparação detalhada C1–C3 × Meta e modelos do artigo](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) |
