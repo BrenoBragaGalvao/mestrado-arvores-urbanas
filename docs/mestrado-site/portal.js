@@ -10,7 +10,7 @@
  const children={
   "topico-1-1":"Dimensões e cobertura","topico-1-2":"Resolução e arquivos",
   "topico-2-1":"Árvores e gramíneas","topico-2-2":"Porte e postes","topico-2-3":"Pipeline original",
-  "topico-3-1":"Memória RAM","topico-3-2":"Os 119 recortes","topico-3-3":"Quickshift e atributos","topico-3-4":"Treino e teste espaciais","topico-3-5":"NDVI, brilho e bordas","topico-3-6":"Resultados dos modelos","topico-3-7":"Consumo de RAM","topico-3-8":"Controle do sobreajuste",
+  "topico-3-x":"Quatro fluxos metodológicos","topico-3-1":"Memória RAM","topico-3-2":"Os 119 recortes","topico-3-3":"Quickshift e atributos","topico-3-4":"Treino e teste espaciais","topico-3-5":"NDVI, brilho e bordas","topico-3-6":"Resultados dos modelos","topico-3-7":"Consumo de RAM","topico-3-8":"Controle do sobreajuste",
   "topico-4-1":"Meta/WRI CHMv2","topico-4-2":"Inventário e espécies","topico-4-3":"Alturas nos 257 pontos","topico-4-4":"Equações alométricas","topico-4-5":"Comparação das 15 árvores","topico-4-6":"Limites da análise"
  };
  const widgets={"topico-3-5":"widget-features","topico-3-6":"widget-classifiers","topico-4-4":"widget-mae","topico-4-5":"widget-points"};
@@ -20,7 +20,7 @@
  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  function urlRewrite(raw){
   const val=String(raw).trim();
-  if(val.startsWith("#sec-")){const m=val.match(/^#sec-([1-6])(?:-(\d+))?/);if(m){const key="topico-"+m[1]+(m[2]?"-"+m[2]:"");return "#"+(pages.has(key)?key:"topico-"+m[1]);}}
+  if(val.startsWith("#sec-")){const m=val.match(/^#sec-([1-6])(?:-(\d+|x))?/);if(m){const key="topico-"+m[1]+(m[2]?"-"+m[2]:"");return "#"+(pages.has(key)?key:"topico-"+m[1]);}}
   if(val.startsWith("#"))return val;
   if(/^(?:https?:|mailto:|tel:)/i.test(val))return val;
   if(val.startsWith("docs/")){const name=val.slice(5);return /\.(?:png|jpg|jpeg|webp|svg|gif|csv|pdf)$/i.test(name)?"./"+name:repo+"/blob/main/docs/"+name;}
@@ -128,7 +128,7 @@
    const tiles=ch.pages.length?'<div class="chapter-index-heading">EXPLORE OS SUBTÓPICOS</div><div class="chapter-index-grid">'+ch.pages.map(p=>'<a href="#'+p.id+'" class="chapter-subcard"><span>'+esc(p.number)+'</span><strong>'+esc(children[p.id]||p.title)+'</strong><em aria-hidden="true">↗</em></a>').join("")+"</div>":"";
    result.push('<section class="portal-view chapter-view" data-view="'+ch.id+'" id="page-'+ch.id+'" hidden><div class="chapter-topline"><span>CAPÍTULO '+num+' / 06</span><span>DOCUMENTAÇÃO DA PESQUISA</span></div><div class="chapter-title-block"><span class="chapter-eyebrow">TÓPICO '+num+'</span><h1>'+esc(labels[ch.number])+'</h1><p>'+esc(summaries[ch.number])+'</p></div><div class="chapter-source"><span>Conteúdo fundamentado no README do repositório</span><a href="'+repo+'/blob/main/README.md#sec-'+ch.number+'" target="_blank" rel="noopener noreferrer">Ler no GitHub ↗</a></div><article class="readme-article">'+overview+'</article>'+tiles+'</section>');
    for(const p of ch.pages){
-    result.push('<section class="portal-view chapter-view subtopic-view" data-view="'+p.id+'" id="page-'+p.id+'" hidden><div class="chapter-topline"><span>CAPÍTULO '+num+' / 06</span><span>'+esc(labels[ch.number]).toUpperCase()+'</span></div><div class="chapter-title-block"><span class="chapter-eyebrow">SUBTÓPICO '+esc(p.number)+'</span><h1>'+esc(p.title)+'</h1></div><div class="chapter-source"><a href="#'+ch.id+'">← Todos os subtópicos de '+esc(labels[ch.number])+'</a><a href="'+repo+'/blob/main/README.md#sec-'+p.number.replace(".","-")+'" target="_blank" rel="noopener noreferrer">Consultar no README ↗</a></div><div class="subtopic-lead"><span>DOCUMENTAÇÃO DO TÓPICO '+esc(p.number)+'</span><p>'+esc(summaries[ch.number])+'</p></div><article class="readme-article">'+md(p.markdown)+'</article><div class="widget-mount" id="mount-'+p.id+'"></div><div class="end-nav"><a href="#'+ch.id+'">← Voltar para '+esc(labels[ch.number])+'</a></div></section>');
+    result.push('<section class="portal-view chapter-view subtopic-view" data-view="'+p.id+'" id="page-'+p.id+'" hidden><div class="chapter-topline"><span>CAPÍTULO '+num+' / 06</span><span>'+esc(labels[ch.number]).toUpperCase()+'</span></div><div class="chapter-title-block"><span class="chapter-eyebrow">SUBTÓPICO '+esc(p.number)+'</span><h1>'+esc(p.title)+'</h1></div><div class="chapter-source"><a href="#'+ch.id+'">← Todos os subtópicos de '+esc(labels[ch.number])+'</a><a href="'+repo+'/blob/main/README.md#sec-'+p.number.toLowerCase().replace(".","-")+'" target="_blank" rel="noopener noreferrer">Consultar no README ↗</a></div><div class="subtopic-lead"><span>DOCUMENTAÇÃO DO TÓPICO '+esc(p.number)+'</span><p>'+esc(summaries[ch.number])+'</p></div><article class="readme-article">'+md(p.markdown)+'</article><div class="widget-mount" id="mount-'+p.id+'"></div><div class="end-nav"><a href="#'+ch.id+'">← Voltar para '+esc(labels[ch.number])+'</a></div></section>');
    }
   }
   $("chapter-pages").innerHTML=result.join("\n");
