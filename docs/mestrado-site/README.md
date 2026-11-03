@@ -7,7 +7,8 @@ O site funciona como um **portal com menu lateral**, contendo uma página de **I
 ## Estrutura atual
 
 - `docs/index.html`: estrutura do portal, tela inicial, componentes de gráficos e explorador;
-- `docs/mestrado-site/portal.css`: layout institucional independente, navegação lateral e versão para celular;
+- `docs/mestrado-site/portal.css`: estrutura responsiva do portal e navegação por capítulos;
+- `docs/mestrado-site/unb-theme.css`: tema visual azul e branco inspirado no painel de referência fornecido, sem alteração em qualquer projeto da FGV;
 - `docs/mestrado-site/portal.js`: navegação por capítulos/subtópicos e renderização de tabelas, textos e figuras do README;
 - `docs/mestrado-site/readme-content.js`: cópia estruturada das seis seções científicas do `README.md`, com os 18 subtópicos;
 - `docs/mestrado-site/styles.css`: estilos de visualização para gráficos e tabelas;
@@ -39,4 +40,5 @@ Para conferir ou alterar a configuração: **Settings → Pages** no repositóri
 - A Meta/WRI fornece estimativas de altura de dossel, não medições de campo.
 - C1–C6 são índices exploratórios, não alturas reais validadas.
 - Proximidade bidimensional com postes não demonstra risco elétrico.
-- O portal tem identidade visual própria inspirada em portais acadêmicos, **não pertence à FGV** e não utiliza sua marca, logotipo ou infraestrutura.
+- O portal é um projeto independente: **não pertence à FGV nem é um portal institucional da UnB**. Seu tema segue a referência visual fornecida pelo autor e não utiliza código ou infraestrutura da FGV.
+- A assinatura UnB em negativo usada no cabeçalho é carregada diretamente do [portal oficial da marca UnB](https://marca.unb.br/marca.php). O uso da marca segue as orientações e condições estabelecidas pela Universidade; em caso de restrição, remova a imagem externa do cabeçalho.
