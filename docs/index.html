@@ -13,11 +13,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./mestrado-site/research-dashboard.css?v=20261103-2">
+  <link rel="stylesheet" href="./mestrado-site/research-dashboard.css?v=20261103-3">
   <script src="./mestrado-site/readme-content.js" defer></script>
   <script src="./mestrado-site/portal.js" defer></script>
   <script src="./mestrado-site/search.js?v=20261103-2" defer></script>
   <script src="./mestrado-site/app.js" defer></script>
+  <script type="module" src="./mestrado-site/diagrams.js?v=20261103-3"></script>
 </head>
 <body>
   <a href="#area-principal" class="skip-link">Ir para o conteúdo</a>
@@ -36,7 +37,6 @@
       </div>
       <div class="sidebar-scroll">
         <div class="sidebar-tools">
-          <div class="sidebar-progress" aria-label="Situação do projeto"><span class="sidebar-progress-icon" aria-hidden="true">◉</span> Pesquisa em desenvolvimento</div>
           <button type="button" id="open-command-search" class="sidebar-search-trigger" aria-haspopup="dialog" aria-controls="command-search" aria-label="Buscar página ou tópico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.6" cy="10.6" r="6.1"/><path d="m15.5 15.5 5 5"/></svg><span>Buscar tópico</span><kbd>Ctrl K</kbd></button>
         </div>
         <p class="sidebar-caption">NAVEGAÇÃO DO PROJETO</p>
@@ -44,11 +44,13 @@
           <a href="#inicio" class="sidebar-home-link">Início</a>
         </nav>
         <p class="sidebar-caption sidebar-caption-secondary">ACESSO À PESQUISA</p>
-        <a class="sidebar-document" href="https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/main/README.md" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">▤</span> README completo <span aria-hidden="true">↗</span></a>
-        <a class="sidebar-document" href="./v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv" download><span aria-hidden="true">⇩</span> Dados dos 257 pontos <span aria-hidden="true">↗</span></a>
+        <a class="sidebar-github-button" href="https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas" target="_blank" rel="noopener noreferrer" aria-label="Abrir repositório completo da pesquisa no GitHub">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 .8A11.2 11.2 0 0 0 8.46 22.63c.56.11.77-.24.77-.54v-1.94c-3.13.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.12.08 1.7 1.15 1.7 1.15.99 1.7 2.59 1.21 3.22.93.1-.72.39-1.21.71-1.49-2.5-.29-5.13-1.25-5.13-5.55 0-1.23.44-2.23 1.15-3.02-.12-.28-.5-1.43.11-2.98 0 0 .94-.3 3.08 1.15A10.8 10.8 0 0 1 12 6.38c.95 0 1.9.13 2.79.37 2.14-1.45 3.08-1.15 3.08-1.15.61 1.55.23 2.7.11 2.98.72.79 1.15 1.79 1.15 3.02 0 4.31-2.63 5.26-5.14 5.54.4.35.75 1.03.75 2.08v3.08c0 .3.2.66.78.54A11.2 11.2 0 0 0 12 .8Z"/></svg>
+          <span>Repositório GitHub</span>
+          <span class="github-external" aria-hidden="true">↗</span>
+        </a>
       </div>
       <div class="sidebar-bottom">
-        <span class="sidebar-status"><i></i> PESQUISA EM DESENVOLVIMENTO</span>
         <strong>Breno Braga Galvão</strong>
         <small>Caxias do Sul · Rio Grande do Sul</small>
       </div>
@@ -77,7 +79,13 @@
               <div class="home-chips"><span>Ciência de dados</span><span>Geotecnologias</span><span>Aprendizado de máquina</span></div>
               <a class="portal-primary-button" href="#topico-1">Conhecer a pesquisa <span aria-hidden="true">→</span></a>
             </div>
-            <div class="home-hero-visual"><img src="./infografico_area1_cobertura_e_recortes_satelitais.png" alt="Visualização da área de estudo Area1 e recortes em imagens de satélite"><div class="home-visual-caption">AREA1 / IMAGEM DE SATÉLITE</div></div>
+            <div class="home-hero-steps" aria-label="Etapas fundamentais da pesquisa">
+              <div class="home-steps-eyebrow">PERCURSO DA PESQUISA</div>
+              <div class="home-step"><span class="home-step-number">01</span><span><strong>Imagens da Area1</strong><small>Bandas RGB e infravermelho próximo (NIR)</small></span></div>
+              <div class="home-step"><span class="home-step-number">02</span><span><strong>Segmentação e atributos</strong><small>Quickshift, NDVI, brilho HSV e bordas Canny</small></span></div>
+              <div class="home-step"><span class="home-step-number">03</span><span><strong>Classificação e validação</strong><small>Oito classificadores e separação espacial</small></span></div>
+              <div class="home-step"><span class="home-step-number">04</span><span><strong>Alometria exploratória</strong><small>257 pontos comparados à Meta/WRI</small></span></div>
+            </div>
           </div>
 
           <div class="project-statement"><div class="statement-marker">TÍTULO DO PROJETO</div><p>Combinação de Características de Brilho, Bordas e NDVI para Detecção de Árvores Urbanas e Avaliação de Proximidade com Linhas de Energia</p><small>Projeto de mestrado · Breno Braga Galvão</small></div>
