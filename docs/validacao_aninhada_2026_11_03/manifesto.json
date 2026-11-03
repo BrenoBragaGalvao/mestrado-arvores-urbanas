@@ -1,0 +1,7 @@
+{
+  "protocolo": "tuning espacial interno 3 splits + teste externo já utilizado em estudos anteriores",
+  "candidatos_por_rodada": 6,
+  "avaliacoes_internas": 540,
+  "ajustes_externos": 30,
+  "advertencia": "Teste externo já conhecido de estudos anteriores, não é teste virgem. Overfitting não pode ser zerado ou descartado apenas por diferença de médias."
+}
