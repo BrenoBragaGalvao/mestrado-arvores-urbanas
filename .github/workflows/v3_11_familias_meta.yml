@@ -1,0 +1,39 @@
+name: "V3 - 11 modelos do artigo vs Meta pixel e 5m"
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/v3_11_familias_meta.yml"
+      - "experimentos/v3_testar_11_modelos_artigo_meta.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  testar_onze_familias:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dependencias
+        run: python -m pip install numpy pandas scipy scikit-learn pyproj matplotlib
+      - name: Ajustar 11 familias e validar Meta pixel e raio de 5 m espacialmente
+        run: |
+          python -u experimentos/v3_testar_11_modelos_artigo_meta.py \
+            --csv docs/v3_alturas_publicas/v3_comparacao_c3_meta_257.csv \
+            --out docs/v3_alturas_publicas
+      - name: Publicar resultados auditaveis no GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/v3_alturas_publicas/v3_11_familias_meta_*
+          git diff --cached --quiet || (git commit -m "data(v3): valida onze familias CW-H adaptadas frente a Meta pixel e 5m" && git push)
+      - name: Anexar resultados mesmo em caso de falha
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-11-familias-meta-pixel-5m
+          path: docs/v3_alturas_publicas/v3_11_familias_meta_*
+          if-no-files-found: ignore
