@@ -14,37 +14,21 @@
   const metricsCsv = "./v3_alturas_publicas/v3_11_familias_meta_resumo.csv";
 
   const models = [
-    {name:"SVM RBF",             s512:{"250":0.9157,"500":0.8518},s256:{"250":0.9341,"500":0.8641}},
-    {name:"Regressão logística", s512:{"250":0.9153,"500":0.8484},s256:{"250":0.9157,"500":0.8685}},
-    {name:"Extra Trees",         s512:{"250":0.9064,"500":0.8747},s256:{"250":0.8968,"500":0.8545}},
-    {name:"KNN (7)",             s512:{"250":0.8940,"500":0.8377},s256:{"250":0.9009,"500":0.8486}},
-    {name:"Random Forest",       s512:{"250":0.8906,"500":0.8657},s256:{"250":0.8835,"500":0.8566}},
-    {name:"Gaussian Naive Bayes",s512:{"250":0.8894,"500":0.8573},s256:{"250":0.8875,"500":0.8464}},
-    {name:"HistGradientBoosting",s512:{"250":0.8738,"500":0.8390},s256:{"250":0.8714,"500":0.8411}},
-    {name:"Dummy",               s512:{"250":0.2847,"500":0.2791},s256:{"250":0.2847,"500":0.2791}}
+    {"name":"Regressão logística","s512":{"250":0.9111,"500":0.8546},"s256":{"250":0.9198,"500":0.8688}},
+    {"name":"SVM RBF","s512":{"250":0.9055,"500":0.8572},"s256":{"250":0.9179,"500":0.8621}},
+    {"name":"KNN (25/35)","s512":{"250":0.9012,"500":0.839},"s256":{"250":0.917,"500":0.8551}},
+    {"name":"Random Forest","s512":{"250":0.8415,"500":0.8393},"s256":{"250":0.8356,"500":0.8286}},
+    {"name":"Extra Trees","s512":{"250":0.8454,"500":0.8195},"s256":{"250":0.8577,"500":0.8352}},
+    {"name":"HistGradientBoosting","s512":{"250":0.8352,"500":0.8214},"s256":{"250":0.861,"500":0.8194}},
+    {"name":"Gaussian Naive Bayes","s512":{"250":0.8234,"500":0.7472},"s256":{"250":0.8251,"500":0.7514}},
+    {"name":"Dummy","s512":{"250":0.2847,"500":0.2791},"s256":{"250":0.2847,"500":0.2791}}
+  
   ];
 
   const ablation = {
-    "250":[
-      {name:"SVM RBF",old:0.7523,all:0.8987,gain:0.1464},
-      {name:"Regressão logística",old:0.7556,all:0.8928,gain:0.1372},
-      {name:"KNN (7)",old:0.7445,all:0.8874,gain:0.1429},
-      {name:"Extra Trees",old:0.7008,all:0.8790,gain:0.1782},
-      {name:"Random Forest",old:0.6925,all:0.8656,gain:0.1731},
-      {name:"HistGradientBoosting",old:0.7206,all:0.8556,gain:0.1349},
-      {name:"Gaussian Naive Bayes",old:0.7409,all:0.8555,gain:0.1146},
-      {name:"Dummy",old:0.2980,all:0.2980,gain:0}
-    ],
-    "500":[
-      {name:"SVM RBF",old:0.7886,all:0.8668,gain:0.0781},
-      {name:"Regressão logística",old:0.7992,all:0.8664,gain:0.0671},
-      {name:"Extra Trees",old:0.7208,all:0.8629,gain:0.1421},
-      {name:"Random Forest",old:0.7264,all:0.8530,gain:0.1266},
-      {name:"HistGradientBoosting",old:0.7327,all:0.8524,gain:0.1197},
-      {name:"KNN (7)",old:0.7678,all:0.8502,gain:0.0824},
-      {name:"Gaussian Naive Bayes",old:0.7699,all:0.8398,gain:0.0700},
-      {name:"Dummy",old:0.2799,all:0.2799,gain:0}
-    ]
+    "250": [{"name":"KNN (25/35)","old":0.7474,"all":0.8931,"gain":0.1457},{"name":"SVM RBF","old":0.7464,"all":0.8908,"gain":0.1444},{"name":"Regressão logística","old":0.7557,"all":0.8879,"gain":0.1323},{"name":"HistGradientBoosting","old":0.7608,"all":0.8325,"gain":0.0717},{"name":"Extra Trees","old":0.7369,"all":0.8266,"gain":0.0897},{"name":"Random Forest","old":0.7522,"all":0.822,"gain":0.0699},{"name":"Gaussian Naive Bayes","old":0.7122,"all":0.7986,"gain":0.0864},{"name":"Dummy (maioria)","old":0.298,"all":0.298,"gain":0}],
+    "500": [{"name":"Regressão logística","old":0.7909,"all":0.8666,"gain":0.0758},{"name":"SVM RBF","old":0.79,"all":0.8619,"gain":0.0719},{"name":"KNN (25/35)","old":0.7835,"all":0.8481,"gain":0.0646},{"name":"Extra Trees","old":0.7822,"all":0.8335,"gain":0.0514},{"name":"HistGradientBoosting","old":0.7805,"all":0.8246,"gain":0.0441},{"name":"Random Forest","old":0.7743,"all":0.824,"gain":0.0498},{"name":"Gaussian Naive Bayes","old":0.7256,"all":0.74,"gain":0.0144},{"name":"Dummy (maioria)","old":0.2799,"all":0.2799,"gain":0}]
+  
   };
 
   function renderClassifiers() {
@@ -61,7 +45,7 @@
       '<span class="bar-value">'+pt4(x.value)+'</span></div>'
     )).join("");
     $("classification-table").innerHTML = vals.map((x)=>'<tr><td>'+safe(x.name)+'</td><td>'+pt4(x.value)+'</td></tr>').join("");
-    $("classification-note").textContent = "E9 · 119 recortes · "+size+" × "+size+" px · blocos "+block+" m · mesmas referências e divisões.";
+    $("classification-note").textContent = "Comparação controlada · 119 recortes · segmentação "+size+" × "+size+" px · blocos "+block+" m · avaliação espacial com regularização selecionada somente no treino.";
   }
 
   function renderFeatures() {
