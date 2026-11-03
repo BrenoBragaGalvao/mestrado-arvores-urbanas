@@ -399,19 +399,21 @@ Os atributos descritos na **seção 3.3 são calculados antes do treinamento**. 
 - **Brilho HSV (`mean_intensity`):** medida média de intensidade/valor da cor no segmento.
 - **Bordas Canny (`mean_edges`):** média do mapa de bordas detectadas, relacionada às transições locais de intensidade/contorno.
 
-A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrantes de 256 × 256 pixels**. Ela reutiliza a base já rotulada de **505 segmentos únicos**, formada a partir dos **510 pontos de referência existentes** da Area1. Foram realizados **160 ajustes e avaliações pareadas** (8 modelos × 2 conjuntos de atributos × 2 escalas espaciais × 5 divisões), com blocos de **250 m e 500 m** e **embargo espacial de 25 m entre as geometrias de teste e os objetos de treinamento**. As médias abaixo são de **F1-macro**, dando o mesmo peso a árvores e gramíneas.
+A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrantes de 256 × 256 pixels**. Ela reutiliza a base já rotulada de **505 segmentos únicos**, formada a partir dos **510 pontos de referência existentes** da Area1. Foram realizados **900 ajustes de validação interna** para escolha da regularização e **160 avaliações externas pareadas** (8 modelos × 2 conjuntos de atributos × 2 escalas espaciais × 5 divisões), com blocos de **250 m e 500 m** e **embargo espacial de 25 m entre as geometrias de teste e os objetos de treinamento**. As médias abaixo são de **F1-macro**, dando o mesmo peso a árvores e gramíneas.
+
+**Controle do sobreajuste:** em cada combinação de atributos, a regularização foi selecionada separadamente, usando três divisões internas formadas exclusivamente com o treinamento. Foram mantidos os mesmos exemplos, classificadores, divisões externas e critérios da seção 3.6.1. Assim, o ganho atribuído à inclusão do NDVI compara *pipelines* ajustados pelo mesmo procedimento, não necessariamente com os mesmos hiperparâmetros.
 
 **Blocos espaciais de 250 m — média de cinco divisões**
 
 | Classificador | HSV + Canny | NDVI + HSV + Canny | Ganho ao acrescentar NDVI |
 |---|---:|---:|---:|
-| **SVM RBF** | 0,7523 | **0,8987** | **+0,1464** |
-| Regressão logística | 0,7556 | **0,8928** | +0,1372 |
-| KNN (7) | 0,7445 | **0,8874** | +0,1429 |
-| Extra Trees | 0,7008 | **0,8790** | +0,1782 |
-| **Random Forest** | 0,6925 | **0,8656** | +0,1731 |
-| HistGradientBoosting | 0,7206 | **0,8556** | +0,1349 |
-| Gaussian Naive Bayes | 0,7409 | **0,8555** | +0,1146 |
+| **KNN (25/35)** | 0,7474 | **0,8931** | **+0,1457** |
+| SVM RBF | 0,7464 | 0,8908 | +0,1444 |
+| Regressão logística | 0,7557 | 0,8879 | +0,1323 |
+| HistGradientBoosting | 0,7608 | 0,8325 | +0,0717 |
+| Extra Trees | 0,7369 | 0,8266 | +0,0897 |
+| Random Forest | 0,7522 | 0,8220 | +0,0699 |
+| Gaussian Naive Bayes | 0,7122 | 0,7986 | +0,0864 |
 | Dummy (maioria) | 0,2980 | 0,2980 | 0,0000 |
 
 **Ordem dos modelos:** F1-macro médio decrescente da combinação **NDVI + HSV + Canny** nos blocos de 250 m. A dupla HSV + Canny permanece fixa para comparação.
@@ -420,13 +422,13 @@ A comparação E4b foi realizada a partir da **bateria derivada de 812 quadrante
 
 | Classificador | HSV + Canny | NDVI + HSV + Canny | Ganho ao acrescentar NDVI |
 |---|---:|---:|---:|
-| **SVM RBF** | 0,7886 | **0,8668** | **+0,0781** |
-| Regressão logística | 0,7992 | **0,8664** | +0,0671 |
-| Extra Trees | 0,7208 | **0,8629** | +0,1421 |
-| **Random Forest** | 0,7264 | **0,8530** | +0,1266 |
-| HistGradientBoosting | 0,7327 | **0,8524** | +0,1197 |
-| KNN (7) | 0,7678 | **0,8502** | +0,0824 |
-| Gaussian Naive Bayes | 0,7699 | **0,8398** | +0,0700 |
+| **Regressão logística** | 0,7909 | **0,8666** | **+0,0758** |
+| SVM RBF | 0,7900 | 0,8619 | +0,0719 |
+| KNN (25/35) | 0,7835 | 0,8481 | +0,0646 |
+| Extra Trees | 0,7822 | 0,8335 | +0,0514 |
+| HistGradientBoosting | 0,7805 | 0,8246 | +0,0441 |
+| Random Forest | 0,7743 | 0,8240 | +0,0498 |
+| Gaussian Naive Bayes | 0,7256 | 0,7400 | +0,0144 |
 | Dummy (maioria) | 0,2799 | 0,2799 | 0,0000 |
 
 **Ordem dos modelos:** F1-macro médio decrescente da combinação **NDVI + HSV + Canny** nos blocos de 500 m.
@@ -554,7 +556,7 @@ A tabela apresenta o **F1-macro médio do treinamento e do teste** de quatro cla
 
 **Por que essa distinção é importante?** Os 505 exemplos de cada configuração pertencem à **mesma imagem da Area1**, e os conjuntos de teste externos já foram analisados em etapas anteriores do projeto. Portanto, os F1 apresentados medem **generalização espacial interna**, não desempenho comprovado numa imagem de outra região. A seleção retrospectiva de modelos com base em testes já conhecidos pode introduzir viés de seleção.
 
-**Reprodução:** a reexecução supervisionada dos oito classificadores está incorporada ao [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). O **Quickshift e as características extraídas não foram recalculados nesta rodada**. A comparação de atributos da **seção 3.5** e os demais dados da pesquisa foram preservados. A rota `--modo v2` calcula o embargo de E2 por **centroides** e pode produzir valores diferentes dos resultados publicados, que utilizaram **geometrias completas**.
+**Reprodução:** a reexecução supervisionada dos oito classificadores está incorporada ao [notebook V2](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). O **Quickshift e as características extraídas não foram recalculados nesta rodada**. A comparação de atributos da **seção 3.5** foi reexecutada com o mesmo protocolo supervisionado da configuração E2 na **seção 3.6.1**; os demais dados da pesquisa foram preservados. A rota `--modo v2` calcula o embargo de E2 por **centroides** e pode produzir valores diferentes dos resultados publicados, que utilizaram **geometrias completas**.
 
 ---
 
