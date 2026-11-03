@@ -50,18 +50,18 @@ Clique no título para abrir diretamente a seção correspondente.
 | [2.2. Fluxo de porte e postes](#sec-2-2-fluxo) | Área dos segmentos, equações C1–C6 e distância. |
 | [2.3. Pipeline original](#sec-2-3) | Infográfico com as 17 etapas do código original. |
 | [3. Evolução metodológica](#sec-3) | Três novas configurações e oito classificadores. |
-| [3.X. Visão geral dos quatro fluxos](#sec-3-x) | Diagrama comparativo e principais diferenças metodológicas. |
-| [3.1. Processamento em partes](#sec-3-1) | Por que não repetimos o Quickshift global. |
-| [3.2. Seleção dos 119 recortes](#sec-3-2) | Como os pontos conhecidos definiram as regiões. |
-| [3.3. Quickshift, rótulos e atributos](#sec-3-3) | Como os segmentos se tornam exemplos rotulados. |
-| [3.4. Treinamento e teste](#sec-3-4) | Divisão aleatória versus validação espacial. |
-| [3.5. NDVI, HSV e Canny](#sec-3-5) | Contribuição dos atributos para o F1-macro. |
-| [3.6. Oito classificadores](#sec-3-6) | Resultados gerais nas três configurações. |
-| [3.6.1. Configuração 1](#sec-3-6-1) | 812 quadrantes de até 256 × 256 pixels. |
-| [3.6.2. Configuração 2](#sec-3-6-2) | 119 recortes inteiros de até 512 × 512 pixels. |
-| [3.6.3. Configuração 3](#sec-3-6-3) | 119 recortes subdivididos em partes de 256 × 256 pixels. |
-| [3.7. Memória RAM](#sec-3-7) | Comparação dos picos de memória. |
-| [3.8. Auditoria de overfitting e regularização](#sec-3-8) | Resultados das três configurações, limites científicos e reprodução dos testes de validação espacial. |
+| [3.1. Visão geral dos quatro fluxos](#sec-3-1) | Diagrama comparativo e principais diferenças metodológicas. |
+| [3.2. Processamento em partes](#sec-3-2) | Por que não repetimos o Quickshift global. |
+| [3.3. Seleção dos 119 recortes](#sec-3-3) | Como os pontos conhecidos definiram as regiões. |
+| [3.4. Quickshift, rótulos e atributos](#sec-3-4) | Como os segmentos se tornam exemplos rotulados. |
+| [3.5. Treinamento e teste](#sec-3-5) | Divisão aleatória versus validação espacial. |
+| [3.6. NDVI, HSV e Canny](#sec-3-6) | Contribuição dos atributos para o F1-macro. |
+| [3.7. Oito classificadores](#sec-3-7) | Resultados gerais nas três configurações. |
+| [3.7.1. Configuração 1](#sec-3-7-1) | 812 quadrantes de até 256 × 256 pixels. |
+| [3.7.2. Configuração 2](#sec-3-7-2) | 119 recortes inteiros de até 512 × 512 pixels. |
+| [3.7.3. Configuração 3](#sec-3-7-3) | 119 recortes subdivididos em partes de 256 × 256 pixels. |
+| [3.8. Memória RAM](#sec-3-8) | Comparação dos picos de memória. |
+| [3.9. Auditoria de overfitting e regularização](#sec-3-9) | Resultados das três configurações, limites científicos e reprodução dos testes de validação espacial. |
 | [4. Alometria, Meta/WRI e espécies locais](#sec-4) | Contexto regional, fontes e resultados dos modelos de altura das árvores. |
 | [4.1. Fonte das alturas Meta/WRI](#sec-4-1) | Raster original, resolução, método e precisão publicada. |
 | [4.2. Inventário e espécies de Caxias do Sul](#sec-4-2) | PDAU municipal, referências de porte e limites. |
@@ -294,8 +294,8 @@ Partimos da **imagem original da Area1 (6.942 × 7.294 pixels)** e dos **510 pon
 | **4. Dividir cada recorte em quatro partes muda os resultados ou a memória?** | Usamos as **mesmas 119 regiões** para descobrir se o tamanho da janela influencia os resultados. Primeiro, aplicamos o Quickshift nos recortes inteiros de **até 512 × 512 pixels**; depois, dividimos esses mesmos recortes em até quatro partes de **256 × 256 pixels**. Assim, podemos verificar **qual estratégia oferece melhor F1-macro para os oito classificadores e qual consome menos memória RAM**, mantendo as mesmas referências e condições de avaliação. |
 | **5. NDVI, brilho HSV e bordas Canny funcionam melhor juntos?** | Comparamos **sete combinações** dos três atributos: **(1)** apenas NDVI; **(2)** apenas brilho HSV; **(3)** apenas bordas Canny; **(4)** NDVI + brilho HSV; **(5)** NDVI + bordas Canny; **(6)** brilho HSV + bordas Canny; e **(7)** NDVI + brilho HSV + bordas Canny. Todas as combinações foram avaliadas com os mesmos classificadores e as mesmas divisões espaciais de treinamento e teste, para identificar quais características proporcionam melhores resultados na classificação de árvores e gramíneas. |
 
-<a id="sec-3-x"></a>
-### 3.X. Visão geral dos quatro fluxos metodológicos
+<a id="sec-3-1"></a>
+### 3.1. Visão geral dos quatro fluxos metodológicos
 
 A figura apresenta, lado a lado, as **quatro formas de processar e classificar árvores e gramíneas**. Elas usam as imagens da mesma **Area1** e as referências originais de vegetação, mas não constituem quatro aplicações idênticas: a segmentação, a seleção dos exemplos e a validação podem mudar.
 
@@ -311,8 +311,8 @@ A figura apresenta, lado a lado, as **quatro formas de processar e classificar �
 
 **O que permanece igual?** Os atributos são **calculados antes da classificação** e fornecidos aos algoritmos como entradas. O **F1-macro é calculado depois das previsões**, para medir o desempenho. Assim, o mesmo conjunto de atributos pode gerar resultados de F1-macro diferentes em classificadores distintos. As estratégias com validação espacial não devem ter seus valores comparados diretamente com a avaliação aleatória do método original.
 
-<a id="sec-3-1"></a>
-### 3.1. Por que deixamos de processar a imagem inteira?
+<a id="sec-3-2"></a>
+### 3.2. Por que deixamos de processar a imagem inteira?
 
 **No método original**, aplicamos **Quickshift na imagem inteira → K-Means (6 grupos, cluster 3) → Random Forest**, obtendo **F1 de 0,85 para árvores e F1-macro aproximado de 0,865**.
 
@@ -332,8 +332,8 @@ No **notebook de experimentos**, investigamos três configurações de segmenta�
   <img src="docs/comparacao_recorte_512_256.webp" alt="Mesmo recorte de 512 × 512 pixels: Quickshift aplicado ao recorte inteiro ou separadamente em quatro partes de 256 × 256 pixels" width="88%">
 </p>
 
-<a id="sec-3-2"></a>
-### 3.2. Por que selecionamos exatamente 119 recortes?
+<a id="sec-3-3"></a>
+### 3.3. Por que selecionamos exatamente 119 recortes?
 
 O número de **119 recortes não foi definido previamente**. Ele surgiu a partir da localização dos **510 pontos de referência já conhecidos** da Area1, sendo **257 árvores** (`Arvores.gpkg`) e **253 gramíneas** (`Grama.gpkg`), utilizados também no método original.
 
@@ -347,8 +347,8 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **Por que isso é importante?** Porque utilizamos **as mesmas regiões, os mesmos pontos conhecidos e as mesmas condições de avaliação** nas duas estratégias. Assim, conseguimos investigar se **alterar o tamanho da janela de segmentação influencia a qualidade da classificação e o consumo de memória**, sem confundir essa diferença com mudanças na região analisada.
 
-<a id="sec-3-3"></a>
-### 3.3. Como Quickshift, pontos de referência e atributos permitem classificar árvores e gramíneas?
+<a id="sec-3-4"></a>
+### 3.4. Como Quickshift, pontos de referência e atributos permitem classificar árvores e gramíneas?
 
 **Nos experimentos novos, não classificamos um bloco inteiro de 250 ou 500 metros como árvore ou gramínea.** Um mesmo bloco pode conter árvores, gramíneas, casas e ruas. A classificação é feita a partir dos **segmentos criados pelo Quickshift**, associados aos **pontos de referência já conhecidos**.
 
@@ -368,10 +368,10 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **Diferença em relação ao método original:** antes, o **K-Means agrupava os segmentos em seis clusters** e selecionávamos o **cluster 3** como conjunto de candidatos, antes de associar as referências e treinar o Random Forest. **Nos experimentos novos, a comparação dos oito classificadores não depende dessa seleção do cluster 3**: os pontos conhecidos fornecem os rótulos dos segmentos produzidos pelo Quickshift.
 
-**Ordem do processamento:** Quickshift cria os segmentos → os pontos conhecidos fornecem os rótulos → calculamos os atributos dos segmentos → separamos os exemplos geograficamente para treino e teste → treinamos e avaliamos os classificadores. **A comparação das combinações de atributos aparece na seção 3.5**, antes dos resultados gerais dos oito classificadores na seção 3.6, porque constitui uma análise experimental do desempenho, e não uma etapa anterior à classificação.
+**Ordem do processamento:** Quickshift cria os segmentos → os pontos conhecidos fornecem os rótulos → calculamos os atributos dos segmentos → separamos os exemplos geograficamente para treino e teste → treinamos e avaliamos os classificadores. **A comparação das combinações de atributos aparece na seção 3.6**, antes dos resultados gerais dos oito classificadores na seção 3.7, porque constitui uma análise experimental do desempenho, e não uma etapa anterior à classificação.
 
-<a id="sec-3-4"></a>
-### 3.4. Como separamos treinamento e teste nas quatro formas de aplicar Quickshift?
+<a id="sec-3-5"></a>
+### 3.5. Como separamos treinamento e teste nas quatro formas de aplicar Quickshift?
 
 **Primeiro, uma distinção:** os **256 × 256 e 512 × 512 pixels** indicam o tamanho das janelas usadas na **segmentação da imagem**. Já o treinamento e o teste são separados **depois**, a partir dos exemplos rotulados associados aos pontos conhecidos de árvores e gramíneas. Nas avaliações mais recentes, usamos também a localização geográfica desses exemplos para reduzir a influência da proximidade espacial.
 
@@ -400,10 +400,10 @@ Para entender como chegamos a esse número, seguimos cinco etapas:
 
 **O que podemos comparar diretamente?** Os **oito classificadores** usam as mesmas divisões de treinamento e teste **dentro de cada avaliação**. Porém, somente as **formas 3 e 4** (os mesmos 119 recortes, inteiros ou subdivididos) compartilham exatamente as referências e divisões entre as duas formas de segmentação. Assim, podemos analisar mais diretamente o efeito de dividir os recortes, sem trocar também os locais de teste. A **forma 1**, do método original, usou divisão aleatória e outra métrica, portanto não é diretamente comparável aos F1-macro atuais. Os resultados documentados da **forma 2** vieram de uma bateria anterior: **a execução integral da rotina progressiva atual dos 812 quadrantes no notebook de experimentos ainda não foi confirmada**, e essa rotina usa distâncias entre **centroides**, em vez de geometrias completas.
 
-<a id="sec-3-5"></a>
-### 3.5. Qual é a contribuição do NDVI, brilho HSV e bordas Canny para o desempenho dos classificadores?
+<a id="sec-3-6"></a>
+### 3.6. Qual é a contribuição do NDVI, brilho HSV e bordas Canny para o desempenho dos classificadores?
 
-Os atributos descritos na **seção 3.3 são calculados antes do treinamento**. Nesta seção, **antes da comparação geral das três configurações de processamento**, analisamos **como a escolha dos atributos influencia o F1-macro dos classificadores**. Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
+Os atributos descritos na **seção 3.4 são calculados antes do treinamento**. Nesta seção, **antes da comparação geral das três configurações de processamento**, analisamos **como a escolha dos atributos influencia o F1-macro dos classificadores**. Para verificar se **NDVI** realmente acrescenta informação, comparamos duas condições **fixas**: **(A) brilho HSV + bordas Canny** e **(B) NDVI + brilho HSV + bordas Canny**. Os mesmos segmentos rotulados, os mesmos classificadores e as mesmas partições de treino e teste foram utilizados em cada comparação. Portanto, **"HSV + Canny" é a dupla escolhida para comparação, e não necessariamente a melhor dupla entre todas as opções**.
 
 **O que representa cada atributo?**
 
@@ -413,7 +413,7 @@ Os atributos descritos na **seção 3.3 são calculados antes do treinamento**. 
 
 A comparação das combinações de atributos foi realizada a partir da **bateria derivada de 812 quadrantes de 256 × 256 pixels**. Ela reutiliza a base já rotulada de **505 segmentos únicos**, formada a partir dos **510 pontos de referência existentes** da Area1. Foram realizados **900 ajustes de validação interna** para escolha da regularização e **160 avaliações externas pareadas** (8 modelos × 2 conjuntos de atributos × 2 escalas espaciais × 5 divisões), com blocos de **250 m e 500 m** e **embargo espacial de 25 m entre as geometrias de teste e os objetos de treinamento**. As médias abaixo são de **F1-macro**, dando o mesmo peso a árvores e gramíneas.
 
-**Controle do sobreajuste:** em cada combinação de atributos, a regularização foi selecionada separadamente, usando três divisões internas formadas exclusivamente com o treinamento. Foram mantidos os mesmos exemplos, classificadores, divisões externas e critérios da seção 3.6.1. Assim, o ganho atribuído à inclusão do NDVI compara *pipelines* ajustados pelo mesmo procedimento, não necessariamente com os mesmos hiperparâmetros.
+**Controle do sobreajuste:** em cada combinação de atributos, a regularização foi selecionada separadamente, usando três divisões internas formadas exclusivamente com o treinamento. Foram mantidos os mesmos exemplos, classificadores, divisões externas e critérios da seção 3.7.1. Assim, o ganho atribuído à inclusão do NDVI compara *pipelines* ajustados pelo mesmo procedimento, não necessariamente com os mesmos hiperparâmetros.
 
 **Blocos espaciais de 250 m — média de cinco divisões**
 
@@ -445,8 +445,8 @@ A comparação das combinações de atributos foi realizada a partir da **bateri
 
 **Ordem dos modelos:** F1-macro médio decrescente da combinação **NDVI + HSV + Canny** nos blocos de 500 m.
 
-<a id="sec-3-6"></a>
-### 3.6. Resultados dos oito classificadores nas três configurações
+<a id="sec-3-7"></a>
+### 3.7. Resultados dos oito classificadores nas três configurações
 
 As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto maior o valor, melhor o equilíbrio entre as classes árvore e gramínea. Em cada configuração, usamos **cinco divisões espaciais** com blocos de **250 m e 500 m** e **embargo de 25 m**. **Esses metros definem a separação geográfica entre treino e teste; não são os tamanhos dos recortes em pixels.**
 
@@ -458,8 +458,8 @@ As tabelas apresentam o **F1-macro médio** dos oito classificadores: quanto mai
   <img src="docs/infografico_validacao_espacial_256px_250m_500m.webp" alt="Diferença entre segmentação em quadrantes de 256 × 256 pixels e validação espacial com blocos de 250 e 500 metros e exclusão de 25 metros." width="100%">
 </p>
 
-<a id="sec-3-6-1"></a>
-#### 3.6.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
+<a id="sec-3-7-1"></a>
+#### 3.7.1. Configuração 1 — imagem organizada em 812 quadrantes de até 256 × 256 pixels
 
 Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadrantes de 256 px**, usando **505 segmentos rotulados únicos**, os três atributos **NDVI + brilho HSV + bordas Canny** e embargo espacial por **geometrias**. Essa bateria é derivada da grade de 812 quadrantes, mas **não comprova uma nova execução integral da rota progressiva atual do notebook de experimentos**.
 
@@ -477,8 +477,8 @@ Os resultados abaixo vêm da **bateria já documentada com Quickshift por quadra
 
 **Resultado:** o **KNN (25/35)** teve o maior F1-macro médio nos blocos de **250 m (0,8931)**, enquanto a **regressão logística** liderou nos blocos de **500 m (0,8666)**.
 
-<a id="sec-3-6-2"></a>
-#### 3.6.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
+<a id="sec-3-7-2"></a>
+#### 3.7.2. Configuração 2 — 119 recortes inteiros de até 512 × 512 pixels
 
 Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas possíveis, e aplicamos **Quickshift em cada recorte inteiro**. Os valores abaixo vêm da comparação controlada entre recortes inteiros e subdivididos, com **505 referências comuns** após deduplicação e embargo de **25 m entre pontos**.
 
@@ -494,8 +494,8 @@ Selecionamos as **119 regiões com pontos de referência**, entre as 210 janelas
 | Gaussian Naive Bayes | 0,8234 | 0,7472 |
 | Dummy | 0,2847 | 0,2791 |
 
-<a id="sec-3-6-3"></a>
-#### 3.6.3. Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels
+<a id="sec-3-7-3"></a>
+#### 3.7.3. Configuração 3 — os mesmos 119 recortes subdivididos em até quatro partes de 256 × 256 pixels
 
 Processamos **exatamente as mesmas regiões** da configuração 2, agora com Quickshift independente em cada parte. Usamos os **mesmos 505 exemplos e as mesmas divisões de treino e teste**, mudando somente a forma de segmentar.
 
@@ -519,8 +519,8 @@ Processamos **exatamente as mesmas regiões** da configuração 2, agora com Qui
 
 **Quais resultados podemos comparar diretamente?** As configurações **2 e 3** utilizam as mesmas 119 regiões, os mesmos pontos de referência, atributos e divisões de treinamento e teste. Assim, permitem avaliar especificamente o efeito do tamanho da segmentação. Já a **configuração 1** utiliza outro protocolo experimental, e seus resultados devem ser analisados separadamente.
 
-<a id="sec-3-7"></a>
-### 3.7. Qual configuração consome menos memória RAM?
+<a id="sec-3-8"></a>
+### 3.8. Qual configuração consome menos memória RAM?
 
 A comparação controlada entre recortes inteiros e subdivididos mediu o **pico de memória RAM (RSS)** durante o processamento sequencial dos **mesmos 119 recortes** nas duas estratégias:
 
@@ -529,23 +529,23 @@ A comparação controlada entre recortes inteiros e subdivididos mediu o **pico 
 | **119 recortes inteiros de até 512 × 512 px** | **467,19 MiB** |
 | **Mesmos 119 recortes, subdivididos em até quatro partes de 256 × 256 px** | **456,80 MiB** |
 
-**Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 3.6).
+**Resultado:** subdividir os recortes reduziu o pico registrado em aproximadamente **10,38 MiB (2,22%)**. Essa economia foi **pequena** no pico total do processo; a subdivisão também alterou o F1-macro, mas **não melhorou todos os classificadores** (veja a seção 3.7).
 
 **Limite da medição:** esses números representam o **pico total de RAM dos processos que trataram os 119 recortes em sequência**, não a memória necessária para executar o Quickshift global original. **Não há medição diretamente equivalente publicada para a execução integral dos 812 quadrantes pela rota progressiva atual do notebook de experimentos.**
 
-<a id="sec-3-8"></a>
-### 3.8. Como controlamos o overfitting na avaliação dos classificadores?
+<a id="sec-3-9"></a>
+### 3.9. Como controlamos o overfitting na avaliação dos classificadores?
 
 **O que é overfitting?** É o sobreajuste: um classificador aprende características muito específicas dos exemplos utilizados no treinamento e pode apresentar desempenho inferior nos exemplos reservados para avaliação. O objetivo do protocolo foi **reduzir esse risco**, sem confundir um F1 elevado no treinamento com comprovação de generalização.
 
-**Quais cuidados utilizamos para gerar os dados atuais da seção 3.6?**
+**Quais cuidados utilizamos para gerar os dados atuais da seção 3.7?**
 
 1. **Deduplicação e controle das partições:** mantivemos **505 exemplos rotulados por configuração** e verificamos a ausência de IDs coincidentes entre treinamento e teste nas 30 divisões espaciais avaliadas.
 2. **Separação espacial e embargo:** utilizamos cinco divisões com blocos de **250 m** e cinco com blocos de **500 m**, por configuração, com exclusão de **25 m**. Na configuração dos **812 quadrantes**, o embargo foi verificado entre **geometrias dos segmentos**; nas duas configurações com **119 recortes inteiros ou subdivididos**, entre **pontos de referência**. Isso reduz a influência de amostras vizinhas, sem tornar todos os exemplos independentes.
 3. **Regularização e seleção somente no treinamento:** comparamos receitas **moderada e forte** nas **três divisões internas** de cada treinamento externo. Escolhemos os parâmetros pelo **F1-macro médio de validação interna**, reajustamos o classificador usando o treinamento externo e só depois calculamos seu desempenho no teste reservado. O Dummy foi mantido como referência. Os modelos com padronização utilizam `Pipeline`, que aprende a escala somente com os dados de treino.
-4. **Auditoria de desempenho:** foram realizadas **1.350 avaliações internas** e **240 avaliações externas**, que originaram as **48 médias** apresentadas nas três tabelas da seção 3.6. Mantivemos os resultados de treino e teste, inclusive nos casos em que a regularização não produziu o mesmo desempenho.
+4. **Auditoria de desempenho:** foram realizadas **1.350 avaliações internas** e **240 avaliações externas**, que originaram as **48 médias** apresentadas nas três tabelas da seção 3.7. Mantivemos os resultados de treino e teste, inclusive nos casos em que a regularização não produziu o mesmo desempenho.
 
-#### 3.8.1. O que os resultados mostram?
+#### 3.9.1. O que os resultados mostram?
 
 A tabela apresenta o **F1-macro médio do treinamento e do teste** de quatro classificadores representativos nas três configurações: 812 quadrantes, 119 recortes inteiros e 119 recortes subdivididos. Cada linha corresponde à média de dez divisões espaciais. A diferença positiva treino–teste é um **indicador de possível sobreajuste**, mas não constitui, isoladamente, um teste estatístico definitivo.
 
@@ -570,7 +570,7 @@ A tabela apresenta o **F1-macro médio do treinamento e do teste** de quatro cla
 
 **Por que essa distinção é importante?** Os 505 exemplos de cada configuração pertencem à **mesma imagem da Area1**, e os conjuntos de teste externos já foram analisados em etapas anteriores do projeto. Portanto, os F1 apresentados medem **generalização espacial interna**, não desempenho comprovado numa imagem de outra região. A seleção retrospectiva de modelos com base em testes já conhecidos pode introduzir viés de seleção.
 
-**Reprodução:** a reexecução supervisionada dos oito classificadores está incorporada ao [notebook de experimentos](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). O **Quickshift e as características extraídas não foram recalculados nesta rodada**. A comparação de atributos da **seção 3.5** foi reexecutada com o mesmo protocolo supervisionado da configuração com **812 quadrantes** na **seção 3.6.1**; os demais dados da pesquisa foram preservados. A rota de execução direta do notebook (`--modo v2`) calcula o embargo da configuração com **812 quadrantes** por **centroides** e pode produzir valores diferentes dos resultados publicados, que utilizaram **geometrias completas**.
+**Reprodução:** a reexecução supervisionada dos oito classificadores está incorporada ao [notebook de experimentos](Segmentacao_area_completa_v2_experimentos.ipynb) e ao script [`experimentos/reexecutar_tabelas_aninhadas_v2.py`](experimentos/reexecutar_tabelas_aninhadas_v2.py). O **Quickshift e as características extraídas não foram recalculados nesta rodada**. A comparação de atributos da **seção 3.6** foi reexecutada com o mesmo protocolo supervisionado da configuração com **812 quadrantes** na **seção 3.7.1**; os demais dados da pesquisa foram preservados. A rota de execução direta do notebook (`--modo v2`) calcula o embargo da configuração com **812 quadrantes** por **centroides** e pode produzir valores diferentes dos resultados publicados, que utilizaram **geometrias completas**.
 
 ---
 
