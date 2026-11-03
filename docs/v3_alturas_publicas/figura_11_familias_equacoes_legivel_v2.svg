@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1132" viewBox="0 0 1440 1132" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">Onze famílias de equações alométricas</title>
+<desc id="descricao">Tabela de onze equações CW em função da altura H, de Chatziathanasiou e colaboradores, 2024. Fundo claro, todas as linhas legíveis.</desc>
+<rect x="0" y="0" width="1440" height="1132" fill="#FFFFFF"/>
+<rect x="40" y="31" width="1360" height="125" rx="19" fill="#0E3C65"/>
+<path d="M 73 127 Q 104 105 134 127 M 90 129 L 90 94 M 90 94 L 79 82 M 90 107 L 102 91" fill="none" stroke="#C5E1F3" stroke-width="5" stroke-linecap="round"/>
+<circle cx="85" cy="78" r="20" fill="none" stroke="#C5E1F3" stroke-width="5"/>
+<circle cx="107" cy="84" r="19" fill="none" stroke="#C5E1F3" stroke-width="5"/>
+<text x="170" y="86" fill="#FFFFFF" font-size="39" font-weight="700" font-family="Arial,DejaVu Sans,sans-serif">Onze famílias de equações alométricas</text>
+<text x="171" y="126" fill="#D7EAF7" font-size="21" font-family="Arial,DejaVu Sans,sans-serif">Chatziathanasiou et al. (2024)  •  Largura da copa (CW) em função da altura (H)</text>
+<rect x="40" y="182" width="1360" height="68" fill="#DCEAF5" stroke="#B8CADB" stroke-width="1"/>
+<text x="107" y="225" fill="#153A58" font-size="22" font-weight="700" text-anchor="middle" font-family="Arial,DejaVu Sans,sans-serif">Nº</text>
+<text x="196" y="225" fill="#153A58" font-size="22" font-weight="700" font-family="Arial,DejaVu Sans,sans-serif">Família de modelo</text>
+<text x="585" y="225" fill="#153A58" font-size="22" font-weight="700" font-family="Arial,DejaVu Sans,sans-serif">Equação (CW em função de H)</text>
+<rect x="40" y="250" width="1360" height="66" fill="#FFFFFF"/>
+
+<rect x="75" y="265" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="290" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">01</text>
+<text x="196" y="293" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Linear</text>
+<text x="585" y="293" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ + b₁H</text>
+<path d="M 40 316 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="316" width="1360" height="66" fill="#F4F7FB"/>
+
+<rect x="75" y="331" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="356" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">02</text>
+<text x="196" y="359" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Logarítmica</text>
+<text x="585" y="359" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ + b₁ ln(H)</text>
+<path d="M 40 382 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="382" width="1360" height="66" fill="#FFFFFF"/>
+
+<rect x="75" y="397" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="422" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">03</text>
+<text x="196" y="425" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Inversa</text>
+<text x="585" y="425" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ + b₁/H</text>
+<path d="M 40 448 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="448" width="1360" height="66" fill="#F4F7FB"/>
+
+<rect x="75" y="463" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="488" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">04</text>
+<text x="196" y="491" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Quadrática</text>
+<text x="585" y="491" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ + b₁H + b₂H²</text>
+<path d="M 40 514 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="514" width="1360" height="66" fill="#FFFFFF"/>
+
+<rect x="75" y="529" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="554" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">05</text>
+<text x="196" y="557" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Cúbica</text>
+<text x="585" y="557" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ + b₁H + b₂H² + b₃H³</text>
+<path d="M 40 580 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="580" width="1360" height="66" fill="#F4F7FB"/>
+
+<rect x="75" y="595" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="620" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">06</text>
+<text x="196" y="623" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Potência</text>
+<text x="585" y="623" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ × H<tspan font-size="19" baseline-shift="super">b₁</tspan><tspan baseline-shift="baseline"></tspan></text>
+<path d="M 40 646 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="646" width="1360" height="66" fill="#FFFFFF"/>
+
+<rect x="75" y="661" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="686" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">07</text>
+<text x="196" y="689" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Composta</text>
+<text x="585" y="689" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ × b₁<tspan font-size="19" baseline-shift="super">H</tspan><tspan baseline-shift="baseline"></tspan></text>
+<path d="M 40 712 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="712" width="1360" height="66" fill="#E7F0F9"/>
+<rect x="40" y="712" width="5" height="66" fill="#3971AA"/>
+<rect x="75" y="727" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="752" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">08</text>
+<text x="196" y="755" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Curva-S</text>
+<text x="585" y="755" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = exp(b₀ + b₁/H)</text>
+<path d="M 40 778 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="778" width="1360" height="66" fill="#FFFFFF"/>
+
+<rect x="75" y="793" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="818" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">09</text>
+<text x="196" y="821" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Logística</text>
+<text x="585" y="821" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = 1 / (1/b₀ + b₁ × b₂<tspan font-size="19" baseline-shift="super">H</tspan><tspan baseline-shift="baseline">)</tspan></text>
+<path d="M 40 844 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="844" width="1360" height="66" fill="#F4F7FB"/>
+
+<rect x="75" y="859" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="884" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">10</text>
+<text x="196" y="887" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Crescimento</text>
+<text x="585" y="887" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = exp(b₀ + b₁H)</text>
+<path d="M 40 910 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="910" width="1360" height="66" fill="#FFFFFF"/>
+
+<rect x="75" y="925" width="65" height="37" rx="8" fill="#134B79"/>
+<text x="107.5" y="950" fill="#FFFFFF" font-family="Arial,DejaVu Sans,sans-serif" font-size="22" font-weight="700" text-anchor="middle">11</text>
+<text x="196" y="953" fill="#142538" font-family="Arial,DejaVu Sans,sans-serif" font-weight="600" font-size="26">Exponencial</text>
+<text x="585" y="953" fill="#142538" font-family="Georgia,DejaVu Serif,serif" font-size="27">CW = b₀ × exp(b₁H)</text>
+<path d="M 40 976 H 1400" stroke="#DDE5ED" stroke-width="1"/>
+<rect x="40" y="991" width="1360" height="108" rx="13" fill="#EEF4FA"/>
+<circle cx="84" cy="1045" r="23" fill="none" stroke="#215C8D" stroke-width="3"/>
+<text x="84" y="1054" text-anchor="middle" fill="#215C8D" font-family="Georgia,serif" font-size="30" font-weight="700">i</text>
+<text x="128" y="1037" fill="#253D53" font-family="Arial,DejaVu Sans,sans-serif" font-size="19">CW = largura da copa; H = altura; b₀, b₁, b₂ e b₃ = coeficientes estimados.</text>
+<text x="128" y="1075" fill="#253D53" font-family="Arial,DejaVu Sans,sans-serif" font-size="18">No projeto, as famílias funcionais foram adaptadas e seus parâmetros, recalibrados para a Area1.</text>
+</svg>
