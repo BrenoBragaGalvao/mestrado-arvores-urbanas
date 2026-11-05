@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="953" viewBox="0 0 1800 953" role="img" aria-labelledby="title desc">
+<title id="title">Pipeline completo da pesquisa em 17 etapas</title>
+<desc id="desc">Ilustração acadêmica detalhada com duas propostas. A primeira utiliza a Area1, 812 quadrantes com Quickshift, 505 segmentos rotulados, NDVI HSV e Canny, oito classificadores e validação espacial. A segunda utiliza 257 pontos e Meta WRI para alometria e proximidade exploratória a postes.</desc>
+<defs>
+<symbol id="aerial" viewBox="0 0 160 90">
+<rect width="160" height="90" fill="#6C9952"/>
+<path d="M0 27L160 51M41 0L80 90M147 0L111 90" stroke="#D9D5BD" stroke-width="11"/>
+<path d="M0 27L160 51M41 0L80 90M147 0L111 90" stroke="#F3EFD9" stroke-width="4"/>
+<path d="M7 6h26v17H7zM90 6h35v23H90zM8 57h39v24H8zM111 58h42v25h-42z" fill="#BBC6A7" stroke="#777E6C" stroke-width="2"/>
+<circle cx="28" cy="40" r="12" fill="#266A30"/><circle cx="127" cy="29" r="14" fill="#317B3F"/><circle cx="93" cy="67" r="12" fill="#226B30"/>
+<path d="M6 75L20 14L67 4L151 25L148 76L44 84Z" fill="none" stroke="#EC2835" stroke-width="4"/>
+</symbol>
+<symbol id="forest" viewBox="0 0 130 90">
+<rect width="130" height="90" fill="#78A75C"/>
+<rect x="47" y="50" width="13" height="33" fill="#7D4C2E"/>
+<circle cx="50" cy="31" r="28" fill="#238748"/><circle cx="29" cy="42" r="21" fill="#23A357"/><circle cx="75" cy="39" r="22" fill="#339B43"/>
+<circle cx="109" cy="69" r="15" fill="#1D653D"/><circle cx="106" cy="32" r="14" fill="#277E3B"/>
+</symbol>
+<symbol id="grid" viewBox="0 0 150 94">
+<rect width="150" height="94" fill="#B5D8AB" stroke="#208C43" stroke-width="3"/>
+<path d="M0 18H150M0 37H150M0 56H150M0 75H150M25 0V94M50 0V94M75 0V94M100 0V94M125 0V94" fill="none" stroke="#208745" stroke-width="1.8"/>
+<path d="M12 10L137 81M16 80L130 12" stroke="#FFFFFF" stroke-width="1.7" opacity=".9"/>
+</symbol>
+<symbol id="seg" viewBox="0 0 150 94">
+<rect width="150" height="94" fill="#C5D8ED" stroke="#2D76B0" stroke-width="3"/>
+<path d="M0 0L45 0L40 20L0 42Z" fill="#ED4EA8"/><path d="M45 0L89 0L68 41L40 20Z" fill="#20C0BD"/><path d="M89 0L150 0L128 37L68 41Z" fill="#F3BE2E"/>
+<path d="M0 42L40 20L68 41L60 72L10 94L0 94Z" fill="#7D49DF"/><path d="M68 41L128 37L150 64L95 75L60 72Z" fill="#59D77C"/>
+<path d="M10 94L60 72L95 75L88 94Z" fill="#F57048"/><path d="M95 75L150 64L150 94L88 94Z" fill="#4389DF"/>
+<path d="M45 0L40 20L0 42M89 0L68 41L40 20M128 37L68 41L60 72M0 94L10 94L60 72L95 75L150 64" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>
+</symbol>
+<symbol id="poly" viewBox="0 0 150 94">
+<rect width="150" height="94" fill="#EFFEEA" stroke="#358546" stroke-width="3"/>
+<path d="M0 29L22 14L49 22L43 61L17 68L0 49M49 22L79 0L103 28L94 53L43 61M103 28L136 9L150 29M94 53L127 77L150 64M43 61L68 94M17 68L26 94M127 77L120 94" fill="none" stroke="#2B994C" stroke-width="3"/>
+</symbol>
+<symbol id="grass" viewBox="0 0 120 90">
+<path d="M7 88L22 28L37 79L49 15L55 74L78 8L79 78L104 26L97 88Z" fill="#04A536" stroke="#148438" stroke-width="3"/>
+<path d="M18 88L10 44M50 88L33 29M86 88L117 35" stroke="#2EAF40" stroke-width="7"/>
+</symbol>
+<symbol id="tree" viewBox="0 0 120 100">
+<path d="M53 63L50 98H71L65 63" fill="#896042"/>
+<circle cx="57" cy="33" r="31" fill="#0A8D3C"/><circle cx="30" cy="49" r="23" fill="#17AB48"/><circle cx="81" cy="47" r="24" fill="#159A43"/><circle cx="60" cy="16" r="19" fill="#2EBD53"/>
+</symbol>
+<symbol id="ndvi" viewBox="0 0 150 94">
+<rect width="150" height="94" fill="#2E48D8"/>
+<path d="M0 0H58L48 31L0 50Z" fill="#12A7CF"/><path d="M58 0H150V25L97 46L48 31Z" fill="#5CCD70"/>
+<path d="M0 50L48 31L97 46L64 94H0Z" fill="#EBE43F"/><path d="M97 46L150 25V94H64Z" fill="#E78825"/>
+<circle cx="42" cy="40" r="13" fill="#08C7A7"/><circle cx="116" cy="63" r="19" fill="#43C96A"/>
+</symbol>
+<symbol id="canny" viewBox="0 0 150 94">
+<rect width="150" height="94" fill="#1E2328"/>
+<path d="M0 19L32 10L57 29L47 61L5 71M57 29L89 6L112 23L105 59L47 61M112 23L150 12M105 59L144 80M47 61L70 94M5 71L17 94" fill="none" stroke="#F3F5F7" stroke-width="2.3"/>
+<path d="M0 40L34 50L67 42L87 72L119 54L150 43" fill="none" stroke="#9BC0C2" stroke-width="1.2"/>
+</symbol>
+<symbol id="wheel" viewBox="0 0 100 100">
+<path d="M50 50L50 0A50 50 0 0 1 93 25Z" fill="#EF3D52"/><path d="M50 50L93 25A50 50 0 0 1 93 75Z" fill="#FFC62D"/>
+<path d="M50 50L93 75A50 50 0 0 1 50 100Z" fill="#6DCC2F"/><path d="M50 50L50 100A50 50 0 0 1 7 75Z" fill="#16C7D9"/>
+<path d="M50 50L7 75A50 50 0 0 1 7 25Z" fill="#4860DD"/><path d="M50 50L7 25A50 50 0 0 1 50 0Z" fill="#BB55C8"/>
+<circle cx="50" cy="50" r="10" fill="#FFFFFF"/>
+</symbol>
+<symbol id="spatial" viewBox="0 0 150 94">
+<rect x="3" y="3" width="64" height="89" fill="#D4E9FB" stroke="#267BCF" stroke-width="3"/><rect x="83" y="3" width="64" height="89" fill="#E8DBFD" stroke="#7842C7" stroke-width="3"/>
+<path d="M3 25H67M3 48H67M3 70H67M24 3V92M46 3V92" stroke="#267BCF" stroke-width="2"/>
+<path d="M83 33H147M83 63H147M105 3V92M126 3V92" stroke="#7842C7" stroke-width="2"/>
+</symbol>
+<symbol id="buffer" viewBox="0 0 150 94">
+<circle cx="27" cy="48" r="24" fill="none" stroke="#38B86C" stroke-dasharray="6 5" stroke-width="2"/><circle cx="27" cy="48" r="10" fill="#179B48"/>
+<circle cx="121" cy="48" r="24" fill="none" stroke="#38B86C" stroke-dasharray="6 5" stroke-width="2"/><circle cx="121" cy="48" r="10" fill="#179B48"/>
+<path d="M60 48H88M60 48L67 42M60 48L67 54M88 48L81 42M88 48L81 54" stroke="#294571" stroke-width="2" fill="none"/>
+<text x="75" y="38" fill="#163C7B" text-anchor="middle" font-size="12" font-weight="bold">25 m</text>
+</symbol>
+<symbol id="gear" viewBox="0 0 150 94">
+<g fill="#1285E3">
+<circle cx="55" cy="52" r="33"/><circle cx="109" cy="25" r="22"/>
+<path d="M52 6h12v25H52zM52 73h12v21H52zM6 48h25v12H6zM77 48h24v12H77zM23 17L15 26L37 45L45 36zM75 18L84 27L64 46L56 37z"/>
+</g><circle cx="55" cy="52" r="12" fill="white"/><circle cx="109" cy="25" r="8" fill="white"/>
+</symbol>
+<symbol id="decision" viewBox="0 0 150 94">
+<path d="M74 14L34 49M74 14L115 49M34 49L17 81M34 49L52 81M115 49L96 81M115 49L135 81" fill="none" stroke="#242E43" stroke-width="3"/>
+<circle cx="74" cy="14" r="10" fill="#0DA54A" stroke="#176B31" stroke-width="2"/>
+<circle cx="34" cy="49" r="10" fill="#E9C62B" stroke="#A8881B" stroke-width="2"/><circle cx="115" cy="49" r="10" fill="#E9C62B" stroke="#A8881B" stroke-width="2"/>
+<circle cx="17" cy="81" r="8" fill="#1AAF54"/><circle cx="52" cy="81" r="8" fill="#70BC4F"/><circle cx="96" cy="81" r="8" fill="#D6E738"/><circle cx="135" cy="81" r="8" fill="#00A762"/>
+</symbol>
+<symbol id="bars" viewBox="0 0 150 94">
+<path d="M17 5V85H145" stroke="#264879" stroke-width="3" fill="none"/>
+<rect x="30" y="60" width="20" height="25" fill="#54A4F7"/><rect x="59" y="44" width="20" height="41" fill="#2E95F0"/>
+<rect x="88" y="24" width="20" height="61" fill="#1483E6"/><rect x="117" y="10" width="20" height="75" fill="#0F62C5"/>
+</symbol>
+<symbol id="height" viewBox="0 0 150 94"><use href="#ndvi" x="0" y="0" width="150" height="94"/><path d="M140 4V90" stroke="#FFFFFF" stroke-width="10"/><path d="M140 4V90" stroke="#1935A1" stroke-width="5"/></symbol>
+<symbol id="curve" viewBox="0 0 150 94">
+<path d="M9 5V86H145" fill="none" stroke="#314B75" stroke-width="3"/>
+<path d="M14 79Q70 14 141 25" fill="none" stroke="#E9463D" stroke-width="4"/>
+<g fill="#1879DB"><circle cx="18" cy="75" r="3.5"/><circle cx="40" cy="50" r="3.5"/><circle cx="62" cy="43" r="3.5"/><circle cx="78" cy="33" r="3.5"/><circle cx="104" cy="25" r="3.5"/><circle cx="126" cy="26" r="3.5"/></g>
+</symbol>
+<symbol id="pole" viewBox="0 0 100 100">
+<path d="M48 6V99M7 32H91M29 32L48 17L70 32M29 32V47M69 32V47" stroke="#555D66" stroke-width="9" stroke-linecap="round" fill="none"/>
+<path d="M8 21H90" stroke="#313D50" stroke-width="3"/><circle cx="28" cy="31" r="5" fill="#262F3A"/><circle cx="69" cy="31" r="5" fill="#262F3A"/>
+</symbol>
+</defs>
+<rect x="0" y="0" width="1800" height="953" rx="0" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text x="900" y="49" font-family="Arial,Helvetica,sans-serif" font-size="43" fill="#082E86" font-weight="800" text-anchor="middle">Pipeline completo da pesquisa — 17 etapas</text>
+<text x="22" y="35" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#0B3D90" font-weight="700" text-anchor="start">Area1 — Caxias do Sul (RS)</text>
+<text x="22" y="55" font-family="Arial,Helvetica,sans-serif" font-size="16" fill="#215BB2" font-weight="500" text-anchor="start">RGB e RGB + NIR</text>
+<text x="1780" y="34" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#0B3D90" font-weight="700" text-anchor="end">Duas propostas complementares</text>
+<text x="1780" y="55" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#215BB2" font-weight="500" text-anchor="end">Identificação • Porte e proximidade</text>
+<rect x="15" y="81" width="1770" height="582" rx="17" fill="#F9FCFF" stroke="#6EA9EE" stroke-width="2"/>
+<rect x="26" y="91" width="1748" height="45" rx="11" fill="#ECF4FF" stroke="#ECF4FF" stroke-width="0"/>
+<rect x="35" y="97" width="177" height="33" rx="11" fill="#092F99" stroke="#092F99" stroke-width="0"/>
+<text x="123" y="120" font-family="Arial,Helvetica,sans-serif" font-size="23" fill="#FFFFFF" font-weight="800" text-anchor="middle">PROPOSTA 1</text>
+<text x="238" y="120" font-family="Arial,Helvetica,sans-serif" font-size="26" fill="#082E86" font-weight="800" text-anchor="start">Identificação de árvores e gramíneas</text>
+<text x="1758" y="121" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#2357A9" font-weight="600" text-anchor="end">Quickshift • NDVI, HSV e Canny • oito classificadores</text>
+<rect x="26" y="148" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="34" y="155" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="51.5" y="180" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">1</text>
+<text x="74" y="169" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Área de estudo — Area1</text>
+<text x="74" y="187" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">RGB e NIR</text>
+<use href="#aerial" x="46" y="196" width="140" height="80"/>
+<text x="196" y="220" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3A84" font-weight="600" text-anchor="start">Caxias do Sul</text>
+<text x="196" y="243" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#0C3A84" font-weight="600" text-anchor="start">0,50 m/pixel</text>
+<rect x="26" y="312" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="34" y="319" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="51.5" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">7</text>
+<text x="74" y="333" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Associar classes</text>
+<text x="74" y="351" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">e deduplicar</text>
+<use href="#poly" x="46" y="360" width="151" height="84"/>
+<use href="#tree" x="195" y="364" width="60" height="62"/>
+<use href="#grass" x="234" y="365" width="49" height="58"/>
+<text x="313" y="230" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<text x="313" y="394" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<rect x="321" y="148" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="329" y="155" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="346.5" y="180" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">2</text>
+<text x="369" y="169" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Imagem RGB para</text>
+<text x="369" y="187" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">segmentação</text>
+<use href="#forest" x="363" y="196" width="150" height="80"/>
+<rect x="321" y="312" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="329" y="319" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="346.5" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">8</text>
+<text x="369" y="333" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Extrair médias: NDVI,</text>
+<text x="369" y="351" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">brilho HSV e Canny</text>
+<use href="#ndvi" x="329" y="365" width="74" height="75"/>
+<use href="#wheel" x="414" y="368" width="76" height="72"/>
+<use href="#canny" x="501" y="365" width="80" height="75"/>
+<text x="368" y="454" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#0C4091" font-weight="700" text-anchor="middle">NDVI</text>
+<text x="453" y="454" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#0C4091" font-weight="700" text-anchor="middle">HSV</text>
+<text x="540" y="454" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#0C4091" font-weight="700" text-anchor="middle">Canny</text>
+<text x="608" y="230" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<text x="608" y="394" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<rect x="616" y="148" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="624" y="155" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="641.5" y="180" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">3</text>
+<text x="664" y="169" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">812 quadrantes</text>
+<text x="664" y="187" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">até 256 × 256 px</text>
+<use href="#grid" x="671" y="196" width="158" height="83"/>
+<text x="841" y="231" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#12744F" font-weight="800" text-anchor="middle">812</text>
+<rect x="616" y="312" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="624" y="319" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="641.5" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">9</text>
+<text x="664" y="333" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Separar treino/teste</text>
+<text x="664" y="351" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">blocos 250 e 500 m</text>
+<use href="#spatial" x="666" y="360" width="160" height="85"/>
+<text x="710" y="460" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#1265A4" font-weight="700" text-anchor="middle">250 m</text>
+<text x="786" y="460" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#7641BD" font-weight="700" text-anchor="middle">500 m</text>
+<text x="903" y="230" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<text x="903" y="394" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<rect x="911" y="148" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="919" y="155" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="936.5" y="180" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">4</text>
+<text x="959" y="169" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Quickshift em</text>
+<text x="959" y="187" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">cada quadrante</text>
+<use href="#seg" x="931" y="196" width="144" height="85"/>
+<use href="#poly" x="1085" y="204" width="91" height="66"/>
+<rect x="911" y="312" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="919" y="319" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="936.5" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">10</text>
+<text x="959" y="333" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Embargo espacial</text>
+<text x="959" y="351" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">de 25 m</text>
+<use href="#buffer" x="964" y="364" width="176" height="86"/>
+<text x="1198" y="230" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<text x="1198" y="394" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<rect x="1206" y="148" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="1214" y="155" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="1231.5" y="180" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">5</text>
+<text x="1254" y="169" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Segmentos e polígonos</text>
+<text x="1254" y="187" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">georreferenciados</text>
+<use href="#poly" x="1236" y="196" width="160" height="84"/>
+<text x="1421" y="229" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#126BAF" font-weight="800" text-anchor="middle">GIS</text>
+<rect x="1206" y="312" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="1214" y="319" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="1231.5" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">11</text>
+<text x="1254" y="333" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Selecionar parâmetros</text>
+<text x="1254" y="351" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">só com o treino</text>
+<use href="#gear" x="1263" y="363" width="177" height="89"/>
+<text x="1493" y="230" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<text x="1493" y="394" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<rect x="1501" y="148" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="1509" y="155" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="1526.5" y="180" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">6</text>
+<text x="1549" y="169" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">510 pontos originais</text>
+<text x="1549" y="187" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">257 árvores / 253 gramas</text>
+<use href="#tree" x="1521" y="196" width="102" height="86"/>
+<use href="#grass" x="1648" y="196" width="94" height="82"/>
+<rect x="1501" y="312" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="1509" y="319" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="1526.5" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">12</text>
+<text x="1549" y="333" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Treinar e avaliar</text>
+<text x="1549" y="351" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">8 classificadores</text>
+<use href="#decision" x="1516" y="361" width="140" height="83"/>
+<text x="1655" y="381" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3A84" font-weight="600" text-anchor="start">RF · SVM</text>
+<text x="1655" y="400" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#0C3A84" font-weight="600" text-anchor="start">Logística · KNN</text>
+<text x="1655" y="419" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#0C3A84" font-weight="600" text-anchor="start">Trees · NB</text>
+<text x="1655" y="438" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#0C3A84" font-weight="600" text-anchor="start">Boost · Dummy</text>
+<rect x="26" y="477" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="34" y="484" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="51.5" y="509" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">13</text>
+<text x="74" y="498" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">Predições no teste</text>
+<text x="74" y="516" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">árvore ou gramínea</text>
+<use href="#seg" x="43" y="528" width="159" height="84"/>
+<use href="#tree" x="204" y="525" width="66" height="62"/>
+<text x="234" y="617" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#0C4091" font-weight="700" text-anchor="middle">árvore / grama</text>
+<rect x="321" y="477" width="273" height="149" rx="12" fill="#FFFFFF" stroke="#167DF2" stroke-width="2"/>
+<rect x="329" y="484" width="35" height="35" rx="18" fill="#117AE6" stroke="#117AE6" stroke-width="0"/>
+<text x="346.5" y="509" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#FFFFFF" font-weight="800" text-anchor="middle">14</text>
+<text x="369" y="498" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">F1-macro médio por</text>
+<text x="369" y="516" font-family="Arial,Helvetica,sans-serif" font-size="15.8" fill="#083577" font-weight="700" text-anchor="start">classificador</text>
+<use href="#bars" x="340" y="525" width="145" height="87"/>
+<text x="529" y="554" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#094FA7" font-weight="800" text-anchor="middle">F1-macro</text>
+<text x="529" y="575" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#094FA7" font-weight="700" text-anchor="middle">250 m</text>
+<text x="529" y="595" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#094FA7" font-weight="700" text-anchor="middle">500 m</text>
+<text x="313" y="557" font-family="Arial,Helvetica,sans-serif" font-size="34" fill="#167DF2" font-weight="800" text-anchor="middle">›</text>
+<rect x="616" y="479" width="1158" height="145" rx="14" fill="#F0F7FF" stroke="#92BBEB" stroke-width="1.5"/>
+<text x="646" y="513" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#083577" font-weight="800" text-anchor="start">Oito classificadores avaliados:</text>
+<rect x="645" y="526" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="774" y="549" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">Random Forest</text>
+<rect x="925" y="526" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="1054" y="549" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">SVM RBF</text>
+<rect x="1205" y="526" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="1334" y="549" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">Regressão logística</text>
+<rect x="1485" y="526" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="1614" y="549" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">Extra Trees</text>
+<rect x="645" y="566" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="774" y="589" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">KNN</text>
+<rect x="925" y="566" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="1054" y="589" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">HistGradientBoosting</text>
+<rect x="1205" y="566" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="1334" y="589" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">Gaussian Naive Bayes</text>
+<rect x="1485" y="566" width="258" height="33" rx="7" fill="#FFFFFF" stroke="#7BA8E3" stroke-width="1"/>
+<text x="1614" y="589" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#0C3884" font-weight="700" text-anchor="middle">Dummy</text>
+<rect x="15" y="679" width="1770" height="256" rx="17" fill="#FAF8FF" stroke="#AC92EB" stroke-width="2"/>
+<rect x="26" y="689" width="1748" height="46" rx="11" fill="#EFE9FD" stroke="#EFE9FD" stroke-width="0"/>
+<rect x="35" y="697" width="177" height="33" rx="11" fill="#6738BD" stroke="#6738BD" stroke-width="0"/>
+<text x="123" y="720" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#FFFFFF" font-weight="800" text-anchor="middle">PROPOSTA 2</text>
+<text x="235" y="720" font-family="Arial,Helvetica,sans-serif" font-size="26" fill="#553096" font-weight="800" text-anchor="start">Porte e proximidade com postes</text>
+<text x="1755" y="721" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#674E99" font-weight="600" text-anchor="end">Análise exploratória; não comprova risco elétrico</text>
+<rect x="28" y="749" width="563" height="158" rx="12" fill="#FFFFFF" stroke="#9674DD" stroke-width="2"/>
+<rect x="37" y="759" width="40" height="40" rx="21" fill="#6F42C9" stroke="#6F42C9" stroke-width="0"/>
+<text x="57" y="787" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#FFFFFF" font-weight="800" text-anchor="middle">15</text>
+<text x="85" y="778" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#552C9B" font-weight="800" text-anchor="start">257 pontos e alturas</text>
+<text x="85" y="802" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#552C9B" font-weight="700" text-anchor="start">Meta/WRI CHMv2</text>
+<use href="#height" x="60" y="812" width="153" height="85"/>
+<text x="234" y="837" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#4C3A82" font-weight="700" text-anchor="start">Referência externa</text>
+<text x="234" y="862" font-family="Arial,Helvetica,sans-serif" font-size="16" fill="#4C3A82" font-weight="600" text-anchor="start">257 árvores da Area1</text>
+<rect x="617" y="749" width="563" height="158" rx="12" fill="#FFFFFF" stroke="#9674DD" stroke-width="2"/>
+<rect x="626" y="759" width="40" height="40" rx="21" fill="#6F42C9" stroke="#6F42C9" stroke-width="0"/>
+<text x="646" y="787" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#FFFFFF" font-weight="800" text-anchor="middle">16</text>
+<text x="674" y="778" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#552C9B" font-weight="800" text-anchor="start">Área dos superpixels</text>
+<text x="674" y="802" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#552C9B" font-weight="700" text-anchor="start">e 11 famílias alométricas</text>
+<use href="#curve" x="655" y="811" width="151" height="91"/>
+<text x="825" y="838" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#4C3A82" font-weight="700" text-anchor="start">Curva-S, cúbica,</text>
+<text x="825" y="863" font-family="Arial,Helvetica,sans-serif" font-size="16" fill="#4C3A82" font-weight="600" text-anchor="start">inversa e outras</text>
+<rect x="1206" y="749" width="563" height="158" rx="12" fill="#FFFFFF" stroke="#9674DD" stroke-width="2"/>
+<rect x="1215" y="759" width="40" height="40" rx="21" fill="#6F42C9" stroke="#6F42C9" stroke-width="0"/>
+<text x="1235" y="787" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#FFFFFF" font-weight="800" text-anchor="middle">17</text>
+<text x="1263" y="778" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#552C9B" font-weight="800" text-anchor="start">Índices C1–C6 e</text>
+<text x="1263" y="802" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#552C9B" font-weight="700" text-anchor="start">proximidade 2D a postes</text>
+<use href="#tree" x="1234" y="814" width="124" height="93"/>
+<text x="1411" y="861" font-family="Arial,Helvetica,sans-serif" font-size="45" fill="#6738BD" font-weight="800" text-anchor="start">↔</text>
+<use href="#pole" x="1515" y="815" width="90" height="91"/>
+<text x="1611" y="839" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#4C3A82" font-weight="700" text-anchor="start">Distância 2D</text>
+<text x="1611" y="863" font-family="Arial,Helvetica,sans-serif" font-size="16" fill="#4C3A82" font-weight="600" text-anchor="start">a postes</text>
+<text x="900" y="947" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#62517C" font-weight="500" text-anchor="middle">A altura Meta/WRI é estimada por modelo; a proximidade horizontal a postes não demonstra interferência em cabos elétricos.</text>
+</svg>
