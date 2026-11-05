@@ -320,6 +320,46 @@ Esta proposta investiga **porte da vegetação e distância horizontal a postes*
 
 **Alometria** é o estudo de relações matemáticas entre dimensões de organismos. No contexto desta pesquisa, investigamos se a **área projetada dos superpixels Quickshift** poderia ajudar a aproximar a altura estimada de árvores. Como o superpixel **não corresponde necessariamente à copa de um único indivíduo**, sua área é uma variável geométrica aproximada, não uma medida botânica direta.
 
+**Fluxograma da Proposta 2 — duas análises exploratórias complementares**
+
+O fluxograma separa o **estudo posterior de alometria com alturas modeladas pela Meta/WRI** do **procedimento histórico com índices de porte e proximidade com postes**. São análises relacionadas à Area1, mas não equivalem a um único teste integrado de risco elétrico.
+
+```mermaid
+flowchart TD
+    subgraph A["Estudo alométrico — Meta/WRI CHMv2"]
+        P["257 pontos conhecidos de árvores da Area1"] --> H["Consultar raster Meta/WRI CHMv2"]
+        H --> V["Meta pixel e máximo estimado no raio de 5 m"]
+        P --> S["Associar aos superpixels Quickshift e obter área em m²"]
+        S --> D["Calcular diâmetro equivalente a partir da área"]
+        V --> E["Organizar exemplos e validação espacial"]
+        D --> E
+        E --> B["Blocos de 250 e 500 m, cinco divisões por escala e embargo de 25 m"]
+        B --> M["Ajustar onze famílias alométricas apenas nos dados de treino"]
+        M --> O["Previsões fora do treino e MAE frente às estimativas Meta/WRI"]
+        O --> C["Comparar famílias, controle constante e limitações"]
+    end
+    subgraph P2["Estudo histórico — índices de porte e proximidade"]
+        K["Quickshift global, K-Means e candidatos do cluster 3"] --> L["Calcular área dos polígonos em m²"]
+        L --> I["Aplicar índices empíricos C1–C6, potenciais e lineares"]
+        I --> F{"Índice potencial C3 maior que 7?"}
+        F -->|Sim| Q["Selecionar candidatos"]
+        F -->|Não| X["Fora do filtro"]
+        Q --> N["Calcular proximidade horizontal aos postes"]
+        R["Pontos do arquivo postes.gpkg"] --> N
+        N --> T["Examinar distâncias de 1, 3 e 5 m"]
+    end
+    C --> U["Síntese: estimativas de porte sem validação com altura de campo"]
+    T --> W["Síntese: distância 2D, sem inferir risco elétrico"]
+    classDef dados fill:#eaf4ff,stroke:#80b4e2,color:#163b5d,stroke-width:1.5px;
+    classDef metodo fill:#e4f4e8,stroke:#67a681,color:#164b35,stroke-width:1.5px;
+    classDef resultado fill:#fff1db,stroke:#dcab68,color:#6b4714,stroke-width:1.5px;
+    class P,H,V,S,K,R dados;
+    class D,E,B,M,L,I,F,Q,X,N metodo;
+    class O,C,T,U,W resultado;
+```
+
+**Como interpretar:** as onze famílias são comparadas às **estimativas Meta/WRI**, e não a alturas medidas em campo. Na análise histórica, os candidatos vêm do **cluster 3**, sem exigir necessariamente a previsão “árvore” do Random Forest; a distância é **horizontal até postes**, não até cabos. Nenhuma dessas análises comprova risco elétrico.
+
 O notebook original contém seis configurações empíricas **C1–C6**, cada uma nas formas **potencial** e **linear**. Por exemplo, o índice potencial C3 foi definido como:
 
 \[
