@@ -85,8 +85,8 @@ A grade RGB e a multiespectral apresentam um pequeno deslocamento entre suas ori
 O diagrama apresenta as **17 etapas de síntese**, preservando as **duas propostas** e substituindo, nesta apresentação, o pipeline histórico que mostrava somente Random Forest. A primeira proposta utiliza **oito classificadores**. A segunda contém análises exploratórias complementares e **não deve ser interpretada como validação da altura ou do risco elétrico**.
 
 <p align="center">
-  <a href="docs/pipeline_completo_17_etapas_oito_classificadores.svg">
-    <img src="docs/pipeline_completo_17_etapas_oito_classificadores.svg" alt="Novo pipeline completo com 17 etapas, duas propostas e oito classificadores, incluindo Quickshift em 812 quadrantes, validação espacial e modelos alométricos." width="100%">
+  <a href="docs/pipeline_17_etapas_ilustrado.svg">
+    <img src="docs/pipeline_17_etapas_ilustrado.svg" alt="Novo pipeline completo com 17 etapas, duas propostas e oito classificadores, incluindo Quickshift em 812 quadrantes, validação espacial e modelos alométricos." width="100%">
   </a>
 </p>
 
@@ -433,7 +433,7 @@ A utilização de **blocos espaciais** e **embargo geométrico de 25 m**, somada
 | **Resultados dos 257 pontos / 74 colunas** | [CSV completo](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) e [tabela Markdown](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_tabela.md). |
 | **Métricas e previsões alométricas** | [Resumo das onze famílias (CSV)](docs/v3_alturas_publicas/v3_11_familias_meta_resumo.csv), [previsões para os 257 pontos](docs/v3_alturas_publicas/v3_11_familias_meta_257_previsoes.csv) e [calibração espacial](docs/v3_alturas_publicas/v3_meta_calibracao_validacao_espacial.csv). |
 | **Índices exploratórios históricos e estudos complementares** | [Descrição da alometria original](docs/allometria.md), [comparação C1–C3 e Meta/WRI](docs/v3_alturas_publicas/v3_c1_c3_meta_relatorio.md) e [comparação 512 vs 256 pixels](docs/comparacao_controlada_segmentacao_512_vs_256.md). |
-| **Figura atualizada do pipeline** | [17 etapas e oito classificadores (SVG)](docs/pipeline_completo_17_etapas_oito_classificadores.svg). |
+| **Figura atualizada do pipeline** | [17 etapas e oito classificadores (SVG)](docs/pipeline_17_etapas_ilustrado.svg). |
 | **Figura original preservada** | [Fluxograma horizontal histórico](docs/fluxo_17_etapas_horizontal_corrigido.png). |
 | **Fonte Meta/WRI CHMv2** | [Raster original 2103121330.tif](https://dataforgood-fb-data.s3.us-east-1.amazonaws.com/forests/v2/global/dinov3_global_chm_v2_ml3/chm/2103121330.tif), [AWS Open Data](https://registry.opendata.aws/dataforgood-fb-forestsv2/) e [Brandt et al. (2026)](https://doi.org/10.1038/s41597-026-07882-0). |
 | **Onze famílias de equações** | [Chatziathanasiou, Kitikidou e Milios (2024)](https://doi.org/10.3390/land13101579) e [correção de 2026](https://doi.org/10.3390/land15030473). |
