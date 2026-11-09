@@ -1,10 +1,7 @@
 # Projeto de mestrado: Combinação de Características de Brilho, Bordas e NDVI para Detecção de Árvores Urbanas e Avaliação de Proximidade com Linhas de Energia
 
 **Pesquisador:** Breno Braga Galvão  
-**Área de estudo:** Area1, Caxias do Sul (RS)  
-**Documentação anterior preservada:** [README_versao_outubro.md](README_versao_outubro.md)
-
-Este documento apresenta as **duas propostas da pesquisa**, adotando como metodologia central de classificação a segmentação Quickshift em **812 quadrantes**. Métodos e resultados históricos continuam preservados, mas não são misturados às tabelas do protocolo principal.
+**Área de estudo:** Area1, Caxias do Sul (RS)
 
 ## Índice
 
