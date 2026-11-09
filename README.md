@@ -81,9 +81,17 @@ Já a **Area1 é delimitada por um polígono irregular**, que não ocupa todo o 
 
 O vetor **AOI_new.shp** delimita a área de interesse; **Arvores.gpkg** contém **257 pontos de árvores**; **Grama.gpkg** contém **253 pontos de gramíneas**; e **postes.gpkg** registra os pontos de postes. Portanto, existem **510 pontos originais de referência**. Esses pontos não são equivalentes, um a um, ao número de segmentos de treinamento: na avaliação da configuração adotada, após a associação dos pontos às geometrias do Quickshift e a deduplicação, foram considerados **505 segmentos rotulados únicos**.
 
-<p align="center"><img src="docs/area1_grades_processamento_validacao_espacial_detalhada.svg" alt="Esquema da Area1 com grades de processamento e validação espacial." width="100%"></p>
+<p align="center">
+  <img src="docs/area1_grades_processamento_validacao_espacial.svg" alt="Fluxo principal: Quickshift em 812 quadrantes, 505 segmentos rotulados e avaliação espacial com blocos de 250 ou 500 metros." width="100%">
+</p>
 
-*Figura — A Area1 é dividida em **812 quadrantes de até 256 × 256 pixels para executar o Quickshift**. Os blocos de **250 m e 500 m** são usados **depois da segmentação**, na separação espacial dos exemplos entre treino e teste. Eles não produzem novas segmentações; as grades desenhadas são ilustrativas.*
+*Figura 1 — Visão geral da metodologia: Quickshift nos 812 quadrantes e, posteriormente, validação espacial em blocos de 250 m ou 500 m.*
+
+<p align="center">
+  <img src="docs/area1_grades_processamento_validacao_espacial_detalhada.svg" alt="Exemplo complementar das cinco divisões espaciais de treinamento e teste para cada tamanho de bloco." width="100%">
+</p>
+
+*Figura 2 — Como funcionam as cinco divisões espaciais: em cada escala, os blocos são separados aproximadamente em 80% para treinamento e 20% para teste, repetindo a avaliação cinco vezes com diferentes partições. As grades são ilustrativas, não a disposição exata dos blocos do experimento.*
 
 **Onde entram os 812 quadrantes e os blocos de 250 m e 500 m?** Primeiro, a imagem RGB é dividida em **812 quadrantes de até 256 × 256 pixels**, e o **Quickshift é executado separadamente em cada quadrante**, criando os segmentos. Depois, os pontos de referência conhecidos são associados a esses segmentos, formando a base de **505 segmentos rotulados únicos**. **Somente na avaliação dos oito classificadores** entram os **blocos geográficos de 250 m ou 500 m**: eles agrupam os exemplos por localização para separar treinamento e teste, com **cinco divisões por escala** e **exclusão espacial de 25 m**. Portanto, **256 × 256 pixels é a janela do Quickshift; 250 m e 500 m são os blocos de validação**, não novos recortes da imagem.
 
