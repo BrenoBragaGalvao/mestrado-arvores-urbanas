@@ -62,10 +62,18 @@ A Area1 situa-se em **Caxias do Sul, Rio Grande do Sul**. São utilizados dois r
 | Grade retangular | **50.634.948 pixels**; aproximadamente **12,658737 km²** |
 | Área efetiva do polígono AOI | Aproximadamente **12,14 km²**, menor que o retângulo por causa do contorno irregular |
 | Resolução espacial | **0,50 × 0,50 m por pixel** (0,25 m²) |
-| Retângulo no terreno | **3.471 × 3.647 m** |
+| Retângulo no terreno | **3.471 × 3.647 m = 12.658.737 m²** (≈ **12,66 km²**) |
 | Referência cartográfica | **EPSG:31982** |
 | Satélite atribuído na documentação dos rasters | **JL1KF01B** |
 | Disponibilização das imagens conforme os registros da pesquisa | **CPFL** |
+
+**Por que o retângulo tem 12,66 km², mas a Area1 tem aproximadamente 12,14 km²?** Os **3.471 m de largura** e **3.647 m de altura** representam a extensão completa e retangular da imagem. A área total desse retângulo é:
+
+\[
+3.471 \times 3.647 = 12.658.737\ \mathrm{m}^2 \approx 12,66\ \mathrm{km}^2
+\]
+
+Já a **Area1 é delimitada por um polígono irregular**, que não ocupa todo o retângulo. Por isso, sua área efetiva é de aproximadamente **12,14 km²**, ou cerca de **0,52 km² a menos**. Assim, **12,66 km² corresponde à imagem inteira** e **12,14 km² corresponde somente à área de estudo dentro dela**.
 
 O vetor **AOI_new.shp** delimita a área de interesse; **Arvores.gpkg** contém **257 pontos de árvores**; **Grama.gpkg** contém **253 pontos de gramíneas**; e **postes.gpkg** registra os pontos de postes. Portanto, existem **510 pontos originais de referência**. Esses pontos não são equivalentes, um a um, ao número de segmentos de treinamento: na avaliação da configuração adotada, após a associação dos pontos às geometrias do Quickshift e a deduplicação, foram considerados **505 segmentos rotulados únicos**.
 
