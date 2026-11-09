@@ -85,7 +85,7 @@ A grade RGB e a multiespectral apresentam um pequeno deslocamento entre suas ori
 
 <p align="center"><img src="docs/area1_grades_processamento_validacao_espacial.svg" alt="Esquema da Area1 com grades de processamento e validação espacial." width="100%"></p>
 
-*Figura — Representação espacial da Area1 e das grades utilizadas no estudo; as grades de processamento em pixels não se confundem com os blocos de validação em metros.*
+*Figura — A mesma Area1 é segmentada **uma única vez, em 812 quadrantes de até 256 × 256 pixels**. Os blocos de **250 m e 500 m** não criam novas segmentações: são duas escalas usadas para dividir os 505 exemplos rotulados entre treinamento e teste. As grades são ilustrativas.*
 
 
 
@@ -215,6 +215,8 @@ Após a separação, removem-se do **treinamento** os objetos cujas **geometrias
 **Por que não usar somente 80/20 aleatório?** Árvores e gramíneas próximas podem compartilhar iluminação, textura e condições de imagem. Distribuir exemplos quase vizinhos entre treinamento e teste pode favorecer um desempenho artificialmente otimista. Os blocos e o embargo **reduzem essa influência**, embora não garantam independência completa nem substituam validação em outra região.
 
 **Não confundir as escalas:** os **256 × 256 pixels** definem o tamanho da janela de **segmentação**, enquanto **250 e 500 metros** definem a escala geográfica das **partições de validação**.
+
+**Por que avaliamos blocos de 250 m e 500 m, em vez de escolher apenas um tamanho?** Para verificar se os resultados dos classificadores **se mantêm consistentes quando muda a escala geográfica da separação entre treino e teste**. Blocos de **250 m** organizam as amostras em regiões menores; blocos de **500 m**, em regiões maiores. Isso modifica a distribuição espacial dos exemplos e pode alterar o F1-macro. Usar as **duas escalas** permite avaliar a sensibilidade e a estabilidade dos modelos, sem depender de uma única escolha arbitrária. **Blocos maiores não garantem, por si só, testes mais difíceis**.
 
 <p align="center"><img src="docs/explicacao_blocos_geograficos_250_500m.webp" alt="Por que blocos geográficos de 250 e 500 metros reduzem a proximidade entre treino e teste." width="100%"></p>
 
