@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 560" width="680" height="560" role="img" aria-labelledby="titulo descricao">
+  <title id="titulo">Retângulo da imagem e área efetiva da Area1</title>
+  <desc id="descricao">Desenho esquemático, fora de escala, que mostra o retângulo completo de 3471 metros de largura por 3647 metros de altura e o polígono irregular da Area1 com aproximadamente 12,14 quilômetros quadrados.</desc>
+  <rect width="680" height="560" fill="#FFFFFF"/>
+  <text x="300" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#222222">3.471 m (largura)</text>
+  <rect x="38" y="62" width="524" height="414" rx="4" fill="#DCEBF9" stroke="#3378B3" stroke-width="4"/>
+  <polygon points="88,74 315,76 457,113 535,218 507,347 454,444 256,460 123,423 53,282 74,151" fill="#8BC6A0" stroke="#21824E" stroke-width="6"/>
+  <text x="292" y="262" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#155A38">Area1</text>
+  <text x="292" y="304" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#155A38">12,14 km²</text>
+  <text x="607" y="272" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#222222" transform="rotate(90 607 272)">3.647 m (altura)</text>
+  <rect x="48" y="505" width="26" height="26" fill="#DCEBF9" stroke="#3378B3" stroke-width="2"/>
+  <text x="86" y="524" font-family="Arial, sans-serif" font-size="22" fill="#222222">Imagem completa</text>
+  <rect x="355" y="505" width="26" height="26" fill="#8BC6A0" stroke="#21824E" stroke-width="2"/>
+  <text x="393" y="524" font-family="Arial, sans-serif" font-size="22" fill="#222222">Área efetiva</text>
+</svg>
