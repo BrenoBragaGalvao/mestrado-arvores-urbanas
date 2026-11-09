@@ -75,9 +75,7 @@ A Area1 situa-se em **Caxias do Sul, Rio Grande do Sul**. São utilizados dois r
 
 **Por que o retângulo tem 12,66 km², mas a Area1 tem aproximadamente 12,14 km²?** Os **3.471 m de largura** e **3.647 m de altura** representam a extensão completa e retangular da imagem. A área total desse retângulo é:
 
-\[
-3.471 \times 3.647 = 12.658.737\ \mathrm{m}^2 \approx 12,66\ \mathrm{km}^2
-\]
+**3.471 m × 3.647 m = 12.658.737 m² ≈ 12,66 km²**
 
 Já a **Area1 é delimitada por um polígono irregular**, que não ocupa todo o retângulo. Por isso, sua área efetiva é de aproximadamente **12,14 km²**, ou cerca de **0,52 km² a menos**. Assim, **12,66 km² corresponde à imagem inteira** e **12,14 km² corresponde somente à área de estudo dentro dela**.
 
