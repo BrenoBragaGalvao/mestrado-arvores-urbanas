@@ -67,6 +67,12 @@ A Area1 situa-se em **Caxias do Sul, Rio Grande do Sul**. São utilizados dois r
 | Satélite atribuído na documentação dos rasters | **JL1KF01B** |
 | Disponibilização das imagens conforme os registros da pesquisa | **CPFL** |
 
+<p align="center">
+  <img src="docs/aoi_retangulo_area1_esquema.svg" alt="Esquema mostrando o retângulo completo da imagem, de 3.471 metros por 3.647 metros, e o polígono irregular da Area1 com aproximadamente 12,14 km²." width="75%">
+</p>
+
+*Figura — Diferença entre o retângulo total da imagem (aproximadamente 12,66 km²) e a área efetiva do polígono Area1 (aproximadamente 12,14 km²). Desenho ilustrativo, fora de escala.*
+
 **Por que o retângulo tem 12,66 km², mas a Area1 tem aproximadamente 12,14 km²?** Os **3.471 m de largura** e **3.647 m de altura** representam a extensão completa e retangular da imagem. A área total desse retângulo é:
 
 \[
