@@ -44,7 +44,7 @@ O estudo mantém **duas propostas complementares**:
 | **🌳 Proposta 1 — Identificação de árvores e gramíneas** | É possível distinguir essas duas classes utilizando características de brilho, bordas e resposta espectral? | Classificação supervisionada de segmentos associados a referências conhecidas. |
 | **⚡ Proposta 2 — Indicador de porte e proximidade com postes** | O que a área dos segmentos, as equações alométricas e as distâncias horizontais a postes permitem explorar? | Estimativas e indicadores exploratórios, sem comprovação de altura real nem de risco elétrico. |
 
-Na **Proposta 1**, a metodologia central utiliza **812 quadrantes de até 256 × 256 pixels**, com segmentação Quickshift, atributos **NDVI, brilho HSV e bordas Canny** e **oito classificadores** avaliados por **F1-macro**, com separação espacial entre treino e teste. A **Proposta 2** reúne experimentos próprios de alometria e proximidade: a referência externa **Meta/WRI CHMv2** permite comparar alturas modeladas em **257 pontos de árvores**, mas não substitui medições de campo. Os métodos históricos e as configurações alternativas permanecem integralmente documentados no [README preservado](README_versao_outubro.md).
+Na **Proposta 1**, a metodologia central utiliza **812 quadrantes de até 256 × 256 pixels**, com segmentação Quickshift, atributos **NDVI, brilho HSV e bordas Canny** e **oito classificadores** avaliados por **F1-macro**, com separação espacial entre treino e teste. A **Proposta 2** reúne experimentos próprios de alometria e proximidade: a referência externa **Meta/WRI CHMv2** permite comparar alturas modeladas em **257 pontos de árvores**, mas não substitui medições de campo.
 
 <a id="sec-1-2"></a>
 ### 1.2. Área de estudo e informações sobre os dados utilizados
