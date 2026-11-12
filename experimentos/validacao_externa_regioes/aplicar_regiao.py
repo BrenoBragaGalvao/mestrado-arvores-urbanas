@@ -218,26 +218,45 @@ def combine_csv(tile_dir, result):
 
 
 def previews(rgb_path, outputs, out, max_dim=1400):
+    """Pré-visualizações reduzidas: RGB, Quickshift, árvore, grama e sobreposição."""
     from matplotlib import pyplot as plt
-    import matplotlib
+    from matplotlib.colors import to_rgb
     with rasterio.open(rgb_path) as ds:
         k = min(1., max_dim / max(ds.width, ds.height))
-        width, height = max(1,int(ds.width*k)), max(1,int(ds.height*k))
+        width, height = max(1, int(ds.width*k)), max(1, int(ds.height*k))
         rgb = np.moveaxis(ds.read([1,2,3], out_shape=(3,height,width),
                                   resampling=Resampling.bilinear).astype(float),0,-1)
-    lo, hi = np.percentile(rgb[np.isfinite(rgb)], [2,98])
+    values=rgb[np.isfinite(rgb)]
+    if not len(values):
+        raise ValueError("Não foi possível criar visualização: RGB sem valores finitos")
+    lo, hi = np.percentile(values, [2,98])
     base = np.clip((rgb-lo)/max(hi-lo,1e-8),0,1)
-    from matplotlib.colors import ListedColormap
-    from matplotlib.colors import to_rgb
-    for name, path in outputs.items():
+    plt.imsave(out/"imagem_rgb_reduzida.png",base)
+    ids_path=out/"segmento_id.tif"
+    if ids_path.is_file():
+        with rasterio.open(ids_path) as src:
+            ids=src.read(1,out_shape=(height,width),resampling=Resampling.nearest)
+        edges=np.zeros((height,width),dtype=bool)
+        edges[:,1:] |= (ids[:,1:]!=ids[:,:-1])
+        edges[1:,:] |= (ids[1:,:]!=ids[:-1,:])
+        edges &= ids>0
+        seg_preview=base.copy()
+        seg_preview[edges]=to_rgb("#43D4F8")
+        plt.imsave(out/"quickshift_segmentos_reduzidos.png",seg_preview)
+    for name,path in outputs.items():
         with rasterio.open(path) as ds:
-            mask = ds.read(1, out_shape=(height,width), resampling=Resampling.nearest)
-        image = base.copy()
-        image[mask==1] = image[mask==1]*.55 + np.array(to_rgb("#2C9C57"))*.45
-        image[mask==2] = image[mask==2]*.55 + np.array(to_rgb("#E4C04F"))*.45
-        plt.imsave(out / ("sobreposicao_" + output_model_name(path.name).replace("classificacao_","") + ".png"), image)
-    plt.imsave(out / "imagem_rgb_reduzida.png", base)
-
+            mask=ds.read(1,out_shape=(height,width),resampling=Resampling.nearest)
+        suffix=output_model_name(path.name).replace("classificacao_","")
+        combined=base.copy()
+        trees=base.copy()
+        grasses=base.copy()
+        combined[mask==1]=combined[mask==1]*.55+np.array(to_rgb("#2C9C57"))*.45
+        combined[mask==2]=combined[mask==2]*.55+np.array(to_rgb("#E4C04F"))*.45
+        trees[mask==1]=trees[mask==1]*.4+np.array(to_rgb("#2C9C57"))*.6
+        grasses[mask==2]=grasses[mask==2]*.4+np.array(to_rgb("#E4C04F"))*.6
+        plt.imsave(out/("sobreposicao_"+suffix+".png"),combined)
+        plt.imsave(out/("arvores_"+suffix+".png"),trees)
+        plt.imsave(out/("gramineas_"+suffix+".png"),grasses)
 
 def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
         resume=False, make_previews=True, limit_tiles=None):
