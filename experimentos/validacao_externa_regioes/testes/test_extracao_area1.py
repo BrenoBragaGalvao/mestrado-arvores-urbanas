@@ -39,8 +39,14 @@ def test_processamento_tile_com_referencias_sinteticas(tmp_path):
             dst.write(arr)
     refs=[{"r":5,"c":5,"classe":"arvore","ref_id":"arvore_0"},
           {"r":25,"c":29,"classe":"grama","ref_id":"grama_0"}]
+    geometry_store=[]
     with rasterio.open(rgb_file) as rgb,rasterio.open(multi_file) as ms:
-        records,stats=process_tile(0,(0,0),refs,rgb,ms,[mapping(box(0,20,20,40))])
+        records,stats=process_tile(0,(0,0),refs,rgb,ms,
+                                   [mapping(box(0,20,20,40))],
+                                   geometry_store=geometry_store)
+    assert len(geometry_store)==len({r["id"] for r in records})
+    assert all("geometry" in x and x["geometry"]["type"] in ("Polygon","MultiPolygon")
+               for x in geometry_store)
     assert stats["pontos"]==2
     assert len(records)==2
     assert set(rec["classe"] for rec in records)=={"arvore","grama"}
