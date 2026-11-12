@@ -121,6 +121,24 @@ def run(area:Path,out:Path,expect:int=505,limit:int|None=None,resume:bool=False)
     missing=[s for s in PACKAGES if not (area/s).is_file()]
     if missing:
         raise FileNotFoundError(f"Ausentes arquivos da Area1: {missing}")
+    signature={
+        "area1":str(area.resolve()),
+        "arquivos":{name:{"bytes":(area/name).stat().st_size,
+                          "modificado_ns":(area/name).stat().st_mtime_ns}
+                    for name in PACKAGES},
+        "tamanho_quadrante_px":TILE,
+        "esperado":expect,
+        "quickshift":{"kernel_size":3,"max_dist":5,"ratio":.04,"rng":42},
+        "features":list(FEATURES)
+    }
+    signature_path=out/"assinatura_reconstrucao.json"
+    if signature_path.exists():
+        if not resume or json.loads(signature_path.read_text(encoding="utf-8"))!=signature:
+            raise ValueError("Checkpoint preexistente com entradas diferentes ou sem --retomar")
+    else:
+        if resume:
+            raise FileNotFoundError("Sem checkpoint para retomar")
+        signature_path.write_text(json.dumps(signature,ensure_ascii=False,indent=2),encoding="utf-8")
     tiles_out=out/"quadrantes_com_referencias"
     tiles_out.mkdir(exist_ok=True)
     started=time.monotonic()
