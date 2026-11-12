@@ -96,7 +96,7 @@ jobs:
           else
             sudo apt-get update -qq
             sudo apt-get install -y -qq p7zip-full
-            7z e -y -o"${{ runner.temp }}/rasters" "${{ runner.temp }}/src/pacote.rar" \
+            7z e -y -r -o"${{ runner.temp }}/rasters" "${{ runner.temp }}/src/pacote.rar" \
               "*_ORTHO_4BANDAS.tif" "*_ORTHO_RGB.tif"
             python - <<'PY'
           import os,shutil
