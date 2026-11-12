@@ -106,8 +106,21 @@ def region_aoi(path, crs):
 
 
 def file_fingerprint(path):
-    st = path.stat()
-    return {"caminho": str(path.resolve()), "bytes": st.st_size, "modificado_ns": st.st_mtime_ns}
+    """Fingerprint estável mesmo após extrair o mesmo ZIP em nova sessão Colab.
+
+    O mtime muda a cada download/extração e não identifica o conteúdo: usar
+    SHA256 integral impede retomar mosaicos produzidos por outro raster.
+    """
+    path=Path(path)
+    digest=hashlib.sha256()
+    with path.open("rb") as reader:
+        while True:
+            block=reader.read(8*1024*1024)
+            if not block:
+                break
+            digest.update(block)
+    return {"nome":path.name,"bytes":path.stat().st_size,
+            "sha256":digest.hexdigest()}
 
 
 def build_signature(region, rgb, multi, aoi, models_path, allow_warp):
