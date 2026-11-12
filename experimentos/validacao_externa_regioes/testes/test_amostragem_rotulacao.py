@@ -46,3 +46,27 @@ def test_sem_crs_nao_permite_criar_arquivo(tmp_path):
         dst.write(np.ones((32,32),dtype="uint32"),1)
     with pytest.raises(ValueError):
         generate_segments(mosaic,20,250,1,tmp_path/"out")
+
+
+def test_sagrada_nao_amostra_area1_nem_buffer_25m(tmp_path):
+    from shapely.geometry import box
+    mosaic=tmp_path/"segmentos_sagrada.tif"
+    ids=np.arange(1024*1024,dtype=np.uint32).reshape((1024,1024))+1
+    with rasterio.open(mosaic,"w",driver="GTiff",height=1024,width=1024,
+                       count=1,dtype="uint32",crs="EPSG:3857",
+                       transform=from_origin(0,1024,1,1)) as dst:
+        dst.write(ids,1)
+    area1=tmp_path/"recorte_area1.gpkg"
+    polygon=box(0,512,512,1024)
+    gpd.GeoDataFrame(geometry=[polygon],crs="EPSG:3857").to_file(area1,driver="GPKG")
+    target=tmp_path/"rotulacao_sagrada"
+    generate_segments(mosaic,50,50,20261112,target,
+                      exclude_aoi=area1,exclusion_m=25)
+    gdf=gpd.read_file(target/"amostras_para_anotar.gpkg")
+    assert len(gdf)>20
+    excluded=polygon.buffer(25)
+    assert all(not excluded.covers(p) for p in gdf.geometry)
+    import json
+    meta=json.loads((target/"metodologia_amostragem.json").read_text(encoding="utf-8"))
+    assert meta["area1_excluida"] is True
+    assert meta["buffer_exclusao_m"]==25
