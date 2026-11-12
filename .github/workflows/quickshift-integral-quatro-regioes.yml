@@ -1,0 +1,132 @@
+name: Segmentacao Quickshift integral das quatro regioes
+on:
+  push:
+    branches:
+      - feature/validacao-geografica-externa
+    paths:
+      - 'experimentos/validacao_externa_regioes/segmentar_regiao_completa.py'
+      - '.github/workflows/quickshift-integral-quatro-regioes.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  auditar:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - regiao: centro_novo_hamburgo
+            id: 1UufzP5quG1tRDgfkuwzJ9evwvIHgitYT
+            formato: zip
+          - regiao: lomba_grande_novo_hamburgo
+            id: 1N5peFz-NauAYeNgBcauFyX9reJpnROQ6
+            formato: zip
+          - regiao: cristo_rei_sao_leopoldo
+            id: 1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU
+            formato: rar
+          - regiao: sagrada_familia_caxias
+            id: 1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91
+            formato: zip
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Instalar dependencias de metadados geograficos
+        run: |
+          python -m pip install -q -r experimentos/validacao_externa_regioes/requirements.txt
+      - name: Baixar arquivo publico regional apenas no runner temporario
+        env:
+          DRIVE_FILE_ID: ${{ matrix.id }}
+          ARCHIVE_FORMAT: ${{ matrix.formato }}
+        run: |
+          set -euo pipefail
+          mkdir -p "${{ runner.temp }}/src"
+          echo "Espaco disponivel antes de baixar:"
+          df -h "${{ runner.temp }}"
+          curl --fail --location --retry 3 --retry-delay 5 --connect-timeout 30 \
+            "https://drive.usercontent.google.com/download?id=${DRIVE_FILE_ID}&export=download&confirm=t" \
+            --output "${{ runner.temp }}/src/pacote.${ARCHIVE_FORMAT}"
+          python - <<'PY'
+          import os,zipfile
+          path=os.environ["RUNNER_TEMP"]+"/src/pacote."+os.environ["ARCHIVE_FORMAT"]
+          assert os.path.getsize(path)>100_000_000, "Download incompleto ou pagina HTML"
+          if path.endswith(".zip"):
+              assert zipfile.is_zipfile(path), "Conteudo nao e ZIP valido"
+          elif path.endswith(".rar"):
+              assert open(path,"rb").read(4)==b"Rar!", "Conteudo nao e RAR valido"
+          print("Pacote obtido:",os.path.getsize(path),"bytes")
+          PY
+      - name: Extrair SOMENTE as duas ortoimagens de interesse
+        env:
+          ARCHIVE_FORMAT: ${{ matrix.formato }}
+        run: |
+          set -euo pipefail
+          mkdir -p "${{ runner.temp }}/rasters"
+          if [ "${ARCHIVE_FORMAT}" = "zip" ]; then
+            python - <<'PY'
+          import os,shutil,zipfile
+          from pathlib import Path
+          src=Path(os.environ["RUNNER_TEMP"])/"src/pacote.zip"
+          dst=Path(os.environ["RUNNER_TEMP"])/"rasters"
+          with zipfile.ZipFile(src) as archive:
+              sources={}
+              for info in archive.infolist():
+                  name=info.filename.lower()
+                  if not info.is_dir() and name.endswith("_ortho_rgb.tif"):
+                      sources["rgb.tif"]=info
+                  if not info.is_dir() and name.endswith("_ortho_4bandas.tif"):
+                      sources["multi.tif"]=info
+              if set(sources)!={"rgb.tif","multi.tif"}:
+                  raise RuntimeError("Duas ortoimagens esperadas nao foram encontradas")
+              for filename,info in sources.items():
+                  if info.file_size > 4*1024**3:
+                      raise ValueError("TIFF inesperadamente grande")
+                  with archive.open(info) as inp, open(dst/filename,"wb") as out:
+                      shutil.copyfileobj(inp,out,length=2*1024*1024)
+                  if (dst/filename).stat().st_size != info.file_size:
+                      raise IOError("TIFF extriado com tamanho inesperado")
+                  print(filename,info.file_size,flush=True)
+          PY
+          else
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq p7zip-full
+            7z e -y -r -o"${{ runner.temp }}/rasters" "${{ runner.temp }}/src/pacote.rar" \
+              "*_ORTHO_4BANDAS.tif" "*_ORTHO_RGB.tif"
+            python - <<'PY'
+          import os,shutil
+          from pathlib import Path
+          folder=Path(os.environ["RUNNER_TEMP"])/"rasters"
+          for pattern,target in [("*_ORTHO_4BANDAS.tif","multi.tif"),
+                                 ("*_ORTHO_RGB.tif","rgb.tif")]:
+              found=list(folder.glob(pattern))
+              if len(found)!=1:
+                  raise RuntimeError(f"RAR: expected one {pattern}, got {len(found)}")
+              found[0].rename(folder/target)
+          PY
+          fi
+          rm -f "${{ runner.temp }}/src/pacote.${ARCHIVE_FORMAT}"
+          ls -lh "${{ runner.temp }}/rasters"
+          df -h "${{ runner.temp }}"
+      - name: Segmentar TODOS quadrantes Quickshift da imagem RGB real
+        run: |
+          python experimentos/validacao_externa_regioes/segmentar_regiao_completa.py \
+            --regiao "${{ matrix.regiao }}" \
+            --rgb "${{ runner.temp }}/rasters/rgb.tif" \
+            --out "${{ runner.temp }}/resultados_quickshift" \
+            --preview-dim 1300
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quickshift-integral-${{ matrix.regiao }}
+          path: |
+            ${{ runner.temp }}/resultados_quickshift/resultado_quickshift.json
+            ${{ runner.temp }}/resultados_quickshift/quickshift_por_quadrante.csv
+            ${{ runner.temp }}/resultados_quickshift/preview_quickshift.png
+          if-no-files-found: ignore
+          retention-days: 14
