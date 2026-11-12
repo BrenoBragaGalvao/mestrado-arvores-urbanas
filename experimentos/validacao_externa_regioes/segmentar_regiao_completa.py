@@ -47,12 +47,28 @@ def process(region: str, rgb_path: Path, out: Path, max_tiles=None, preview_dim=
         lo,hi=np.percentile(preview[np.isfinite(preview)],[2,98])
         preview=np.clip((preview-lo)/max(hi-lo,1e-8),0.,1.)
         boundaries=np.zeros((ph,pw),dtype=bool)
+
+        def register_edges(edges, r, c):
+            by,bx=np.where(edges)
+            if len(bx):
+                py=np.floor((r+by+.5)*ph/ds.height).astype(int)
+                px=np.floor((c+bx+.5)*pw/ds.width).astype(int)
+                boundaries[np.clip(py,0,ph-1),np.clip(px,0,pw-1)]=True
+
         already=0
         for yy in range(ny):
             for xx in range(nx):
                 i=yy*nx+xx
                 info_file=chunks/f"bloco_{i:06d}.json"
+                edge_file=chunks/f"bloco_{i:06d}.edges"
                 if info_file.exists():
+                    if not edge_file.is_file():
+                        raise RuntimeError(f"Checkpoint sem bordas: {info_file}; não fingir preview completo.")
+                    prior=json.loads(info_file.read_text(encoding="utf-8"))
+                    h0,w0=prior["altura"],prior["largura"]
+                    packed=np.frombuffer(edge_file.read_bytes(),dtype="uint8")
+                    restored=np.unpackbits(packed,count=h0*w0).astype(bool).reshape((h0,w0))
+                    register_edges(restored,prior["raster_row"],prior["raster_col"])
                     already+=1
                     continue
                 if max_tiles is not None and already>=max_tiles:
@@ -67,6 +83,7 @@ def process(region: str, rgb_path: Path, out: Path, max_tiles=None, preview_dim=
                 records={"quadrante":i,"raster_row":r,"raster_col":c,
                     "largura":w,"altura":h,
                     "pixels_validos":int(valid.sum()),"segmentos":0}
+                edges=np.zeros((h,w),dtype=bool)
                 if valid.any() and h>=3 and w>=3:
                     if not np.isfinite(raw).all():
                         raise ValueError(f"NaN/inf no quadrante {i}")
@@ -75,14 +92,12 @@ def process(region: str, rgb_path: Path, out: Path, max_tiles=None, preview_dim=
                     records["segmentos"]=len(ids)
                     # Marcamos APENAS fronteiras internas do quadrante e pixels
                     # validos; linhas artificiais entre quadrantes não são bordas.
-                    edges=np.zeros(valid.shape,dtype=bool)
                     edges[:,1:] = (segmentation[:,1:]!=segmentation[:,:-1])&valid[:,1:]&valid[:,:-1]
                     edges[1:,:] |= (segmentation[1:,:]!=segmentation[:-1,:])&valid[1:,:]&valid[:-1,:]
-                    by,bx=np.where(edges)
-                    if len(bx):
-                        py=np.floor((r+by+.5)*ph/ds.height).astype(int)
-                        px=np.floor((c+bx+.5)*pw/ds.width).astype(int)
-                        boundaries[np.clip(py,0,ph-1),np.clip(px,0,pw-1)]=True
+                    register_edges(edges,r,c)
+                # Escrever dados de contorno ANTES do marcador de checkpoint;
+                # assim a retomada jamais perde as bordas dos blocos concluídos.
+                edge_file.write_bytes(np.packbits(edges.ravel()).tobytes())
                 info_file.write_text(json.dumps(records,ensure_ascii=False),encoding="utf-8")
                 already+=1
                 if already%100==0:
