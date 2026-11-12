@@ -13,6 +13,9 @@ from pathlib import Path
 
 import numpy as np
 import rasterio
+from rasterio.enums import Resampling
+from rasterio.vrt import WarpedVRT
+from contextlib import nullcontext
 from rasterio.windows import Window
 from skimage.segmentation import quickshift
 
@@ -50,53 +53,59 @@ def inspect(region: str, rgb_path:Path, multi_path:Path, dest:Path):
         meta["rasters_amostrados"]=[]
         if not meta["bands_possible"]:
             meta["status"]="bandas_insuficientes"
-        elif not same_extent:
-            meta["status"]="grades_ou_crs_diferentes_a_verificar"
+        elif rgb.crs is None or multi.crs is None:
+            meta["status"]="crs_ausente"
         else:
-            anchors=[
-              (int(rgb.height*.2),int(rgb.width*.2)),
-              (int(rgb.height*.5),int(rgb.width*.5)),
-              (int(rgb.height*.8),int(rgb.width*.8))
-            ]
-            for index,(row,col) in enumerate(anchors):
-                row=max(0,min(row,rgb.height-256))
-                col=max(0,min(col,rgb.width-256))
-                win=Window(col,row,min(256,rgb.width-col),min(256,rgb.height-row))
-                if win.height<3 or win.width<3:
-                    continue
-                rgb_arr=np.moveaxis(rgb.read([1,2,3],window=win),0,-1)
-                multi_arr=multi.read([1,2,3,4],window=win)
-                valid=(rgb.read_masks(1,window=win)>0)&(multi.read_masks(4,window=win)>0)
-                if not valid.any():
-                    continue
-                try:
-                    segmentation=quickshift(rgb_arr,kernel_size=3,max_dist=5,ratio=.04,rng=42)
-                    counts,features=features_originales(multi_arr,segmentation,valid)
-                    good=(counts>0)&np.isfinite(features).all(axis=1)
-                    feat=features[good]
-                    segment_count=int(np.sum(counts>0))
-                    correlation=[]
-                    for band in range(3):
-                        a=rgb_arr[...,band][valid].ravel().astype(float)
-                        b=multi_arr[band][valid].ravel().astype(float)
-                        if len(a)>1 and np.std(a)>0 and np.std(b)>0:
-                            correlation.append(float(np.corrcoef(a,b)[0,1]))
-                        else:
-                            correlation.append(None)
-                    meta["rasters_amostrados"].append({
-                      "janela":index,"row":row,"col":col,"segmentos":segment_count,
-                      "segmentos_com_atributos_finitos":len(feat),
-                      "media_hsv":float(feat[:,0].mean()) if len(feat) else None,
-                      "media_canny":float(feat[:,1].mean()) if len(feat) else None,
-                      "media_ndvi":float(feat[:,2].mean()) if len(feat) else None,
-                      "correlacao_rgb_multi_bandas_1a3":correlation,
-                      "n_pixels_validos":int(valid.sum())
-                    })
-                except Exception as exc:
-                    meta["rasters_amostrados"].append({
-                      "janela":index,"erro":type(exc).__name__+": "+str(exc)[:220]})
-            meta["status"]="amostra_quickshift_executada" if any(
-                "segmentos" in x for x in meta["rasters_amostrados"]) else "amostra_sem_segmentos_validos"
+            meta["requer_warp_do_multiespectral"]=not aligned
+            ms_context=(nullcontext(multi) if aligned else
+                        WarpedVRT(multi, crs=rgb.crs, transform=rgb.transform,
+                                  width=rgb.width, height=rgb.height,
+                                  resampling=Resampling.bilinear))
+            with ms_context as msreader:
+                anchors=[
+                  (int(rgb.height*.2),int(rgb.width*.2)),
+                  (int(rgb.height*.5),int(rgb.width*.5)),
+                  (int(rgb.height*.8),int(rgb.width*.8))
+                ]
+                for index,(row,col) in enumerate(anchors):
+                    row=max(0,min(row,rgb.height-256))
+                    col=max(0,min(col,rgb.width-256))
+                    win=Window(col,row,min(256,rgb.width-col),min(256,rgb.height-row))
+                    if win.height<3 or win.width<3:
+                        continue
+                    rgb_arr=np.moveaxis(rgb.read([1,2,3],window=win),0,-1)
+                    multi_arr=msreader.read([1,2,3,4],window=win)
+                    valid=(rgb.read_masks(1,window=win)>0)&(msreader.read_masks(4,window=win)>0)
+                    if not valid.any():
+                        continue
+                    try:
+                        segmentation=quickshift(rgb_arr,kernel_size=3,max_dist=5,ratio=.04,rng=42)
+                        counts,features=features_originales(multi_arr,segmentation,valid)
+                        good=(counts>0)&np.isfinite(features).all(axis=1)
+                        feat=features[good]
+                        segment_count=int(np.sum(counts>0))
+                        correlation=[]
+                        for band in range(3):
+                            a=rgb_arr[...,band][valid].ravel().astype(float)
+                            b=multi_arr[band][valid].ravel().astype(float)
+                            if len(a)>1 and np.std(a)>0 and np.std(b)>0:
+                                correlation.append(float(np.corrcoef(a,b)[0,1]))
+                            else:
+                                correlation.append(None)
+                        meta["rasters_amostrados"].append({
+                          "janela":index,"row":row,"col":col,"segmentos":segment_count,
+                          "segmentos_com_atributos_finitos":len(feat),
+                          "media_hsv":float(feat[:,0].mean()) if len(feat) else None,
+                          "media_canny":float(feat[:,1].mean()) if len(feat) else None,
+                          "media_ndvi_candidato_banda4":float(feat[:,2].mean()) if len(feat) else None,
+                          "correlacao_rgb_multi_bandas_1a3":correlation,
+                          "n_pixels_validos":int(valid.sum())
+                        })
+                    except Exception as exc:
+                        meta["rasters_amostrados"].append({
+                          "janela":index,"erro":type(exc).__name__+": "+str(exc)[:220]})
+                meta["status"]="amostra_quickshift_executada" if any(
+                    "segmentos" in x for x in meta["rasters_amostrados"]) else "amostra_sem_segmentos_validos"
         meta["nota"]=(
            "Quickshift e atributos em janelas amostrais com dados reais. "
            "Nenhum modelo foi treinado; nenhum F1 foi medido. "
@@ -108,7 +117,11 @@ def inspect(region: str, rgb_path:Path, multi_path:Path, dest:Path):
           "shape_rgb":[meta["rgb"]["height"],meta["rgb"]["width"]],
           "res_rgb":meta["rgb"]["res"],"bandas_rgb":meta["rgb"]["count"],
           "bandas_multi":meta["multi"]["count"],"crs":meta["rgb"]["crs"],
-          "aligned":meta["aligned"],"tem_descritor_nir":meta["nir_confirmed_by_metadata"],
+          "aligned":meta["aligned"],"multi_shape":[meta["multi"]["height"],meta["multi"]["width"]],
+          "multi_res":meta["multi"]["res"],"bounds_rgb":meta["rgb"]["bounds"],
+          "bounds_multi":meta["multi"]["bounds"],
+          "warp_usado":meta.get("requer_warp_do_multiespectral"),
+          "tem_descritor_nir":meta["nir_confirmed_by_metadata"],
           "quickshift_amostras":meta["rasters_amostrados"]},ensure_ascii=False),flush=True)
     return meta
 
