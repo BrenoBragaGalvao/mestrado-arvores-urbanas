@@ -49,6 +49,24 @@ A rotina [`segmentar_regiao_completa.py`](segmentar_regiao_completa.py) processa
 
 **Dados observados:** todos os quatro pacotes têm TIFF de 4 bandas e TIFF RGB, mas **não apresentam GeoPackage/Shapefile de rótulos árvore/grama**. A banda 4 **não está explicitamente identificada como NIR** nos metadados inspecionados. O Colab exige confirmação documental para chamá-la de NIR antes de executar a classificação final. Os rasters RGB e multiespectrais apresentam grades distintas e precisam de alinhamento registrado.
 
+## Próximo passo pronto: treinar e validar a Area1 com 510 pontos
+
+Foi criado um [notebook de execução focalizada no treinamento real da Area1](treinamento_area1_colab.ipynb) e o [script orquestrador auditável](executar_treinamento_real_area1.py).
+
+O notebook não exige selecionar uma região externa: utiliza somente os arquivos privados originais de `Projetos/Segmentacao_Breno/Area1` em seu **Google Drive montado**, confere **257 árvores + 253 gramíneas**, reconstrói os **505 segmentos rotulados** com geometrias e salva **8 modelos congelados**. Em seguida, executa uma nova validação espacial **aninhada 5 × 2** com embargo geométrico de **25 m**, sem modificar a versão histórica nem publicar os rasters no GitHub.
+
+**Status honesto:** os arquivos de entrada foram localizados no Google Drive, e o código foi verificado em testes automatizados com dados artificiais. **O treinamento REAL ainda não foi executado nesta conversa**, porque a sessão autenticada do Colab do usuário não é controlável pelo conector GitHub/Drive. Conectar o Drive em uma sessão prévia não concede acesso computacional direto a essa sessão.
+
+Executar no Google Colab:
+
+[**Abrir treinamento da Area1 no Colab**](https://colab.research.google.com/github/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/feature/validacao-geografica-externa/experimentos/validacao_externa_regioes/treinamento_area1_colab.ipynb)
+
+Com o Drive montado, executar as células na ordem. O relatório final só será produzido depois da execução bem-sucedida, em:
+
+`Meu Drive/Projetos/Segmentacao_Breno/outputs/validacao_externa_regioes/area1_treinamento_real/resumo_execucao_treinamento.json`
+
+As saídas permanecem no Drive do usuário e não contêm novos valores de F1 externo até existirem rótulos independentes.
+
 ## Como executar — Google Colab
 
 Abra [validacao_externa_colab.ipynb](validacao_externa_colab.ipynb) no Colab. Ele instala os requisitos, monta o Drive e apresenta as etapas na ordem correta. A conta de Google utilizada no Colab deve ter acesso aos arquivos: caso estejam apenas em «Compartilhados comigo», crie um **atalho em Meu Drive** e ajuste os caminhos. Os pacotes são grandes: selecione **uma região por vez**.
