@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 955" role="img" aria-labelledby="title desc"><title id="title">Mapa esquemático das cinco áreas de estudo</title><desc id="desc">Mapa de limites retangulares RGB com coordenadas SIRGAS 2000 UTM 22S. Quatro regiões e recorte da Area1 sobre Sagrada Família.</desc>
+<rect x="0" y="0" width="1420" height="955" fill="#fbfdff" stroke="#fbfdff" stroke-width="1" rx="0" />
+<text x="48" y="56" fill="#102b53" font-family="Arial,Helvetica,sans-serif" font-size="32" font-weight="750" text-anchor="start">PROPOSTA 1  |  CINCO ÁREAS DE ESTUDO</text>
+<text x="48" y="90" fill="#61768c" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" text-anchor="start">Limites dos rasters RGB regionais e delimitação preliminar da Area1  •  SIRGAS 2000 / UTM 22S (EPSG:31982)</text>
+<rect x="40" y="125" width="640" height="715" fill="#ffffff" stroke="#c1d1e3" stroke-width="2" rx="18" />
+<rect x="704" y="125" width="674" height="715" fill="#ffffff" stroke="#c1d1e3" stroke-width="2" rx="18" />
+<text x="65" y="166" fill="#152f58" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="750" text-anchor="start">A  |  Distribuição regional</text>
+<text x="730" y="166" fill="#152f58" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="750" text-anchor="start">B  |  Detalhe: Sagrada Família e Area1</text>
+<line x1="98" y1="211" x2="98" y2="782" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="98" y="803" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">480 km E</text>
+<line x1="213.9" y1="211" x2="213.9" y2="782" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="213.9" y="803" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">485 km E</text>
+<line x1="329.8" y1="211" x2="329.8" y2="782" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="329.8" y="803" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">490 km E</text>
+<line x1="445.7" y1="211" x2="445.7" y2="782" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="445.7" y="803" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">495 km E</text>
+<line x1="561.6" y1="211" x2="561.6" y2="782" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="561.6" y="803" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">500 km E</text>
+<line x1="92" y1="778" x2="612" y2="778" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="86" y="782" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6700 km N</text>
+<line x1="92" y1="637.5" x2="612" y2="637.5" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="86" y="641.5" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6720 km N</text>
+<line x1="92" y1="497" x2="612" y2="497" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="86" y="501" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6740 km N</text>
+<line x1="92" y1="356.5" x2="612" y2="356.5" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="86" y="360.5" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6760 km N</text>
+<line x1="92" y1="216" x2="612" y2="216" stroke="#e7eef4" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="86" y="220" fill="#7c8ca0" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6780 km N</text>
+<rect x="145.9" y="235" width="120.8" height="36.7" fill="#4ca1da" stroke="#4ca1da" stroke-width="2" rx="3" />
+<rect x="145.9" y="235" width="120.8" height="36.7" fill="#ffffff" stroke="none" stroke-width="0" rx="0" />
+<rect x="145.9" y="235" width="120.8" height="36.7" fill="#4ca1da" fill-opacity=".34" stroke="#4ca1da" stroke-width="2.5"/>
+<text x="152.9" y="257" fill="#092e52" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="800" text-anchor="start">A1</text>
+<rect x="217.3" y="645.6" width="121.7" height="37.1" fill="#25b0a2" stroke="#25b0a2" stroke-width="2" rx="3" />
+<rect x="217.3" y="645.6" width="121.7" height="37.1" fill="#ffffff" stroke="none" stroke-width="0" rx="0" />
+<rect x="217.3" y="645.6" width="121.7" height="37.1" fill="#25b0a2" fill-opacity=".34" stroke="#25b0a2" stroke-width="2.5"/>
+<text x="224.3" y="667.6" fill="#092e52" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="800" text-anchor="start">A2</text>
+<rect x="358.6" y="679.9" width="201.9" height="57.6" fill="#d7a331" stroke="#d7a331" stroke-width="2" rx="3" />
+<rect x="358.6" y="679.9" width="201.9" height="57.6" fill="#ffffff" stroke="none" stroke-width="0" rx="0" />
+<rect x="358.6" y="679.9" width="201.9" height="57.6" fill="#d7a331" fill-opacity=".34" stroke="#d7a331" stroke-width="2.5"/>
+<text x="365.6" y="701.9" fill="#092e52" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="800" text-anchor="start">A3</text>
+<rect x="159.4" y="726.4" width="120.7" height="37" fill="#ad82d2" stroke="#ad82d2" stroke-width="2" rx="3" />
+<rect x="159.4" y="726.4" width="120.7" height="37" fill="#ffffff" stroke="none" stroke-width="0" rx="0" />
+<rect x="159.4" y="726.4" width="120.7" height="37" fill="#ad82d2" fill-opacity=".34" stroke="#ad82d2" stroke-width="2.5"/>
+<text x="166.4" y="748.4" fill="#092e52" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="800" text-anchor="start">A4</text>
+<rect x="143.6" y="246.3" width="80.5" height="25.6" fill="none" stroke="none" stroke-width="3" rx="4" stroke-dasharray="7 4"/>
+<line x1="855" y1="239" x2="855" y2="729" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="855" y="751" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">482km E</text>
+<line x1="981.7" y1="239" x2="981.7" y2="729" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="981.7" y="751" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">484km E</text>
+<line x1="1108.3" y1="239" x2="1108.3" y2="729" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="1108.3" y="751" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">486km E</text>
+<line x1="1235" y1="239" x2="1235" y2="729" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="1235" y="751" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="middle">488km E</text>
+<line x1="752" y1="628" x2="1337" y2="628" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="748" y="632" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6772km N</text>
+<line x1="752" y1="521.3" x2="1337" y2="521.3" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="748" y="525.3" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6774km N</text>
+<line x1="752" y1="414.7" x2="1337" y2="414.7" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="748" y="418.7" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6776km N</text>
+<line x1="752" y1="308" x2="1337" y2="308" stroke="#e8eef6" stroke-width="1" stroke-dasharray="4 6"/>
+<text x="748" y="312" fill="#7b90a4" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="400" text-anchor="end">6778km N</text>
+<rect x="859.2" y="345.5" width="330" height="278.8" fill="#4ca1da" stroke="#4ca1da" stroke-width="2" rx="4" />
+<rect x="852.8" y="431.1" width="219.9" height="194.5" fill="#df4664" stroke="#df4664" stroke-width="4" rx="4" stroke-dasharray="10 7"/>
+<rect x="859.2" y="345.5" width="330" height="278.8" fill="#4ca1da" fill-opacity=".2" stroke="#4ca1da" stroke-width="3"/>
+<rect x="852.8" y="431.1" width="219.9" height="194.5" fill="#df4664" fill-opacity=".1" stroke="#df4664" stroke-width="4" stroke-dasharray="11 7"/>
+<text x="770" y="209" fill="#677e94" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="400" text-anchor="start">Retângulos geográficos dos arquivos (não são polígonos de vegetação)</text>
+<text x="785" y="790" fill="#df4664" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="750" text-anchor="start">A0  Area1 — recorte original</text>
+<text x="1145" y="790" fill="#217bb8" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="750" text-anchor="start">A1  Sagrada Família</text>
+<text x="73" y="820" fill="#61768b" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="400" text-anchor="start">Retângulos com escala geográfica; cores identificam áreas distintas.</text>
+<rect x="48" y="858" width="1324" height="66" fill="#eff6fc" stroke="#d4e4f0" stroke-width="1" rx="10" />
+<text x="71" y="884" fill="#df4664" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="800" text-anchor="start">A0 Area1</text>
+<text x="174" y="884" fill="#217bb8" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700" text-anchor="start">A1 Sagrada Família</text>
+<text x="393" y="884" fill="#168c82" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700" text-anchor="start">A2 Centro</text>
+<text x="531" y="884" fill="#a77812" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700" text-anchor="start">A3 Lomba Grande</text>
+<text x="740" y="884" fill="#8857b3" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700" text-anchor="start">A4 Cristo Rei</text>
+<text x="72" y="908" fill="#536c85" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="400" text-anchor="start">A0 é a delimitação retangular do shapefile da Area1; sua sobreposição de 96,4% com A1 é preliminar, NÃO prova pixels idênticos.</text>
+</svg>
