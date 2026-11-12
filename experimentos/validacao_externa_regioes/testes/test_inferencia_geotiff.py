@@ -64,3 +64,13 @@ def test_processa_retomada_e_oito_mapas(tmp_path):
     assert second["estado"]=="concluido"
     assert second["quadrantes_concluidos"]==1
     assert (result/"segmentos.csv.gz").exists()
+    import pandas as pd
+    counts=pd.read_csv(result/"resumo_classes_previstas.csv")
+    assert len(counts)==8
+    assert counts.segmentos_previstos_arvore.gt(0).all()
+    assert counts.segmentos_previstos_grama.eq(0).all()
+    assert counts.pixels_previstos_arvore.eq(32*32).all()
+    assert counts.pixels_previstos_grama.eq(0).all()
+    assert len(list((result/"tiles").glob("tile_*.classes.json")))==1
+    assert second["contagens_segmentos_e_pixels_por_classificador"]==first[
+        "contagens_segmentos_e_pixels_por_classificador"]
