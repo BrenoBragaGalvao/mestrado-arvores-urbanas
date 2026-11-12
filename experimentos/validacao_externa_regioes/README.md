@@ -51,7 +51,17 @@ Entrada original do notebook 812 quadrantes:
 
 `/content/drive/MyDrive/Projetos/Segmentacao_Breno/outputs/v2_progressivo_256/rotulos_sem_duplicacao.csv`
 
-Este CSV **não estava disponível nas pastas do Drive examinadas nem no GitHub** no momento da implementação. Se ele ainda não existir em sua sessão, é necessário executar a etapa correspondente do notebook V2 para produzi-lo. O CSV de métricas não serve para treinar.
+Esse CSV **não apareceu nas pastas do Drive examinadas nem no GitHub**. O notebook Colab agora possui uma rota para **reconstruí-lo automaticamente**, utilizando os rasters e os pontos `Arvores.gpkg` e `Grama.gpkg` originais da Area1:
+
+```bash
+python experimentos/validacao_externa_regioes/extrair_base_area1.py \
+  --area1 "/content/drive/MyDrive/Projetos/Segmentacao_Breno/Area1" \
+  --out "/content/base_area1_reconstruida"
+```
+
+A reconstrução processa os quadrantes com referências conhecidas (o Quickshift é independente em cada quadrante), aplica a máscara AOI e calcula os atributos do notebook V2. Ela **confere se existem exatamente 505 segmentos únicos válidos**; se não houver concordância, interrompe a etapa seguinte e grava um arquivo de auditoria. Não substitui nem edita os CSVs históricos. Reinícios devem usar `--retomar` sem alterar entradas. Um CSV apenas de métricas não serve para treinar.
+
+Use o CSV reconstruído em `--area1-csv` caso a base histórica não esteja disponível.
 
 ```bash
 python experimentos/validacao_externa_regioes/treinar_area1.py \
@@ -88,6 +98,31 @@ A aplicação:
 
 Se faltar NIR, **não substitua por valores fictícios** nem apresente métricas comparáveis. Um protocolo RGB-only precisaria de extração e treinamento próprios na Area1, incluindo a definição consistente de bordas sem NIR.
 
+### 3.1. Mapas individuais e segmentos
+
+Ao concluir a inferência, são criados os mapas completos `classificacao_*.tif` (árvore = 1, gramínea = 2, sem classe = 0) para os oito classificadores. Para inspeção visual, o script também salva `imagem_rgb_reduzida.png`, `quickshift_segmentos_reduzidos.png`, `arvores_*.png`, `gramineas_*.png` e `sobreposicao_*.png`. **As imagens reduzidas são apenas para visualização**; qualquer métrica deve usar os rasters e as referências geográficas, não a representação em PNG.
+
+### 3.2. Se faltarem rótulos locais, preparar rotulação cega
+
+Não usar os mapas dos classificadores como rótulos de verdade. O script abaixo sorteia pontos entre segmentos geográficos distintos, distribuídos por blocos de 250 m, **sem usar as previsões** dos modelos:
+
+```bash
+python experimentos/validacao_externa_regioes/preparar_rotulacao.py gerar \
+  --segmentos "/content/resultados/centro/segmento_id.tif" \
+  --n 200 --bloco-m 250 \
+  --out "/content/rotulacao/centro"
+```
+
+Abra `amostras_para_anotar.gpkg` no QGIS, sobre o raster original. Interprete cada local e preencha manualmente a coluna **`classe_verificada`** com `arvore`, `grama` ou `incerto`. Não exiba o mapa classificado ao anotador. Depois:
+
+```bash
+python experimentos/validacao_externa_regioes/preparar_rotulacao.py exportar \
+  --anotadas "/content/rotulacao/centro/amostras_para_anotar.gpkg" \
+  --out "/content/rotulacao/centro/rotulos_verificados"
+```
+
+Os arquivos `Arvores.gpkg` e `Grama.gpkg` exportados podem alimentar `avaliar_regiao.py`. A quantidade de pontos realmente anotados, a seleção espacial e os locais incertos devem constar no relatório; a amostra com um candidato por bloco é **espacialmente distribuída, não necessariamente representativa da prevalência por pixel**.
+
 ### 4. Avaliar F1-macro quando houver rótulos locais independentes
 
 ```bash
@@ -103,6 +138,19 @@ A avaliação georreferencia os pontos, identifica o segmento correspondente, re
 
 Os dados de referência das novas regiões **não podem** ser utilizados na seleção dos modelos da Area1.
 
+### 5. Consolidar os resultados de várias regiões
+
+Depois que os CSVs de métricas externas forem produzidos, execute:
+
+```bash
+python experimentos/validacao_externa_regioes/consolidar_resultados.py \
+  --metricas-root "/content/metricas" \
+  --baseline "docs/e4b_ablacao_aninhada_2026-11-03_tabelas.csv" \
+  --out "/content/comparacao_regioes"
+```
+
+O script cria `status_regioes.csv` e `relatorio.md`. Quando existem métricas externas realmente validadas, cria `comparacao_externa_oito_modelos.csv` e `contexto_descritivo_area1_vs_externo.csv`. Se faltarem, marca a região como **não avaliada**, sem inventar F1. A diferença com o F1 histórico da Area1 é **apenas descritiva**, pois a avaliação de 250/500 m na Area1 e a transferência para outra cidade são protocolos não pareados.
+
 ## Organização gerada
 
 | Saída | Significado |
@@ -112,6 +160,8 @@ Os dados de referência das novas regiões **não podem** ser utilizados na sele
 | `predicoes/REGIAO/classificacao_*.tif` | Predição por classificador (1 = árvore, 2 = gramínea, 0 = sem classificação). |
 | `predicoes/REGIAO/segmento_id.tif` | IDs geográficos para vincular pontos a segmentos. |
 | `predicoes/REGIAO/segmentos.csv.gz` | Características extraídas sem carregar a imagem inteira na RAM. |
+| `predicoes/REGIAO/*reduzidos.png`, `arvores_*.png`, `gramineas_*.png` | Pré-visualizações por modelo e Quickshift; não são mapas para avaliação numérica. |
+| `rotulacao/REGIAO/amostras_para_anotar.gpkg` | Pontos independentes para anotação cega quando não houver rótulos. |
 | `metricas/REGIAO/metricas_externas.csv` | Métricas externas **somente se existirem referências independentes**. |
 | `metricas/REGIAO/matrizes_confusao.csv` | Matriz por classificador e região, quando validada. |
 
