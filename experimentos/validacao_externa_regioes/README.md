@@ -12,6 +12,32 @@ Treinar os oito classificadores exclusivamente com **segmentos rotulados da Area
 
 O nome `SAGRADA_FAMÍLIA_CAXIAS DO SUL.zip` **não prova** que seu conteúdo corresponda à Area1. Compare rasters, CRS, grade, cobertura e, quando possível, pixels.
 
+## Cinco áreas, mapa geográfico e risco de sobreposição
+
+![Limites geográficos das cinco áreas de estudo — figura esquemática georreferenciada](figuras/mapa_esquematico_cinco_areas.svg)
+
+| Código | Região | Papel no experimento |
+|---|---|---|
+| A0 | Area1 — Caxias do Sul | Fonte dos **510 pontos originais** (257 árvores + 253 gramíneas) para treinamento e validação espacial interna |
+| A1 | Sagrada Família — Caxias do Sul | Região maior; verificar qual parcela corresponde a A0 e excluir sobreposição e buffer de qualquer teste independente |
+| A2 | Centro — Novo Hamburgo | Aplicação externa dos modelos fixos; métricas somente com pontos independentes locais |
+| A3 | Lomba Grande — Novo Hamburgo | Aplicação externa dos modelos fixos; métricas somente com pontos independentes locais |
+| A4 | Cristo Rei — São Leopoldo | Aplicação externa dos modelos fixos; métricas somente com pontos independentes locais |
+
+**Nova constatação geométrica:** os limites do arquivo original `AOI_new.shp` têm retângulo delimitador `(481965,56; 6772044,64; 485437,34; 6775692,25)` em SIRGAS 2000 / UTM 22S. O RGB de Sagrada Família cobre `(482066,48; 6772069,27; 487277,48; 6777297,27)`. A **interseção dos retângulos** equivale a aproximadamente **96,44% do retângulo da Area1**, o que favorece a hipótese de que A0 seja um recorte da mesma área. **Não é o percentual exato de interseção dos polígonos, não prova equivalência entre pixels e não é validação externa.**
+
+Para computar a sobreposição geográfica **do polígono real**, coordenadas dos 510 pontos e faixa de exclusão de 25 m na imagem de Sagrada Família, executar [`auditar_sobreposicao_area1.py`](auditar_sobreposicao_area1.py) no Colab, com os arquivos privados originais montados.
+
+## Validação quantitativa da Area1
+
+A implementação inclui dois procedimentos **distintos** e complementares: [`treinar_area1.py`](treinar_area1.py) escolhe receitas de regularização por validação espacial interna e produz os **oito modelos finais** para transferência geográfica; [`validar_area1_aninhada.py`](validar_area1_aninhada.py) realiza uma **nova avaliação aninhada com cinco divisões externas por escala (250 m e 500 m) e três divisões internas por conjunto de treinamento**. O embargo espacial é de 25 m. O script [`extrair_base_area1.py`](extrair_base_area1.py) agora reconstrói os polígonos georreferenciados dos segmentos rotulados para usar **distância geométrica real**, evitando depender apenas de centróides.
+
+A reconstrução exige conferir os **505 segmentos únicos** da base original antes de treinar. A avaliação aninhada cria novos resultados com sementes/partições próprias; **não substitui a F1 histórica**, nem autoriza afirmar que houve generalização geográfica.
+
+## Segmentação Quickshift integral nas regiões
+
+A rotina [`segmentar_regiao_completa.py`](segmentar_regiao_completa.py) processa todos os pixels RGB de cada região em quadrantes de até 256 × 256, conta segmentos não rotulados e gera uma pré-visualização de fronteiras. A execução se dá no workflow [`quickshift-integral-quatro-regioes.yml`](../../.github/workflows/quickshift-integral-quatro-regioes.yml), que usa runners temporários e publica apenas CSV/JSON/PNG compactos como artefatos. **Segmentação integral não é aplicação supervisionada dos oito classificadores** e não gera métricas F1.
+
 ## Fontes conectadas e checagens já feitas
 
 - [Pasta das novas imagens no Google Drive](https://drive.google.com/drive/u/1/folders/1cUNFdo2w3V-ldPnxA9N_vnjmQtOrVHyd): quatro arquivos regionais de **1,56 GB a 3,12 GB** e um ZIP de imagens de baixa resolução. A listagem e seus tamanhos foram conferidos no Drive.
