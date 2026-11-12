@@ -27,3 +27,8 @@ def test_segmenta_todas_as_janelas_sem_modelo_nem_f1(tmp_path):
     assert result["f1_macro"] is None
     assert (tmp_path/"report/preview_quickshift.png").exists()
     assert (tmp_path/"report/quickshift_por_quadrante.csv").exists()
+    png_before=(tmp_path/"report/preview_quickshift.png").read_bytes()
+    repeat=process("area_sintetica",rgb,tmp_path/"report",preview_dim=160)
+    assert repeat["segmentos_nao_rotulados"]==result["segmentos_nao_rotulados"]
+    assert (tmp_path/"report/preview_quickshift.png").read_bytes()==png_before
+    assert len(list((tmp_path/"report/quadrantes").glob("*.edges")))==4
