@@ -27,7 +27,8 @@ from rasterio.windows import Window
 from shapely.geometry import Point
 
 
-def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path):
+def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path,
+                      exclude_aoi: Path | None=None, exclusion_m:float=25):
     if target<20:
         raise ValueError("Amostragem de avaliação recomenda no mínimo 20 pontos.")
     out.mkdir(parents=True,exist_ok=True)
@@ -42,6 +43,14 @@ def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path
         if ds.crs.linear_units not in {"metre", "meter", "metres", "meters", "m"}:
             # Pyproj/GDAL retornam usualmente 'metre' ou 'meter'.
             raise ValueError(f"CRS projetado não possui unidades métricas: {ds.crs.linear_units}")
+        excluded_area=None
+        if exclude_aoi is not None:
+            if exclusion_m<0:
+                raise ValueError("Exclusão espacial negativa")
+            excluded=gpd.read_file(exclude_aoi)
+            if excluded.empty or excluded.crs is None:
+                raise ValueError("AOI de exclusão vazia ou sem CRS")
+            excluded_area=excluded.to_crs(ds.crs).geometry.union_all().buffer(exclusion_m)
         for r0 in range(0,ds.height,256):
             for c0 in range(0,ds.width,256):
                 win=Window(c0,r0,min(256,ds.width-c0),min(256,ds.height-r0))
@@ -55,6 +64,8 @@ def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path
                     dr,dc=np.unravel_index(pix,v.shape)
                     row,col=r0+int(dr),c0+int(dc)
                     x,y=ds.xy(row,col,offset="center")
+                    if excluded_area is not None and excluded_area.covers(Point(x,y)):
+                        continue
                     key=(int(np.floor(x/block)),int(np.floor(y/block)))
                     candidates[key].append((int(v[int(dr),int(dc)]),float(x),float(y)))
         groups=list(candidates.keys())
@@ -93,6 +104,8 @@ def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path
             "tipo":"amostragem espacial cega para anotação independente",
             "n_pretendido":target,"n_gerado":len(points),"bloco_m":block,"semente":seed,
             "regiao_crs":str(ds.crs),
+            "area1_excluida":bool(exclude_aoi is not None),
+            "buffer_exclusao_m":exclusion_m if exclude_aoi is not None else None,
             "classes_aceitas":["arvore","grama","incerto"],
             "regra":"Previsões dos classificadores não foram usadas para escolher nem rotular as amostras.",
             "advertencia":"Amostragem com um candidato por bloco: cobertura espacial, não amostra aleatória uniforme de pixels; não garante proporção real de classes."
@@ -143,12 +156,16 @@ def main():
     g.add_argument("--n",type=int,default=200)
     g.add_argument("--bloco-m",type=float,default=250)
     g.add_argument("--semente",type=int,default=20261112)
+    g.add_argument("--excluir-aoi",type=Path,
+                   help="Sagrada Família: polígono Area1 a excluir da amostragem cega")
+    g.add_argument("--buffer-exclusao-m",type=float,default=25)
     x=sub.add_parser("exportar")
     x.add_argument("--anotadas",required=True,type=Path)
     x.add_argument("--out",required=True,type=Path)
     a=p.parse_args()
     if a.cmd=="gerar":
-        generate_segments(a.segmentos,a.n,a.bloco_m,a.semente,a.out)
+        generate_segments(a.segmentos,a.n,a.bloco_m,a.semente,a.out,
+                          a.excluir_aoi,a.buffer_exclusao_m)
     else:
         export_labels(a.anotadas,a.out)
 
