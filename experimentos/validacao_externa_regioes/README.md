@@ -38,6 +38,8 @@ A reconstrução exige conferir os **505 segmentos únicos** da base original an
 
 A rotina [`segmentar_regiao_completa.py`](segmentar_regiao_completa.py) processa todos os pixels RGB de cada região em quadrantes de até 256 × 256, conta segmentos não rotulados e gera uma pré-visualização de fronteiras. A execução se dá no workflow [`quickshift-integral-quatro-regioes.yml`](../../.github/workflows/quickshift-integral-quatro-regioes.yml), que usa runners temporários e publica apenas CSV/JSON/PNG compactos como artefatos. **Segmentação integral não é aplicação supervisionada dos oito classificadores** e não gera métricas F1.
 
+**Execução REAL concluída em 12/11/2026:** [relatório verificável com as quatro áreas e os arquivos ZIP depositados no Google Drive](RESULTADOS_QUICKSHIFT_INTEGRAL_2026-11-12.md). Foram processados integralmente **9.652 quadrantes** e gerados **2.764.496 segmentos não rotulados** nas quatro imagens RGB. Os quatro jobs da execução [43296756137](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/actions/runs/43296756137) terminaram com sucesso. A Area1 original (A0) mantém os números **históricos**, não reexecutados neste workflow: 812 quadrantes e 168.133 segmentos. A classificação supervisionada dos oito modelos e o F1-macro externo **ainda não foram realizados**.
+
 ## Fontes conectadas e checagens já feitas
 
 - [Pasta das novas imagens no Google Drive](https://drive.google.com/drive/u/1/folders/1cUNFdo2w3V-ldPnxA9N_vnjmQtOrVHyd): quatro arquivos regionais de **1,56 GB a 3,12 GB** e um ZIP de imagens de baixa resolução. A listagem e seus tamanhos foram conferidos no Drive.
