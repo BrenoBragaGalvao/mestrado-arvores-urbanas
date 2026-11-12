@@ -197,10 +197,11 @@ def nir_evidence(code:str, multids, supplied:dict):
         return False,"Arquivo multiespectral com menos de quatro bandas"
     if multids.colorinterp[3].name.lower()=="alpha":
         return False,"Banda quatro é canal alfa/transparência, não NIR"
-    strs=[str(x or "") for x in multids.descriptions]
-    strs += [str(multids.tags(i)) for i in range(1,multids.count+1)]
-    metadata=any(re.search(r"\b(nir|near[\s_-]*infrared|infravermelho)\b",s,re.I)
-                 for s in strs)
+    # A identificação precisa referir-se especificamente à quarta banda:
+    # mencionar NIR em outra banda não prova que a banda 4 é infravermelho.
+    band4=str(multids.descriptions[3] or "")+" "+str(multids.tags(4))
+    metadata=bool(re.search(
+        r"\b(nir|near[\s_-]*infrared|infravermelho)\b",band4,re.I))
     if metadata:
         return True,"NIR identificado explicitamente nos metadados espectrais"
     proof=supplied.get(code,{})
