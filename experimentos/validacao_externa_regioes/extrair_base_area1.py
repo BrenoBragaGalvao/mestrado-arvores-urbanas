@@ -69,7 +69,8 @@ def aggregate(seg,channel,mask):
     return counts,mean
 
 
-def process_tile(index:int,rc:tuple[int,int],refs:list[dict],rgb,multi,aois):
+def process_tile(index:int,rc:tuple[int,int],refs:list[dict],rgb,multi,aois,
+                 geometry_store=None):
     r0,c0=rc
     h=min(TILE,rgb.height-r0);w=min(TILE,rgb.width-c0)
     win=Window(c0,r0,w,h)
@@ -112,6 +113,30 @@ def process_tile(index:int,rc:tuple[int,int],refs:list[dict],rgb,multi,aois):
                            n_pixels=int(counts[sid]),x=float(xx[sid]),
                            y=float(yy[sid]),mean_intensity=vec[0],mean_edges=vec[1],
                            mean_ndvi=vec[2],classe=p["classe"],ref_id=p["ref_id"]))
+    if geometry_store is not None and points:
+        # Gerar geometrias dos MESMOS segmentos rotulados, para embargo
+        # geométrico exato de 25 m em vez de aproximação por centróides.
+        from rasterio.features import shapes
+        from shapely.geometry import shape, mapping
+        from shapely.ops import unary_union
+        from collections import defaultdict
+        wanted={int(p["sid"]) for p in points}
+        polygon_mask=mask & np.isin(seg,list(wanted))
+        polygons=defaultdict(list)
+        for polygon,sid in shapes(seg.astype("int32"),mask=polygon_mask,
+                                  transform=trans):
+            if int(sid) in wanted:
+                polygons[int(sid)].append(shape(polygon))
+        for sid in wanted:
+            if not polygons[sid]:
+                raise ValueError(f"Segmento {sid} sem polígono georreferenciado")
+            merged=unary_union(polygons[sid])
+            if not merged.is_valid or merged.is_empty:
+                raise ValueError(f"Geometria inválida para o segmento {sid}")
+            geometry_store.append({
+                "segmento_id":str(index*65536+sid),
+                "geometry":mapping(merged)
+            })
     return points,{"tile":index,"pontos":len(refs),"fora_aoi":outside,
                    "segmentos":int(seg.max()+1),"validos":len(points)}
 
@@ -160,20 +185,28 @@ def run(area:Path,out:Path,expect:int=505,limit:int|None=None,resume:bool=False)
             index=(r0//TILE)*ncols+(c0//TILE)
             dest=tiles_out/f"tile_{index:04d}.csv"
             check=tiles_out/f"tile_{index:04d}.meta.json"
-            if dest.is_file() and check.is_file():
+            geo_path=tiles_out/f"tile_{index:04d}.geometrias.json"
+            if dest.is_file() and check.is_file() and geo_path.is_file():
                 if not resume:
                     raise FileExistsError(f"Quadrante já processado: {dest}. Use --retomar.")
                 continue
             if limit is not None and completed>=limit:
                 break
-            records,stat=process_tile(index,(r0,c0),points,rgb,multi,aois)
+            geometries=[]
+            records,stat=process_tile(index,(r0,c0),points,rgb,multi,aois,
+                                      geometry_store=geometries)
+            if len(geometries)!=len({p["id"] for p in records}):
+                raise ValueError("Quantidade de polígonos distinta dos segmentos rotulados")
             pd.DataFrame(records,columns=(*NAMES,"ref_id")).to_csv(dest,index=False)
+            geo_path.write_text(json.dumps(geometries),encoding="utf-8")
             check.write_text(json.dumps(stat,ensure_ascii=False,indent=2),encoding="utf-8")
             completed+=1
             if completed%20==0:
                 print(f"Novos quadrantes com pontos: {completed}/{len(selected)}",flush=True)
         files=list(tiles_out.glob("tile_*.csv"))
-        total_ready=sum((tiles_out/f"tile_{(r//TILE)*ncols+(c//TILE):04d}.csv").is_file() for (r,c) in refs)
+        total_ready=sum(all((tiles_out/f"tile_{(r//TILE)*ncols+(c//TILE):04d}.{suffix}").is_file()
+                            for suffix in ("csv","meta.json","geometrias.json"))
+                        for (r,c) in refs)
         full=total_ready==len(refs)
         if not full:
             partial={"estado":"parcial","tiles_com_referencia":len(refs),
@@ -190,6 +223,26 @@ def run(area:Path,out:Path,expect:int=505,limit:int|None=None,resume:bool=False)
         valid=(data.loc[~data.id.isin(conflicts)]
                .drop_duplicates(subset="id")
                .sort_values("id").drop(columns="ref_id").reset_index(drop=True))
+        # Agregar polígonos salvos junto com cada quadrante, sem reprocessar
+        # o Quickshift no fechamento da reconstrução.
+        from shapely.geometry import shape
+        geometry_entries=[]
+        for file in sorted(tiles_out.glob("tile_*.geometrias.json")):
+            geometry_entries.extend(json.loads(file.read_text(encoding="utf-8")))
+        unique_geometries={}
+        for entry in geometry_entries:
+            identifier=str(entry["segmento_id"])
+            if identifier in unique_geometries:
+                raise ValueError(f"Polígono duplicado do segmento {identifier}")
+            unique_geometries[identifier]=shape(entry["geometry"])
+        expected_ids=set(valid.id.astype(str))
+        if not expected_ids.issubset(set(unique_geometries)):
+            raise ValueError("Não existem polígonos para todos os segmentos da base")
+        geometry_gdf=gpd.GeoDataFrame({
+            "segmento_id":sorted(expected_ids),
+        },geometry=[unique_geometries[i] for i in sorted(expected_ids)],crs=rgb.crs)
+        if geometry_gdf.geometry.isna().any() or not geometry_gdf.is_valid.all():
+            raise ValueError("Geometrias não válidas ou ausentes")
         diagnostics={
             "estado":"dados_reconstruidos_e_nao_publicados_historicamente",
             "quadrantes_total_raster":nrows*ncols,
@@ -201,6 +254,8 @@ def run(area:Path,out:Path,expect:int=505,limit:int|None=None,resume:bool=False)
             "ids_distintos_antes_conflito":int(data.id.nunique()),
             "segmentos_classes_conflitantes":len(conflicts),
             "segmentos_rotulados_unicos_validos":len(valid),
+            "poligonos_segmentos_rotulados":len(geometry_gdf),
+            "permite_embargo_geometrico_exato":True,
             "quantidade_esperada":expect,
             "compatibilidade_com_registro_historico":len(valid)==expect,
             "crs":str(rgb.crs),
@@ -220,6 +275,8 @@ def run(area:Path,out:Path,expect:int=505,limit:int|None=None,resume:bool=False)
             raise RuntimeError(f"RESULTADO NÃO CONFERIDO: {len(valid)} segmentos vs {expect} esperados. "
                                "Verifique auditoria_reproducao_area1.json; não treine.")
         valid.to_csv(out/"rotulos_sem_duplicacao.csv",index=False)
+        geometry_gdf.to_file(out/"E3c_geometrias_rotuladas_812.gpkg",driver="GPKG")
+        print("Geometrias exatas dos segmentos:",out/"E3c_geometrias_rotuladas_812.gpkg")
         print(f"Base Area1 OK: {len(valid)} segmentos | {len(refs)} quadrantes com referências | "
               f"{nrows*ncols} quadrantes totais. Arquivo: {out/'rotulos_sem_duplicacao.csv'}")
 
