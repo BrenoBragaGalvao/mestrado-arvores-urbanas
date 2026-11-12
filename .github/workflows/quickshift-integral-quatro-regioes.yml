@@ -1,11 +1,5 @@
 name: Segmentacao Quickshift integral das quatro regioes
 on:
-  push:
-    branches:
-      - feature/validacao-geografica-externa
-    paths:
-      - 'experimentos/validacao_externa_regioes/segmentar_regiao_completa.py'
-      - '.github/workflows/quickshift-integral-quatro-regioes.yml'
   workflow_dispatch:
 
 permissions:
