@@ -1,6 +1,8 @@
 # Validação geográfica externa — implantação reprodutível
 
-**Situação:** código implementado em branch isolada. **Nenhum F1-macro externo foi produzido nesta etapa.** A auditoria do conteúdo *interno* dos pacotes ZIP/RAR e o processamento completo dependem de execução no Colab ou em computador com armazenamento para arquivos de vários GB.
+**Situação:** código implementado em branch isolada e **auditoria real de rasters executada nas quatro regiões** via GitHub Actions, incluindo leitura de metadados, alinhamento explícito em amostras e Quickshift em janelas de 256 × 256 pixels. **Nenhum F1-macro externo foi produzido**; o processamento supervisionado completo ainda depende de executar a Area1 privada e verificar NIR/rótulos.
+
+**[Auditoria técnica executada em 12/11/2026 — quatro regiões, dimensões dos TIFFs, CRS e segmentos Quickshift em janelas reais](AUDITORIA_RASTERS_REAIS_2026-11-12.md)** · [Execução auditada no GitHub Actions](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/actions/runs/43292319271) — quatro jobs concluídos com sucesso.
 
 **Não altera:** `README.md` principal, os notebooks antigos, a Area1, os gráficos, as tabelas históricas e a Proposta 2.
 
@@ -14,10 +16,10 @@ O nome `SAGRADA_FAMÍLIA_CAXIAS DO SUL.zip` **não prova** que seu conteúdo cor
 
 - [Pasta das novas imagens no Google Drive](https://drive.google.com/drive/u/1/folders/1cUNFdo2w3V-ldPnxA9N_vnjmQtOrVHyd): quatro arquivos regionais de **1,56 GB a 3,12 GB** e um ZIP de imagens de baixa resolução. A listagem e seus tamanhos foram conferidos no Drive.
 - [Dados originais da Area1](https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6): foram verificados dois rasters, arquivos do AOI, arquivos de referências `Arvores.gpkg`, `Grama.gpkg` e `postes.gpkg`.
-- [Fonte e tamanhos verificados](fontes_drive.json): **não contém inventário interno dos pacotes**, nem confirma bandas, rótulos e sobreposição geográfica.
+- [Fonte e tamanhos verificados](fontes_drive.json), [auditoria remota de ZIP/RAR](inspecionar_arquivos_remotos.py) e [auditoria dos GeoTIFFs reais](AUDITORIA_RASTERS_REAIS_2026-11-12.md): as quatro regiões têm arquivos RGB e 4 bandas; a auditoria das bandas/grades foi realmente executada; o canal NIR ainda precisa de confirmação espectral documental.
 - Código existente: [notebook V2](../../Segmentacao_area_completa_v2_experimentos.ipynb), [receitas auditadas dos oito modelos](../v2_auditoria_regularizacao.py).
 
-**Ausência de NIR e de rótulos nas novas regiões permanece INDETERMINADA** até a leitura interna dos arquivos. O novo código não calcula NDVI quando NIR estiver ausente.
+**Dados observados:** todos os quatro pacotes têm TIFF de 4 bandas e TIFF RGB, mas **não apresentam GeoPackage/Shapefile de rótulos árvore/grama**. A banda 4 **não está explicitamente identificada como NIR** nos metadados inspecionados. O Colab exige confirmação documental para chamá-la de NIR antes de executar a classificação final. Os rasters RGB e multiespectrais apresentam grades distintas e precisam de alinhamento registrado.
 
 ## Como executar — Google Colab
 
@@ -181,8 +183,8 @@ O script mede a **distância horizontal 2D entre a posição do poste e o centro
 
 ## Limitações e próximas condições
 
-1. **Pacotes ZIP/RAR grandes:** não foram descompactados neste ambiente. Sem inspeção interna, não podemos dizer quais regiões dispõem de NIR, rótulos, AOI ou postes.
-2. **Ausência de base de treinamento disponível nesta sessão:** o CSV de 505 segmentos rotulados precisa ser localizado no Drive de execução ou reproduzido pelo notebook antigo.
+1. **Auditoria real executada:** os ZIP/RAR foram lidos e as duas ortoimagens por região foram abertas no GitHub Actions (sem publicação do conteúdo raster). Falta confirmação formal da identidade espectral do quarto canal e processamento completo de toda a cobertura; não foram encontrados vetores de rótulos nos pacotes.
+2. **Base de treinamento protegida:** os dados de origem da Area1 são privados no Google Drive e não são diretamente acessíveis a um runner GitHub sem autenticação. O notebook Colab pode reconstruir o CSV de 505 segmentos rotulados com os arquivos privados, desde que o usuário autorize o Drive.
 3. **Sem métricas externas:** resultados antigos da Area1 não são novos testes externos.
 4. **Sem projeção de porte ou risco elétrico nesta etapa:** a Proposta 2 permanece preservada; ela depende de dados de postes/alturas e não mede risco a cabos.
 5. **Compatibilidade espectral:** a ordem RGB+NIR, calibração radiométrica, diferença de sensores, resolução e eventual alinhamento precisam ser auditados. Sem essa compatibilidade, a comparação direta do F1 pode não ser válida.
