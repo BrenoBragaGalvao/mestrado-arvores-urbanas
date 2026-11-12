@@ -192,6 +192,36 @@ def predict_tile(rgb: np.ndarray, ms: np.ndarray, valid: np.ndarray,
     return rows, tag, outputs
 
 
+def count_tile_predictions(tag, predictions):
+    """Conta segmentos únicos e pixels por classe prevista em cada janela.
+
+    Segmentos (unidades do modelo) e pixels (área prevista) são contagens
+    diferentes; nenhuma das duas é medida de acerto sem referência local.
+    """
+    stats={}
+    valid=tag>0
+    for model,classified in predictions.items():
+        if classified.shape!=tag.shape:
+            raise ValueError("Máscara prevista incompatível com IDs de segmentos")
+        if not set(np.unique(classified)).issubset({0,1,2}):
+            raise ValueError("Há códigos de classe inesperados na predição")
+        arvores=(classified==1)&valid
+        gramas=(classified==2)&valid
+        if np.any((classified!=0)&~valid):
+            raise ValueError("Previsão fora dos pixels válidos da segmentação")
+        count_a=int(np.unique(tag[arvores]).size)
+        count_g=int(np.unique(tag[gramas]).size)
+        if np.intersect1d(np.unique(tag[arvores]),np.unique(tag[gramas])).size:
+            raise ValueError("Mesmo segmento previsto como árvore e gramínea")
+        stats[model]={
+            "segmentos_previstos_arvore":count_a,
+            "segmentos_previstos_grama":count_g,
+            "pixels_previstos_arvore":int(arvores.sum()),
+            "pixels_previstos_grama":int(gramas.sum()),
+        }
+    return stats
+
+
 def write_rows_atomic(p: Path, rows):
     tmp = p.with_suffix(p.suffix + ".partial")
     with gzip.open(tmp, "wt", encoding="utf-8", newline="") as fp:
@@ -308,7 +338,10 @@ def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
                 if limit_tiles is not None and completed >= limit_tiles:
                     break
                 done = tile_dir / f"tile_{tile_id:06d}.ok"
+                class_stats=tile_dir / f"tile_{tile_id:06d}.classes.json"
                 if done.exists():
+                    if not class_stats.is_file():
+                        raise RuntimeError(f"Checkpoint sem contagem de classes: {done}")
                     continue
                 w = min(256,rgbds.width-col)
                 h = min(256,rgbds.height-row)
@@ -328,6 +361,10 @@ def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
                     with rasterio.open(path,"r+") as dest:
                         dest.write(pred[name],1,window=win)
                 write_rows_atomic(tile_dir / f"tile_{tile_id:06d}.csv.gz",rows)
+                tile_counts=count_tile_predictions(tag,pred)
+                tmp_stats=class_stats.with_suffix(".partial")
+                tmp_stats.write_text(json.dumps(tile_counts,ensure_ascii=False),encoding="utf-8")
+                os.replace(tmp_stats,class_stats)
                 done.write_text("ok\n",encoding="utf-8")
                 completed += 1
                 if completed % 25 == 0:
@@ -337,7 +374,24 @@ def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
     count_done = len(list(tile_dir.glob("tile_*.ok")))
     total = nrows*ncols
     complete = count_done == total
+    class_summary={}
     if complete:
+        class_files=sorted(tile_dir.glob("tile_*.classes.json"))
+        if len(class_files)!=total:
+            raise RuntimeError(f"Contagem de classes incompleta: {len(class_files)}/{total}")
+        for item in class_files:
+            counts=json.loads(item.read_text(encoding="utf-8"))
+            if set(counts)!=set(models):
+                raise ValueError(f"Contagem de modelos divergente: {item}")
+            for model,stats in counts.items():
+                aggregate=class_summary.setdefault(model,{
+                    "segmentos_previstos_arvore":0,"segmentos_previstos_grama":0,
+                    "pixels_previstos_arvore":0,"pixels_previstos_grama":0})
+                for k in aggregate:
+                    aggregate[k]+=int(stats[k])
+        import pandas as pd
+        pd.DataFrame([{"modelo":name,**stats} for name,stats in class_summary.items()]).to_csv(
+            output/"resumo_classes_previstas.csv",index=False)
         combine_csv(tile_dir, output/"segmentos.csv.gz")
         if make_previews:
             previews(rgb,outputs,output)
@@ -349,6 +403,9 @@ def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
         "multiespectral_alinhado_sem_reprojecao": aligned,
         "reprojecao_explicita": bool(not aligned and allow_warp),
         "referencias_externas_usadas_em_treino": False,
+        "contagens_segmentos_e_pixels_por_classificador":class_summary if complete else None,
+        "resumo_classes_previstas":str(output/"resumo_classes_previstas.csv") if complete else None,
+        "significado_contagens":"Previsões SEM rótulos locais: não são árvores verificadas, nem F1.",
         "validacao_externa": "NÃO REALIZADA AQUI; exige rótulos locais independentes",
         "mapas": {name: str(p) for name,p in outputs.items()},
         "segmentos": str(output/"segmento_id.tif")
