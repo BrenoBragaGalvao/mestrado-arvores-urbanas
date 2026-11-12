@@ -13,6 +13,7 @@ from rasterio.transform import from_origin
 from shapely.geometry import Point
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import pytest
 from avaliar_regiao import run
 
 
@@ -57,3 +58,9 @@ def test_avaliacao_independente_de_pontos_sinteticos(tmp_path):
     assert (output/"matrizes_confusao.csv").exists()
     assert (output/"auditoria_referencias.csv").exists()
     assert pd.read_csv(output/"comparacao_por_segmento.csv").shape[0]==12
+
+def test_sagrada_nao_permite_metricas_sem_excluir_area1(tmp_path):
+    with pytest.raises(ValueError, match="area1-aoi"):
+        run("sagrada_familia_caxias",tmp_path/"pred",
+            tmp_path/"arvores.gpkg",tmp_path/"grama.gpkg",
+            tmp_path/"resultados")
