@@ -151,6 +151,20 @@ python experimentos/validacao_externa_regioes/consolidar_resultados.py \
 
 O script cria `status_regioes.csv` e `relatorio.md`. Quando existem métricas externas realmente validadas, cria `comparacao_externa_oito_modelos.csv` e `contexto_descritivo_area1_vs_externo.csv`. Se faltarem, marca a região como **não avaliada**, sem inventar F1. A diferença com o F1 histórico da Area1 é **apenas descritiva**, pois a avaliação de 250/500 m na Area1 e a transferência para outra cidade são protocolos não pareados.
 
+### 6. Proposta 2, somente quando houver pontos de postes
+
+Se, e somente se, a nova região possuir uma camada georreferenciada de **pontos de postes**, pode-se realizar a seguinte análise complementar **estritamente exploratória**:
+
+```bash
+python experimentos/validacao_externa_regioes/proximidade_postes_opcional.py \
+  --predicoes "/content/resultados/centro" \
+  --postes "/caminho/postes.gpkg" \
+  --raio-m 10 \
+  --out "/content/proximidade/centro"
+```
+
+O script mede a **distância horizontal 2D entre a posição do poste e o centro do pixel mais próximo classificado como árvore**, com contagens dentro de 1, 3 e 5 m, para cada um dos oito modelos. Trata-se de uma **aproximação raster**, diferente dos polígonos e dos índices históricos de porte. **Não há estimativa de altura nesta etapa e não é possível inferir proximidade real a cabos ou risco elétrico.** Caso não haja pontos de postes, não executar nem inventar distâncias.
+
 ## Organização gerada
 
 | Saída | Significado |
