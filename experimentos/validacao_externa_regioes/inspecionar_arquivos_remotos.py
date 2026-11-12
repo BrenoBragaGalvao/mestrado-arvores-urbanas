@@ -125,6 +125,48 @@ class HTTPRangeReader(io.RawIOBase):
         return len(piece)
 
 
+def tiff_prefix_metadata(z, entry):
+    """Lê só o cabeçalho do TIFF de dentro do ZIP. Não lê pixels completos."""
+    try:
+        import tifffile
+    except ImportError:
+        return {"status":"tifffile_nao_instalado"}
+    length=min(entry.file_size,2*1024*1024)
+    try:
+        with z.open(entry) as source:
+            prefix=source.read(length)
+        with tifffile.TiffFile(io.BytesIO(prefix)) as tf:
+            p=tf.pages[0]
+            wanted=("ImageWidth","ImageLength","SamplesPerPixel","BitsPerSample",
+                    "ModelPixelScaleTag","ModelTiepointTag","GeoKeyDirectoryTag",
+                    "PlanarConfiguration","PhotometricInterpretation","ExtraSamples")
+            tag_summary={}
+            for name in wanted:
+                tag=p.tags.get(name)
+                if tag is None:
+                    continue
+                value=tag.value
+                if hasattr(value,"tolist"):
+                    value=value.tolist()
+                if isinstance(value,(tuple,list)) and len(value)>18:
+                    value=list(value[:18])
+                tag_summary[name]=str(value)[:450]
+            desc=p.tags.get("GDAL_METADATA")
+            desc_value=str(desc.value) if desc is not None else ""
+            import re
+            reported_bands=re.findall(r'<Item[^>]*sample="(\d+)"[^>]*>([^<]+)</Item>',
+                                      desc_value,re.I)
+            return {"status":"cabecalho_tiff_lido",
+                    "shape":list(p.shape),
+                    "samples_per_pixel":int(p.samplesperpixel),
+                    "photometric":str(p.photometric),
+                    "tags":tag_summary,
+                    "descricao_bandas_GDAL":reported_bands[:8]}
+    except Exception as exc:
+        return {"status":"cabecalho_nao_suficiente_ou_invalido",
+                "erro":type(exc).__name__+": "+str(exc)[:190]}
+
+
 def remote_inventory(region:str, file_id:str, filetype:str, budget:int) -> dict:
     r=HTTPRangeReader(URL_TEMPLATE.format(id=file_id),budget=budget)
     report={"regiao":region,"formato":filetype,"tamanho_compactado_bytes":r.total_size,
@@ -132,13 +174,17 @@ def remote_inventory(region:str, file_id:str, filetype:str, budget:int) -> dict:
     try:
         if filetype=="zip":
             with zipfile.ZipFile(r) as z:
+                raster_headers={}
                 for entry in z.infolist():
+                    if not entry.is_dir() and Path(entry.filename).suffix.lower() in {".tif",".tiff"}:
+                        raster_headers[entry.filename]=tiff_prefix_metadata(z,entry)
                     report["entradas"].append({
                         "caminho":entry.filename, "is_dir":entry.is_dir(),
                         "bytes_descompactados":entry.file_size,
                         "bytes_compactados":entry.compress_size,
                         "extensao":Path(entry.filename).suffix.lower()
                     })
+                report["cabecalhos_tiff"]=raster_headers
         elif filetype=="rar":
             try:
                 import rarfile
@@ -199,6 +245,7 @@ def main():
                 for a in entry.get("entradas",[])
                 if a.get("extensao") in {".tif",".tiff",".jp2",".vrt",".img"}],
             "vetores":entry.get("arquivos_provaveis_vetor",[])[:30],
+            "cabecalhos_tiff":entry.get("cabecalhos_tiff",{}),
             "bytes_transferidos":entry.get("bytes_transferidos_da_rede"),
             "erro":entry.get("erro")
         },ensure_ascii=False),flush=True)
