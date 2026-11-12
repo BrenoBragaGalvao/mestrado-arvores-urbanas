@@ -4,11 +4,9 @@ on:
     branches:
       - feature/validacao-geografica-externa
     paths:
-      - 'experimentos/validacao_externa_regioes/**'
+      - 'experimentos/validacao_externa_regioes/**/*.py'
+      - 'experimentos/validacao_externa_regioes/requirements.txt'
       - '.github/workflows/testar-validacao-externa.yml'
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
