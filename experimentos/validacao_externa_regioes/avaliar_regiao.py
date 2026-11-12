@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from shapely.geometry import Point
 
 import numpy as np
 import pandas as pd
@@ -46,8 +47,13 @@ def sample_raster(path, coords):
 
 
 def run(region: str, pred_dir: Path, trees: Path, grasses: Path, output: Path,
-        min_class=5):
+        min_class=5, area1_aoi:Path|None=None, exclusion_m:float=25):
     output.mkdir(parents=True, exist_ok=True)
+    if region=="sagrada_familia_caxias" and area1_aoi is None:
+        raise ValueError("Sagrada Família: informe --area1-aoi para excluir o recorte "
+                         "original e buffer de 25 m antes do teste independente.")
+    if exclusion_m<0:
+        raise ValueError("Raio de exclusão negativo")
     manifest = pred_dir/"manifesto_execucao.json"
     if not manifest.is_file():
         raise FileNotFoundError("Execute aplicar_regiao.py antes de avaliar.")
@@ -59,6 +65,25 @@ def run(region: str, pred_dir: Path, trees: Path, grasses: Path, output: Path,
         if src.crs is None:
             raise ValueError("Mapas sem georreferenciamento.")
         references = read_references(trees,grasses,src.crs)
+        raster_crs=src.crs
+    all_references_count=len(references)
+    excluded=pd.DataFrame(columns=references.columns)
+    if area1_aoi is not None:
+        aoi=gpd.read_file(area1_aoi)
+        if aoi.empty or aoi.crs is None:
+            raise ValueError("AOI Area1 ausente ou sem CRS")
+        aoi=aoi.to_crs(raster_crs).geometry.union_all().buffer(exclusion_m)
+        if aoi.is_empty:
+            raise ValueError("AOI Area1 vazia")
+        within=np.asarray([aoi.covers(Point(x,y))
+                           for x,y in zip(references.x,references.y)],dtype=bool)
+        excluded=references.loc[within].copy()
+        excluded["status"]="excluida_sobreposicao_area1_buffer"
+        references=references.loc[~within].copy()
+        excluded.to_csv(output/"referencias_excluidas_sobreposicao.csv",index=False)
+        if references.empty:
+            raise ValueError("Todos os pontos candidatos pertencem à Area1 ou ao "
+                             "buffer de exclusão; não existe teste geográfico independente.")
     coords = list(zip(references.x, references.y))
     references["segmento_id"] = sample_raster(segments,coords).astype("uint64")
     missed = int((references.segmento_id==0).sum())
@@ -80,7 +105,8 @@ def run(region: str, pred_dir: Path, trees: Path, grasses: Path, output: Path,
     references["status"] = "valido"
     references.loc[references.segmento_id.eq(0),"status"] = "fora_da_imagem_ou_sem_predicao"
     references.loc[references.segmento_id.isin(conflicting),"status"] = "segmento_com_classes_conflitantes"
-    references.to_csv(output/"auditoria_referencias.csv",index=False)
+    pd.concat([references,excluded],ignore_index=True,sort=False).to_csv(
+        output/"auditoria_referencias.csv",index=False)
     coordinates = list(zip(unique.x,unique.y))
     metrics, confusion_rows = [], []
     for name,pathstr in pred_paths.items():
@@ -127,7 +153,10 @@ def run(region: str, pred_dir: Path, trees: Path, grasses: Path, output: Path,
     pd.DataFrame(confusion_rows).to_csv(output/"matrizes_confusao.csv",index=False)
     unique.to_csv(output/"comparacao_por_segmento.csv",index=False)
     result=dict(regiao=region,status="VALIDACAO_EXTERNA_CONCLUIDA",
-                referencias_originais=len(references),
+                referencias_originais=all_references_count,
+                referencias_excluidas_area1=int(len(excluded)),
+                area1_aoi_fornecida=str(area1_aoi) if area1_aoi else None,
+                buffer_exclusao_m=exclusion_m if area1_aoi else None,
                 referencias_fora_ou_invalidas=missed,
                 conflitos_segmentacao=len(conflicting),
                 segmentos_unicos_avaliados=len(unique), classes=counts,
@@ -147,9 +176,13 @@ def main():
     p.add_argument("--arvores",type=Path,required=True)
     p.add_argument("--grama",type=Path,required=True)
     p.add_argument("--min-por-classe",type=int,default=5)
+    p.add_argument("--area1-aoi",type=Path,
+                   help="Obrigatório na Sagrada Família: recorte original excluído do teste externo")
+    p.add_argument("--buffer-exclusao-m",type=float,default=25)
     p.add_argument("--out",type=Path,required=True)
     args=p.parse_args()
-    run(args.regiao,args.predicoes,args.arvores,args.grama,args.out,args.min_por_classe)
+    run(args.regiao,args.predicoes,args.arvores,args.grama,args.out,
+        args.min_por_classe,args.area1_aoi,args.buffer_exclusao_m)
 
 
 if __name__=="__main__":
