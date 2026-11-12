@@ -302,9 +302,13 @@ def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
         blind=base/"rotulacao"/code
         samples=blind/"amostras_para_anotar.gpkg"
         if not samples.is_file():
-            call(sys.executable,HERE/"preparar_rotulacao.py","gerar",
-                 "--segmentos",region_out/"segmento_id.tif",
-                 "--n","200","--bloco-m","250","--out",blind)
+            cmd=[sys.executable,str(HERE/"preparar_rotulacao.py"),"gerar",
+                 "--segmentos",str(region_out/"segmento_id.tif"),
+                 "--n","200","--bloco-m","250","--out",str(blind)]
+            if code=="sagrada_familia_caxias":
+                cmd+=["--excluir-aoi",str(area1/"AOI_new.shp"),
+                      "--buffer-exclusao-m","25"]
+            call(*cmd)
         return {"estado":"predicoes_concluidas_sem_rotulos_externos",
                 "manifesto":str(region_out/"manifesto_execucao.json"),
                 "amostras_para_anotar":str(samples),
@@ -314,6 +318,32 @@ def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
         # o Colab tenha espaço para a próxima região (não toca no Drive).
         if work.is_dir() and work.resolve()!=scratch.resolve():
             shutil.rmtree(work)
+
+
+def verify_external_labels(code:str,base:Path,area1:Path):
+    """Calcula métricas só quando referências independentes já foram rotuladas."""
+    verified=base/"rotulacao"/code/"rotulos_verificados"
+    trees=verified/"Arvores.gpkg"
+    grass=verified/"Grama.gpkg"
+    region_out=base/"predicoes"/code
+    manifest=region_out/"manifesto_execucao.json"
+    if not trees.is_file() or not grass.is_file() or not manifest.is_file():
+        return {"estado":"sem_rotulos_independentes","f1_externo":None}
+    state=json.loads(manifest.read_text(encoding="utf-8"))
+    if state.get("estado")!="concluido":
+        return {"estado":"predicoes_parciais","f1_externo":None}
+    metrics=base/"metricas"/code
+    cmd=[sys.executable,str(HERE/"avaliar_regiao.py"),
+         "--regiao",code,"--predicoes",str(region_out),
+         "--arvores",str(trees),"--grama",str(grass),"--out",str(metrics)]
+    if code=="sagrada_familia_caxias":
+        cmd+=["--area1-aoi",str(area1/"AOI_new.shp"),
+              "--buffer-exclusao-m","25"]
+    call(*cmd)
+    if not (metrics/"metricas_externas.csv").is_file():
+        raise RuntimeError(f"{code}: avaliação concluída sem CSV de métricas")
+    return {"estado":"validacao_externa_com_rotulos_independentes",
+            "arquivo":str(metrics/"metricas_externas.csv")}
 
 
 def main():
@@ -383,6 +413,9 @@ def main():
             response=run_region(code,SOURCES[code],args.pacotes_drive,args.scratch,
                                 args.out,models,out,area1,proof,args.limite_quadrantes)
             summary[code]=response
+            if response["estado"] in (
+                "concluido","predicoes_concluidas_sem_rotulos_externos"):
+                response["avaliacao"]=verify_external_labels(code,args.out,area1)
             record_status(args.out,{code:response})
         except Exception as e:
             state={"estado":"erro","tipo":type(e).__name__,"motivo":str(e)[:700]}
@@ -390,6 +423,18 @@ def main():
             print(f"{code}: ERROR {type(e).__name__}: {e}",file=sys.stderr,flush=True)
             # Um erro de dados não deve ser encoberto como sucesso em cinco áreas.
             raise
+    comparison=args.out/"comparacao_regioes"
+    baseline=HERE.parents[1]/"docs/e4b_ablacao_aninhada_2026-11-03_tabelas.csv"
+    if not baseline.is_file():
+        raise FileNotFoundError(f"Baseline histórica da Area1 ausente: {baseline}")
+    metrics_root=args.out/"metricas"
+    metrics_root.mkdir(exist_ok=True)
+    call(sys.executable,HERE/"consolidar_resultados.py",
+         "--metricas-root",metrics_root,
+         "--baseline",baseline,"--out",comparison)
+    summary["consolidacao"]={"estado":"gerada",
+                             "relatorio":str(comparison/"relatorio.md")}
+    record_status(args.out,{"consolidacao":summary["consolidacao"]})
     print(json.dumps(summary,ensure_ascii=False,indent=2))
 
 
