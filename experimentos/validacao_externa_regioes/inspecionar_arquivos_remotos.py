@@ -192,10 +192,33 @@ def main():
             "regiao":region,"sucesso":entry.get("conteudo_inspecionado_por_ranges",False),
             "total_entradas":entry.get("total_entradas"),
             "rasters":entry.get("arquivos_provaveis_raster",[])[:30],
+            "tamanhos_rasters":[
+                {"arquivo":a["caminho"],
+                 "descompactado":a["bytes_descompactados"],
+                 "compactado":a["bytes_compactados"]}
+                for a in entry.get("entradas",[])
+                if a.get("extensao") in {".tif",".tiff",".jp2",".vrt",".img"}],
             "vetores":entry.get("arquivos_provaveis_vetor",[])[:30],
             "bytes_transferidos":entry.get("bytes_transferidos_da_rede"),
             "erro":entry.get("erro")
         },ensure_ascii=False),flush=True)
+    print("Verificando acesso binario publico aos arquivos originais Area1:",flush=True)
+    original_files={
+      "area1_rgb":("1yKT4dL-nZZfKnfmJr3rQNX47Wep-mKv0",b"II"),
+      "area1_multiespectral":("16HBN08OmycfoULenwtLHHQizEzJ2he3K",b"II"),
+      "area1_arvores":("1iSdrGtSRAubXJPYJcwBW36_DYhEIQE8h",b"SQLite format 3"),
+      "area1_grama":("1N0Is3oJuWDq9CLsLBN4Ur6mnjTzyF2cI",b"SQLite format 3"),
+    }
+    for original,(id_,signature) in original_files.items():
+        try:
+            rr=HTTPRangeReader(URL_TEMPLATE.format(id=id_),budget=1024*1024)
+            start=rr.read(16)
+            good=start.startswith(signature)
+            print(json.dumps({"original":original,"acesso_binario":good,
+                              "tamanho_bytes":rr.total_size},ensure_ascii=False),flush=True)
+        except Exception as ex:
+            print(json.dumps({"original":original,"acesso_binario":False,
+                              "erro":str(ex)[:180]},ensure_ascii=False),flush=True)
     (args.out/"inventario_zip_rar_remoto.json").write_text(
         json.dumps(results,indent=2,ensure_ascii=False),encoding="utf-8")
     print("Arquivo de auditoria salvo; pacotes NÃO foram baixados integralmente.")
