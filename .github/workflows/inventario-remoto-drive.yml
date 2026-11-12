@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Instalar somente biblioteca de leitura de RAR
-        run: python -m pip install -q rarfile
+        run: python -m pip install -q rarfile tifffile
       - name: Inspecionar central de ZIP e cabecalhos de RAR usando leituras limitadas
         run: |
           python experimentos/validacao_externa_regioes/inspecionar_arquivos_remotos.py \
