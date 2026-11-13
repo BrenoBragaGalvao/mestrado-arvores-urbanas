@@ -53,11 +53,14 @@ def candidate_splits(indices, groups, labels, xy, geoms, n, seed, embargo=25,
 
 def evaluate(dataset:Path, output:Path, geometry:Path|None=None,
              centroid_embargo:bool=False,
-             outer:int=5, inner:int=3, models=None, scales=SCALES):
+             outer:int=5, inner:int=3, models=None, scales=SCALES,
+             embargo_m:float=25):
     if geometry is None and not centroid_embargo:
         raise ValueError("Forneça --geometrias ou --permitir-embargo-centroides.")
     if outer<2 or inner<2:
         raise ValueError("São necessárias ao menos duas partições internas e externas.")
+    if embargo_m<0:
+        raise ValueError("Embargo em metros não pode ser negativo.")
     frame=read_training_data(dataset)
     geoms=read_geometry(geometry,frame)
     xy=frame[["x","y"]].to_numpy(dtype=float)
@@ -74,12 +77,14 @@ def evaluate(dataset:Path, output:Path, geometry:Path|None=None,
         groups=assign_groups(xy,block)
         outer_splits=candidate_splits(
             np.arange(len(frame)),groups,y,xy,geoms,outer,
-            seed=20261112+block,test_size=.2,minimum_train=50,minimum_test=12)
+            seed=20261112+block,test_size=.2,minimum_train=50,minimum_test=12,
+            embargo=embargo_m)
         for split_no,(tr,te) in enumerate(outer_splits,1):
             inner_splits=candidate_splits(
                 tr,groups,y,xy,geoms,inner,
                 seed=20270000+block*100+split_no,
-                test_size=.25,minimum_train=35,minimum_test=10)
+                test_size=.25,minimum_train=35,minimum_test=10,
+                embargo=embargo_m)
             if not set(tr).isdisjoint(te):
                 raise AssertionError("Índices outer train/test repetidos")
             for name in chosen_models:
@@ -104,13 +109,19 @@ def evaluate(dataset:Path, output:Path, geometry:Path|None=None,
                 cv_mean,recipe,params=sorted(choices,key=lambda v:(-v[0],v[1]))[0]
                 final=criar_modelo(name,params).fit(X[tr],y[tr])
                 pred=final.predict(X[te])
+                pred_train=final.predict(X[tr])
+                f1_train=float(f1_score(
+                    y[tr],pred_train,average="macro",labels=["arvore","grama"],zero_division=0))
+                f1_test=float(f1_score(
+                    y[te],pred,average="macro",labels=["arvore","grama"],zero_division=0))
                 cm=confusion_matrix(y[te],pred,labels=["arvore","grama"])
                 evaluations.append({
                     "bloco_m":block,"divisao_externa":split_no,
                     "modelo":name,"receita_escolhida":recipe,
                     "f1_validacao_interna":cv_mean,
-                    "f1_teste_espacial":float(f1_score(
-                        y[te],pred,average="macro",labels=["arvore","grama"],zero_division=0)),
+                    "f1_treino":f1_train,
+                    "f1_teste_espacial":f1_test,
+                    "gap_f1_treino_menos_teste":f1_train-f1_test,
                     "acuracia":float(accuracy_score(y[te],pred)),
                     "acuracia_balanceada":float(balanced_accuracy_score(y[te],pred)),
                     "n_treino":len(tr),"n_teste":len(te),
@@ -125,6 +136,8 @@ def evaluate(dataset:Path, output:Path, geometry:Path|None=None,
     pd.DataFrame(selections).to_csv(output/"area1_validacao_interna.csv",index=False)
     summary=(tab.groupby(["bloco_m","modelo"],as_index=False)
              .agg(f1_macro_media=("f1_teste_espacial","mean"),
+                  f1_treino_medio=("f1_treino","mean"),
+                  gap_f1_treino_menos_teste_medio=("gap_f1_treino_menos_teste","mean"),
                   f1_macro_dp=("f1_teste_espacial","std"),
                   acuracia_media=("acuracia","mean"),
                   acuracia_balanceada_media=("acuracia_balanceada","mean"),
@@ -138,7 +151,7 @@ def evaluate(dataset:Path, output:Path, geometry:Path|None=None,
         "particoes_externas_por_escala":outer,
         "particoes_internas_por_particao_externa":inner,
         "razao_teste_externo":.2,
-        "distancia_embargo_m":25,
+        "distancia_embargo_m":embargo_m,
         "embargo":"geometrico" if geoms is not None else "centroides_aproximacao",
         "modelos":list(chosen_models),
         "classes":["arvore","grama"],
@@ -157,8 +170,11 @@ def main():
     p.add_argument("--geometrias",type=Path)
     p.add_argument("--permitir-embargo-centroides",action="store_true")
     p.add_argument("--out",type=Path,required=True)
+    p.add_argument("--embargo-m",type=float,default=25,
+                   help="Análise de sensibilidade: usar pasta de saída NOVA para 50/100 m.")
     a=p.parse_args()
-    evaluate(a.csv,a.out,a.geometrias,a.permitir_embargo_centroides)
+    evaluate(a.csv,a.out,a.geometrias,a.permitir_embargo_centroides,
+             embargo_m=a.embargo_m)
 
 
 if __name__=="__main__":
