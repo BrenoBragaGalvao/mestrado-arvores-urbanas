@@ -23,8 +23,32 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import rasterio
+from rasterio.features import geometry_mask, geometry_window
+from rasterio.errors import WindowError
 from rasterio.windows import Window
-from shapely.geometry import Point
+from shapely.geometry import Point, mapping
+
+
+def excluded_segment_ids(dataset, excluded_area):
+    """Exclui também segmentos que cruzam o buffer e têm pontos do lado de fora."""
+    geom = [mapping(excluded_area)]
+    try:
+        affected = geometry_window(dataset, geom)
+    except WindowError:
+        return set()
+    start_row, start_col = int(affected.row_off), int(affected.col_off)
+    stop_row = int(affected.row_off + affected.height)
+    stop_col = int(affected.col_off + affected.width)
+    result = set()
+    for row in range(start_row, stop_row, 256):
+        for col in range(start_col, stop_col, 256):
+            win = Window(col, row, min(256, stop_col - col), min(256, stop_row - row))
+            values = dataset.read(1, window=win)
+            inside = geometry_mask(geom, values.shape, dataset.window_transform(win),
+                                   all_touched=True, invert=True)
+            result.update(np.unique(values[inside]).tolist())
+    result.discard(0)
+    return result
 
 
 def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path,
@@ -44,6 +68,7 @@ def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path
             # Pyproj/GDAL retornam usualmente 'metre' ou 'meter'.
             raise ValueError(f"CRS projetado não possui unidades métricas: {ds.crs.linear_units}")
         excluded_area=None
+        excluded_ids=set()
         if exclude_aoi is not None:
             if exclusion_m<0:
                 raise ValueError("Exclusão espacial negativa")
@@ -51,11 +76,18 @@ def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path
             if excluded.empty or excluded.crs is None:
                 raise ValueError("AOI de exclusão vazia ou sem CRS")
             excluded_area=excluded.to_crs(ds.crs).geometry.union_all().buffer(exclusion_m)
+            excluded_ids=excluded_segment_ids(ds,excluded_area)
         for r0 in range(0,ds.height,256):
             for c0 in range(0,ds.width,256):
                 win=Window(c0,r0,min(256,ds.width-c0),min(256,ds.height-r0))
                 v=ds.read(1,window=win)
-                valid=np.flatnonzero(v.ravel()>0)
+                eligible=v>0
+                if excluded_ids and eligible.any():
+                    present=np.unique(v[eligible])
+                    crossing=[sid for sid in present if sid in excluded_ids]
+                    if crossing:
+                        eligible &= ~np.isin(v,crossing)
+                valid=np.flatnonzero(eligible.ravel())
                 if not valid.size:
                     continue
                 # Amostra aleatória independente da classe prevista.
@@ -106,6 +138,7 @@ def generate_segments(ids: Path, target: int, block: float, seed: int, out: Path
             "regiao_crs":str(ds.crs),
             "area1_excluida":bool(exclude_aoi is not None),
             "buffer_exclusao_m":exclusion_m if exclude_aoi is not None else None,
+            "segmentos_que_tocam_area1_buffer_excluidos":len(excluded_ids),
             "classes_aceitas":["arvore","grama","incerto"],
             "regra":"Previsões dos classificadores não foram usadas para escolher nem rotular as amostras.",
             "advertencia":"Amostragem com um candidato por bloco: cobertura espacial, não amostra aleatória uniforme de pixels; não garante proporção real de classes."
@@ -122,7 +155,7 @@ def export_labels(source: Path, out: Path):
         raise ValueError("O GeoPackage rotulado não possui CRS")
     if not gdf.geometry.geom_type.eq("Point").all():
         raise ValueError("Todas as amostras precisam ser pontos")
-    expected={"arvore","grama","incerto"}
+    expected={"arvore","grama","incerto","outro"}
     if "classe_verificada" not in gdf or "amostra_id" not in gdf:
         raise ValueError("Faltam amostra_id ou classe_verificada")
     classes=gdf.classe_verificada.fillna("").astype(str).str.strip().str.lower()
@@ -133,14 +166,15 @@ def export_labels(source: Path, out: Path):
         raise ValueError("IDs de amostra duplicados")
     out.mkdir(parents=True,exist_ok=True)
     labels={}
+    if any(int(classes.eq(cls).sum())<5 for cls in ("arvore","grama")):
+        raise ValueError("São necessárias pelo menos cinco amostras anotadas por classe.")
     for cls,filename in (("arvore","Arvores.gpkg"),("grama","Grama.gpkg")):
         valid=gdf.loc[classes.eq(cls)].copy()
-        if len(valid)<5:
-            raise ValueError(f"Apenas {len(valid)} exemplos da classe {cls}: mínimo técnico 5.")
         valid.to_file(out/filename,driver="GPKG")
         labels[cls]=len(valid)
     state={"registros_total":len(gdf),"validados":labels,
            "incertos":int(classes.eq("incerto").sum()),
+           "outra_cobertura":int(classes.eq("outro").sum()),
            "sem_rotulo":int(classes.eq("").sum()),
            "protocolo":"Os rótulos foram produzidos externamente; revisar qualidade, cegamento e independência."}
     (out/"manifesto_rotulacao.json").write_text(json.dumps(state,ensure_ascii=False,indent=2),encoding="utf-8")

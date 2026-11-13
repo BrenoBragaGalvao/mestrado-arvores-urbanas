@@ -70,3 +70,18 @@ def test_sagrada_nao_amostra_area1_nem_buffer_25m(tmp_path):
     meta=json.loads((target/"metodologia_amostragem.json").read_text(encoding="utf-8"))
     assert meta["area1_excluida"] is True
     assert meta["buffer_exclusao_m"]==25
+
+
+def test_exclusao_cobre_segmento_que_cruza_buffer(tmp_path):
+    from preparar_rotulacao import excluded_segment_ids
+    from shapely.geometry import box
+
+    path = tmp_path / "ids.tif"
+    ids = np.ones((10, 10), dtype=np.uint32)
+    ids[:, 8:] = 2
+    with rasterio.open(path, "w", driver="GTiff", height=10, width=10,
+                       count=1, dtype="uint32", crs="EPSG:3857",
+                       transform=from_origin(0, 10, 1, 1)) as dst:
+        dst.write(ids, 1)
+    with rasterio.open(path) as src:
+        assert excluded_segment_ids(src, box(1, 1, 5, 5)) == {1}

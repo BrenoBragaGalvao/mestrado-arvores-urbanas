@@ -20,6 +20,7 @@ import json
 import math
 import os
 from contextlib import ExitStack
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import joblib
@@ -36,6 +37,7 @@ from skimage.segmentation import quickshift
 FEATURES = ("mean_intensity", "mean_edges", "mean_ndvi")
 LABELS = {"arvore": 1, "grama": 2}
 FIELDS = ("segmento_id", "quadrante", "sid", "n_pixels", "x", "y", *FEATURES)
+RGB_NIR = (1, 2, 3, 4)
 
 
 def geo_mask(ds, window: Window, geom):
@@ -67,6 +69,11 @@ def features_originales(multis, seg, valid):
     canny_nir = canny(nir / 10000.0, sigma=1).astype("float32")
     channels = np.stack([hsv_brilho, canny_nir, ndvi], axis=0)
     return feature_means(seg, channels, valid)
+
+
+def read_spectral_bands(dataset, window, band_order):
+    bands = dataset.read(list(band_order), window=window, masked=True)
+    return bands.filled(0), ~np.ma.getmaskarray(bands).any(axis=0)
 
 
 def load_models(path):
@@ -123,14 +130,18 @@ def file_fingerprint(path):
             "sha256":digest.hexdigest()}
 
 
-def build_signature(region, rgb, multi, aoi, models_path, allow_warp):
+def build_signature(region, rgb, multi, aoi, models_path, allow_warp,
+                    band_order=RGB_NIR):
     model_bytes = (models_path / "manifesto_modelos.json").read_bytes()
-    return dict(regiao=region, rgb=file_fingerprint(rgb), multiespectral=file_fingerprint(multi),
+    signature = dict(regiao=region, rgb=file_fingerprint(rgb), multiespectral=file_fingerprint(multi),
                 aoi=file_fingerprint(aoi) if aoi else None, tamanho_janela=256,
                 features=list(FEATURES), quickshift={"kernel_size": 3, "max_dist": 5,
                                                      "ratio": 0.04, "rng": 42},
                 modelo_manifesto_sha256=hashlib.sha256(model_bytes).hexdigest(),
                 permitir_reprojecao=allow_warp)
+    if tuple(band_order) != RGB_NIR:
+        signature["bandas_entrada_R_G_B_NIR"] = list(band_order)
+    return signature
 
 
 def ensure_rasters(dst, rgb_ds, model_files, resume):
@@ -302,12 +313,17 @@ def previews(rgb_path, outputs, out, max_dim=1400):
         plt.imsave(out/("gramineas_"+suffix+".png"),grasses)
 
 def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
-        resume=False, make_previews=True, limit_tiles=None):
+        resume=False, make_previews=True, limit_tiles=None, band_order=RGB_NIR,
+        workers=1):
     if not rgb.exists() or not multi.exists():
         raise FileNotFoundError("Rasters RGB e RGB+NIR devem ser informados com --rgb e --multi.")
+    if len(band_order) != 4 or set(band_order) != set(RGB_NIR):
+        raise ValueError("Informe a ordem R, G, B, NIR como permutação de 1, 2, 3, 4.")
+    if workers < 1:
+        raise ValueError("Use pelo menos um trabalhador.")
     models, manifest = load_models(models_dir)
     filenames = {name: manifest["modelos"][name]["arquivo"] for name in models}
-    signature = build_signature(region, rgb, multi, aoi, models_dir, allow_warp)
+    signature = build_signature(region, rgb, multi, aoi, models_dir, allow_warp, band_order)
     output.mkdir(parents=True, exist_ok=True)
     config_file = output / "configuracao_execucao.json"
     if config_file.exists():
@@ -323,6 +339,8 @@ def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
         if rgbds.count < 3 or multids.count < 4:
             raise ValueError("É obrigatório RGB (3 bandas) e multiespectral com NIR (4 bandas). "
                              "Sem NIR, NDVI e Canny originais não são reproduzíveis; não inventar.")
+        if multids.colorinterp[band_order[-1] - 1].name == "alpha":
+            raise ValueError("A banda indicada como NIR é um canal alfa.")
         if rgbds.crs is None or multids.crs is None:
             raise ValueError("Rasters devem ter CRS válido.")
         geoms = region_aoi(aoi, rgbds.crs)
@@ -344,46 +362,58 @@ def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
         ncols = math.ceil(rgbds.width/256)
         tile_dir = output / "tiles"
         tile_dir.mkdir(exist_ok=True)
+        pending = []
+        for tile_id in range(nrows * ncols):
+            done = tile_dir / f"tile_{tile_id:06d}.ok"
+            if done.exists():
+                if not (tile_dir / f"tile_{tile_id:06d}.classes.json").is_file():
+                    raise RuntimeError(f"Checkpoint sem contagem de classes: {done}")
+            else:
+                pending.append(tile_id)
+
+        def write_tile(tile_id, win, predicted):
+            rows, tag, pred = predicted
+            # Todas as escritas raster são serializadas e fechadas antes do checkpoint.
+            with rasterio.open(ids, "r+") as dest:
+                dest.write(tag, 1, window=win)
+            for name, path in outputs.items():
+                with rasterio.open(path, "r+") as dest:
+                    dest.write(pred[name], 1, window=win)
+            write_rows_atomic(tile_dir / f"tile_{tile_id:06d}.csv.gz", rows)
+            stats = tile_dir / f"tile_{tile_id:06d}.classes.json"
+            tmp = stats.with_suffix(".partial")
+            tmp.write_text(json.dumps(count_tile_predictions(tag, pred), ensure_ascii=False),
+                           encoding="utf-8")
+            os.replace(tmp, stats)
+            (tile_dir / f"tile_{tile_id:06d}.ok").write_text("ok\n", encoding="utf-8")
+
+        pending = pending[:limit_tiles]
         completed = 0
-        for ri, row in enumerate(range(0,rgbds.height,256)):
-            for ci, col in enumerate(range(0,rgbds.width,256)):
-                tile_id = ri * ncols + ci
-                if limit_tiles is not None and completed >= limit_tiles:
-                    break
-                done = tile_dir / f"tile_{tile_id:06d}.ok"
-                class_stats=tile_dir / f"tile_{tile_id:06d}.classes.json"
-                if done.exists():
-                    if not class_stats.is_file():
-                        raise RuntimeError(f"Checkpoint sem contagem de classes: {done}")
-                    continue
-                w = min(256,rgbds.width-col)
-                h = min(256,rgbds.height-row)
-                win = Window(col,row,w,h)
-                valid = geo_mask(rgbds,win,geoms)
-                rgb_m = np.moveaxis(rgbds.read([1,2,3],window=win),0,-1)
-                ms_m = msds.read([1,2,3,4],window=win)
-                valid &= (rgbds.read_masks(1,window=win)>0)
-                valid &= (msds.read_masks(4,window=win)>0)
-                rows, tag, pred = predict_tile(rgb_m,ms_m,valid,
-                                               win_transform(win,rgbds.transform),
-                                               tile_id,models)
-                # Fechar cada escrita antes de assinalar o checkpoint.
-                with rasterio.open(ids,"r+") as dest:
-                    dest.write(tag,1,window=win)
-                for name, path in outputs.items():
-                    with rasterio.open(path,"r+") as dest:
-                        dest.write(pred[name],1,window=win)
-                write_rows_atomic(tile_dir / f"tile_{tile_id:06d}.csv.gz",rows)
-                tile_counts=count_tile_predictions(tag,pred)
-                tmp_stats=class_stats.with_suffix(".partial")
-                tmp_stats.write_text(json.dumps(tile_counts,ensure_ascii=False),encoding="utf-8")
-                os.replace(tmp_stats,class_stats)
-                done.write_text("ok\n",encoding="utf-8")
-                completed += 1
-                if completed % 25 == 0:
-                    print(f"{region}: {completed} novos quadrantes nesta execução",flush=True)
-            if limit_tiles is not None and completed >= limit_tiles:
-                break
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for offset in range(0, len(pending), workers):
+                batch = []
+                for tile_id in pending[offset:offset + workers]:
+                    ri, ci = divmod(tile_id, ncols)
+                    row, col = ri * 256, ci * 256
+                    win = Window(col, row, min(256, rgbds.width - col),
+                                 min(256, rgbds.height - row))
+                    valid = geo_mask(rgbds, win, geoms)
+                    rgb_m = np.moveaxis(rgbds.read([1, 2, 3], window=win), 0, -1)
+                    valid &= rgbds.read_masks(1, window=win) > 0
+                    if tuple(band_order) == RGB_NIR:
+                        ms_m = msds.read(list(RGB_NIR), window=win)
+                        valid &= msds.read_masks(4, window=win) > 0
+                    else:
+                        ms_m, spectral_valid = read_spectral_bands(msds, win, band_order)
+                        valid &= spectral_valid
+                    task = pool.submit(predict_tile, rgb_m, ms_m, valid,
+                                       win_transform(win, rgbds.transform), tile_id, models)
+                    batch.append((tile_id, win, task))
+                for tile_id, win, task in batch:
+                    write_tile(tile_id, win, task.result())
+                    completed += 1
+                    if completed % 100 == 0:
+                        print(f"{region}: {completed}/{len(pending)} novos quadrantes", flush=True)
     count_done = len(list(tile_dir.glob("tile_*.ok")))
     total = nrows*ncols
     complete = count_done == total
@@ -413,6 +443,7 @@ def run(region, rgb, multi, models_dir, output, aoi=None, allow_warp=False,
         "quadrantes_previstos": total, "quadrantes_concluidos": count_done,
         "tamanho_janela_px": 256, "modelos": list(models),
         "features": list(FEATURES), "labels": LABELS,
+        "bandas_entrada_R_G_B_NIR": list(band_order),
         "multiespectral_alinhado_sem_reprojecao": aligned,
         "reprojecao_explicita": bool(not aligned and allow_warp),
         "referencias_externas_usadas_em_treino": False,
@@ -443,10 +474,13 @@ def main():
     p.add_argument("--sem-previews",action="store_true")
     p.add_argument("--limite-quadrantes",type=int,
                    help="Para teste rápido; execução incompleta NÃO é resultado final")
+    p.add_argument("--bandas-r-g-b-nir", nargs=4, type=int, default=RGB_NIR,
+                   help="Posições verificadas de vermelho, verde, azul e NIR.")
+    p.add_argument("--trabalhadores", type=int, default=1)
     args=p.parse_args()
     run(args.regiao,args.rgb,args.multi,args.modelos,args.out,args.aoi,
         args.alinhar_multiespectral,args.retomar,not args.sem_previews,
-        args.limite_quadrantes)
+        args.limite_quadrantes, args.bandas_r_g_b_nir, args.trabalhadores)
 
 
 if __name__=="__main__":

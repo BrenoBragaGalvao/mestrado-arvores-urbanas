@@ -17,6 +17,7 @@ import geopandas as gpd
 import rasterio
 from sklearn.metrics import (accuracy_score, balanced_accuracy_score,
                              classification_report, confusion_matrix, f1_score)
+from preparar_rotulacao import excluded_segment_ids
 
 CLASS = {1:"arvore", 2:"grama"}
 EXPECTED = {"arvore", "grama"}
@@ -68,6 +69,7 @@ def run(region: str, pred_dir: Path, trees: Path, grasses: Path, output: Path,
         raster_crs=src.crs
     all_references_count=len(references)
     excluded=pd.DataFrame(columns=references.columns)
+    excluded_ids=set()
     if area1_aoi is not None:
         aoi=gpd.read_file(area1_aoi)
         if aoi.empty or aoi.crs is None:
@@ -75,6 +77,8 @@ def run(region: str, pred_dir: Path, trees: Path, grasses: Path, output: Path,
         aoi=aoi.to_crs(raster_crs).geometry.union_all().buffer(exclusion_m)
         if aoi.is_empty:
             raise ValueError("AOI Area1 vazia")
+        with rasterio.open(segments) as src:
+            excluded_ids=excluded_segment_ids(src,aoi)
         within=np.asarray([aoi.covers(Point(x,y))
                            for x,y in zip(references.x,references.y)],dtype=bool)
         excluded=references.loc[within].copy()
@@ -86,6 +90,13 @@ def run(region: str, pred_dir: Path, trees: Path, grasses: Path, output: Path,
                              "buffer de exclusão; não existe teste geográfico independente.")
     coords = list(zip(references.x, references.y))
     references["segmento_id"] = sample_raster(segments,coords).astype("uint64")
+    if excluded_ids:
+        crossing=references.segmento_id.isin(excluded_ids)
+        if crossing.any():
+            more=references.loc[crossing].assign(status="segmento_intersecta_area1_buffer")
+            excluded=pd.concat([excluded,more],ignore_index=True)
+            references=references.loc[~crossing].copy()
+            excluded.to_csv(output/"referencias_excluidas_sobreposicao.csv",index=False)
     missed = int((references.segmento_id==0).sum())
     valid = references.loc[references.segmento_id.gt(0)].copy()
     conflict = valid.groupby("segmento_id").classe.nunique()

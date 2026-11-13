@@ -15,6 +15,7 @@ INTEGRIDADE CIENTÍFICA:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -26,6 +27,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import rasterio
+from rasterio.enums import ColorInterp, Resampling
+from rasterio.vrt import WarpedVRT
 
 HERE=Path(__file__).resolve().parent
 SOURCES={
@@ -48,6 +51,70 @@ SOURCES={
 }
 REQUIRED_A0=("AOI_RGB_NEW.tif","AOI_NEW_MULTI.tif","AOI_new.shp",
              "AOI_new.shx","AOI_new.dbf","AOI_new.prj","Arvores.gpkg","Grama.gpkg")
+RGB_NIR=(1,2,3,4)
+
+
+def documented_order(multispectral: Path, proof: dict):
+    if not proof.get("confirmada") or "ordem_R_G_B_NIR" not in proof:
+        raise ValueError("A ordem espectral requer confirmação com uma fonte documentada.")
+    order=tuple(proof["ordem_R_G_B_NIR"])
+    if len(order)!=4 or set(order)!=set(RGB_NIR):
+        raise ValueError("Ordem R/G/B/NIR inválida no registro de evidência.")
+    with multispectral.open("rb") as fp:
+        actual=hashlib.file_digest(fp,"sha256").hexdigest()
+    if actual!=proof.get("arquivo_multiespectral_sha256"):
+        raise ValueError(f"SHA-256 da ortoimagem diverge da evidência espectral: {multispectral}")
+    return order
+
+
+def copy_spectral_evidence(source: Path, dest: Path):
+    """Vincula uma pasta nova à ordem espectral que originou seus modelos."""
+    marker=dest/"evidencia_espectral_execucao.json"
+    content=json.loads(source.read_text(encoding="utf-8"))
+    if marker.is_file():
+        if json.loads(marker.read_text(encoding="utf-8"))!=content:
+            raise ValueError("A evidência espectral mudou. Escolha uma nova pasta de execução.")
+    else:
+        historical=("area1_treinamento_real","predicoes","estado_cinco_areas.json")
+        if any((dest/name).exists() for name in historical):
+            raise ValueError("Use uma pasta nova para a ordem espectral corrigida.")
+        shutil.copyfile(source,marker)
+
+
+def prepare_verified_area1(source: Path, work: Path, proof: dict):
+    order=documented_order(source/"AOI_NEW_MULTI.tif",proof)
+    work.mkdir(parents=True,exist_ok=True)
+    signature={"originais":{},"ordem_R_G_B_NIR":list(order),"alinhamento":"bilinear na grade RGB"}
+    for name in REQUIRED_A0:
+        with (source/name).open("rb") as fp:
+            signature["originais"][name]=hashlib.file_digest(fp,"sha256").hexdigest()
+    marker=work/"preparacao_espectral.json"
+    target=work/"AOI_NEW_MULTI.tif"
+    if marker.is_file():
+        if json.loads(marker.read_text(encoding="utf-8"))!=signature:
+            raise ValueError("A entrada de treinamento mudou. Escolha uma nova pasta de execução.")
+        if all((work/f).is_file() for f in REQUIRED_A0):
+            return work
+    for name in REQUIRED_A0:
+        if name!="AOI_NEW_MULTI.tif":
+            shutil.copy2(source/name,work/name)
+    tmp=target.with_suffix(".partial.tif")
+    with rasterio.open(source/"AOI_RGB_NEW.tif") as rgb, rasterio.open(source/"AOI_NEW_MULTI.tif") as multi:
+        if multi.colorinterp[order[-1]-1].name=="alpha":
+            raise ValueError("A banda informada como NIR é um canal alfa.")
+        with WarpedVRT(multi,crs=rgb.crs,transform=rgb.transform,width=rgb.width,
+                       height=rgb.height,resampling=Resampling.bilinear,nodata=0) as aligned:
+            profile=rgb.profile.copy()
+            profile.update(count=4,dtype=multi.dtypes[0],nodata=0,tiled=True,
+                           blockxsize=256,blockysize=256,compress="deflate",predictor=2)
+            with rasterio.open(tmp,"w",**profile) as dst:
+                dst.colorinterp=(ColorInterp.red,ColorInterp.green,ColorInterp.blue,ColorInterp.undefined)
+                dst.descriptions=("Red","Green","Blue","NIR")
+                for _,window in dst.block_windows(1):
+                    dst.write(aligned.read(list(order),window=window),window=window)
+    tmp.replace(target)
+    marker.write_text(json.dumps(signature,ensure_ascii=False,indent=2),encoding="utf-8")
+    return work
 
 
 def record_status(dest:Path, data:dict):
@@ -234,15 +301,17 @@ def ensure_space(scratch:Path,size:int):
 
 def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
                base:Path,models:Path,region_out:Path,area1:Path,
-               confirmations:dict,max_tiles:int|None):
+               confirmations:dict,max_tiles:int|None,workers:int=1):
     previous=region_out/"manifesto_execucao.json"
     if previous.is_file():
         existing=json.loads(previous.read_text(encoding="utf-8"))
         if existing.get("estado")=="concluido" and len(existing.get("mapas",{}))==8:
             if all((region_out/Path(x).name).is_file() for x in existing["mapas"].values()):
-                print(f"{code}: 8 mapas completos já presentes. Nenhum reprocessamento.",flush=True)
-                return {"estado":"concluido","motivo":"resultados existentes verificados",
-                        "manifesto":str(previous)}
+                if (region_out/"segmento_id.tif").is_file():
+                    print(f"{code}: 8 mapas completos já presentes.",flush=True)
+                    samples=make_blind_samples(code,base,region_out,area1)
+                    return {"estado":"concluido","motivo":"resultados existentes verificados",
+                            "manifesto":str(previous),"amostras_para_anotar":str(samples)}
     work=scratch/code
     work.mkdir(parents=True,exist_ok=True)
     ensure_space(work,info["bytes"])
@@ -252,6 +321,10 @@ def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
         transfer_public_or_drive(info,source_folder,zip_path)
         rgb,multi=extract_geotiffs(zip_path,local)
         good,why=check_region_bands(code,rgb,multi,confirmations)
+        proof=confirmations.get(code,{})
+        order=RGB_NIR
+        if good and "ordem_R_G_B_NIR" in proof:
+            order=documented_order(multi,proof)
         with rasterio.open(rgb) as rgb_ds,rasterio.open(multi) as multi_ds:
             grid_aligned=(rgb_ds.crs==multi_ds.crs and
                           rgb_ds.width==multi_ds.width and
@@ -264,6 +337,7 @@ def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
                 "rgb_res":list(rgb_ds.res),"multi_res":list(multi_ds.res),
                 "bandas_rgb":rgb_ds.count,"bandas_multi":multi_ds.count,
                 "bandas_descricao":list(multi_ds.descriptions),
+                "ordem_R_G_B_NIR":list(order),
                 "grades_alinhadas":grid_aligned,
                 "nir_cientificamente_confirmado":good,
                 "comprovacao_nir":why
@@ -287,7 +361,8 @@ def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
                  "--out",region_out/"auditoria_sobreposicao")
         cmd=[sys.executable,str(HERE/"aplicar_regiao.py"),
              "--regiao",code,"--rgb",str(rgb),"--multi",str(multi),
-             "--modelos",str(models),"--out",str(region_out)]
+             "--modelos",str(models),"--out",str(region_out),
+             "--bandas-r-g-b-nir",*map(str,order),"--trabalhadores",str(workers)]
         if not grid_aligned:
             cmd+=["--alinhar-multiespectral"]
         if (region_out/"configuracao_execucao.json").is_file():
@@ -300,16 +375,7 @@ def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
             return {"estado":"parcial","quadrantes":manifest.get("quadrantes_concluidos")}
         # Sem rótulos novos, a saída inclui apenas mapas previstos;
         # gerar protocolo de anotação cega, não inventar F1.
-        blind=base/"rotulacao"/code
-        samples=blind/"amostras_para_anotar.gpkg"
-        if not samples.is_file():
-            cmd=[sys.executable,str(HERE/"preparar_rotulacao.py"),"gerar",
-                 "--segmentos",str(region_out/"segmento_id.tif"),
-                 "--n","200","--bloco-m","250","--out",str(blind)]
-            if code=="sagrada_familia_caxias":
-                cmd+=["--excluir-aoi",str(area1/"AOI_new.shp"),
-                      "--buffer-exclusao-m","25"]
-            call(*cmd)
+        samples=make_blind_samples(code,base,region_out,area1)
         return {"estado":"predicoes_concluidas_sem_rotulos_externos",
                 "manifesto":str(region_out/"manifesto_execucao.json"),
                 "amostras_para_anotar":str(samples),
@@ -319,6 +385,19 @@ def run_region(code:str,info:dict,source_folder:Path,scratch:Path,
         # o Colab tenha espaço para a próxima região (não toca no Drive).
         if work.is_dir() and work.resolve()!=scratch.resolve():
             shutil.rmtree(work)
+
+
+def make_blind_samples(code: str, base: Path, region_out: Path, area1: Path):
+    blind=base/"rotulacao"/code
+    samples=blind/"amostras_para_anotar.gpkg"
+    if not samples.is_file():
+        cmd=[sys.executable,str(HERE/"preparar_rotulacao.py"),"gerar",
+             "--segmentos",str(region_out/"segmento_id.tif"),
+             "--n","200","--bloco-m","250","--out",str(blind)]
+        if code=="sagrada_familia_caxias":
+            cmd+=["--excluir-aoi",str(area1/"AOI_new.shp"),"--buffer-exclusao-m","25"]
+        call(*cmd)
+    return samples
 
 
 def verify_external_labels(code:str,base:Path,area1:Path):
@@ -362,6 +441,7 @@ def main():
                    default=list(SOURCES))
     p.add_argument("--somente-area1",action="store_true")
     p.add_argument("--pular-area1-mapas",action="store_true")
+    p.add_argument("--trabalhadores",type=int,default=1)
     p.add_argument("--limite-quadrantes",type=int,
                    help="Teste de fumaça; NÃO declarar conclusão se usar este limite.")
     args=p.parse_args()
@@ -373,8 +453,17 @@ def main():
     if args.confirmacoes_nir is not None:
         proof=json.loads(args.confirmacoes_nir.read_text(encoding="utf-8"))
     area1=locate_area1(args.drive_root,args.area1)
-    training_out=args.out/"area1_treinamento_real"
-    training=train_original_area1(area1,training_out)
+    order_a0=RGB_NIR
+    training_area1=area1
+    if "area1_caxias" in proof:
+        copy_spectral_evidence(args.confirmacoes_nir,args.out)
+        order_a0=documented_order(area1/"AOI_NEW_MULTI.tif",proof["area1_caxias"])
+        training_area1=prepare_verified_area1(
+            area1,args.scratch/"entrada_area1_espectralmente_verificada",proof["area1_caxias"])
+        training_out=args.out/"area1_treinamento_bandas_verificadas"
+    else:
+        training_out=args.out/"area1_treinamento_real"
+    training=train_original_area1(training_area1,training_out)
     summary={"area1_treinamento":{"estado":"concluido",
              "segmentos_rotulados":training["area1_segmentos_rotulados_unicos"],
              "modelos":len(training["modelos"])}}
@@ -391,7 +480,10 @@ def main():
                  "--regiao","area1_caxias",
                  "--rgb",str(area1/"AOI_RGB_NEW.tif"),
                  "--multi",str(area1/"AOI_NEW_MULTI.tif"),
-                 "--modelos",str(models),"--out",str(output)]
+                 "--modelos",str(models),"--out",str(output),
+                 "--bandas-r-g-b-nir",*map(str,order_a0),"--trabalhadores",str(args.trabalhadores)]
+            if "area1_caxias" in proof:
+                cmd+=["--aoi",str(area1/"AOI_new.shp")]
             with rasterio.open(area1/"AOI_RGB_NEW.tif") as a, rasterio.open(area1/"AOI_NEW_MULTI.tif") as b:
                 if a.crs!=b.crs or a.shape!=b.shape or not a.transform.almost_equals(b.transform):
                     cmd+=["--alinhar-multiespectral"]
@@ -412,7 +504,7 @@ def main():
         try:
             out=args.out/"predicoes"/code
             response=run_region(code,SOURCES[code],args.pacotes_drive,args.scratch,
-                                args.out,models,out,area1,proof,args.limite_quadrantes)
+                                args.out,models,out,area1,proof,args.limite_quadrantes,args.trabalhadores)
             summary[code]=response
             if response["estado"] in (
                 "concluido","predicoes_concluidas_sem_rotulos_externos"):

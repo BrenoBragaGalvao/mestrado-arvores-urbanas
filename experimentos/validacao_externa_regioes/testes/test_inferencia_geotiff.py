@@ -74,3 +74,18 @@ def test_processa_retomada_e_oito_mapas(tmp_path):
     assert len(list((result/"tiles").glob("tile_*.classes.json")))==1
     assert second["contagens_segmentos_e_pixels_por_classificador"]==first[
         "contagens_segmentos_e_pixels_por_classificador"]
+
+
+def test_ordem_documentada_usa_banda_tres_como_vermelho(tmp_path):
+    from aplicar_regiao import read_spectral_bands
+    from rasterio.windows import Window
+
+    data = np.broadcast_to(
+        np.array([110, 220, 330, 440], dtype=np.uint16)[:, None, None], (4, 8, 8)
+    ).copy()
+    path = tmp_path / "multiespectral.tif"
+    write_tif(path, data)
+    with rasterio.open(path) as src:
+        aligned, valid = read_spectral_bands(src, Window(0, 0, 8, 8), (3, 2, 1, 4))
+    assert aligned[:, 4, 4].tolist() == [330, 220, 110, 440]
+    assert valid.all()

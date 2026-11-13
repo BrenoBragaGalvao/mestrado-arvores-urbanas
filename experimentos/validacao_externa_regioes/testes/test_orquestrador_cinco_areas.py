@@ -90,3 +90,17 @@ def test_status_de_execucao_persiste_na_retomada(tmp_path):
 def test_nao_aceita_area1_sem_todos_arquivos_originais(tmp_path):
     with pytest.raises(FileNotFoundError):
         locate_area1(tmp_path,tmp_path/"area1_incompleta")
+
+
+def test_ordenamento_verificado_vincula_o_hash_do_raster(tmp_path):
+    import hashlib
+    from executar_proposta1_cinco_areas import documented_order
+
+    multi = tmp_path / "multi.tif"
+    multi.write_bytes(b"imagem original")
+    proof = {"confirmada": True, "ordem_R_G_B_NIR": [3, 2, 1, 4],
+             "arquivo_multiespectral_sha256": hashlib.sha256(multi.read_bytes()).hexdigest()}
+    assert documented_order(multi, proof) == (3, 2, 1, 4)
+    multi.write_bytes(b"outro raster")
+    with pytest.raises(ValueError, match="SHA-256"):
+        documented_order(multi, proof)
