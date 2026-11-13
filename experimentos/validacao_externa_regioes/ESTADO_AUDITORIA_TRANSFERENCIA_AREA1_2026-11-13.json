@@ -1,0 +1,124 @@
+{
+  "schema": "registro-de-auditoria-proposta1-v1",
+  "date": "2026-11-13",
+  "scope": "Aplicação dos mesmos oito modelos treinados exclusivamente na Area1 a cinco imagens",
+  "source_github_csv": "experimentos/validacao_externa_regioes/RESULTADOS_CONSOLIDADOS_CINCO_AREAS_8_MODELOS_2026-11-13.csv",
+  "source_drive_folder": "https://drive.google.com/drive/folders/1JAcdZwUNqgFfsaJwNqOcsJsUypNqr2mY",
+  "target_branch": "feature/validacao-geografica-externa",
+  "reference_training": {
+    "source": "Arvores.gpkg + Grama.gpkg Area1",
+    "original_tree_points": 257,
+    "original_grass_points": 253,
+    "unique_segments": 505,
+    "never_use_external_labels_for_training": true
+  },
+  "spectral_order_r_g_b_nir": [
+    3,
+    2,
+    1,
+    4
+  ],
+  "published_model_archives": [
+    {
+      "name": "Area1_modelos_corrigidos_e_validacao.zip",
+      "url": "https://drive.google.com/file/d/1Hsn1WQxic6150_fXrqXpkLkaePkTIEl-/view"
+    }
+  ],
+  "models": [
+    "Random Forest",
+    "SVM RBF",
+    "Regressão logística",
+    "Extra Trees",
+    "KNN",
+    "HistGradientBoosting",
+    "Gaussian Naive Bayes",
+    "Dummy"
+  ],
+  "summary_checks": {
+    "rows": 40,
+    "regions": 5,
+    "algorithms_per_region": 8,
+    "matching_segment_class_totals": true,
+    "matching_ha_totals": true,
+    "percentage_matches_area_ratio_tolerance_percentage_points": 0.00001,
+    "rows_with_internal_F1_only_from_area1": 8,
+    "external_F1_verified_count": 0
+  },
+  "area_metadata": [
+    {
+      "code": "area1_caxias",
+      "municipio": "Caxias do Sul",
+      "estimated_segments_classified": 131776,
+      "predicted_valid_area_ha": 1174.023425,
+      "maps_archive": "https://drive.google.com/file/d/1DETrhSCnIIcUG92LHz1sFUkVNstD6fte/view",
+      "figures_archive": "https://drive.google.com/file/d/1MIC-KnqBUXlrdZMUYfUe8REMRWeU2_Q8/view",
+      "classifier_maps_previously_recorded": 8,
+      "evaluated_internal_spatial_F1": true,
+      "evaluated_external_independent_F1": false,
+      "blind_samples_reserved": 0,
+      "geometric_external_exclusion_required": null
+    },
+    {
+      "code": "sagrada_familia_caxias",
+      "municipio": "Caxias do Sul",
+      "estimated_segments_classified": 318830,
+      "predicted_valid_area_ha": 2678.747275,
+      "maps_archive": "https://drive.google.com/file/d/18GwhiVAC_LT1rxZgmICTvz2VLjABFKQQ/view",
+      "figures_archive": "https://drive.google.com/file/d/15f_mBHWyIgShjyJT3Haqp9-6MQAOMYQc/view",
+      "classifier_maps_previously_recorded": 8,
+      "evaluated_internal_spatial_F1": false,
+      "evaluated_external_independent_F1": false,
+      "blind_samples_reserved": 200,
+      "geometric_external_exclusion_required": "Area1 + 25m and intersecting segments"
+    },
+    {
+      "code": "centro_novo_hamburgo",
+      "municipio": "Novo Hamburgo",
+      "estimated_segments_classified": 317756,
+      "predicted_valid_area_ha": 2667.18195,
+      "maps_archive": "https://drive.google.com/file/d/1co5EApBv9zHWsCjdF7W0s-nC5jZ1QcqW/view",
+      "figures_archive": "https://drive.google.com/file/d/16zhmFcbPwGA_b2dDX3O0XaJpQENzQ7fz/view",
+      "classifier_maps_previously_recorded": 8,
+      "evaluated_internal_spatial_F1": false,
+      "evaluated_external_independent_F1": false,
+      "blind_samples_reserved": 200,
+      "geometric_external_exclusion_required": null
+    },
+    {
+      "code": "lomba_grande_novo_hamburgo",
+      "municipio": "Novo Hamburgo",
+      "estimated_segments_classified": 614030,
+      "predicted_valid_area_ha": 4612.192075,
+      "maps_archive": "https://drive.google.com/file/d/1ePRzJQColP1dvqJJv9P3LaSVo1LxE30w/view",
+      "figures_archive": "https://drive.google.com/file/d/1M_1GrUk9KyPGmM0DZ4pkNHtmqNODR20E/view",
+      "classifier_maps_previously_recorded": 8,
+      "evaluated_internal_spatial_F1": false,
+      "evaluated_external_independent_F1": false,
+      "blind_samples_reserved": 200,
+      "geometric_external_exclusion_required": null
+    },
+    {
+      "code": "cristo_rei_sao_leopoldo",
+      "municipio": "São Leopoldo",
+      "estimated_segments_classified": 335628,
+      "predicted_valid_area_ha": 2664.41085,
+      "maps_archive": "https://drive.google.com/file/d/1ih1_ti5svuc-ZIq-zOiuEa1ymYFjf239/view",
+      "figures_archive": "https://drive.google.com/file/d/1qXn85ESzOWwFRIenR2kj4gxWdUmidjDw/view",
+      "classifier_maps_previously_recorded": 8,
+      "evaluated_internal_spatial_F1": false,
+      "evaluated_external_independent_F1": false,
+      "blind_samples_reserved": 200,
+      "geometric_external_exclusion_required": null
+    }
+  ],
+  "caveats": [
+    "This manifest is a follow-up audit over preexisting evidence, not a new Google Colab training or inference execution.",
+    "Source rasters and maps were not independently re-opened pixel-by-pixel in this session.",
+    "F1-macro external requires independent human-validated references: no numeric F1 external is asserted.",
+    "All predicted coverages are binary pixel assignments, not verified tree/grass land-cover areas.",
+    "Images Area1 and Sagrada Familia geographically overlap and should not be summed as unique coverage.",
+    "Current Area1 multiband file size differs from previously logged size; SHA256 provenance remains to be reconciled."
+  ],
+  "status": "predictive_outputs_exist_external_generalization_unvalidated",
+  "main_unchanged": true
+}

@@ -1,0 +1,61 @@
+{
+  "capturado_em": "2026-11-12",
+  "estado": "metadados de arquivos verificados por listagem Google Drive; conteúdo de ZIP/RAR ainda não inspecionado",
+  "pasta_novas_regioes": "https://drive.google.com/drive/u/1/folders/1cUNFdo2w3V-ldPnxA9N_vnjmQtOrVHyd",
+  "pasta_area1": "https://drive.google.com/drive/folders/1asqPz9xFr7dlnK1ggvrwftXEbkhvwjg6",
+  "arquivos": [
+    {
+      "regiao": "centro_novo_hamburgo",
+      "nome": "CENTRO_NOVO HAMBURGO.zip",
+      "drive_id": "1UufzP5quG1tRDgfkuwzJ9evwvIHgitYT",
+      "bytes": 2388874067,
+      "formato": "zip",
+      "n_bandas": null,
+      "rotulos": null
+    },
+    {
+      "regiao": "lomba_grande_novo_hamburgo",
+      "nome": "LOMBA_GRANDE_NOVO_HAMBURGO.zip",
+      "drive_id": "1N5peFz-NauAYeNgBcauFyX9reJpnROQ6",
+      "bytes": 3117343825,
+      "formato": "zip",
+      "n_bandas": null,
+      "rotulos": null
+    },
+    {
+      "regiao": "cristo_rei_sao_leopoldo",
+      "nome": "CRISTO_REI_SÃO_LEOPOLDO.rar",
+      "drive_id": "1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU",
+      "bytes": 1563064317,
+      "formato": "rar",
+      "n_bandas": null,
+      "rotulos": null
+    },
+    {
+      "regiao": "sagrada_familia_caxias",
+      "nome": "SAGRADA_FAMÍLIA_CAXIAS DO SUL.zip",
+      "drive_id": "1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91",
+      "bytes": 1771082301,
+      "formato": "zip",
+      "n_bandas": null,
+      "rotulos": null
+    },
+    {
+      "regiao": "baixa_resolucao",
+      "nome": "ImagensBaixaResolucao.zip",
+      "drive_id": "1YRrdOyn0LVVMaGJivmd4YKEOJtkVd6Fw",
+      "bytes": 1073741954,
+      "formato": "zip",
+      "n_bandas": null,
+      "rotulos": null
+    }
+  ],
+  "entrada_area1": {
+    "AOI_RGB_NEW.tif": "1yKT4dL-nZZfKnfmJr3rQNX47Wep-mKv0",
+    "AOI_NEW_MULTI.tif": "16HBN08OmycfoULenwtLHHQizEzJ2he3K",
+    "Arvores.gpkg": "1iSdrGtSRAubXJPYJcwBW36_DYhEIQE8h",
+    "Grama.gpkg": "1N0Is3oJuWDq9CLsLBN4Ur6mnjTzyF2cI",
+    "postes.gpkg": "1yV8x3CPGTIv-HX_N7psjQsrth8FZvc14"
+  },
+  "aviso": "Nomes regionais não comprovam a equivalência da Sagrada Família com a Area1. Ausência de rótulos e de NIR só se confirma após inspeção interna."
+}

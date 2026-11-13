@@ -1,0 +1,58 @@
+name: Verificar acesso ao Drive sem login
+on:
+  push:
+    branches:
+      - feature/validacao-geografica-externa
+    paths:
+      - '.github/workflows/verificar-acesso-drive-sem-login.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testar-leitura-publica:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Testar apenas o cabeçalho e primeiros bytes das quatro regiões
+        shell: bash
+        run: |
+          python - <<'PY'
+          import urllib.request, urllib.parse, urllib.error, re, json, html
+          ids={
+            "CENTRO_NOVO_HAMBURGO":"1UufzP5quG1tRDgfkuwzJ9evwvIHgitYT",
+            "LOMBA_GRANDE_NOVO_HAMBURGO":"1N5peFz-NauAYeNgBcauFyX9reJpnROQ6",
+            "CRISTO_REI_SAO_LEOPOLDO":"1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU",
+            "SAGRADA_FAMILIA_CAXIAS":"1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91"
+          }
+          for region, file_id in ids.items():
+            for mode, base in [
+              ("uc",f"https://drive.google.com/uc?export=download&id={file_id}"),
+              ("direct",f"https://drive.usercontent.google.com/download?id={file_id}&export=download&confirm=t")
+            ]:
+              req=urllib.request.Request(base,headers={"Range":"bytes=0-2047",
+                  "User-Agent":"Mozilla/5.0","Accept":"*/*"})
+              try:
+                with urllib.request.urlopen(req,timeout=18) as response:
+                  sample=response.read(2048)
+                  snippet=sample.decode("utf-8","ignore").lower()
+                  title=re.search(r"<title[^>]*>(.*?)</title>",snippet,re.S)
+                  result={
+                   "region":region,"method":mode,"status":response.status,
+                   "mime":response.headers.get("Content-Type"),
+                   "file_header":bool(response.headers.get("Content-Disposition")),
+                   "zip_or_rar_signature":sample.startswith(b"PK") or sample.startswith(b"Rar!"),
+                   "html_title":html.unescape(title.group(1))[:110] if title else None,
+                   "contains_download_form":("<form" in snippet or "download anyway" in snippet),
+                   "contains_auth_message":any(s in snippet for s in
+                       ("sign in","request access","you need access","google accounts")),
+                   "declared_size":response.headers.get("Content-Length")
+                  }
+                print(json.dumps(result,ensure_ascii=False),flush=True)
+              except Exception as e:
+                print(json.dumps({"region":region,"method":mode,
+                                  "error_type":type(e).__name__,
+                                  "message":str(e)[:140]},ensure_ascii=False),flush=True)
+          print("Nenhum arquivo completo foi baixado.",flush=True)
+          PY
