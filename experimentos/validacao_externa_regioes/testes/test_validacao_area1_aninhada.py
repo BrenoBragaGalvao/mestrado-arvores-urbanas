@@ -29,5 +29,15 @@ def test_valida_spatial_nested_sem_uso_teste_para_hiperparametros(tmp_path):
     assert len(test_data)==4
     assert len(inner_data)==16
     assert test_data.f1_teste_espacial.between(0,1).all()
+    assert test_data.f1_treino.between(0,1).all()
+    assert np.allclose(test_data.gap_f1_treino_menos_teste,
+                       test_data.f1_treino-test_data.f1_teste_espacial)
     assert inner_data.f1_validacao_interna.between(0,1).all()
     assert (tmp_path/"results/metodologia_area1_aninhada.json").exists()
+
+
+def test_recusa_embargo_negativo(tmp_path):
+    import pytest
+    with pytest.raises(ValueError, match="negativo"):
+        evaluate(tmp_path/"inexistente.csv", tmp_path/"out",
+                 centroid_embargo=True, embargo_m=-1)
