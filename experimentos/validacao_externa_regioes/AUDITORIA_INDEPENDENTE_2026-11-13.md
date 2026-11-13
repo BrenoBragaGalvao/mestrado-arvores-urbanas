@@ -23,7 +23,7 @@ Esta auditoria é uma **verificação complementar de artefatos produzidos anter
 | Centro · Novo Hamburgo | 317.756 | 106.687.278 | 0 | 106.687.278 |
 | Lomba Grande · Novo Hamburgo | 614.030 | 126.045.052 | 58.442.631 | 184.487.683 |
 | Cristo Rei · São Leopoldo | 335.628 | 96.591.354 | 9.985.080 | 106.576.434 |
-| **Total** | **1.718.020** | **470.139.918** | **81.723.305** | **551.863.223** |
+| **Total** | **1.718.020** | **470.138.918** | **81.723.305** | **551.862.223** |
 
 Os valores acima são **predições de um classificador específico**, não contagens de árvores reais nem métricas de acurácia. Classes `1=árvore prevista` e `2=gramínea prevista`; `0=sem predição`. Em particular, o SVM RBF classificou **100% dos pixels válidos do Centro como árvore**, reforçando a necessidade de validação externa e cautela frente à mudança de domínio.
 
