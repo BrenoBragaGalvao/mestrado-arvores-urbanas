@@ -12,6 +12,25 @@ Treinar os oito classificadores exclusivamente com **segmentos rotulados da Area
 
 O nome `SAGRADA_FAMÍLIA_CAXIAS DO SUL.zip` **não prova** que seu conteúdo corresponda à Area1. Compare rasters, CRS, grade, cobertura e, quando possível, pixels.
 
+## Execução integrada da Proposta 1 nas cinco áreas
+
+**Novo ponto de entrada:** [notebook único `proposta1_cinco_areas_colab.ipynb`](proposta1_cinco_areas_colab.ipynb) ([abrir no Colab](https://colab.research.google.com/github/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/feature/validacao-geografica-externa/experimentos/validacao_externa_regioes/proposta1_cinco_areas_colab.ipynb)).
+
+O notebook monta o Google Drive, atualiza a branch e executa [`executar_proposta1_cinco_areas.py`](executar_proposta1_cinco_areas.py):
+
+1. Localiza **somente os dados originais da Area1** (257 árvores + 253 gramíneas), reproduz a base de **505 segmentos únicos** e os polígonos necessários ao embargo espacial de 25 m.
+2. Seleciona parâmetros por validação espacial interna, treina os **oito classificadores fixos**, e realiza **cinco partições externas para blocos de 250 m e cinco para blocos de 500 m**, com seleção interna aninhada. Isso produz resultados novos da Area1, não reescreve os históricos.
+3. Gera **mapas descritivos dos modelos aplicados na própria Area1**; por reutilizarem dados de treinamento, esses mapas **não são teste independente**. O alinhamento RGB/multiespectral fica registrado.
+4. Percorre sequencialmente Sagrada Família, Centro, Lomba Grande e Cristo Rei. Consulta arquivos existentes no Drive ou usa os links de download público já auditados; **extrai apenas RGB e ortoimagem de quatro bandas**, sem arquivar cópias dos rasters no GitHub.
+5. Confere a banda 4. **Não executa NDVI/inferência regional quando NIR não está documentalmente comprovado**. Uma identificação NIR no próprio metadado da banda 4 é suficiente; caso contrário, exige o arquivo privado `confirmacoes_nir.json` com fonte técnica registrada (modelo não autorizado: [`confirmacoes_nir.modelo.json`](confirmacoes_nir.modelo.json)). **O nome `4BANDAS` não é prova científica.**
+6. Quando NIR está confirmado, aplica os oito modelos sem retreinamento, faz alinhamento de raster declarado quando necessário e salva, por região: GeoTIFF de **árvore/gramínea por classificador**, prévias RGB e Quickshift, `segmentos.csv.gz`, `resumo_classes_previstas.csv` com **contagens de segmentos e pixels previstos**, e manifestos auditáveis. Contagens de predição não são acurácia/F1.
+7. Se não existirem referências externas independentes, gera até 200 pontos para **rotulação cega** em cada região, em `rotulacao/REGIAO/amostras_para_anotar.gpkg`. Em Sagrada, o polígono Area1 e buffer de 25 m são excluídos desde a amostragem. Se os rótulos forem fornecidos e verificados, calcula F1-macro e matriz de confusão, sem usar esses rótulos para seleção dos modelos.
+8. Consolida o status das regiões no arquivo `estado_cinco_areas.json` e gera `comparacao_regioes/relatorio.md`. Regiões sem rótulos ficam explicitamente **não avaliadas**.
+
+**Resiliência:** cada região é processada separadamente, os mosaicos mantêm checkpoint por janela e a entrada SHA256 identifica rasters mesmo após nova extração em sessão Colab diferente. Os downloads temporários da região processada são eliminados do espaço local; os resultados já salvos no Drive permanecem. Para retomar, execute novamente o mesmo notebook com os mesmos dados, banda documentada e caminho de saída.
+
+**Limite de acesso:** o conector Drive/GitHub desta conversa **não controla a sessão interativa Colab autorizada pelo usuário**. Este notebook e seus testes foram implementados no GitHub, mas **o treinamento real e as quatro aplicações supervisionadas ainda não foram executados aqui**. Não confundir código pronto ou testes sintéticos com experimento científico concluído.
+
 ## Cinco áreas, mapa geográfico e risco de sobreposição
 
 ![Limites geográficos das cinco áreas de estudo — figura esquemática georreferenciada](figuras/mapa_esquematico_cinco_areas.svg)
