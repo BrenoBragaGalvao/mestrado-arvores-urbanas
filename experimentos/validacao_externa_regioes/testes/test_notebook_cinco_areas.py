@@ -22,6 +22,7 @@ def test_notebook_cinco_areas_e_codigo_sintaticamente_valido():
         "sagrada_familia_caxias","centro_novo_hamburgo",
         "lomba_grande_novo_hamburgo","cristo_rei_sao_leopoldo"))
     assert "FONTE_NIR" in combined
+    assert "p7zip-full" in combined  # Cristo Rei exige descompactador RAR
     assert "REGIOES" in combined
     assert "estado_cinco_areas.json" in combined
     assert "metricas_externas.csv" in combined
