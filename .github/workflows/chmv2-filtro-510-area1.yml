@@ -20,6 +20,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Diagnóstico de acesso às imagens de regiões externas
+        run: |
+          python - <<'PY'
+          import requests
+          for region,id in [('sagrada','1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91'),('lomba','1N5peFz-NauAYeNgBcauFyX9reJpnROQ6'),('cristo','1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU')]:
+              try:
+                  with requests.get('https://drive.google.com/uc?export=download&id='+id,stream=True,timeout=(16,16)) as resp:
+                      first=next(resp.iter_content(256),b'')
+                      print('ORIGEM',region,'http',resp.status_code,'content-type',resp.headers.get('content-type'),'bytes',resp.headers.get('content-length'),'prefix',first[:12].hex(),'url',resp.url[:90],flush=True)
+              except Exception as e:
+                  print('ORIGEM',region,'erro',type(e).__name__,str(e)[:120],flush=True)
+          PY
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
