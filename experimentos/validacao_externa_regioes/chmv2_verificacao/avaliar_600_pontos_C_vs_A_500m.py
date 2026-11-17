@@ -68,7 +68,7 @@ def download(fid,p,n=None):
                 resp.raise_for_status()
                 iterator=resp.iter_content(4*1024*1024)
                 first=next(iterator,b'')
-                if first[:4] not in (b'PK\\x03\\x04',b'Rar!'):
+                if first[:4] not in (b'PK\x03\x04',b'Rar!'):
                     raise IOError('Drive respondeu HTML ou conteudo inesperado: '
                                   +str(resp.status_code)+' '+str(resp.headers.get('Content-Type'))+
                                   ' primeiro='+repr(first[:100]))
@@ -94,7 +94,7 @@ def download(fid,p,n=None):
         if not temp.is_file() or (n and temp.stat().st_size!=n):
             raise IOError('gdown não retornou arquivo integral')
         with temp.open('rb') as f:
-            if f.read(4) not in (b'PK\\x03\\x04',b'Rar!'):
+            if f.read(4) not in (b'PK\x03\x04',b'Rar!'):
                 raise IOError('gdown retornou outro formato')
         temp.replace(p)
         return p
