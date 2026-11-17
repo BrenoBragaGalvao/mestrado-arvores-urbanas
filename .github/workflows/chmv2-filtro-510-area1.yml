@@ -61,6 +61,8 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+      - name: Validar sintaxe do extrator dos 600 pontos
+        run: python -m py_compile experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
