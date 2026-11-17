@@ -68,15 +68,25 @@ def extractzip(p,pattern,dest):
     return dest
 def extract_multi(p,out):
     if p.suffix=='.zip':return extractzip(p,'_ortho_4bandas.tif',out)
-    subprocess.run([def get_features(region,part,conf):
-    """Reconstrói o atributo diretamente de Multi original nos pixels do segmento congelado.
-    As máscaras foram extraídas, testadas e vinculadas ao GeoTIFF de segmento original.
-    Não depende de um novo mapa ou novas amostras.
-    """
+    path=p.parent/'unrar'
+    path.mkdir(exist_ok=True)
+    subprocess.run(['7z','e','-y',str(p),'-o'+str(path),'*_ORTHO_4BANDAS.tif'],check=True)
+    found=[x for x in path.iterdir() if x.name.lower().endswith('_ortho_4bandas.tif')]
+    if len(found)!=1:raise ValueError('Falha extraindo multiespectral de RAR')
+    found[0].rename(out)
+    return out
+
+def predict(X,params):
+    mean,scale,coef,intercept=params
+    z=((X-np.asarray(mean))/np.asarray(scale))@np.asarray(coef)+intercept
+    return np.where(z>0,'grama','arvore'),z
+
+def get_features(region,part,conf):
+    """Reconstrói atributos apenas nos 600 segmentos originais congelados."""
     import zlib,base64
     from rasterio.transform import Affine
     fid,size,ext,_mapid=conf
-    work=TMP/region;work.mkdir(exist_ok=True)
+    work=TMP/region;work.mkdir(parents=True,exist_ok=True)
     archive=download(fid,work/('original'+ext),size)
     multipath=extract_multi(archive,work/'multi.tif')
     archive.unlink()
@@ -110,7 +120,7 @@ def extract_multi(p,out):
                 if len(indices)!=int(rec['n_pixels_original']) or np.any(indices>=h*w):raise ValueError('Máscara inválida')
                 mask=np.zeros((h*w,),dtype=bool);mask[indices]=True;mask=mask.reshape(h,w)
                 mask &= valid
-                if not mask.any():raise ValueError('Segmento ficou sem pixels espectrais: '+str(rec['amostra_id']))
+                if not mask.any():raise ValueError('Segmento sem pixels espectrais: '+str(rec['amostra_id']))
                 out={k:rec[k] for k in ['regiao','amostra_id','x','y','segmento_id','bloco_500m','predicao_modelo','B']}
                 out['mean_intensity']=float(hsv[mask].mean(dtype=np.float64))
                 out['mean_edges']=float(edge[mask].mean(dtype=np.float64))
@@ -123,15 +133,6 @@ def extract_multi(p,out):
     shutil.rmtree(work,ignore_errors=True)
     return table
 
-.mean(dtype=np.float64)),
-                   'mean_edges':float(edge[mask].mean(dtype=np.float64)),
-                   'mean_ndvi':float(ndvi[mask].mean(dtype=np.float64)),
-                   'n_pixels_segmento':int(mask.sum())}
-                allrows.append(a)
-    result=pd.DataFrame(allrows).sort_values('amostra_id')
-    result.to_csv(OUT/(region+'_atributos_200.csv'),index=False)
-    shutil.rmtree(work,ignore_errors=True)
-    return result
 def calc(g,key):
     q=g[g['B'].isin(['arvore','grama'])]
     y=q['B'].to_numpy();pred=q[key].to_numpy()
