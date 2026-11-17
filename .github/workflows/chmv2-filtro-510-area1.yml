@@ -52,3 +52,30 @@ jobs:
             resultados_chm_2010/2010_pontos_alturas_chmv2.csv
             resultados_chm_2010/manifesto_2010_alturas_chmv2.json
           if-no-files-found: warn
+  f1-seiscentos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar bibliotecas e leitor de RAR
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq p7zip-full
+          python -m pip install --disable-pip-version-check numpy pandas rasterio scikit-image scikit-learn requests
+      - name: Recuperar bandas e segmentos originais e calcular F1 no mesmo conjunto cego
+        env:
+          CHM_F1_OUTPUT: resultado_600_pontos_lr_500m
+        run: |
+          python experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py
+      - name: Preservar CSV de resultados, inclusive em caso de falha
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 600_pontos_A_vs_C_f1_500m
+          path: |
+            resultado_600_pontos_lr_500m/*.csv
+            resultado_600_pontos_lr_500m/*.json
+          if-no-files-found: warn
