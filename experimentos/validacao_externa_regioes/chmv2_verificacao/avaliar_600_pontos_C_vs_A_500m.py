@@ -110,13 +110,42 @@ def extractzip(p,pattern,dest):
         with z.open(found[0]) as src,dest.open('wb') as dst:shutil.copyfileobj(src,dst,8*1024*1024)
     return dest
 def extract_multi(p,out):
-    if p.suffix=='.zip':return extractzip(p,'_ortho_4bandas.tif',out)
-    path=p.parent/'unrar'
-    path.mkdir(exist_ok=True)
-    subprocess.run(['7z','e','-y',str(p),'-o'+str(path),'*_ORTHO_4BANDAS.tif'],check=True)
-    found=[x for x in path.iterdir() if x.name.lower().endswith('_ortho_4bandas.tif')]
-    if len(found)!=1:raise ValueError('Falha extraindo multiespectral de RAR')
-    found[0].rename(out)
+    """Abre o multiespectral original sem depender de glob não recursivo no RAR."""
+    if p.suffix.lower()=='.zip':
+        return extractzip(p,'_ortho_4bandas.tif',out)
+    if p.suffix.lower()!='.rar':
+        raise ValueError('Arquivo original precisa ser ZIP ou RAR: '+str(p))
+    if out.is_file():
+        with rasterio.open(out) as ds:
+            if ds.count!=4:raise ValueError('Multiespectral em cache sem quatro bandas')
+        return out
+    listing=subprocess.run(['7z','l','-slt',str(p)],capture_output=True,
+                           text=True,errors='replace',check=True)
+    names=[line[7:].strip() for line in listing.stdout.splitlines()
+           if line.startswith('Path = ')]
+    candidates=[name for name in names if
+                name.replace('\\','/').lower().endswith('_ortho_4bandas.tif')]
+    print('RAR_MULTIESPECTRAIS_ENCONTRADOS',candidates,flush=True)
+    if len(candidates)!=1:
+        tif=[n for n in names if n.lower().endswith(('.tif','.tiff'))]
+        raise ValueError('RAR: esperado um _ORTHO_4BANDAS.tif, encontrados '
+                         +str(len(candidates))+'; TIFFs existentes='+repr(tif[:35]))
+    dest=p.parent/'unrar'
+    dest.mkdir(parents=True,exist_ok=True)
+    filename=candidates[0].replace('\\','/').split('/')[-1]
+    cmd=['7z','e','-y','-r',str(p),'-o'+str(dest),filename]
+    finished=subprocess.run(cmd,capture_output=True,text=True,errors='replace')
+    if finished.returncode!=0:
+        raise RuntimeError('7z falhou extraindo '+filename+': '+finished.stdout[-1500:]+finished.stderr[-1500:])
+    files=[x for x in dest.iterdir() if x.is_file() and x.name.lower()==filename.lower()]
+    if len(files)!=1:
+        raise ValueError('RAR: multiespectral listado mas não extraído: '+filename
+                         +'; arquivos='+repr([x.name for x in dest.iterdir()][:30])
+                         +'; 7z='+finished.stdout[-1800:])
+    with rasterio.open(files[0]) as ds:
+        if ds.count!=4:
+            raise ValueError('O TIFF extraído de Cristo Rei não possui 4 bandas: '+str(ds.count))
+    os.replace(files[0],out)
     return out
 
 def predict(X,params):
