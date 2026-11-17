@@ -32,7 +32,7 @@ jobs:
               try:
                   with requests.get('https://drive.usercontent.google.com/download?export=download&confirm=t&id='+id,stream=True,timeout=(16,16)) as resp:
                       first=next(resp.iter_content(256),b'')
-                      print('ORIGEM',region,'http',resp.status_code,'content-type',resp.headers.get('content-type'),'bytes',resp.headers.get('content-length'),'prefix',first[:12].hex(),'url',resp.url[:90],'html_title',resp.text[:330] if b'<html' in first.lower() or b'<!doctype' in first.lower() else '',flush=True)
+                      print('ORIGEM',region,'http',resp.status_code,'content-type',resp.headers.get('content-type'),'bytes',resp.headers.get('content-length'),'prefix',first[:12].hex(),'url',resp.url[:90],'html_tail',resp.text[-1100:] if b'<html' in first.lower() or b'<!doctype' in first.lower() else '',flush=True)
               except Exception as e:
                   print('ORIGEM',region,'erro',type(e).__name__,str(e)[:120],flush=True)
           PY
@@ -57,6 +57,7 @@ jobs:
             resultados_chm_2010/manifesto_2010_alturas_chmv2.json
           if-no-files-found: warn
   f1-seiscentos:
+    if: false # diagnóstico temporário de limite de download do Google Drive
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
