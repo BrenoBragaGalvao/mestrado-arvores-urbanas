@@ -160,8 +160,12 @@ def main():
     data=pd.read_csv(SOURCE,dtype={'segmento_id':str})
     assert len(data)==600
     assert all(data.groupby('regiao').size()==200)
+    selecionada=os.environ.get('CHM_REGION_ONLY')
+    if selecionada and selecionada not in REGIONS:
+        raise ValueError('Região externa desconhecida: '+selecionada)
+    regioes={selecionada:REGIONS[selecionada]} if selecionada else REGIONS
     pieces=[]
-    for region,conf in REGIONS.items():
+    for region,conf in regioes.items():
         pieces.append(get_features(region,data[data.regiao==region],conf))
     frame=pd.concat(pieces).reset_index(drop=True)
     values=frame[FEATURES].to_numpy(dtype='float64')
@@ -170,13 +174,15 @@ def main():
     frame['confere_A_raster']=(frame.previsto_A_reprocessado==frame.predicao_modelo)
     frame.to_csv(OUT/'600_pontos_mesmos_atributos_e_previsoes.csv',index=False)
     n_diff=int((~frame.confere_A_raster).sum())
+    print('BASELINE_DIVERGENCIAS',n_diff,'/ ',len(frame),flush=True)
     metrics=[]
     for region,g in frame.groupby('regiao'):
         for model,key in [('A_raster_original','predicao_modelo'),('A_reprocessado','previsto_A_reprocessado'),('C_retreinado_371','previsto_C_filtrado')]:
             metrics.append(dict(regiao=region,modelo=model,**calc(g,key)))
     pd.DataFrame(metrics).to_csv(OUT/'COMPARACAO_F1_MACRO_500m_600_PONTOS.csv',index=False)
     manifest={'status':'CONFERIDO' if n_diff==0 else 'DIVERGENCIA_REPROCESSAMENTO',
-        'pontos_originais':600,'diferencas_baseline_A':n_diff,
+        'regiao_selecionada':selecionada or 'todas',
+        'pontos_totais_protocolo':600,'pontos_avaliados_nesta_execucao':int(len(frame)),'diferencas_baseline_A':n_diff,
         'interpretacao':'F1 de concordancia com pseudo-rotulos CHMv2, nao validacao humana',
         'amostras':'600 pontos cegos da avaliacao anterior, fixos; 200 por regiao',
         'modelo_C':'LogisticRegression C=0.1 StandardScaler; Area1 371 segmentos de treino concordantes com CHMv2',
