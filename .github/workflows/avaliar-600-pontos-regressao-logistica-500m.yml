@@ -4,6 +4,7 @@ on:
     branches: [feature/validacao-geografica-externa]
     paths:
       - ".github/workflows/avaliar-600-pontos-regressao-logistica-500m.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py"
   workflow_dispatch:
 permissions:
   contents: read
@@ -26,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq p7zip-full
-          python -m pip install -q numpy pandas rasterio scikit-image scikit-learn requests
+          python -m pip install -q numpy pandas rasterio scikit-image scikit-learn requests gdown
       - name: Consultar espaço disponível
         run: df -h .
       - name: Extrair atributos dos mesmos pontos e calcular F1-macro
