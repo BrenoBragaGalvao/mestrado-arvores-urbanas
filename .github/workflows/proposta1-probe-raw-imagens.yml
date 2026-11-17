@@ -1,4 +1,4 @@
-name: Proposta 1 - Teste de acesso aos ortomosaicos completos
+name: Proposta 1 - Teste publico de acesso aos ortomosaicos completos
 on:
   push:
     branches: [feature/validacao-geografica-externa]
