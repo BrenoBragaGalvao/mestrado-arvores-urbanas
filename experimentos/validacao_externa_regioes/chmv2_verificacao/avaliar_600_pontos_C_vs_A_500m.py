@@ -40,7 +40,7 @@ GRID={
 MASKCSV=HERE/'600_pontos_mascaras_quickshift_originais.csv'
 
 def download(fid,p,n=None):
-    # Modo Colab: ler arquivos na conta Drive do usuário, sem tráfego público/limite do link.
+    """Acessa os arquivos por caminho autenticado no Colab; evita copiar ~6,5GB."""
     origem=os.environ.get('CHM_ORIGINAIS_DRIVE')
     nome_arquivo={
         '1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91':'SAGRADA_FAMÍLIA_CAXIAS DO SUL.zip',
@@ -49,32 +49,60 @@ def download(fid,p,n=None):
     }.get(fid)
     if origem and nome_arquivo:
         source=Path(origem)/nome_arquivo
-        if not source.is_file():raise FileNotFoundError(f'Arquivo original não encontrado no Drive montado: {source}')
-        if n is not None and source.stat().st_size!=n:raise ValueError('Arquivo original com tamanho diferente: '+str(source))
-        p.parent.mkdir(parents=True,exist_ok=True)
-        shutil.copyfile(source,p)
-        print('COPIA_DRIVE_AUTENTICADO_OK',p.name,p.stat().st_size,flush=True)
+        if not source.is_file():
+            raise FileNotFoundError(f'Arquivo original não encontrado no Drive montado: {source}')
+        if n is not None and source.stat().st_size!=n:
+            raise ValueError(f'Tamanho inesperado {source}: {source.stat().st_size} != {n}')
+        print('DRIVE_AUTENTICADO_SEM_COPIA',source.name,source.stat().st_size,flush=True)
+        return source
+    if p.is_file() and (n is None or p.stat().st_size==n):
         return p
-    if p.is_file() and (n is None or p.stat().st_size==n):return p
+    p.parent.mkdir(parents=True,exist_ok=True)
     url=f'https://drive.usercontent.google.com/download?export=download&confirm=t&id={fid}'
+    messages=[]
     for attempt in range(3):
+        temp=p.with_suffix(p.suffix+'.part')
         try:
-            temp=p.with_suffix(p.suffix+'.part')
-            with requests.get(url,stream=True,timeout=(50,160)) as resp:
+            with requests.get(url,stream=True,timeout=(50,240),
+                              headers={'User-Agent':'Mozilla/5.0'}) as resp:
                 resp.raise_for_status()
-                assert not resp.headers.get('content-type','').startswith('text/html'),"Drive entregou HTML"
+                iterator=resp.iter_content(4*1024*1024)
+                first=next(iterator,b'')
+                if first[:4] not in (b'PK\\x03\\x04',b'Rar!'):
+                    raise IOError('Drive respondeu HTML ou conteudo inesperado: '
+                                  +str(resp.status_code)+' '+str(resp.headers.get('Content-Type'))+
+                                  ' primeiro='+repr(first[:100]))
                 with temp.open('wb') as w:
-                    for chunk in resp.iter_content(4*1024*1024):
+                    w.write(first)
+                    for chunk in iterator:
                         if chunk:w.write(chunk)
-            if n and temp.stat().st_size!=n:raise ValueError(f'{p.name}: tamanho errado {temp.stat().st_size} != {n}')
+            if n and temp.stat().st_size!=n:
+                raise ValueError(f'{p.name}: tamanho divergente {temp.stat().st_size} != {n}')
             temp.replace(p)
-            print('DOWNLOAD_OK',p.name,p.stat().st_size,flush=True)
+            print('DOWNLOAD_INTEGRO',p.name,p.stat().st_size,flush=True)
             return p
         except Exception as e:
-            print('DOWNLOAD_TENTATIVA',attempt,str(e)[:180],flush=True)
-            p.with_suffix(p.suffix+'.part').unlink(missing_ok=True)
-            if attempt==2:raise
+            messages.append(f'requests {attempt}: {str(e)[:300]}')
+            temp.unlink(missing_ok=True)
+            print('DOWNLOAD_TENTATIVA',attempt,repr(e),flush=True)
             time.sleep(3*(attempt+1))
+    # gdown trata páginas de confirmação e tokens dos arquivos públicos grandes.
+    try:
+        import gdown
+        temp=p.with_suffix(p.suffix+'.part')
+        gdown.download(id=fid,output=str(temp),quiet=False,fuzzy=True)
+        if not temp.is_file() or (n and temp.stat().st_size!=n):
+            raise IOError('gdown não retornou arquivo integral')
+        with temp.open('rb') as f:
+            if f.read(4) not in (b'PK\\x03\\x04',b'Rar!'):
+                raise IOError('gdown retornou outro formato')
+        temp.replace(p)
+        return p
+    except Exception as e:
+        messages.append('gdown: '+repr(e))
+        raise RuntimeError('Falha ao recuperar ZIP/RAR original de '+p.name+
+                           '. Diagnosticos: '+' | '.join(messages)) from e
+
 def extractzip(p,pattern,dest):
     with zipfile.ZipFile(p) as z:
         found=[m for m in z.infolist() if m.filename.lower().endswith(pattern.lower())]
@@ -104,7 +132,8 @@ def get_features(region,part,conf):
     work=TMP/region;work.mkdir(parents=True,exist_ok=True)
     archive=download(fid,work/('original'+ext),size)
     multipath=extract_multi(archive,work/'multi.tif')
-    archive.unlink()
+    if archive.parent.resolve()==work.resolve():
+        archive.unlink()
     masks=pd.read_csv(MASKCSV,dtype={'segmento_id':str})
     masks=masks[masks.regiao==region]
     joined=part.merge(masks,on=['regiao','amostra_id','segmento_id'],validate='one_to_one',how='inner')
