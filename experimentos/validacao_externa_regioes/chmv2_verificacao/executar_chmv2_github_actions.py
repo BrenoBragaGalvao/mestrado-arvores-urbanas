@@ -88,7 +88,7 @@ def chm_at(ds,x,y):
     rows,cols=np.meshgrid(np.arange(row0,row1),np.arange(col0,col1),indexing="ij")
     xx,yy=rasterio.transform.xy(ds.transform,rows,cols,offset="center")
     ax,ay=TO_31982.transform(np.asarray(xx),np.asarray(yy))
-    dist=(np.asarray(ax)-float(x))**2+(np.asarray(ay)-float(y))**2
+    dist=(np.asarray(ax).reshape(rows.shape)-float(x))**2+(np.asarray(ay).reshape(rows.shape)-float(y))**2
     mask=(dist<=25+1e-7) & (~np.ma.getmaskarray(arr)) & (np.asarray(arr)!=255)
     z=np.asarray(arr)[mask].astype(float)
     if not len(z):return (px,None,None,0,0)
