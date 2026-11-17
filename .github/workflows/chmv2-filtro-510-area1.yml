@@ -26,9 +26,9 @@ jobs:
           import requests
           for region,id in [('sagrada','1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91'),('lomba','1N5peFz-NauAYeNgBcauFyX9reJpnROQ6'),('cristo','1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU')]:
               try:
-                  with requests.get('https://drive.google.com/uc?export=download&id='+id,stream=True,timeout=(16,16)) as resp:
+                  with requests.get('https://drive.usercontent.google.com/download?export=download&confirm=t&id='+id,stream=True,timeout=(16,16)) as resp:
                       first=next(resp.iter_content(256),b'')
-                      print('ORIGEM',region,'http',resp.status_code,'content-type',resp.headers.get('content-type'),'bytes',resp.headers.get('content-length'),'prefix',first[:12].hex(),'url',resp.url[:90],flush=True)
+                      print('ORIGEM',region,'http',resp.status_code,'content-type',resp.headers.get('content-type'),'bytes',resp.headers.get('content-length'),'prefix',first[:12].hex(),'url',resp.url[:90],'html_title',resp.text[:330] if b'<html' in first.lower() or b'<!doctype' in first.lower() else '',flush=True)
               except Exception as e:
                   print('ORIGEM',region,'erro',type(e).__name__,str(e)[:120],flush=True)
           PY
