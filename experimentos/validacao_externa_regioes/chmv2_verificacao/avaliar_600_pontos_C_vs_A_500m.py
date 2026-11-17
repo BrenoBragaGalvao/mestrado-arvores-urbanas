@@ -30,6 +30,15 @@ MODEL={
 [.0013112548610879312,.06485456340171991,.09461235886398553],
 [1.6508681883369405,-1.2836744130124456,.5665999147865749],.3899300983285226)}
 FEATURES=['mean_intensity','mean_edges','mean_ndvi']
+# Grade RGB original, recuperada do segmento_id.tif dos mapas auditados.
+# Estas grades são necessárias para reproduzir o WarpedVRT histórico.
+GRID={
+ 'sagrada_familia_caxias':(10422,10456,482066.4796141586,6777297.270391193),
+ 'lomba_grande_novo_hamburgo':(17423,16409,491242.3209731818,6713967.373159798),
+ 'cristo_rei_sao_leopoldo':(10410,10530,482650.7000000648,6707348.525005451)
+}
+MASKCSV=HERE/'600_pontos_mascaras_quickshift_originais.csv'
+
 def download(fid,p,n=None):
     if p.is_file() and (n is None or p.stat().st_size==n):return p
     url=f'https://drive.usercontent.google.com/download?export=download&confirm=t&id={fid}'
@@ -59,54 +68,62 @@ def extractzip(p,pattern,dest):
     return dest
 def extract_multi(p,out):
     if p.suffix=='.zip':return extractzip(p,'_ortho_4bandas.tif',out)
-    subprocess.run(['7z','e','-y',str(p),'-o'+str(p.parent/'unrar'),'*_ORTHO_4BANDAS.tif'],check=True)
-    f=[x for x in (p.parent/'unrar').iterdir() if x.name.lower().endswith('_ortho_4bandas.tif')]
-    if len(f)!=1:raise ValueError('Erro de extração RAR')
-    f[0].rename(out);return out
-def predict(X,params):
-    mean,scale,coef,intercept=params
-    z=((X-np.asarray(mean))/np.asarray(scale))@np.asarray(coef)+intercept
-    return np.where(z>0,'grama','arvore'),z
-def get_features(region,part,conf):
-    fid,size,ext,mapid=conf
+    subprocess.run([def get_features(region,part,conf):
+    """Reconstrói o atributo diretamente de Multi original nos pixels do segmento congelado.
+    As máscaras foram extraídas, testadas e vinculadas ao GeoTIFF de segmento original.
+    Não depende de um novo mapa ou novas amostras.
+    """
+    import zlib,base64
+    from rasterio.transform import Affine
+    fid,size,ext,_mapid=conf
     work=TMP/region;work.mkdir(exist_ok=True)
     archive=download(fid,work/('original'+ext),size)
-    mapzip=download(mapid,work/'mapas.zip')
-    segpath=extractzip(mapzip,'segmento_id.tif',work/'segmentos.tif')
-    oldpath=extractzip(mapzip,'classificacao_regressao_logistica.tif',work/'old.tif')
     multipath=extract_multi(archive,work/'multi.tif')
-    archive.unlink() # liberar armazenamento de ZIP/RAR depois da extração
+    archive.unlink()
+    masks=pd.read_csv(MASKCSV,dtype={'segmento_id':str})
+    masks=masks[masks.regiao==region]
+    joined=part.merge(masks,on=['regiao','amostra_id','segmento_id'],validate='one_to_one',how='inner')
+    if len(joined)!=200:raise ValueError('Máscara ausente para algum ponto: '+region)
     allrows=[]
-    with rasterio.open(segpath) as ids,rasterio.open(oldpath) as old,rasterio.open(multipath) as src,ExitStack() as stack:
-        aligned=(src.crs==ids.crs and src.width==ids.width and src.height==ids.height and src.transform.almost_equals(ids.transform))
-        ds=src if aligned else stack.enter_context(WarpedVRT(src,crs=ids.crs,transform=ids.transform,width=ids.width,height=ids.height,resampling=Resampling.bilinear))
-        if ds.count!=4:raise ValueError('Esperadas quatro bandas multiespectrais')
-        tiles={}
-        for rec in part.to_dict('records'):
-            row,col=ids.index(float(rec['x']),float(rec['y']))
-            pointwin=Window(col,row,1,1)
-            actual_id=int(ids.read(1,window=pointwin)[0,0])
-            actual_old=int(old.read(1,window=pointwin)[0,0])
-            if actual_id!=int(rec['segmento_id']) or actual_old not in (1,2):
-                raise ValueError(f'ID de segmento divergente: {region} {rec["amostra_id"]}')
-            pred_old='arvore' if actual_old==1 else 'grama'
-            if pred_old!=rec['predicao_modelo']:raise ValueError('Predição original divergente!')
-            tiles.setdefault((row//256,col//256),[]).append(rec)
-        print('REGIAO',region,'n_pontos',len(part),'n_tiles_256px',len(tiles),'warp',not aligned,flush=True)
-        for (tr,tc),recs in tiles.items():
-            win=Window(tc*256,tr*256,min(256,ids.width-tc*256),min(256,ids.height-tr*256))
-            pixels=ids.read(1,window=win)
+    width,height,x0,y0=GRID[region]
+    original_transform=Affine(.5,0,x0,0,-.5,y0)
+    with rasterio.open(multipath) as src,ExitStack() as stack:
+        if src.count!=4:raise ValueError('Esperadas quatro bandas multiespectrais')
+        aligned=(src.crs.to_epsg()==31982 and src.width==width and src.height==height and src.transform.almost_equals(original_transform))
+        ds=src if aligned else stack.enter_context(WarpedVRT(src,crs='EPSG:31982',transform=original_transform,width=width,height=height,resampling=Resampling.bilinear))
+        tiles=joined.groupby(['tile_row','tile_col'])
+        print('REGIAO',region,'n_pontos',len(part),'n_tiles_256px',tiles.ngroups,'warp',not aligned,flush=True)
+        for (tr,tc),group in tiles:
+            h=min(256,height-int(tr)*256);w=min(256,width-int(tc)*256)
+            win=Window(int(tc)*256,int(tr)*256,w,h)
             bands=ds.read([3,2,1,4],window=win,masked=True)
-            b=bands.filled(0)
-            nir=b[3].astype('float32');red=b[0].astype('float32')
+            raw=bands.filled(0)
+            nir=raw[3].astype('float32');red=raw[0].astype('float32')
             ndvi=(nir-red)/(nir+red+1e-8)
-            hsv=rgb2hsv(np.moveaxis(b[:3],0,-1))[...,2].astype('float32')
+            hsv=rgb2hsv(np.moveaxis(raw[:3],0,-1))[...,2].astype('float32')
             edge=canny(nir/10000.0,sigma=1).astype('float32')
             valid=~np.ma.getmaskarray(bands).any(axis=0)
-            for rec in recs:
-                mask=(pixels==int(rec['segmento_id'])) & valid
-                if not mask.any():raise ValueError(f'Segmento sem pixels válidos {rec["amostra_id"]}')
-                a={**rec,'mean_intensity':float(hsv[mask].mean(dtype=np.float64)),
+            for rec in group.to_dict('records'):
+                if int(rec['tile_width'])!=w or int(rec['tile_height'])!=h:raise ValueError('Tile alterado')
+                packed=base64.b64decode(rec['indices_zlib_base64'])
+                indices=np.frombuffer(zlib.decompress(packed),dtype='<u2').astype(np.int64)
+                if len(indices)!=int(rec['n_pixels_original']) or np.any(indices>=h*w):raise ValueError('Máscara inválida')
+                mask=np.zeros((h*w,),dtype=bool);mask[indices]=True;mask=mask.reshape(h,w)
+                mask &= valid
+                if not mask.any():raise ValueError('Segmento ficou sem pixels espectrais: '+str(rec['amostra_id']))
+                out={k:rec[k] for k in ['regiao','amostra_id','x','y','segmento_id','bloco_500m','predicao_modelo','B']}
+                out['mean_intensity']=float(hsv[mask].mean(dtype=np.float64))
+                out['mean_edges']=float(edge[mask].mean(dtype=np.float64))
+                out['mean_ndvi']=float(ndvi[mask].mean(dtype=np.float64))
+                out['n_pixels_segmento']=int(mask.sum())
+                allrows.append(out)
+    table=pd.DataFrame(allrows).sort_values('amostra_id')
+    table.to_csv(OUT/(region+'_atributos_200.csv'),index=False)
+    print('REGIAO_OK',region,len(table),flush=True)
+    shutil.rmtree(work,ignore_errors=True)
+    return table
+
+.mean(dtype=np.float64)),
                    'mean_edges':float(edge[mask].mean(dtype=np.float64)),
                    'mean_ndvi':float(ndvi[mask].mean(dtype=np.float64)),
                    'n_pixels_segmento':int(mask.sum())}
