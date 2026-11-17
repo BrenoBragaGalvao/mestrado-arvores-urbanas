@@ -1,0 +1,31 @@
+name: Proposta 1 - Teste de acesso aos ortomosaicos completos
+on:
+  push:
+    branches: [feature/validacao-geografica-externa]
+    paths: ['.github/workflows/proposta1-probe-raw-imagens.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verificar-arquivos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verificar download público de ZIPs regionais, sem salvar arquivos
+        run: |
+          python - <<'PY'
+          import requests
+          links={
+             'sagrada_familia':'1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91',
+             'lomba_grande':'1N5peFz-NauAYeNgBcauFyX9reJpnROQ6',
+             'cristo_rei':'1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU'}
+          for name,id in links.items():
+              try:
+                  url=f"https://drive.google.com/uc?export=download&id={id}"
+                  with requests.get(url,stream=True,timeout=(18,22)) as r:
+                      first=next(r.iter_content(256),b'')
+                      print(name,"status",r.status_code,"content_type",r.headers.get("content-type"),
+                            "content_size",r.headers.get("content-length"),"redirect_url",r.url[:150],
+                            "prefix_hex",first[:32].hex(),flush=True)
+              except Exception as e: print(name,type(e).__name__,str(e)[:200],flush=True)
+          PY
