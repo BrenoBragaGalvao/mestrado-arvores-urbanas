@@ -1,0 +1,46 @@
+name: Avaliar 600 pontos cegos LR A versus C CHMv2 500m
+on:
+  push:
+    branches: [feature/validacao-geografica-externa]
+    paths:
+      - ".github/workflows/avaliar-600-pontos-regressao-logistica-500m.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regressao-logistica-por-regiao:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        region: [sagrada_familia_caxias, lomba_grande_novo_hamburgo, cristo_rei_sao_leopoldo]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Dependencias do processamento original
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq p7zip-full
+          python -m pip install -q numpy pandas rasterio scikit-image scikit-learn requests
+      - name: Consultar espaço disponível
+        run: df -h .
+      - name: Extrair atributos dos mesmos pontos e calcular F1-macro
+        env:
+          CHM_REGION_ONLY: ${{ matrix.region }}
+          CHM_F1_OUTPUT: resultado_600_500m_${{ matrix.region }}
+        run: python -u experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py
+      - name: Publicar resultados regionais e diagnostico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regressao-logistica-chmv2-500m-${{ matrix.region }}
+          path: |
+            resultado_600_500m_${{ matrix.region }}/*.csv
+            resultado_600_500m_${{ matrix.region }}/*.json
+          if-no-files-found: warn
+          retention-days: 30
