@@ -40,6 +40,21 @@ GRID={
 MASKCSV=HERE/'600_pontos_mascaras_quickshift_originais.csv'
 
 def download(fid,p,n=None):
+    # Modo Colab: ler arquivos na conta Drive do usuário, sem tráfego público/limite do link.
+    origem=os.environ.get('CHM_ORIGINAIS_DRIVE')
+    nome_arquivo={
+        '1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91':'SAGRADA_FAMÍLIA_CAXIAS DO SUL.zip',
+        '1N5peFz-NauAYeNgBcauFyX9reJpnROQ6':'LOMBA_GRANDE_NOVO_HAMBURGO.zip',
+        '1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU':'CRISTO_REI_SÃO_LEOPOLDO.rar'
+    }.get(fid)
+    if origem and nome_arquivo:
+        source=Path(origem)/nome_arquivo
+        if not source.is_file():raise FileNotFoundError(f'Arquivo original não encontrado no Drive montado: {source}')
+        if n is not None and source.stat().st_size!=n:raise ValueError('Arquivo original com tamanho diferente: '+str(source))
+        p.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(source,p)
+        print('COPIA_DRIVE_AUTENTICADO_OK',p.name,p.stat().st_size,flush=True)
+        return p
     if p.is_file() and (n is None or p.stat().st_size==n):return p
     url=f'https://drive.usercontent.google.com/download?export=download&confirm=t&id={fid}'
     for attempt in range(3):
