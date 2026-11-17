@@ -90,7 +90,7 @@ def download(fid,p,n=None):
     try:
         import gdown
         temp=p.with_suffix(p.suffix+'.part')
-        gdown.download(id=fid,output=str(temp),quiet=False,fuzzy=True)
+        gdown.download(id=fid,output=str(temp),quiet=False)
         if not temp.is_file() or (n and temp.stat().st_size!=n):
             raise IOError('gdown não retornou arquivo integral')
         with temp.open('rb') as f:
