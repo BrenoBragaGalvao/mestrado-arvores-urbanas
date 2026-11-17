@@ -7,12 +7,16 @@ on:
       - ".github/workflows/chmv2-filtro-510-area1.yml"
       - "experimentos/validacao_externa_regioes/chmv2_verificacao/CHM_INPUT_2010_PONTOS_FILTRO_AREA1.csv"
       - "experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/600_pontos_mascaras_quickshift_originais.csv"
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
       - ".github/workflows/chmv2-filtro-510-area1.yml"
       - "experimentos/validacao_externa_regioes/chmv2_verificacao/CHM_INPUT_2010_PONTOS_FILTRO_AREA1.csv"
       - "experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/600_pontos_mascaras_quickshift_originais.csv"
 permissions:
   contents: read
 jobs:
