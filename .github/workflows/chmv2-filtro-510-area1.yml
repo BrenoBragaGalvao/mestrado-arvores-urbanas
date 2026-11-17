@@ -1,0 +1,42 @@
+name: Proposta 1 - Filtro de 510 pontos originais pelo CHMv2
+on:
+  push:
+    branches:
+      - feature/validacao-geografica-externa
+    paths:
+      - ".github/workflows/chmv2-filtro-510-area1.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/CHM_INPUT_2010_PONTOS_FILTRO_AREA1.csv"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/chmv2-filtro-510-area1.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/CHM_INPUT_2010_PONTOS_FILTRO_AREA1.csv"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py"
+permissions:
+  contents: read
+jobs:
+  extrair-alturas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Instalar bibliotecas espaciais
+        run: python -m pip install --disable-pip-version-check numpy pandas rasterio pyproj scikit-learn requests
+      - name: Consultar CHMv2 original
+        env:
+          CHM_OUTPUT: resultados_chm_2010
+        run: python experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py
+      - name: Publicar os 2010 valores de altura e manifesto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chmv2-area1-510-e-externas-1500
+          path: |
+            resultados_chm_2010/2010_pontos_alturas_chmv2.csv
+            resultados_chm_2010/manifesto_2010_alturas_chmv2.json
+          if-no-files-found: warn
