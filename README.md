@@ -43,7 +43,7 @@ Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmen
   - [1.3. As duas propostas e suas contribuições](#sec-1-3)
 - [2. Áreas de estudo e dados utilizados](#sec-2)
   - [2.1. Localização e função das quatro regiões](#sec-2-1)
-  - [2.2. Imagens RGB e multiespectrais](#sec-2-2)
+  - [2.2. Imagens multiespectrais de quatro bandas (RGB + NIR)](#sec-2-2)
   - [2.3. Amostras de árvores e gramíneas](#sec-2-3)
   - [2.4. Dados auxiliares: CHMv2 e postes](#sec-2-4)
 - [3. Visão geral da metodologia](#sec-3)
@@ -127,30 +127,39 @@ A fase computacional da Proposta 1 está encerrada. A Proposta 2 tem experimento
 | **Cristo Rei** | São Leopoldo — RS | Avaliação externa em outra cidade |
 
 <a id="sec-2-2"></a>
-### 2.2. Imagens RGB e multiespectrais
+### 2.2. Imagens multiespectrais de quatro bandas (RGB + NIR)
 
-O estudo utiliza **quatro regiões**: **Area1**, usada para treinamento e avaliação interna, e **Sagrada Família, Lomba Grande e Cristo Rei**, nas quais o modelo treinado na Area1 foi aplicado para avaliação externa. Cada região possui um raster **RGB (3 bandas)** para a segmentação Quickshift e um raster **multiespectral (4 bandas)** para os atributos espectrais, com alinhamento de grade quando necessário.
+**Padrão adotado para as próximas execuções:** utilizar **uma única imagem de quatro bandas em cada região** como fonte dos dados. Quando uma operação exigir apenas RGB, serão lidas **somente as três bandas visíveis desse mesmo arquivo**, sem recorrer ao GeoTIFF RGB separado. O canal NIR será utilizado nas etapas que precisarem dele.
 
-| Região | RGB — 3 bandas (altura × largura) | Multiespectral — 4 bandas (altura × largura) | Resolução nominal | Retângulo do RGB (km², aprox.) |
-|---|---:|---:|---:|---:|
-| **Area1 — Caxias do Sul** | **6.942 × 7.294 px** | **6.942 × 7.294 px** | 0,50 m/pixel | **12,66** |
-| **Sagrada Família — Caxias do Sul** | **10.456 × 10.422 px** | **14.643 × 14.566 px** | 0,50 m/pixel | **27,24** |
-| **Lomba Grande — Novo Hamburgo** | **16.409 × 17.423 px** | **20.074 × 18.349 px** | 0,50 m/pixel | **71,47** |
-| **Cristo Rei — São Leopoldo** | **10.530 × 10.410 px** | **14.602 × 14.460 px** | 0,50 m/pixel | **27,40** |
+| Operação | Canais utilizados no GeoTIFF de quatro bandas |
+|---|---|
+| **Quickshift** (segmentação) | **R, G e B** derivados das bandas **3, 2 e 1**, nessa ordem |
+| **Brilho HSV** | **R, G e B** extraídos do mesmo GeoTIFF |
+| **NDVI** | **NIR (banda 4)** e **vermelho (banda 3)** |
+| **Bordas Canny** | Canal previsto no protocolo de atributos; na implementação histórica da transferência, foi usado **NIR (banda 4)** |
 
-**Características comuns:** os rasters auditados estão em **EPSG:31982 — SIRGAS 2000 / UTM 22S**; o RGB contém **3 canais visíveis** e o produto multiespectral contém **4 canais (azul, verde, vermelho e infravermelho próximo)**. Na Area1, os arquivos são `AOI_RGB_NEW.tif` e `AOI_NEW_MULTI.tif`, respectivamente. As dimensões das outras regiões foram obtidas na [auditoria dos GeoTIFFs reais de 12/11/2026](experimentos/validacao_externa_regioes/AUDITORIA_RASTERS_REAIS_2026-11-12.md).
+A ordem física **azul, verde, vermelho e infravermelho próximo** foi conferida na [auditoria espectral dos produtos Jilin-1](experimentos/validacao_externa_regioes/AUDITORIA_BANDAS_JILIN.md). Os índices citados são posições de bandas **começando em 1** (padrão Rasterio/GDAL). Qualquer novo arquivo deverá ter sua ordem espectral conferida antes do processamento.
 
-**Como interpretar as áreas:** os valores em km² representam somente o **retângulo da grade RGB** (altura × largura × 0,25 m²/pixel). **Não são áreas efetivas de vegetação, nem necessariamente toda a área com pixels válidos.** O polígono irregular original da Area1 possui aproximadamente **12,14 km²**, enquanto o retângulo de seu raster RGB ocupa aproximadamente **12,66 km²**.
+#### Dimensões dos quatro rasters multiespectrais
+
+| Região | Quatro bandas — altura × largura | Resolução nominal | Referência espacial | Retângulo do raster (km², aprox.) |
+|---|---:|---|---|---:|
+| **Area1 — Caxias do Sul** | **6.942 × 7.294 pixels** | 0,50 m/pixel | EPSG:31982 | **12,66** |
+| **Sagrada Família — Caxias do Sul** | **14.643 × 14.566 pixels** | 0,50 m/pixel | EPSG:31982 | **53,32** |
+| **Lomba Grande — Novo Hamburgo** | **20.074 × 18.349 pixels** | 0,50 m/pixel | EPSG:31982 | **92,08** |
+| **Cristo Rei — São Leopoldo** | **14.602 × 14.460 pixels** | 0,50 m/pixel | EPSG:31982 | **52,79** |
+
+**Fonte das dimensões:** [auditoria dos GeoTIFFs reais](experimentos/validacao_externa_regioes/AUDITORIA_RASTERS_REAIS_2026-11-12.md) e [inventário da Area1](data/README.md). Na Area1, o arquivo multiespectral é `AOI_NEW_MULTI.tif`. A área tabulada é **apenas a área geométrica do retângulo da grade** (número de pixels × 0,25 m²), **não** a área de vegetação nem a área obrigatoriamente coberta por pixels válidos. O polígono irregular da Area1 possui aproximadamente **12,14 km²**.
 
 ![Esquema da extensão retangular da imagem e do polígono Area1](docs/aoi_retangulo_area1_esquema.svg)
 
-*Figura 1 — O retângulo do raster não equivale à área efetiva do polígono de estudo.*
+*Figura 1 — Exemplo da Area1: o retângulo do raster não equivale à área efetiva do polígono de estudo.*
 
-**Alinhamento das imagens:** nas três regiões externas, os arquivos RGB e multiespectral possuem **dimensões e extensões diferentes**; por isso, os valores multiespectrais devem ser amostrados na grade do RGB mediante alinhamento geoespacial explícito. A [auditoria dos produtos Jilin-1](experimentos/validacao_externa_regioes/AUDITORIA_BANDAS_JILIN.md) confirmou a ordem física **azul, verde, vermelho e infravermelho próximo**. Para formar os canais R, G, B e NIR utilizados nos atributos, a extração emprega as bandas **3, 2, 1 e 4**, respectivamente.
+**Distinção entre protocolo futuro e resultados já publicados:** os experimentos de classificação encerrados anteriormente utilizaram **o raster RGB separado para Quickshift** e **o multiespectral alinhado à grade RGB para os atributos**. A escolha de adotar **exclusivamente o raster de quatro bandas** como fonte também para a segmentação é uma **diretriz para novas execuções**, e não uma reinterpretação dos resultados já medidos. A troca de raster pode mudar a grade, os segmentos, a associação dos pontos e os atributos; será necessário **reprocessar, retreinar e reavaliar** antes de atribuir os F1-macro publicados ao novo fluxo. Os **505 segmentos únicos** e as métricas atuais permanecem identificados como resultados da execução anterior.
 
-**Restrição radiométrica:** o NDVI foi calculado a partir de **valores digitais**, sem calibração documentada para reflectância de superfície. Assim, diferenças de sensor, data e iluminação podem afetar a comparação entre regiões.
+**Restrição radiométrica:** o NDVI foi calculado a partir de **valores digitais**, sem calibração documentada para reflectância de superfície. Diferenças de sensor, data e iluminação continuam relevantes para comparar regiões.
 
-Os ortomosaicos originais de grande volume não estão publicados no GitHub: consulte a [documentação dos dados da Area1](data/README.md) e a [documentação dos pacotes regionais](experimentos/validacao_externa_regioes/README.md).
+Os ortomosaicos originais não estão publicados no GitHub: consulte o [inventário da Area1](data/README.md) e a [documentação dos pacotes regionais](experimentos/validacao_externa_regioes/README.md).
 
 <a id="sec-2-3"></a>
 ### 2.3. Amostras de árvores e gramíneas
