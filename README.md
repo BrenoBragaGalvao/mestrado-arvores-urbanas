@@ -18,7 +18,7 @@ Esta pesquisa investiga como imagens de sensoriamento remoto podem contribuir pa
 
 Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmentos, processados em janelas de até **256 × 256 pixels**. Cada segmento foi analisado por meio dos atributos **HSV, Canny e NDVI**, que ajudam a diferenciar árvores e gramíneas. A **Regressão Logística** foi treinada exclusivamente com **510 pontos originais da Area1** (505 segmentos únicos) e, depois, aplicada às imagens de **Sagrada Família, Lomba Grande e Cristo Rei**, sem novos treinamentos. Para verificar o desempenho, realizamos **30 divisões de treinamento e teste na Area1** e **30 reamostragens em cada região externa**, utilizando 200 pontos por região para comparar as previsões com referências automáticas do **CHMv2**. Todas as avaliações consideraram blocos espaciais de **500 m**.
 
-![Infográfico explicativo da Proposta 1: imagem da Area1, segmentação Quickshift, associação de 510 pontos a 505 segmentos, extração de HSV/Canny/NDVI, Regressão Logística e validação espacial em blocos de 500 m](docs/proposta1_fluxo_quickshift_infografico_20261120.png)
+![Infográfico atualizado da Proposta 1: seis etapas desde a Area1, segmentação Quickshift, 510 pontos de referência, 505 segmentos únicos, atributos HSV/Canny/NDVI, treinamento da Regressão Logística e aplicação sem novo treinamento a Sagrada Família, Lomba Grande e Cristo Rei, com 200 pontos de avaliação por região](docs/proposta1_fluxo_seis_etapas_aplicacao_externa_20261120.webp)
 
 *Figura — Etapas do processamento da Proposta 1. Na avaliação final, a Area1 utiliza 30 divisões espaciais de treino/teste; as três regiões externas utilizam 30 reamostragens espaciais por região, com o modelo original congelado.*
 
