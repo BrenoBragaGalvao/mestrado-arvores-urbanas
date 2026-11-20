@@ -224,8 +224,6 @@ em que **NIR** é o canal do infravermelho próximo e **R** o vermelho. Na fonte
 
 **HSV** transforma a representação das cores para matiz (*Hue*), saturação (*Saturation*) e valor (*Value*). O experimento usa a componente **V**, ligada ao brilho. **Canny** identifica transições locais de intensidade/bordas. Juntos, os três atributos fornecem sinais complementares, mas **nenhum garante, isoladamente, a identificação botânica**.
 
-Esses atributos são calculados **antes da inferência**. A avaliação histórica de sua contribuição está preservada na [ablação dos atributos](docs/e4b_ablação_aninhada_2026-11-03.md).
-
 <a id="sec-4-4"></a>
 ### 4.4. Regressão Logística e treinamento na Area1
 
