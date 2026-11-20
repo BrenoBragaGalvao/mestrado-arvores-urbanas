@@ -183,8 +183,6 @@ O diagrama abaixo representa **os fluxos efetivamente adotados**, separando os r
 <a id="sec-4"></a>
 ## 4. Proposta 1 — Identificação de árvores e gramíneas
 
-**Estado:** processamento, avaliação espacial e verificação de reprodução computacional **concluídos**; auditoria cega de rótulos humanos externos **ainda pendente**.
-
 <a id="sec-4-1"></a>
 ### 4.1. Objetivo e justificativa da metodologia
 
