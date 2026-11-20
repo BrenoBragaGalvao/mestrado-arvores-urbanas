@@ -129,30 +129,28 @@ A fase computacional da Proposta 1 está encerrada. A Proposta 2 tem experimento
 <a id="sec-2-2"></a>
 ### 2.2. Imagens RGB e multiespectrais
 
-Na Area1, os dois rasters cumprem papéis distintos:
+O estudo utiliza **quatro regiões**: **Area1**, usada para treinamento e avaliação interna, e **Sagrada Família, Lomba Grande e Cristo Rei**, nas quais o modelo treinado na Area1 foi aplicado para avaliação externa. Cada região possui um raster **RGB (3 bandas)** para a segmentação Quickshift e um raster **multiespectral (4 bandas)** para os atributos espectrais, com alinhamento de grade quando necessário.
 
-| Arquivo | Conteúdo | Aplicação |
-|---|---|---|
-| `AOI_RGB_NEW.tif` | Três canais visíveis (RGB) | Segmentação Quickshift |
-| `AOI_NEW_MULTI.tif` | Quatro canais multiespectrais | Extração e alinhamento dos atributos |
+| Região | RGB — 3 bandas (altura × largura) | Multiespectral — 4 bandas (altura × largura) | Resolução nominal | Retângulo do RGB (km², aprox.) |
+|---|---:|---:|---:|---:|
+| **Area1 — Caxias do Sul** | **6.942 × 7.294 px** | **6.942 × 7.294 px** | 0,50 m/pixel | **12,66** |
+| **Sagrada Família — Caxias do Sul** | **10.456 × 10.422 px** | **14.643 × 14.566 px** | 0,50 m/pixel | **27,24** |
+| **Lomba Grande — Novo Hamburgo** | **16.409 × 17.423 px** | **20.074 × 18.349 px** | 0,50 m/pixel | **71,47** |
+| **Cristo Rei — São Leopoldo** | **10.530 × 10.410 px** | **14.602 × 14.460 px** | 0,50 m/pixel | **27,40** |
 
-| Propriedade verificada na Area1 | Valor |
-|---|---|
-| Dimensão do raster | **6.942 × 7.294 pixels** |
-| Resolução nominal | **0,50 m por pixel** |
-| Retângulo da imagem | **12,66 km²** (aprox.) |
-| Polígono irregular da Area1 | **12,14 km²** (aprox.) |
-| Referência espacial de análise | **EPSG:31982 — SIRGAS 2000 / UTM 22S** |
+**Características comuns:** os rasters auditados estão em **EPSG:31982 — SIRGAS 2000 / UTM 22S**; o RGB contém **3 canais visíveis** e o produto multiespectral contém **4 canais (azul, verde, vermelho e infravermelho próximo)**. Na Area1, os arquivos são `AOI_RGB_NEW.tif` e `AOI_NEW_MULTI.tif`, respectivamente. As dimensões das outras regiões foram obtidas na [auditoria dos GeoTIFFs reais de 12/11/2026](experimentos/validacao_externa_regioes/AUDITORIA_RASTERS_REAIS_2026-11-12.md).
+
+**Como interpretar as áreas:** os valores em km² representam somente o **retângulo da grade RGB** (altura × largura × 0,25 m²/pixel). **Não são áreas efetivas de vegetação, nem necessariamente toda a área com pixels válidos.** O polígono irregular original da Area1 possui aproximadamente **12,14 km²**, enquanto o retângulo de seu raster RGB ocupa aproximadamente **12,66 km²**.
 
 ![Esquema da extensão retangular da imagem e do polígono Area1](docs/aoi_retangulo_area1_esquema.svg)
 
 *Figura 1 — O retângulo do raster não equivale à área efetiva do polígono de estudo.*
 
-**Rastreabilidade das bandas:** a [auditoria dos produtos Jilin-1](experimentos/validacao_externa_regioes/AUDITORIA_BANDAS_JILIN.md) identificou, nas ortoimagens multiespectrais relevantes, a ordem física **azul, verde, vermelho e infravermelho próximo**. A extração utiliza os índices **3, 2, 1 e 4** para obter R, G, B e NIR. O alinhamento entre a grade RGB e a multiespectral precisa ser respeitado antes de extrair valores de cada segmento.
+**Alinhamento das imagens:** nas três regiões externas, os arquivos RGB e multiespectral possuem **dimensões e extensões diferentes**; por isso, os valores multiespectrais devem ser amostrados na grade do RGB mediante alinhamento geoespacial explícito. A [auditoria dos produtos Jilin-1](experimentos/validacao_externa_regioes/AUDITORIA_BANDAS_JILIN.md) confirmou a ordem física **azul, verde, vermelho e infravermelho próximo**. Para formar os canais R, G, B e NIR utilizados nos atributos, a extração emprega as bandas **3, 2, 1 e 4**, respectivamente.
 
-**Restrição radiométrica:** o NDVI do experimento é calculado a partir de **valores digitais**, sem calibração documentada para reflectância de superfície. Portanto, não se deve interpretar seus valores como perfeitamente comparáveis entre sensores, datas ou condições de iluminação. A equivalência radiométrica é uma limitação da transferência.
+**Restrição radiométrica:** o NDVI foi calculado a partir de **valores digitais**, sem calibração documentada para reflectância de superfície. Assim, diferenças de sensor, data e iluminação podem afetar a comparação entre regiões.
 
-Os arquivos originais são mantidos fora do GitHub: [documentação da Area1 e acesso ao Drive](data/README.md).
+Os ortomosaicos originais de grande volume não estão publicados no GitHub: consulte a [documentação dos dados da Area1](data/README.md) e a [documentação dos pacotes regionais](experimentos/validacao_externa_regioes/README.md).
 
 <a id="sec-2-3"></a>
 ### 2.3. Amostras de árvores e gramíneas
