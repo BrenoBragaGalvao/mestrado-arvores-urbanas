@@ -1,18 +1,36 @@
-# Validação geográfica externa — implantação reprodutível
+# Proposta 1 — validação geográfica externa (experimentos e encerramento computacional)
 
-**Situação:** código implementado em branch isolada e **auditoria real de rasters executada nas quatro regiões** via GitHub Actions, incluindo leitura de metadados, alinhamento explícito em amostras e Quickshift em janelas de 256 × 256 pixels. **Nenhum F1-macro externo foi produzido**; o processamento supervisionado completo ainda depende de executar a Area1 privada e verificar NIR/rótulos.
+**Estado atual (17/11/2026):** a **fase experimental computacional da Proposta 1 foi concluída e reexecutada**, com o modelo principal de **Regressão Logística original** treinado exclusivamente na Area1. As comparações históricas de oito classificadores e cinco imagens **continuam documentadas abaixo como histórico de implementação**, mas **não representam a versão final**. A **auditoria visual humana independente permanece pendente**.
 
-**[Auditoria técnica executada em 12/11/2026 — quatro regiões, dimensões dos TIFFs, CRS e segmentos Quickshift em janelas reais](AUDITORIA_RASTERS_REAIS_2026-11-12.md)** · [Execução auditada no GitHub Actions](https://github.com/BrenoBragaGalvao/mestrado-arvores-urbanas/actions/runs/43292319271) — quatro jobs concluídos com sucesso.
+**Relatórios principais:** [síntese no README da feature](../../README.md#sec-3-8) · [encerramento experimental com resultados, metodologia e limites](PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md).
 
-**Não altera:** `README.md` principal, os notebooks antigos, a Area1, os gráficos, as tabelas históricas e a Proposta 2.
+### Resultados finais de 30 avaliações em 500 m
 
-## Objetivo
+| Região | Média F1-macro (n=30) | Desvio-padrão | Modalidade |
+|---|---:|---:|---|
+| Area1 — Caxias do Sul | **0,8421** | 0,0389 | 30 divisões espaciais, com ajuste do modelo a cada treino |
+| Sagrada Família — Caxias do Sul | **0,7584** | 0,0330 | 30 reamostragens de blocos; modelo fixo Area1 |
+| Lomba Grande — Novo Hamburgo | **0,7794** | 0,0337 | 30 reamostragens de blocos; modelo fixo Area1 |
+| Cristo Rei — São Leopoldo | **0,7961** | 0,0377 | 30 reamostragens de blocos; modelo fixo Area1 |
 
-Treinar os oito classificadores exclusivamente com **segmentos rotulados da Area1 (Caxias do Sul)**, selecionar regularização por **validação espacial interna** sobre esses dados e aplicar os modelos, **sem retreinamento nas regiões de teste**, a Centro e Lomba Grande (Novo Hamburgo) e Cristo Rei (São Leopoldo). Só calcular métricas externas se existirem rótulos locais independentes.
+**Modelo:** `StandardScaler` + Regressão Logística (`C=0,1`, L2); base de 510 pontos originais Area1, após deduplicação **505 segmentos**. Atributos **NDVI, HSV e Canny**; avaliação interna com grupos de **500 m** e embargo geométrico de **25 m**. **Somente 543/600 pontos externos** apresentaram referências conservadoras CHMv2 elegíveis. Os F1 externos são **concordância com pseudo-rótulos automáticos**, e as **90 reamostragens externas não são novos treinamentos ou conjuntos independentes**.
+
+**Conferência:** a reprodução computacional dos quatro CSV do experimento de 30 avaliações foi confirmada **byte a byte**. Uma amostra cega de **180 recortes** foi preparada para revisão humana, porém **a anotação ainda não foi realizada/concluída**. Não declarar validação humana ou acurácia de campo.
+
+**Registro anterior:** a [auditoria dos rasters de 12/11/2026](AUDITORIA_RASTERS_REAIS_2026-11-12.md) continua válida para aquela etapa. As instruções abaixo representam a cronologia operacional; referências antigas a "ainda não calculado" devem ser lidas **como estado histórico anterior à execução final**.
+
+**Branch:** esta documentação pertence apenas a `feature/validacao-geografica-externa`. A `main` permanece sem modificações.
+
+---
+## Objetivo (evolução histórica do estudo)
+
+**Objetivo final adotado:** avaliar a transferência da **Regressão Logística original**, treinada na Area1, para **Sagrada Família, Lomba Grande e Cristo Rei**. Os resultados externos utilizam referências automáticas conservadoras CHMv2 e, portanto, **não constituem validação humana independente**.
+
+**Objetivo da implementação exploratória anterior:** treinar oito classificadores exclusivamente com segmentos rotulados da Area1 e aplicá-los, sem retreinamento, a outras imagens, incluindo Centro de Novo Hamburgo. Esse fluxo anterior permanece abaixo como histórico técnico e não substitui o experimento final.
 
 O nome `SAGRADA_FAMÍLIA_CAXIAS DO SUL.zip` **não prova** que seu conteúdo corresponda à Area1. Compare rasters, CRS, grade, cobertura e, quando possível, pixels.
 
-## Execução integrada da Proposta 1 nas cinco áreas
+## Execução integrada histórica da Proposta 1 nas cinco áreas (não é o protocolo final)
 
 **Novo ponto de entrada:** [notebook único `proposta1_cinco_areas_colab.ipynb`](proposta1_cinco_areas_colab.ipynb) ([abrir no Colab](https://colab.research.google.com/github/BrenoBragaGalvao/mestrado-arvores-urbanas/blob/feature/validacao-geografica-externa/experimentos/validacao_externa_regioes/proposta1_cinco_areas_colab.ipynb)).
 
@@ -29,7 +47,7 @@ O notebook monta o Google Drive, atualiza a branch e executa [`executar_proposta
 
 **Resiliência:** cada região é processada separadamente, os mosaicos mantêm checkpoint por janela e a entrada SHA256 identifica rasters mesmo após nova extração em sessão Colab diferente. Os downloads temporários da região processada são eliminados do espaço local; os resultados já salvos no Drive permanecem. Para retomar, execute novamente o mesmo notebook com os mesmos dados, banda documentada e caminho de saída.
 
-**Limite de acesso:** o conector Drive/GitHub desta conversa **não controla a sessão interativa Colab autorizada pelo usuário**. Este notebook e seus testes foram implementados no GitHub, mas **o treinamento real e as quatro aplicações supervisionadas ainda não foram executados aqui**. Não confundir código pronto ou testes sintéticos com experimento científico concluído.
+**Nota histórica sobre a execução:** no momento em que este roteiro foi criado, a sessão interativa Colab ainda não havia produzido os resultados externos. **Essa informação foi superada pela execução computacional posterior**, documentada no [relatório final da Proposta 1](PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md). O conector GitHub não controla sessões Colab; não confundir código pronto, testes sintéticos, avaliações CHMv2 e validação humana.
 
 ## Cinco áreas, mapa geográfico e risco de sobreposição
 
@@ -68,7 +86,7 @@ A rotina [`segmentar_regiao_completa.py`](segmentar_regiao_completa.py) processa
 
 **Dados observados:** todos os quatro pacotes têm TIFF de 4 bandas e TIFF RGB, mas **não apresentam GeoPackage/Shapefile de rótulos árvore/grama**. A banda 4 **não está explicitamente identificada como NIR** nos metadados inspecionados. O Colab exige confirmação documental para chamá-la de NIR antes de executar a classificação final. Os rasters RGB e multiespectrais apresentam grades distintas e precisam de alinhamento registrado.
 
-## Próximo passo pronto: treinar e validar a Area1 com 510 pontos
+## Procedimento original de treinamento com 510 pontos (histórico)
 
 Foi criado um [notebook de execução focalizada no treinamento real da Area1](treinamento_area1_colab.ipynb) e o [script orquestrador auditável](executar_treinamento_real_area1.py).
 
