@@ -2,6 +2,8 @@
 
 **Estado atual (17/11/2026):** a **fase experimental computacional da Proposta 1 foi concluída e reexecutada**, com o modelo principal de **Regressão Logística original** treinado exclusivamente na Area1. As comparações históricas de oito classificadores e cinco imagens **continuam documentadas abaixo como histórico de implementação**, mas **não representam a versão final**. A **auditoria visual humana independente permanece pendente**.
 
+**Diretriz para novas execuções (20/11/2026):** utilizar como **fonte única a ortoimagem multiespectral de 4 bandas** em cada área. Extrair o RGB para Quickshift e HSV da própria imagem (na ordem documentada: bandas 3, 2 e 1); utilizar o NIR (banda 4) para NDVI e para os atributos que o exigirem. O código histórico abaixo **ainda utiliza raster RGB separado para segmentação e multiespectral para atributos**; portanto, essa mudança **não foi executada nem validada**, e os F1 já publicados **não devem ser atribuídos ao novo fluxo**. Para implementar o padrão, alterar as leituras de raster, recalcular segmentos/atributos e repetir treinamento e validação antes de publicar novos resultados. Consulte a [seção de dados do README principal](../../README.md#sec-2-2).
+
 **Relatórios principais:** [síntese no README da feature](../../README.md#sec-3-8) · [encerramento experimental com resultados, metodologia e limites](PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md).
 
 ### Resultados finais de 30 avaliações em 500 m
