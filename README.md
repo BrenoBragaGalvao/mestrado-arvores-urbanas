@@ -178,34 +178,7 @@ O `postes.gpkg` contém **pontos de postes** da Area1, utilizados no estudo hist
 
 O diagrama abaixo representa **os fluxos efetivamente adotados**, separando os resultados finais da Proposta 1 das análises exploratórias da Proposta 2:
 
-```mermaid
-flowchart TD
-  A["Area1: RGB, RGB + NIR e pontos de referência"] --> B["Quickshift: 812 janelas de até 256 × 256 pixels"]
-  B --> C["Associar e deduplicar: 505 segmentos rotulados"]
-  A --> D["Extrair NDVI, brilho HSV e bordas Canny"]
-  C --> E["Tabela de atributos dos segmentos"]
-  D --> E
-  E --> F["Regressão Logística + StandardScaler, C = 0,1"]
-  F --> G["Area1: 30 divisões espaciais de 500 m, com embargo de 25 m"]
-  F --> H["Modelo final congelado aplicado às 3 regiões externas"]
-  H --> I["200 pontos fixos por região"]
-  J["Meta/WRI CHMv2: pseudo-rótulos automáticos"] --> K["Concordância F1-macro nos pontos elegíveis"]
-  I --> K
-  K --> L["30 reamostragens espaciais por região"]
-  A --> M["Proposta 2: área de superpixels e 257 referências de árvores"]
-  J --> N["Estimativas de altura de dossel para a Area1"]
-  M --> O["Índices C1–C6 e 11 famílias alométricas"]
-  N --> O
-  O --> P["Comparação exploratória com controle constante"]
-  Q["Pontos de postes"] --> R["Distâncias horizontais históricas: 1, 3 e 5 m"]
-  M --> R
-  classDef dados fill:#edf3fa,stroke:#6e90af,color:#163247;
-  classDef modelo fill:#e9f7ef,stroke:#4b956a,color:#19442f;
-  classDef cautela fill:#fff5e6,stroke:#b89b63,color:#654714;
-  class A,J,Q dados;
-  class F,G,H,I,K,L,M,O,P,R modelo;
-  class N cautela;
-```
+![Fluxograma completo da pesquisa — Proposta 1: identificação de árvores e gramíneas; Proposta 2: análises de porte e proximidade com postes](docs/fluxograma_completo_da_pesquisa.png)
 
 *Figura 2 — O CHMv2 não é utilizado para treinar a Regressão Logística. Na Proposta 2, a altura continua sendo uma **estimativa modelada**. O estudo de distâncias a postes não mede risco elétrico.*
 
