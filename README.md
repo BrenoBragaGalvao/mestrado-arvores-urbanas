@@ -48,8 +48,6 @@ Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmen
   - [2.4. Dados auxiliares: CHMv2 e postes](#sec-2-4)
 - [3. Visão geral da metodologia](#sec-3)
   - [3.1. Fluxograma completo](#sec-3-1)
-  - [3.2. Etapas de processamento](#sec-3-2)
-  - [3.3. Relação entre as duas propostas](#sec-3-3)
 - [4. Proposta 1 — Identificação de árvores e gramíneas](#sec-4)
   - [4.1. Objetivo e justificativa](#sec-4-1)
   - [4.2. Segmentação Quickshift](#sec-4-2)
@@ -181,29 +179,6 @@ O diagrama abaixo representa **os fluxos efetivamente adotados**, separando os r
 ![Fluxograma completo da pesquisa — Proposta 1: identificação de árvores e gramíneas; Proposta 2: análises de porte e proximidade com postes](docs/fluxograma_completo_da_pesquisa.png)
 
 *Figura 2 — O CHMv2 não é utilizado para treinar a Regressão Logística. Na Proposta 2, a altura continua sendo uma **estimativa modelada**. O estudo de distâncias a postes não mede risco elétrico.*
-
-<a id="sec-3-2"></a>
-### 3.2. Etapas de processamento das imagens
-
-| Etapa | O que é feito | Resultado |
-|---|---|---|
-| 1. Preparação | Conferir rasters, resolução, bandas e alinhamento | Imagens compatíveis com o processamento |
-| 2. Segmentação | Aplicar Quickshift em janelas menores | Segmentos ou *superpixels* |
-| 3. Rotulação da Area1 | Associar pontos existentes e deduplicar objetos | 505 segmentos rotulados |
-| 4. Atributos | Calcular médias de NDVI, HSV e Canny | Vetores numéricos por segmento |
-| 5. Classificação | Padronizar atributos e treinar Regressão Logística | Previsão binária árvore/gramínea |
-| 6. Avaliação interna | 30 separações espaciais na Area1 | F1-macro e variabilidade entre divisões |
-| 7. Aplicação externa | Aplicar **o mesmo modelo final** às três regiões | Previsões congeladas em locais distintos |
-| 8. Concordância externa | Comparar pontos elegíveis ao CHMv2 e reamostrar blocos | F1-macro descritivo e variabilidade espacial |
-
-A reprodução das **tabelas derivadas** não equivale a recomputar toda a segmentação dos grandes ortomosaicos. As duas possibilidades exigem conjuntos de arquivos e recursos diferentes.
-
-<a id="sec-3-3"></a>
-### 3.3. Relação entre as duas propostas
-
-**Compartilham:** a Area1, imagens de sensoriamento remoto, segmentos Quickshift e o contexto de vegetação urbana.
-
-**Não compartilham o mesmo alvo:** a Proposta 1 prevê **classe de vegetação**; a Proposta 2 compara **estimativas de porte** e **proximidade horizontal a postes**. Um segmento classificado como “árvore” **não é automaticamente uma copa individual** e não implica altura ou interferência em fios.
 
 <a id="sec-4"></a>
 ## 4. Proposta 1 — Identificação de árvores e gramíneas
