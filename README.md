@@ -101,7 +101,7 @@ Em uma segunda frente, estimar **porte arbóreo** por áreas segmentadas exige c
 
 1. Segmentar a imagem RGB da Area1 em janelas computacionalmente viáveis, por **Quickshift**.
 2. Associar pontos conhecidos de árvores e gramíneas aos segmentos e extrair **NDVI, brilho HSV e bordas Canny**.
-3. Treinar e validar espacialmente **a Regressão Logística original** com os dados exclusivos da Area1.
+3. Treinar e validar espacialmente **a Regressão Logística** com os dados exclusivos da Area1.
 4. Examinar a **concordância** das previsões do modelo em três regiões externas com pseudo-rótulos Meta/WRI CHMv2, incluindo análise de variabilidade espacial.
 5. Investigar relações exploratórias entre **área de segmentos, índices alométricos e alturas modeladas** e examinar distâncias horizontais a postes.
 6. Documentar limites, rastreabilidade e condições necessárias para validação independente.
@@ -125,10 +125,6 @@ A fase computacional da Proposta 1 está encerrada. A Proposta 2 tem experimento
 | **Sagrada Família** | Caxias do Sul — RS | Avaliação externa; pontos de teste selecionados **fora da Area1 e do buffer de 25 m** |
 | **Lomba Grande** | Novo Hamburgo — RS | Avaliação externa em outra região |
 | **Cristo Rei** | São Leopoldo — RS | Avaliação externa em outra cidade |
-
-**Centro de Novo Hamburgo:** participou de experimentos anteriores com cinco imagens, mas **não compõe a bateria final de quatro regiões**. Seus dados e relatórios permanecem preservados nos documentos históricos.
-
-A [auditoria de sobreposição entre Area1 e Sagrada Família](experimentos/validacao_externa_regioes/AUDITORIA_SOBREPOSICAO_AREA1_SAGRADA_2026-11-12.md) explica por que a exclusão espacial era necessária. O nome das duas regiões não deve sugerir independência sem essa exclusão.
 
 <a id="sec-2-2"></a>
 ### 2.2. Imagens RGB e multiespectrais
@@ -193,7 +189,7 @@ flowchart TD
   A --> D["Extrair NDVI, brilho HSV e bordas Canny"]
   C --> E["Tabela de atributos dos segmentos"]
   D --> E
-  E --> F["Regressão Logística original + StandardScaler, C = 0,1"]
+  E --> F["Regressão Logística + StandardScaler, C = 0,1"]
   F --> G["Area1: 30 divisões espaciais de 500 m, com embargo de 25 m"]
   F --> H["Modelo final congelado aplicado às 3 regiões externas"]
   H --> I["200 pontos fixos por região"]
@@ -215,7 +211,7 @@ flowchart TD
   class N cautela;
 ```
 
-*Figura 2 — O CHMv2 não é utilizado para treinar a Regressão Logística original. Na Proposta 2, a altura continua sendo uma **estimativa modelada**. O estudo de distâncias a postes não mede risco elétrico.*
+*Figura 2 — O CHMv2 não é utilizado para treinar a Regressão Logística. Na Proposta 2, a altura continua sendo uma **estimativa modelada**. O estudo de distâncias a postes não mede risco elétrico.*
 
 <a id="sec-3-2"></a>
 ### 3.2. Etapas de processamento das imagens
@@ -406,7 +402,7 @@ A reprodução confirmada parte dos **atributos, pontos e geometrias derivados**
 
 **Limitação mais relevante:** os rótulos CHMv2 são **automáticos**, não verificados por revisor humano independente. Uma amostra **cega de 180 recortes RGB** (60 por região externa) foi preparada para auditoria, mas **sua anotação humana ainda está pendente**. Portanto, não se afirma validação de campo, acurácia humana confirmada ou ausência de erros sistemáticos no CHMv2.
 
-**Conclusão da Proposta 1:** a **fase de modelagem, avaliação e reprodução computacional foi encerrada** com a Regressão Logística original e quatro médias documentadas. A validade da transferência para **rótulos humanos independentes** continua uma questão em aberto.
+**Conclusão da Proposta 1:** a **fase de modelagem, avaliação e reprodução computacional foi encerrada** com a Regressão Logística e quatro médias documentadas. A validade da transferência para **rótulos humanos independentes** continua uma questão em aberto.
 
 <a id="sec-5"></a>
 ## 5. Proposta 2 — Porte das árvores e proximidade com a rede elétrica
@@ -502,7 +498,7 @@ A metodologia histórica está preservada no [notebook original](Segmentacao_are
 <a id="sec-6-1"></a>
 ### 6.1. Principais resultados
 
-- **Proposta 1:** a Regressão Logística original foi avaliada por **30 divisões espaciais** na Area1 (média **0,8421**) e apresentou **concordância média** com referências automáticas CHMv2 entre **0,7584 e 0,7961** nas três regiões externas. Isso caracteriza o comportamento do modelo **sob o protocolo documentado**, não precisão humana confirmada em novos locais.
+- **Proposta 1:** a Regressão Logística foi avaliada por **30 divisões espaciais** na Area1 (média **0,8421**) e apresentou **concordância média** com referências automáticas CHMv2 entre **0,7584 e 0,7961** nas três regiões externas. Isso caracteriza o comportamento do modelo **sob o protocolo documentado**, não precisão humana confirmada em novos locais.
 - **Proposta 2:** a avaliação de **onze famílias alométricas** contra alturas modeladas CHMv2 **não melhorou o controle constante**; índices derivados de superpixel e distância a postes não bastam, isoladamente, para estimar altura real ou risco elétrico.
 
 <a id="sec-6-2"></a>
@@ -602,7 +598,7 @@ Os **ortomosaicos de grande volume e os arquivos privados** da Area1 não estão
 <a id="apendice"></a>
 ## Apêndice — Experimentos anteriores e análises complementares
 
-As abordagens abaixo foram **investigadas e preservadas para rastreabilidade**, mas **não** devem ser confundidas com a escolha final da **Regressão Logística original, C=0,1, com 30 avaliações por região**.
+As abordagens abaixo foram **investigadas e preservadas para rastreabilidade**, mas **não** devem ser confundidas com a escolha final da **Regressão Logística, C=0,1, com 30 avaliações por região**.
 
 | Estudo histórico ou complementar | Onde consultar | Por que não compõe a tabela principal |
 |---|---|---|
@@ -620,7 +616,7 @@ As abordagens abaixo foram **investigadas e preservadas para rastreabilidade**, 
 
 #### A.1. Comparação histórica dos oito classificadores
 
-**Registro histórico — não é a tabela final:** os F1 abaixo provêm de outra bateria de avaliação, com configurações e ajuste de parâmetros próprios. **Não confundir a regressão logística dessa tabela (0,8666 em 500 m) com a Regressão Logística original fixa C=0,1 nas 30 divisões (0,8421).**
+**Registro histórico — não é a tabela final:** os F1 abaixo provêm de outra bateria de avaliação, com configurações e ajuste de parâmetros próprios. **Não confundir a regressão logística dessa tabela (0,8666 em 500 m) com a Regressão Logística fixa C=0,1 nas 30 divisões (0,8421).**
 
 A tabela apresenta **exclusivamente a bateria histórica documentada com segmentos derivados dos 812 quadrantes de até 256 × 256 pixels**. São **505 segmentos rotulados únicos**, os três atributos **NDVI + HSV + Canny** e cinco divisões espaciais por escala, com embargo de **25 m entre geometrias**. Os classificadores foram ordenados pela média de seus resultados nas duas escalas, apenas para facilitar a leitura.
 
