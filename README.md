@@ -287,6 +287,17 @@ Os números abaixo foram conferidos com os CSVs originais de 30 avaliações int
 | **Lomba Grande** | **0,7794** | 0,0337 | 0,7785 — F1 agregado dos pontos elegíveis |
 | **Cristo Rei** | **0,7961** | 0,0377 | 0,8042 — F1 agregado dos pontos elegíveis |
 
+
+**Comparação de atributos solicitada — HSV + Canny vs. HSV + Canny + NDVI.**
+A linha de três atributos contém as **médias históricas conferidas** das 30 avaliações. A linha sem NDVI só será preenchida após uma **nova avaliação pareada**, mantendo as mesmas 30 divisões/reamostragens e os mesmos pontos. Não é correto deduzir essa linha da tabela histórica nem reutilizar os resultados de cinco divisões da E4b.
+
+| Configuração de atributos | Area1 | Sagrada Família | Lomba Grande | Cristo Rei |
+|---|---:|---:|---:|---:|
+| Apenas HSV + Canny | **Pendente de execução real** | **Pendente de execução real** | **Pendente de execução real** | **Pendente de execução real** |
+| HSV + Canny + NDVI (referência histórica) | **0,8421** | **0,7584** | **0,7794** | **0,7961** |
+
+A implementação auditável para calcular a **nova tabela pareada**, sem misturar o resultado histórico ao novo experimento, está em [`ablacao_hsv_canny_ndvi_quatro_regioes.py`](experimentos/validacao_externa_regioes/ablacao_hsv_canny_ndvi_quatro_regioes.py). O teste automatizado usa exclusivamente dados sintéticos; seus F1 **não** são resultados científicos.
+
 ![Médias de F1-macro de 30 avaliações nas quatro regiões](docs/proposta1_f1_macro_30_avaliacoes_500m.svg)
 
 *Figura 3 — O ponto de comparação é a média das 30 avaliações; a barra de dispersão representa **± 1 desvio-padrão**, não intervalo de confiança. A Area1 e as regiões externas utilizam referências e procedimentos distintos.*
