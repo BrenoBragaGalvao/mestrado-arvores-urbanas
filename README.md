@@ -261,7 +261,7 @@ make_pipeline(
 <a id="sec-4-5"></a>
 ### 4.5. Validação espacial — blocos de 500 m e 30 avaliações
 
-**Area1 — 30 divisões com retreinamento.** Os segmentos são agrupados em células geográficas de **500 m**. Em cada divisão, aproximadamente 20% dos **grupos** ficam reservados para teste; a porcentagem efetiva de segmentos pode diferir. Do conjunto de treino são excluídos segmentos cujas geometrias estejam a **25 m ou menos** dos objetos de teste. O `StandardScaler` e a Regressão Logística são ajustados **exclusivamente no treino remanescente**. O F1-macro é calculado sobre o teste. A tabela final resume **30 F1-macro**, não as “épocas” de uma rede neural.
+**Area1 — 30 divisões com retreinamento.** Os segmentos são agrupados em células geográficas de **500 m**. Em cada divisão, aproximadamente 20% dos **grupos** ficam reservados para teste; a porcentagem efetiva de segmentos pode diferir. Do conjunto de treino são excluídos segmentos cujas geometrias estejam a **25 m ou menos** dos objetos de teste. O F1-macro é calculado sobre o teste.
 
 **Regiões externas — 30 reamostragens espaciais, sem retreinamento.** Em cada região, foram previamente reservados **200 pontos fixos**. Após excluir os sem referência CHMv2 elegível, os pontos são agrupados por blocos de **500 m**. Cada reamostragem sorteia **blocos com reposição** e inclui os pontos desses blocos; o **mesmo modelo** e as **mesmas previsões** são mantidos. Calcula-se novamente o F1-macro no conjunto reamostrado.
 
