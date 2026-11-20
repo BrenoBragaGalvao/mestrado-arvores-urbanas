@@ -31,11 +31,6 @@ Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmen
 | **Lomba Grande — Novo Hamburgo** | **0,7794** | 0,0337 | 30 reamostragens de blocos; modelo congelado |
 | **Cristo Rei — São Leopoldo** | **0,7961** | 0,0377 | 30 reamostragens de blocos; modelo congelado |
 
-**Os 120 valores individuais de F1-macro também estão disponíveis em [CSV verificável](docs/proposta1_f1_30_avaliacoes_4_regioes.csv)**, organizado em 30 linhas e quatro colunas de regiões.
-
-> **Como ler esses números:** na Area1, os 30 F1 resultam de **30 separações de treinamento e teste**. Nas três regiões externas, são **30 reamostragens dos mesmos pontos e previsões**, mantendo o classificador treinado na Area1. Portanto, **não houve 120 treinamentos nem 120 testes independentes**. Os F1 externos medem **concordância com pseudo-rótulos automáticos do Meta/WRI CHMv2**, e **não** acurácia validada por interpretação humana. As avaliações internas e externas têm referências diferentes e não devem ser tratadas como uma competição numérica sob condições idênticas.
-
-O [relatório de encerramento experimental da Proposta 1](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md) registra o protocolo, a auditoria de reprodução e a limitação ainda pendente.
 
 ---
 
