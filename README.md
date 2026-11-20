@@ -13,10 +13,14 @@ Esta pesquisa investiga como imagens de sensoriamento remoto podem contribuir pa
 
 | Proposta | Pergunta científica | Situação documentada |
 |---|---|---|
-| **1 — Identificação de árvores e gramíneas** | Um classificador treinado em uma única área consegue discriminar essas duas classes e apresentar concordância com referências automáticas em outras regiões? | **Fase experimental computacional concluída e reproduzida**; validação visual humana independente **pendente** |
-| **2 — Porte e proximidade com a rede elétrica** | A geometria dos segmentos, alturas modeladas de dossel e distâncias a postes permitem construir indicadores exploratórios? | **Estudos exploratórios executados**; sem alturas medidas em campo nem demonstração de risco elétrico |
+| **🌳 Proposta 1 — Identificação de árvores e gramíneas** | Um classificador treinado em uma única área consegue discriminar essas duas classes e apresentar concordância com referências automáticas em outras regiões? | **Fase experimental computacional concluída e reproduzida**; validação visual humana independente **pendente** |
+| **⚡ Proposta 2 — Porte e proximidade com a rede elétrica** | A geometria dos segmentos, alturas modeladas de dossel e distâncias a postes permitem construir indicadores exploratórios? | **Estudos exploratórios executados**; sem alturas medidas em campo nem demonstração de risco elétrico |
 
 Na **Proposta 1**, a imagem é segmentada por **Quickshift** em janelas de até **256 × 256 pixels**. Os segmentos são descritos por **brilho HSV, bordas Canny e NDVI**. O modelo final escolhido é a **Regressão Logística original**, treinada exclusivamente na Area1 com **510 pontos de referência** (257 árvores e 253 gramíneas), que correspondem a **505 segmentos rotulados únicos**. A avaliação final utiliza blocos espaciais de **500 m**.
+
+![Infográfico explicativo da Proposta 1: imagem da Area1, segmentação Quickshift, associação de 510 pontos a 505 segmentos, extração de HSV/Canny/NDVI, Regressão Logística e validação espacial em blocos de 500 m](docs/proposta1_fluxo_quickshift_infografico_20261120.png)
+
+*Figura — Etapas do processamento da Proposta 1. Na avaliação final, a Area1 utiliza 30 divisões espaciais de treino/teste; as três regiões externas utilizam 30 reamostragens espaciais por região, com o modelo original congelado.*
 
 ### Resultados principais da Proposta 1
 
