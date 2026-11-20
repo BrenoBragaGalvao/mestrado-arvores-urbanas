@@ -149,17 +149,6 @@ As bandas espectrais utilizadas são: **R (Red)** – vermelho (banda 3); **G (G
 | **Lomba Grande — Novo Hamburgo** | **20.074 × 18.349 pixels** | 0,50 m/pixel | EPSG:31982 | **92,08** |
 | **Cristo Rei — São Leopoldo** | **14.602 × 14.460 pixels** | 0,50 m/pixel | EPSG:31982 | **52,79** |
 
-**Fonte das dimensões:** [auditoria dos GeoTIFFs reais](experimentos/validacao_externa_regioes/AUDITORIA_RASTERS_REAIS_2026-11-12.md) e [inventário da Area1](data/README.md). Na Area1, o arquivo multiespectral é `AOI_NEW_MULTI.tif`. A área tabulada é **apenas a área geométrica do retângulo da grade** (número de pixels × 0,25 m²), **não** a área de vegetação nem a área obrigatoriamente coberta por pixels válidos. O polígono irregular da Area1 possui aproximadamente **12,14 km²**.
-
-![Esquema da extensão retangular da imagem e do polígono Area1](docs/aoi_retangulo_area1_esquema.svg)
-
-*Figura 1 — Exemplo da Area1: o retângulo do raster não equivale à área efetiva do polígono de estudo.*
-
-**Distinção entre protocolo futuro e resultados já publicados:** os experimentos de classificação encerrados anteriormente utilizaram **o raster RGB separado para Quickshift** e **o multiespectral alinhado à grade RGB para os atributos**. A escolha de adotar **exclusivamente o raster de quatro bandas** como fonte também para a segmentação é uma **diretriz para novas execuções**, e não uma reinterpretação dos resultados já medidos. A troca de raster pode mudar a grade, os segmentos, a associação dos pontos e os atributos; será necessário **reprocessar, retreinar e reavaliar** antes de atribuir os F1-macro publicados ao novo fluxo. Os **505 segmentos únicos** e as métricas atuais permanecem identificados como resultados da execução anterior.
-
-**Restrição radiométrica:** o NDVI foi calculado a partir de **valores digitais**, sem calibração documentada para reflectância de superfície. Diferenças de sensor, data e iluminação continuam relevantes para comparar regiões.
-
-Os ortomosaicos originais não estão publicados no GitHub: consulte o [inventário da Area1](data/README.md) e a [documentação dos pacotes regionais](experimentos/validacao_externa_regioes/README.md).
 
 <a id="sec-2-3"></a>
 ### 2.3. Amostras de árvores e gramíneas
