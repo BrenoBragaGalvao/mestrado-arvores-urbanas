@@ -241,14 +241,22 @@ make_pipeline(
 )
 ```
 
+| Comando | O que significa | Para que serve |
+|---|---|---|
+| `make_pipeline()` | Cria uma sequência de processamento | Executa as etapas na ordem correta |
+| `StandardScaler()` | Padroniza os atributos | Coloca NDVI, HSV e Canny em escalas comparáveis |
+| `LogisticRegression()` | Modelo de classificação | Distingue árvores de gramíneas |
+| `C=0.1` | Intensidade inversa da regularização | Aplica regularização relativamente forte para controlar o sobreajuste |
+| `penalty="l2"` | Regularização L2 | Penaliza coeficientes elevados |
+| `max_iter=3000` | Limite de 3.000 iterações | Permite mais tentativas para o algoritmo convergir |
+| `random_state=42` | Semente aleatória fixa | Favorece a reprodutibilidade quando há aleatoriedade |
+
 **Por que mantê-la?** É uma abordagem relativamente simples, reproduzível e interpretável, adequada a uma base rotulada pequena e a três atributos numéricos. Ela foi mantida após as comparações e tentativas complementares, **não** porque todos os experimentos alternativos tenham demonstrado ganhos.
 
 - **Treinamento:** exclusivamente nos **505 segmentos únicos da Area1**, derivados de **510 pontos originais**.
 - **Padronização:** o `StandardScaler` estima média e escala **somente a partir do treino**, inclusive dentro de cada divisão espacial.
 - **Regularização L2:** controla a magnitude dos coeficientes; o parâmetro é mantido **fixo em C=0,1**.
 - **Inferência externa:** usa o **modelo final congelado**, sem reajustar parâmetros, padronizador ou classes com os pontos das regiões externas.
-
-A comparação dos **oito classificadores** e as variantes **B/C/D** foram preservadas como **histórico**, não como a metodologia adotada ao encerrar esta proposta ([Apêndice](#apendice)).
 
 <a id="sec-4-5"></a>
 ### 4.5. Validação espacial — blocos de 500 m e 30 avaliações
