@@ -27,7 +27,7 @@ Na **Proposta 1**, a imagem é segmentada por **Quickshift** em janelas de até 
 | **Lomba Grande — Novo Hamburgo** | **0,7794** | 0,0337 | 30 reamostragens de blocos; modelo congelado |
 | **Cristo Rei — São Leopoldo** | **0,7961** | 0,0377 | 30 reamostragens de blocos; modelo congelado |
 
-![Gráfico das quatro médias de F1-macro, com desvio-padrão e identificação dos protocolos](docs/proposta1_f1_macro_30_avaliacoes_500m.svg)
+**Os 120 valores individuais de F1-macro também estão disponíveis em [CSV verificável](docs/proposta1_f1_30_avaliacoes_4_regioes.csv)**, organizado em 30 linhas e quatro colunas de regiões.
 
 > **Como ler esses números:** na Area1, os 30 F1 resultam de **30 separações de treinamento e teste**. Nas três regiões externas, são **30 reamostragens dos mesmos pontos e previsões**, mantendo o classificador treinado na Area1. Portanto, **não houve 120 treinamentos nem 120 testes independentes**. Os F1 externos medem **concordância com pseudo-rótulos automáticos do Meta/WRI CHMv2**, e **não** acurácia validada por interpretação humana. As avaliações internas e externas têm referências diferentes e não devem ser tratadas como uma competição numérica sob condições idênticas.
 
@@ -339,7 +339,7 @@ A comparação dos **oito classificadores** e as variantes **B/C/D** foram prese
 <a id="sec-4-6"></a>
 ### 4.6. Resultados das quatro regiões
 
-Os números abaixo foram conferidos com os CSVs de 30 avaliações e 90 reamostragens descritos no [relatório técnico de encerramento](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md).
+Os números abaixo foram conferidos com os CSVs originais de 30 avaliações internas e 90 reamostragens externas, descritos no [relatório técnico de encerramento](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md). Para auditoria rápida, consulte [**todos os 120 valores de F1-macro**](docs/proposta1_f1_30_avaliacoes_4_regioes.csv); este CSV foi transcrito das avaliações concluídas com precisão suficiente para reproduzir suas médias e desvios-padrão.
 
 | Região | Média do F1-macro | Desvio-padrão | F1 da avaliação anterior |
 |---|---:|---:|---:|
@@ -575,6 +575,7 @@ Os **ortomosaicos de grande volume e os arquivos privados** da Area1 não estão
 | Material | Consulta |
 |---|---|
 | Relatório principal e métricas finais | [Proposta 1 — encerramento experimental](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md) |
+| **120 valores individuais de F1-macro, 30 por região** | [CSV consolidado e auditável](docs/proposta1_f1_30_avaliacoes_4_regioes.csv) |
 | Estudo dos 257 pontos e CHMv2 | [Alometria V3](docs/v3_alometria_caxias.md) |
 | Tabela completa das 257 árvores e modelos | [CSV de 74 colunas](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) |
 | Onze famílias, controles e resultados | [Relatório científico de comparação](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) |
