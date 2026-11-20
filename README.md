@@ -203,8 +203,6 @@ A imagem RGB da Area1 tem **6.942 × 7.294 pixels**; uma tentativa de segmentar 
 | **Bloco de 500 m** | Unidade geográfica para separar ou reamostrar avaliações; **não** é o recorte Quickshift |
 | **Embargo de 25 m** | Exclusão, no treino, de segmentos geometricamente próximos aos de teste |
 
-O projeto preserva [o relatório sobre a tentativa de processamento global e a memória](docs/e10_teste_execucao_local.md) e [a comparação de estratégias de segmentação](docs/comparacao_controlada_segmentacao_512_vs_256.md).
-
 <a id="sec-4-3"></a>
 ### 4.3. Atributos NDVI, brilho HSV e bordas Canny
 
