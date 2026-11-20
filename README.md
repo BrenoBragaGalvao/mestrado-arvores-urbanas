@@ -138,7 +138,7 @@ A fase computacional da Proposta 1 está encerrada. A Proposta 2 tem experimento
 | **NDVI** | **NIR (banda 4)** e **vermelho (banda 3)** |
 | **Bordas Canny** | Canal previsto no protocolo de atributos; na implementação histórica da transferência, foi usado **NIR (banda 4)** |
 
-A ordem física **azul, verde, vermelho e infravermelho próximo** foi conferida na [auditoria espectral dos produtos Jilin-1](experimentos/validacao_externa_regioes/AUDITORIA_BANDAS_JILIN.md). Os índices citados são posições de bandas **começando em 1** (padrão Rasterio/GDAL). Qualquer novo arquivo deverá ter sua ordem espectral conferida antes do processamento.
+As bandas espectrais utilizadas são: **R (Red)** – vermelho (banda 3); **G (Green)** – verde (banda 2); **B (Blue)** – azul (banda 1); e **NIR (Near Infrared)** – infravermelho próximo (banda 4).
 
 #### Dimensões dos quatro rasters multiespectrais
 
