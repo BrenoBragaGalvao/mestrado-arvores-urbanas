@@ -618,7 +618,7 @@ As abordagens abaixo foram **investigadas e preservadas para rastreabilidade**, 
 <details>
 <summary><strong>Expandir a tabela histórica dos oito classificadores</strong></summary>
 
-``#### A.1. Comparação histórica dos oito classificadores
+#### A.1. Comparação histórica dos oito classificadores
 
 **Registro histórico — não é a tabela final:** os F1 abaixo provêm de outra bateria de avaliação, com configurações e ajuste de parâmetros próprios. **Não confundir a regressão logística dessa tabela (0,8666 em 500 m) com a Regressão Logística original fixa C=0,1 nas 30 divisões (0,8421).**
 
@@ -643,14 +643,13 @@ A tabela apresenta **exclusivamente a bateria histórica documentada com segment
 
 **Quais resultados podemos comparar diretamente?** Na configuração dos 812 quadrantes, os oito classificadores compartilham a mesma base rotulada, os atributos e as divisões externas **dentro de cada escala**. A comparação de HSV + Canny versus NDVI + HSV + Canny também utiliza esse protocolo supervisionado. Os resultados históricos do Quickshift global e das configurações com 119 recortes **não são comparações diretas**, pois diferem em segmentação, construção dos exemplos e/ou protocolos. [Consultar o histórico integral](README_versao_outubro.md).
 
-``
 
 </details>
 
 <details>
 <summary><strong>Expandir o registro histórico das estratégias de controle de sobreajuste</strong></summary>
 
-``#### A.2. Análise histórica de sobreajuste
+#### A.2. Análise histórica de sobreajuste
 
 **Overfitting** (sobreajuste) ocorre quando o modelo aprende particularidades dos dados de treinamento e pode apresentar desempenho inferior em exemplos reservados. Foram adotados os seguintes cuidados:
 
@@ -675,14 +674,13 @@ A tabela apresenta **exclusivamente a bateria histórica documentada com segment
 
 
 
-``
 
 </details>
 
 <details>
 <summary><strong>Expandir a tabela histórica das primeiras quinze árvores (Proposta 2)</strong></summary>
 
-``#### A.3. Quinze árvores — tabela histórica detalhada
+#### A.3. Quinze árvores — tabela histórica detalhada
 
 A tabela apresenta as **15 primeiras árvores na ordem original**, sem selecionar exemplos pelos resultados. As **três primeiras colunas** são a contagem, a **Meta pixel** e a **Meta 5 m**; depois vêm as previsões da **logarítmica, inversa, curva-S e cúbica** em blocos de **250 m** e os índices históricos **C1 potencial e C3 potencial** (as versões `I = a × A^b` do notebook original). As previsões das quatro famílias são **OOF (teste espacial)**; C1 e C3 **não são alturas calibradas em metros** e não representam as variantes lineares.
 
@@ -708,7 +706,6 @@ A tabela apresenta as **15 primeiras árvores na ordem original**, sem seleciona
 
 Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5 m**, enquanto os modelos logarítmico, inverso, curva-S e cúbico retornam valores bastante inferiores nos testes espaciais. Isso mostra que, apesar de terem sido testadas diversas famílias, **os modelos ainda não recuperam de forma confiável a variação individual das alturas modeladas pela Meta**. Os índices **C1 potencial** e **C3 potencial** apresentam valores maiores, mas não equivalem automaticamente a metros de altura real; as variantes lineares existem no notebook original e não são as colunas desta tabela.
 
-``
 
 </details>
 
