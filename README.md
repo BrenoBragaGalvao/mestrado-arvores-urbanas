@@ -1,10 +1,30 @@
 # Projeto de mestrado: Combinação de Características de Brilho, Bordas e NDVI para Detecção de Árvores Urbanas e Avaliação de Proximidade com Linhas de Energia
 
 **Pesquisador:** Breno Braga Galvão  
-**Área de estudo:** Area1, Caxias do Sul (RS)
+**Área de treinamento:** Area1, Caxias do Sul (RS); validação externa em três outras regiões do RS
+
+## Estado atual — Proposta 1 encerrada computacionalmente (novembro de 2026)
+
+**Modelo principal definitivo:** Regressão Logística original com `StandardScaler`, regularização L2 e `C=0,1`, treinada exclusivamente com os **510 pontos da Area1** (257 árvores e 253 gramíneas; **505 segmentos Quickshift únicos**). Atributos: **NDVI, brilho HSV e bordas Canny**. Blocos espaciais de **500 m** e embargo de **25 m** na validação interna.
+
+| Região | F1-macro médio, 30 avaliações | Desvio-padrão | Tipo de avaliação |
+|---|---:|---:|---|
+| **Area1 — Caxias do Sul** | **0,8421** | 0,0389 | 30 divisões espaciais com retreinamento restrito à Area1 |
+| **Sagrada Família — Caxias do Sul** | **0,7584** | 0,0330 | 30 reamostragens dos blocos, modelo congelado |
+| **Lomba Grande — Novo Hamburgo** | **0,7794** | 0,0337 | 30 reamostragens dos blocos, modelo congelado |
+| **Cristo Rei — São Leopoldo** | **0,7961** | 0,0377 | 30 reamostragens dos blocos, modelo congelado |
+
+> **Como interpretar:** as 30 divisões da Area1 envolvem treino/teste separados em cada divisão; as 90 avaliações externas são *bootstrap espacial* dos **mesmos 600 pontos**, com um único modelo treinado na Area1. Portanto, **não são 120 treinamentos nem 120 testes independentes**. Nos testes externos, somente **543 dos 600 pontos** receberam referências conservadoras do **Meta/WRI CHMv2**. Os F1 externos medem **concordância com pseudo-rótulos automáticos**, não acurácia confirmada em campo.
+
+**Situação:** os resultados foram reproduzidos computacionalmente. A auditoria visual cega de **180 recortes** está **preparada, porém não anotada/concluída**. A comparação dos oito classificadores e as variantes B/C/D permanecem como histórico; **não integram o modelo principal**. A **Proposta 2 é independente** e não foi encerrada por esta entrega.
+
+Consulte [a metodologia final e os resultados](#sec-3-8), [as limitações e a reprodutibilidade](#sec-3-9) e o [relatório de encerramento experimental](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md).
+
+---
 
 ## Índice
 
+- [Situação atual da Proposta 1](#sec-3-8)
 - [1. Introdução](#sec-1)
 - [1.1. Contextualização da pesquisa](#sec-1-1)
 - [1.2. Área de estudo e informações sobre os dados utilizados](#sec-1-2)
@@ -16,7 +36,9 @@
 - [3.4. Treinamento e teste espacial](#sec-3-4)
 - [3.5. Contribuição do NDVI, HSV e Canny](#sec-3-5)
 - [3.6. Resultados dos oito classificadores](#sec-3-6)
-- [3.7. Controle do overfitting](#sec-3-7)
+- [3.7. Controle do overfitting — histórico](#sec-3-7)
+- [3.8. Protocolo final da Regressão Logística — 30 avaliações](#sec-3-8)
+- [3.9. Auditoria e limitações](#sec-3-9)
 - [4. Proposta 2 — Porte e proximidade com postes](#sec-4)
 - [4.1. Alometria: conceito e aplicação](#sec-4-1)
 - [4.2. Fonte Meta/WRI CHMv2](#sec-4-2)
@@ -44,7 +66,7 @@ O estudo mantém **duas propostas complementares**:
 | **🌳 Proposta 1 — Identificação de árvores e gramíneas** | É possível distinguir essas duas classes utilizando características de brilho, bordas e resposta espectral? | Classificação supervisionada de segmentos associados a referências conhecidas. |
 | **⚡ Proposta 2 — Indicador de porte e proximidade com postes** | O que a área dos segmentos, as equações alométricas e as distâncias horizontais a postes permitem explorar? | Estimativas e indicadores exploratórios, sem comprovação de altura real nem de risco elétrico. |
 
-Na **Proposta 1**, a metodologia central utiliza **812 quadrantes de até 256 × 256 pixels**, com segmentação Quickshift, atributos **NDVI, brilho HSV e bordas Canny** e **oito classificadores** avaliados por **F1-macro**, com separação espacial entre treino e teste. A **Proposta 2** reúne experimentos próprios de alometria e proximidade: a referência externa **Meta/WRI CHMv2** permite comparar alturas modeladas em **257 pontos de árvores**, mas não substitui medições de campo.
+Na **Proposta 1**, a metodologia utiliza **812 quadrantes de até 256 × 256 pixels**, com segmentação Quickshift e atributos **NDVI, brilho HSV e bordas Canny**. Embora oito classificadores tenham sido comparados na etapa exploratória, **o modelo final selecionado é somente a Regressão Logística original**, avaliada em blocos de **500 m** com **30 avaliações por região**. A **Proposta 2** reúne experimentos próprios de alometria e proximidade: a referência externa **Meta/WRI CHMv2** permite comparar alturas modeladas em **257 pontos de árvores**, mas não substitui medições de campo.
 
 <a id="sec-1-2"></a>
 ### 1.2. Área de estudo e informações sobre os dados utilizados
@@ -96,7 +118,7 @@ O vetor **AOI_new.shp** delimita a área de interesse; **Arvores.gpkg** contém 
 <a id="sec-2"></a>
 ## 2. Pipeline completo da metodologia
 
-O diagrama apresenta as **17 etapas de síntese**, preservando as **duas propostas** e substituindo, nesta apresentação, o pipeline histórico que mostrava somente Random Forest. A primeira proposta utiliza **oito classificadores**. A segunda contém análises exploratórias complementares e **não deve ser interpretada como validação da altura ou do risco elétrico**.
+O diagrama apresenta as **17 etapas de síntese** e a comparação **histórica** de oito classificadores; no encerramento da Proposta 1, o modelo principal foi reduzido **exclusivamente à Regressão Logística original**. A segunda contém análises exploratórias complementares e **não deve ser interpretada como validação da altura ou do risco elétrico**.
 
 <p align="center">
   <a href="docs/pipeline_17_etapas_ilustrado.svg">
@@ -128,16 +150,16 @@ O infográfico original representa o código anterior, com **Quickshift global, 
 <a id="sec-3"></a>
 ## 3. Proposta 1 — Identificação de árvores e gramíneas
 
-A classificação adotada nesta apresentação utiliza **Quickshift na grade de 812 quadrantes de até 256 × 256 pixels**, seguido de associação às referências, extração de atributos e comparação de oito classificadores. O objetivo é distinguir **árvore** e **gramínea nos exemplos rotulados**: isso não constitui uma classificação validada de todas as categorias presentes na cidade, como telhados, vias ou solo exposto.
+A configuração final utiliza **Quickshift na grade de 812 quadrantes de até 256 × 256 pixels**, associação às referências e extração dos três atributos, mantendo **apenas a Regressão Logística original** como classificador principal. A comparação histórica dos oito modelos permanece nas subseções seguintes. O objetivo é distinguir **árvore** e **gramínea nos exemplos rotulados**: isso não constitui uma classificação validada de todas as categorias presentes na cidade, como telhados, vias ou solo exposto.
 
 <a id="sec-3-1"></a>
 ### 3.1. Metodologia utilizada
 
 A imagem é organizada em **812 quadrantes** (grade de 28 × 29 partes, com dimensões menores nas bordas). O Quickshift é aplicado **independentemente a cada quadrante**, formando segmentos e polígonos. Os pontos conhecidos de árvores e gramíneas identificam as classes dos segmentos associados. A base usada para a avaliação reúne **505 segmentos rotulados únicos**.
 
-As três médias — **NDVI, brilho HSV e bordas Canny** — são calculadas para cada segmento. Depois, os exemplos são separados espacialmente e avaliados com **Random Forest, SVM RBF, regressão logística, Extra Trees, KNN, HistGradientBoosting, Gaussian Naive Bayes e Dummy**, utilizando a mesma base e as mesmas partições externas em cada comparação.
+As três médias — **NDVI, brilho HSV e bordas Canny** — são calculadas para cada segmento. Na fase exploratória foram comparados **Random Forest, SVM RBF, Regressão Logística, Extra Trees, KNN, HistGradientBoosting, Gaussian Naive Bayes e Dummy**. **A versão final adotou somente a Regressão Logística original com regularização fixa C=0,1**, detalhada na seção [3.8](#sec-3-8).
 
-**Fluxograma da metodologia adotada (código Mermaid):**
+**Fluxograma da comparação exploratória de oito algoritmos (o modelo final usa somente Regressão Logística):**
 
 ```mermaid
 flowchart TD
@@ -212,7 +234,7 @@ Essas figuras contextualizam alternativas estudadas e estão mantidas por integr
 <a id="sec-3-4"></a>
 ### 3.4. Como separamos treinamento e teste na metodologia adotada?
 
-A validação desta configuração é **espacial**, e não um sorteio aleatório simples dos objetos. Os exemplos são agrupados em blocos geográficos de **250 m** e, separadamente, **500 m**. Para cada tamanho são realizadas **cinco divisões**, reservando aproximadamente **80% dos grupos para treino** e **20% para teste**. Os exemplos de um mesmo bloco não são distribuídos entre os dois conjuntos na mesma divisão.
+**Protocolo histórico dos oito classificadores:** divisões espaciais em blocos de **250 e 500 m**, com **cinco divisões por escala**. **Protocolo final adotado:** **30 divisões espaciais de 500 m na Area1**, com retreinamento apenas sobre os dados de treino de cada divisão e embargo de 25 m; **30 reamostragens espaciais de 500 m em cada uma das três regiões externas**, sem retreinamento. Os dois procedimentos não são equivalentes (ver seção [3.8](#sec-3-8)).
 
 Após a separação, removem-se do **treinamento** os objetos cujas **geometrias** estejam a até **25 m** das geometrias de teste. Os exemplos de teste permanecem reservados. Portanto, a proporção final de segmentos pode não corresponder exatamente a 80%/20%: a proporção se refere à seleção inicial dos **grupos espaciais**.
 
@@ -276,9 +298,11 @@ A dupla HSV + Canny **não é necessariamente a melhor combinação de dois atri
 **Interpretação:** incluir NDVI elevou o F1-macro médio dos **sete classificadores que usam os atributos**, nas duas escalas; o **Dummy** permaneceu inalterado porque não aprende a partir dessas características. Os valores de F1-macro não são valores de NDVI, HSV ou Canny: são **métricas de desempenho medidas depois das previsões**.
 
 <a id="sec-3-6"></a>
-### 3.6. Resultados dos oito classificadores na configuração adotada
+### 3.6. Resultados históricos dos oito classificadores (comparação exploratória)
 
-A tabela apresenta **exclusivamente a bateria documentada com segmentos derivados dos 812 quadrantes de até 256 × 256 pixels**. São **505 segmentos rotulados únicos**, os três atributos **NDVI + HSV + Canny** e cinco divisões espaciais por escala, com embargo de **25 m entre geometrias**. Os classificadores foram ordenados pela média de seus resultados nas duas escalas, apenas para facilitar a leitura.
+**Registro histórico — não é a tabela final:** os F1 abaixo provêm de outra bateria de avaliação, com configurações e ajuste de parâmetros próprios. **Não confundir a regressão logística dessa tabela (0,8666 em 500 m) com a Regressão Logística original fixa C=0,1 nas 30 divisões (0,8421).**
+
+A tabela apresenta **exclusivamente a bateria histórica documentada com segmentos derivados dos 812 quadrantes de até 256 × 256 pixels**. São **505 segmentos rotulados únicos**, os três atributos **NDVI + HSV + Canny** e cinco divisões espaciais por escala, com embargo de **25 m entre geometrias**. Os classificadores foram ordenados pela média de seus resultados nas duas escalas, apenas para facilitar a leitura.
 
 | Classificador | F1-macro — blocos de 250 m | F1-macro — blocos de 500 m |
 |---|---:|---:|
@@ -300,7 +324,7 @@ A tabela apresenta **exclusivamente a bateria documentada com segmentos derivado
 **Quais resultados podemos comparar diretamente?** Na configuração dos 812 quadrantes, os oito classificadores compartilham a mesma base rotulada, os atributos e as divisões externas **dentro de cada escala**. A comparação de HSV + Canny versus NDVI + HSV + Canny também utiliza esse protocolo supervisionado. Os resultados históricos do Quickshift global e das configurações com 119 recortes **não são comparações diretas**, pois diferem em segmentação, construção dos exemplos e/ou protocolos. [Consultar o histórico integral](README_versao_outubro.md).
 
 <a id="sec-3-7"></a>
-### 3.7. Como controlamos o overfitting na avaliação dos classificadores?
+### 3.7. Controle de sobreajuste nos oito classificadores — protocolo histórico
 
 **Overfitting** (sobreajuste) ocorre quando o modelo aprende particularidades dos dados de treinamento e pode apresentar desempenho inferior em exemplos reservados. Foram adotados os seguintes cuidados:
 
@@ -323,6 +347,39 @@ A tabela apresenta **exclusivamente a bateria documentada com segmentos derivado
 
 **Limitação de generalização:** todos os exemplos pertencem à mesma **Area1**. A avaliação mede **generalização espacial interna**; não demonstra desempenho em outra cidade ou imagem independente. Além disso, os conjuntos externos já foram examinados em etapas anteriores da pesquisa, o que limita interpretações retrospectivas de seleção de modelos.
 
+
+
+<a id="sec-3-8"></a>
+### 3.8. Protocolo final da Proposta 1: Regressão Logística original e 30 avaliações por região
+
+**Modelo:** `StandardScaler` + `LogisticRegression(C=0.1, penalty="l2", max_iter=3000, random_state=42)`. Treinamento somente na Area1: **510 pontos originais** (257 árvores + 253 gramíneas), correspondentes a **505 segmentos rotulados únicos**, sem seleção filtrada de pontos pelo CHMv2. Extração de atributos por segmento: **média do NDVI**, **média do brilho HSV** e **média das bordas Canny**, após segmentação **Quickshift** em quadrantes de até **256 × 256 pixels**.
+
+**Protocolos mantidos separados:**
+
+1. **Area1 — validação espacial interna:** 30 divisões de grupos espaciais com blocos de **500 m**, mantendo teste reservado e aplicando embargo geométrico de **25 m** ao treinamento. O escalonamento e a Regressão Logística são ajustados apenas no treinamento de cada divisão. Relatam-se a **média** e o **desvio-padrão** dos 30 F1-macro.
+2. **Regiões externas — avaliação de estabilidade:** o modelo **final treinado na Area1** permanece **congelado**. Em cada região são feitas **30 reamostragens com reposição de blocos de 500 m** sobre os mesmos pontos de teste. O F1-macro é calculado frente a **pseudo-rótulos CHMv2** conservadores. **Não há retreinamento externo ou 30 novos conjuntos independentes por região.**
+
+| Região | F1-macro médio (n=30) | Desvio-padrão | F1 anterior de referência |
+|---|---:|---:|---:|
+| **Area1 — Caxias do Sul** | **0,8421** | 0,0389 | 0,8542 (média das cinco primeiras divisões) |
+| **Sagrada Família — Caxias do Sul** | **0,7584** | 0,0330 | 0,7597 (F1 agregado original) |
+| **Lomba Grande — Novo Hamburgo** | **0,7794** | 0,0337 | 0,7785 (F1 agregado original) |
+| **Cristo Rei — São Leopoldo** | **0,7961** | 0,0377 | 0,8042 (F1 agregado original) |
+
+O F1-macro de **0,8542** na Area1 corresponde à média histórica de **cinco** divisões, enquanto **0,8421** resulta de **30** divisões — essa mudança não implica alteração do classificador. Nas regiões externas, a diferença entre o F1 agregado e a média das 30 avaliações ocorre porque são reamostrados os blocos; **não significa que o modelo mudou**.
+
+**Pontos externos elegíveis:** Sagrada Família **179/200**, Lomba Grande **183/200**, Cristo Rei **181/200**: **543/600** com rótulo CHMv2 conservador. Os demais 57 pontos não entram no F1-macro. Esta é uma **medida de concordância com pseudo-rótulos automáticos**, não uma acurácia confirmada em campo. Os resultados das variantes B/C/D e dos outros sete modelos permanecem **exploratórios/históricos**, fora desta tabela.
+
+<a id="sec-3-9"></a>
+### 3.9. Conferência de reprodutibilidade e limitações científicas
+
+**Reprodutibilidade computacional concluída:** uma segunda execução dos **30 resultados internos** e das **90 reamostragens externas**, a partir dos dados derivados e do modelo original congelados, reproduziu **byte a byte** os quatro arquivos de resultados: `area1_30_divisoes_500m.csv`, `externas_90_reamostragens_blocos_500m.csv`, `externas_f1_original_sem_reamostragem.csv` e `TABELA_FINAL_MEDIAS_30_AVALIACOES_500M.csv`. Isso **não equivale** a reconstruir os rasters RGB/NIR brutos desde o início.
+
+**Pendência declarada:** foi montada uma amostra **cega de 180 recortes RGB** (60 por região externa) para **anotação humana independente**. Os recortes e formulários estão preparados, **mas os rótulos humanos não foram preenchidos/validados**. Consequentemente, não se pode declarar F1 externo confirmado por especialistas, acurácia de campo ou validação humana concluída.
+
+**Cautelas:** as avaliações internas e externas têm protocolos distintos; as 30 reamostragens externas reutilizam as observações; os pseudo-rótulos CHMv2 podem conter erros; e as métricas externas consultadas anteriormente **não devem ser usadas para escolher retrospectivamente os parâmetros do modelo**.
+
+**Estado formal:** fase **experimental computacional** da Proposta 1 encerrada e reproduzida; a **auditoria visual humana** permanece em aberto. A Proposta 2 continua independente. [Relatório técnico de encerramento da Proposta 1](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md).
 
 
 <a id="sec-4"></a>
@@ -482,9 +539,9 @@ Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5
 <a id="sec-5"></a>
 ## 5. Conclusões
 
-**Proposta 1 — Identificação de árvores e gramíneas.** A segmentação Quickshift em quadrantes de até 256 × 256 pixels permitiu organizar o processamento da Area1 sem reduzir a resolução dos pixels e avaliar, na bateria derivada documentada, **505 segmentos rotulados únicos** com **oito classificadores**. O acréscimo de **NDVI** à dupla HSV + Canny aumentou o F1-macro médio dos sete modelos que utilizam atributos. O **KNN** obteve **0,8931** em blocos de **250 m** e a **regressão logística**, **0,8666** em blocos de **500 m**. O melhor classificador, portanto, depende da escala de validação.
+**Proposta 1 — etapa computacional encerrada.** A configuração principal selecionada utiliza **Quickshift**, as médias de **NDVI, brilho HSV e bordas Canny** e **somente a Regressão Logística original**, com 505 segmentos únicos derivados das 510 referências da Area1. O F1-macro médio após **30 divisões espaciais de 500 m na Area1** foi **0,8421 ± 0,0389**. Em **30 reamostragens espaciais por região externa**, com modelo congelado, a concordância média com o CHMv2 foi **0,7584 ± 0,0330** (Sagrada Família), **0,7794 ± 0,0337** (Lomba Grande) e **0,7961 ± 0,0377** (Cristo Rei).
 
-A utilização de **blocos espaciais** e **embargo geométrico de 25 m**, somada à seleção de parâmetros somente no treinamento, reduziu riscos metodológicos. Contudo, **não eliminou comprovadamente o overfitting**, nem substitui testes independentes em outras regiões. O desempenho histórico do método original (**acurácia 0,87**) **não pode ser comparado diretamente** com esses F1-macro espaciais.
+**Interpretação e limitação:** as avaliações internas envolveram treinamento por divisão, ao passo que as externas repetiram reamostragens dos mesmos pontos já classificados; **não são 120 treinamentos independentes**. A reprodução computacional dos resultados foi conferida, mas **não há validação humana concluída das referências externas CHMv2**. Os oito classificadores da comparação histórica, as melhorias B/C/D e a antiga acurácia **0,87** pertencem a outros protocolos e **não são os resultados finais adotados**.
 
 **Proposta 2 — Porte e proximidade com postes.** O estudo das **257 referências de árvores**, das estimativas **Meta/WRI CHMv2**, dos índices originais C1–C6 e das **onze famílias alométricas** foi exploratório. A área do superpixel, isoladamente, não reproduziu de forma suficientemente confiável a variação das alturas estimadas pela Meta/WRI; os melhores ajustes não superaram o controle constante. As distâncias horizontais aos postes também **não comprovam risco elétrico**.
 
@@ -497,12 +554,16 @@ A utilização de **blocos espaciais** e **embargo geométrico de 25 m**, somada
 
 ### Documentação preservada e reprodutibilidade
 
+**Documentação final adotada:** [Proposta 1 — encerramento experimental com 30 avaliações por região](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md). A implementação detalhada da transferência geográfica está em [experimentos/validacao_externa_regioes/README.md](experimentos/validacao_externa_regioes/README.md), que conserva também o histórico dos experimentos anteriores.
+
 **[README_versao_outubro.md — documentação integral anterior](README_versao_outubro.md)**: cópia preservada do README antes desta reorganização, com **todas as metodologias alternativas, tabelas, figuras, resultados históricos e discussões anteriores**. Os códigos e as bases experimentais anteriores permanecem no repositório, sem exclusão.
 
 **Atenção:** os scripts de reavaliação supervisionada reutilizam características previamente extraídas; essa execução **não equivale a recalcular a segmentação Quickshift em todo o raster**. O estado de execução de cada etapa deve ser conferido nos relatórios e nos artefatos produzidos.
 
 | Material | Onde consultar / finalidade |
 |---|---|
+| **Resultados finais da Proposta 1 (500 m; n=30)** | [Relatório científico de encerramento e limitações CHMv2](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md). |
+| **Código de avaliação da transferência** | [Regressão Logística em quatro regiões](experimentos/validacao_externa_regioes/validar_logistica_quatro_regioes_500m.py). |
 | **Notebook original da classificação e proximidade** | [Segmentacao_area_completa.ipynb](Segmentacao_area_completa.ipynb) — Quickshift global, K-Means, Random Forest e índice de porte. |
 | **Notebook de experimentos com quadrantes e recortes** | [Segmentacao_area_completa_v2_experimentos.ipynb](Segmentacao_area_completa_v2_experimentos.ipynb) — código das três configurações investigadas, mantendo o histórico. |
 | **Reexecução supervisionada dos oito classificadores** | [reexecutar_tabelas_aninhadas_v2.py](experimentos/reexecutar_tabelas_aninhadas_v2.py) — seleção interna de regularização e testes espaciais. |
@@ -522,4 +583,4 @@ A utilização de **blocos espaciais** e **embargo geométrico de 25 m**, somada
 | **Onze famílias de equações** | [Chatziathanasiou, Kitikidou e Milios (2024)](https://doi.org/10.3390/land13101579) e [correção de 2026](https://doi.org/10.3390/land15030473). |
 | **Contexto regional das espécies** | [PDAU de Caxias do Sul](https://caxias.rs.gov.br/servicos/meio-ambiente/plano-diretor-de-arborizacao-urbana-pdau) e [Anexo 1 — espécies arbóreas](https://gcpstorage.caxias.rs.gov.br/documents/2020/09/c2d2ec2b-dfb4-4646-aadd-01eced79a722.pdf). |
 
-**Nota de publicação:** o [portal do mestrado](https://brenobragagalvao.github.io/mestrado-arvores-urbanas/) é mantido em arquivos próprios na pasta docs. **Esta reorganização altera apenas o README principal e adiciona uma figura**, sem sincronizar nem modificar o site nesta etapa.
+**Nota de publicação:** o [portal do mestrado](https://brenobragagalvao.github.io/mestrado-arvores-urbanas/) é mantido em arquivos próprios na pasta docs. **A documentação desta feature foi atualizada sem alterar a branch `main` nem sincronizar automaticamente o site do mestrado.**
