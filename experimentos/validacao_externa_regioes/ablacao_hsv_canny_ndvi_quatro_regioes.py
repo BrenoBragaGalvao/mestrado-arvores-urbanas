@@ -153,6 +153,8 @@ def load_external(files, frozen_path):
         compared.bloco_500m.astype(str) == compared.bloco_500m_original.astype(str)
     ).all():
         raise ValueError("Rótulos CHMv2 ou blocos espaciais foram alterados")
+    if not (compared.predicao_modelo == compared.predicao_modelo_original).all():
+        raise ValueError("Predição congelada original divergiu da tabela de atributos")
     return compared
 
 
