@@ -188,8 +188,6 @@ O diagrama abaixo representa **os fluxos efetivamente adotados**, separando os r
 
 A proposta busca distinguir **árvores** e **gramíneas** com um classificador treinado em exemplos previamente conhecidos na Area1 e investigar se as previsões permanecem coerentes fora da área de origem.
 
-A tarefa é **binária**. Na aplicação de um modelo de duas classes a toda a imagem, pixels de asfalto, telhados, solo exposto ou sombra podem receber uma das classes disponíveis. Assim, **mapas de predição não são automaticamente inventários confiáveis de cobertura vegetal**.
-
 <a id="sec-4-2"></a>
 ### 4.2. Segmentação Quickshift — por que 812 janelas?
 
