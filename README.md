@@ -524,7 +524,33 @@ A [tabela auditada com todos os cenários](docs/v3_alturas_publicas/v3_11_famili
 **Exemplo individual, sem escolha retrospectiva pelo desempenho:** para a primeira árvore da tabela original, o CHMv2 estimou **16 m no pixel** e **17 m no máximo em 5 m**; a previsão espacial fora do treino da curva-S foi **2,98 m** para o alvo de pixel. A discrepância é **em relação ao CHMv2**, não à altura real. Os valores das [257 árvores e 74 colunas](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) permitem examinar cada caso sem depender de amostras escolhidas à mão.
 
 
-#### 5.5.1. Evidências individuais das equações — cinco primeiras árvores da Area1
+#### 5.5.1. Tabela comparativa — primeiras 15 árvores da Area1
+
+A tabela a seguir apresenta **as 15 primeiras árvores de Caxias do Sul na ordem original do arquivo**, sem seleção pelos resultados. Os valores de **Meta pixel** e **Meta 5 m** correspondem às estimativas CHMv2. As previsões das famílias **logarítmica, inversa, curva-S e cúbica** são resultados **fora do treinamento (OOF)** com separação espacial em blocos de **250 m**, nas versões ajustadas para cada alvo. Os índices **C1 potencial** e **C3 potencial** foram preservados, mas **não representam alturas calibradas em metros**.
+
+| Árvore | **Meta pixel (m)** | **Meta 5 m (m)** | Log. pixel (m) | Log. 5 m (m) | Inversa pixel (m) | Inversa 5 m (m) | Curva-S pixel (m) | Curva-S 5 m (m) | Cúbica pixel (m) | Cúbica 5 m (m) | C1 potencial (índice) | C3 potencial (índice) |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 16,00 | 17,00 | 3,02 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 3,21 | 5,97 | 23,95 | 22,81 |
+| 2 | 0,00 | 6,00 | 3,02 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 3,24 | 5,97 | 24,62 | 23,17 |
+| 3 | 10,00 | 13,00 | 3,40 | 6,50 | 3,56 | 6,58 | 3,46 | 6,57 | 3,25 | 6,39 | 9,66 | 13,58 |
+| 4 | 19,00 | 20,00 | 3,04 | 5,97 | 2,98 | 5,97 | 2,98 | 5,97 | 3,51 | 5,97 | 31,34 | 26,60 |
+| 5 | 0,00 | 2,00 | 3,86 | 6,87 | 3,87 | 6,89 | 3,87 | 6,89 | 3,66 | 6,72 | 15,13 | 17,55 |
+| 6 | 0,00 | 2,00 | 2,93 | 6,11 | 3,11 | 6,13 | 2,94 | 6,13 | 3,08 | 6,26 | 6,02 | 10,36 |
+| 7 | 0,00 | 0,00 | 3,98 | 6,98 | 3,93 | 6,96 | 3,97 | 6,96 | 3,87 | 6,89 | 17,15 | 18,84 |
+| 8 | 0,00 | 0,00 | 3,98 | 6,97 | 3,93 | 6,96 | 3,97 | 6,96 | 3,86 | 6,88 | 17,09 | 18,81 |
+| 9 | 3,00 | 6,00 | 4,17 | 7,13 | 4,03 | 7,05 | 4,11 | 7,06 | 4,30 | 7,23 | 20,65 | 20,96 |
+| 10 | 6,00 | 9,00 | 3,73 | 6,77 | 3,79 | 6,82 | 3,77 | 6,81 | 3,51 | 6,60 | 13,38 | 16,36 |
+| 11 | 0,00 | 3,00 | 4,14 | 7,11 | 4,01 | 7,04 | 4,09 | 7,05 | 4,21 | 7,16 | 19,99 | 20,57 |
+| 12 | 5,00 | 6,00 | 3,35 | 6,45 | 3,52 | 6,54 | 3,41 | 6,53 | 3,22 | 6,37 | 9,14 | 13,15 |
+| 13 | 10,00 | 10,00 | 2,15 | 5,14 | 2,24 | 5,13 | 2,17 | 5,13 | 2,22 | 5,33 | 5,72 | 10,06 |
+| 14 | 1,00 | 8,00 | 2,39 | 5,40 | 2,50 | 5,47 | 2,44 | 5,46 | 2,29 | 5,39 | 8,13 | 12,31 |
+| 15 | 6,00 | 9,00 | 2,77 | 5,83 | 2,79 | 5,86 | 2,79 | 5,85 | 2,60 | 5,67 | 14,23 | 16,94 |
+
+*Tabela — As colunas de pixel e raio de 5 m correspondem a alvos distintos. Uma diferença em relação ao CHMv2 **não é um erro contra altura medida em campo**. A tabela pertence à **Area1, em Caxias do Sul**, e não à amostra de 12 árvores da Candangolândia.*
+
+**Base integral:** [257 árvores e 74 colunas](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv).
+
+#### 5.5.2. Evidências individuais das demais famílias — cinco primeiras árvores da Area1
 
 Para mostrar concretamente o motivo da etapa de campo, são reproduzidas abaixo **as cinco primeiras árvores na ordem original do experimento com 257 pontos de Caxias do Sul**, sem escolher exemplos por maior ou menor erro. As previsões das onze famílias foram obtidas **fora do treinamento (OOF), com blocos espaciais de 250 m**, usando como referência o **CHMv2 no pixel exato**; a coluna de **máximo em 5 m** é mostrada apenas para contexto. **Estas árvores não são as 12 árvores CAND da Candangolândia.**
 
@@ -550,7 +576,7 @@ Para mostrar concretamente o motivo da etapa de campo, são reproduzidas abaixo 
 
 **Exemplo interpretativo:** na **árvore 1 da Area1**, o pixel CHMv2 registra **16,00 m**, mas a previsão espacial OOF pela curva-S é **2,98 m** (diferença **13,02 m em relação ao CHMv2**, e **não** à altura real). Na árvore 4, o CHMv2 registra **19,00 m**, enquanto a curva-S retorna **2,98 m**. A concentração das previsões alométricas em uma faixa estreita contrasta com a maior amplitude das alturas-alvo e ajuda a explicar por que a avaliação espacial não mostrou ganho sobre a previsão constante.
 
-O [apêndice A.3 traz as primeiras 15 árvores da Area1](#a3-quinze-árvores--tabela-histórica-detalhada), incluindo colunas OOF para Meta pixel e Meta 5 m, mais índices C1/C3 que **não são alturas calibradas**. Os [257 registros e 74 colunas](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) permitem verificar todas as previsões sem seleção retrospectiva de casos.
+A [tabela comparativa de 15 árvores](#sec-5-5) está reproduzida diretamente nesta seção, com colunas OOF para Meta pixel e Meta 5 m, mais índices C1/C3 que **não são alturas calibradas**. Os [257 registros e 74 colunas](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) permitem verificar todas as previsões sem seleção retrospectiva de casos.
 
 **Ponte com a validação de campo:** os resultados mostram a **fragilidade da aproximação alométrica testada** para reproduzir um produto modelado. **Não autorizam dizer que CHMv2 representa melhor a realidade que ETH 2020**, pois ambos precisam ser comparados com uma referência presencial independente. A seção [5.2](#sec-5-2) apresenta a amostra selecionada para testar essa questão.
 
@@ -762,7 +788,7 @@ A tabela apresenta **exclusivamente a bateria histórica documentada com segment
 
 #### A.3. Quinze árvores — tabela histórica detalhada
 
-A tabela apresenta as **15 primeiras árvores na ordem original**, sem selecionar exemplos pelos resultados. As **três primeiras colunas** são a contagem, a **Meta pixel** e a **Meta 5 m**; depois vêm as previsões da **logarítmica, inversa, curva-S e cúbica** em blocos de **250 m** e os índices históricos **C1 potencial e C3 potencial** (as versões `I = a × A^b` do notebook original). As previsões das quatro famílias são **OOF (teste espacial)**; C1 e C3 **não são alturas calibradas em metros** e não representam as variantes lineares.
+Esta tabela histórica também está apresentada **diretamente na seção 5.5.1 do README**, para consulta sem abrir o apêndice. A tabela apresenta as **15 primeiras árvores na ordem original**, sem selecionar exemplos pelos resultados. As **três primeiras colunas** são a contagem, a **Meta pixel** e a **Meta 5 m**; depois vêm as previsões da **logarítmica, inversa, curva-S e cúbica** em blocos de **250 m** e os índices históricos **C1 potencial e C3 potencial** (as versões `I = a × A^b` do notebook original). As previsões das quatro famílias são **OOF (teste espacial)**; C1 e C3 **não são alturas calibradas em metros** e não representam as variantes lineares.
 
 | Árvore | **Meta pixel (m)** | **Meta 5 m (m)** | Log. pixel (m) | Log. 5 m (m) | Inversa pixel (m) | Inversa 5 m (m) | Curva-S pixel (m) | Curva-S 5 m (m) | Cúbica pixel (m) | Cúbica 5 m (m) | C1 potencial (índice) | C3 potencial (índice) |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
