@@ -16,20 +16,28 @@ Esta pesquisa investiga como imagens de sensoriamento remoto podem contribuir pa
 | **🌳 Proposta 1 — Identificação de árvores e gramíneas** | Um classificador treinado em uma única área consegue discriminar essas duas classes e apresentar concordância com referências automáticas em outras regiões? | **Fase experimental computacional concluída e reproduzida**; validação visual humana independente **pendente** |
 | **⚡ Proposta 2 — Porte e proximidade com a rede elétrica** | A geometria dos segmentos, alturas modeladas de dossel e distâncias a postes permitem construir indicadores exploratórios? | **Estudos exploratórios executados**; sem alturas medidas em campo nem demonstração de risco elétrico |
 
-Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmentos, processados em janelas de até **256 × 256 pixels**. Cada segmento foi analisado por meio dos atributos **HSV, Canny e NDVI**, que ajudam a diferenciar árvores e gramíneas. A **Regressão Logística** foi treinada exclusivamente com **510 pontos originais da Area1** (505 segmentos únicos) e, depois, aplicada às imagens de **Sagrada Família, Lomba Grande e Cristo Rei**, sem novos treinamentos. Para verificar o desempenho, realizamos **30 divisões de treinamento e teste na Area1** e **30 reamostragens em cada região externa**, utilizando 200 pontos por região para comparar as previsões com referências automáticas do **CHMv2**. Todas as avaliações consideraram blocos espaciais de **500 m**.
+Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmentos, processados em janelas de até **256 × 256 pixels**. Cada segmento foi analisado por meio dos atributos **HSV (componente V), Canny e NDVI**. No **experimento principal de transferência**, a Regressão Logística foi treinada exclusivamente com **510 pontos originais da Area1** (505 segmentos únicos) e aplicada a **Sagrada Família, Lomba Grande e Cristo Rei**, sem novos treinamentos; foram realizadas **30 divisões espaciais na Area1** e **30 reamostragens por região externa**, com referências automáticas **CHMv2** e blocos de **500 m**. **Posteriormente**, realizamos uma análise **complementar e exploratória de ablação de atributos**, com **treinamento e teste regionais** e 30 divisões por região/configuração; os resultados locais **não substituem** os da transferência geográfica do modelo congelado.
 
 ![Infográfico atualizado da Proposta 1: seis etapas desde a Area1, segmentação Quickshift, 510 pontos de referência, 505 segmentos únicos, atributos HSV/Canny/NDVI, treinamento da Regressão Logística e aplicação sem novo treinamento a Sagrada Família, Lomba Grande e Cristo Rei, com 200 pontos de avaliação por região](docs/proposta1_fluxo_seis_etapas_aplicacao_externa_20261120.webp)
 
-*Figura — Etapas do processamento da Proposta 1. Na avaliação final, a Area1 utiliza 30 divisões espaciais de treino/teste; as três regiões externas utilizam 30 reamostragens espaciais por região, com o modelo original congelado.*
+*Figura — Etapas do **experimento principal de transferência geográfica** da Proposta 1. Na avaliação histórica, a Area1 utiliza 30 divisões espaciais de treino/teste; as três regiões externas utilizam 30 reamostragens por região, com o modelo original congelado. O experimento complementar de treinamento regional é descrito na seção 4.6.*
 
-### Resultados principais da Proposta 1
 
-| Região | F1-macro médio (30 avaliações) | Desvio-padrão | Procedimento |
+### Resultados principais da Proposta 1 — nova análise exploratória
+
+**HSV + Canny + NDVI**, com **30 avaliações por região**; desvio-padrão **amostral** (`n−1`) calculado sobre os 30 F1 individuais.
+
+| Região | F1-macro médio (n=30) | Desvio-padrão | Procedimento da **nova análise** |
 |---|---:|---:|---|
-| **Area1 — Caxias do Sul** | **0,8421** | 0,0389 | 30 divisões espaciais com ajuste do modelo em cada treino |
-| **Sagrada Família — Caxias do Sul** | **0,7584** | 0,0330 | 30 reamostragens de blocos; modelo congelado |
-| **Lomba Grande — Novo Hamburgo** | **0,7794** | 0,0337 | 30 reamostragens de blocos; modelo congelado |
-| **Cristo Rei — São Leopoldo** | **0,7961** | 0,0377 | 30 reamostragens de blocos; modelo congelado |
+| **Area1 — Caxias do Sul** | **0,8438** | **0,0406** | Validação espacial aninhada, seleção interna de regularização |
+| **Sagrada Família — Caxias do Sul** | **0,8552** | **0,0460** | Treino e teste regionais com CHMv2; seleção interna de regularização/balanceamento/interações |
+| **Lomba Grande — Novo Hamburgo** | **0,8108** | **0,0734** | Treino e teste regionais com CHMv2; Regressão Logística `C=0,1` |
+| **Cristo Rei — São Leopoldo** | **0,8358** | **0,0595** | Treino e teste regionais com CHMv2; Regressão Logística `C=0,1` |
+
+> **Não confundir protocolos:** a Area1 utiliza rótulos originais e seleção aninhada; nas três outras regiões há **treinamento local com pseudo-rótulos CHMv2**, e Sagrada Família utiliza uma família de modelos mais flexível. Os quatro F1 não demonstram que o **modelo original treinado apenas na Area1** generalizou com esses índices. A antiga transferência geográfica e suas matrizes de confusão continuam documentadas na seção 4.6–4.7.
+
+**Comparação de atributos (treinamento regional exploratório):** [médias, desvios e ganho do NDVI](#sec-4-6) · [240 avaliações individuais](docs/proposta1_ablacao_regional_240_avaliacoes_20261120.csv) · [CSV-resumo](docs/proposta1_ablacao_regional_resumo_20261120.csv)
+
 
 
 ---
@@ -227,7 +235,7 @@ em que **NIR** é o canal do infravermelho próximo e **R** o vermelho. Na fonte
 <a id="sec-4-4"></a>
 ### 4.4. Regressão Logística e treinamento na Area1
 
-A configuração final adotada é:
+A configuração do **modelo original congelado, usado na transferência geográfica**, é:
 
 ```python
 make_pipeline(
@@ -255,8 +263,10 @@ make_pipeline(
 
 - **Treinamento:** exclusivamente nos **505 segmentos únicos da Area1**, derivados de **510 pontos originais**.
 - **Padronização:** o `StandardScaler` estima média e escala **somente a partir do treino**, inclusive dentro de cada divisão espacial.
-- **Regularização L2:** controla a magnitude dos coeficientes; o parâmetro é mantido **fixo em C=0,1**.
-- **Inferência externa:** usa o **modelo final congelado**, sem reajustar parâmetros, padronizador ou classes com os pontos das regiões externas.
+- **Regularização L2 do modelo original de transferência:** controla a magnitude dos coeficientes; neste protocolo o parâmetro permanece **fixo em C=0,1**.
+- **Inferência externa no experimento original:** usa o **modelo final congelado**, sem reajustar parâmetros, padronizador ou classes com os pontos das regiões externas.
+
+**Experimento complementar (não é transferência):** na Area1, a regularização é selecionada por validação interna; em Sagrada Família também se avaliam regularização, balanceamento e interações de atributos; em Lomba Grande e Cristo Rei aplica-se o classificador local com `C=0,1`. Esses modelos **não são a mesma configuração fixa** acima, e os pseudo-rótulos CHMv2 são utilizados nos treinos regionais.
 
 <a id="sec-4-5"></a>
 ### 4.5. Validação espacial — blocos de 500 m e 30 avaliações
@@ -275,36 +285,48 @@ make_pipeline(
 
 **Atenção:** 30 reamostragens **não criam 30 conjuntos externos independentes**. As médias internas e externas descrevem protocolos distintos. Os quantis de apenas 30 reamostragens também **não devem ser apresentados como intervalos de confiança formais**.
 
+**Nova avaliação regional exploratória:** foram efetuadas **30 separações espaciais de treino/teste por configuração e região**, com grupos de 500 m e separação espacial de treino/teste, avaliando sempre os **mesmos conjuntos de teste para as duas configurações de atributos** em cada região. A padronização é ajustada somente sobre o treino. Na Area1 e em Sagrada Família, a escolha de parâmetros se faz em validações internas; em Sagrada Família, o espaço de busca também contempla **interações** entre atributos e balanceamento de classes. Em Lomba Grande e Cristo Rei, `C=0,1` é mantido fixo. Nas três regiões externas, os pseudo-rótulos CHMv2 são usados tanto para treino quanto para teste, em divisões espaciais separadas: essa análise mede **ajuste local aos pseudo-rótulos**, não validade externa do modelo da Area1. A reanálise de Sagrada Família foi desenvolvida **após examinar resultados anteriores**, portanto é especialmente exploratória.
+
 <a id="sec-4-6"></a>
-### 4.6. Resultados das quatro regiões
 
-Os números abaixo foram conferidos com os CSVs originais de 30 avaliações internas e 90 reamostragens externas, descritos no [relatório técnico de encerramento](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md). Para auditoria rápida, consulte [**todos os 120 valores de F1-macro**](docs/proposta1_f1_30_avaliacoes_4_regioes.csv); este CSV foi transcrito das avaliações concluídas com precisão suficiente para reproduzir suas médias e desvios-padrão.
+### 4.6. Resultados nas quatro regiões: ablação regional e transferência original
 
-| Região | Média do F1-macro | Desvio-padrão | F1 da avaliação anterior |
-|---|---:|---:|---:|
-| **Area1** | **0,8421** | 0,0389 | 0,8542 — média de apenas 5 divisões |
+#### 4.6.1. Nova comparação exploratória — HSV + Canny versus HSV + Canny + NDVI
+
+Os valores foram recalculados a partir de **240 avaliações individuais**: **2 configurações × 4 regiões × 30 divisões**. Cada desvio-padrão abaixo é **amostral**, calculado com denominador **29**, e não representa intervalo de confiança ou 30 testes independentes. [Consultar o CSV de todas as avaliações](docs/proposta1_ablacao_regional_240_avaliacoes_20261120.csv) e o [resumo numérico](docs/proposta1_ablacao_regional_resumo_20261120.csv).
+
+| Configuração | Area1 | Sagrada Família | Lomba Grande | Cristo Rei |
+|---|---:|---:|---:|---:|
+| **HSV + Canny — F1 médio** | 0,7698 | 0,8368 | 0,7993 | 0,7920 |
+| **HSV + Canny — desvio-padrão** | 0,0374 | 0,0550 | 0,0717 | 0,0725 |
+| **HSV + Canny + NDVI — F1 médio** | **0,8438** | **0,8552** | **0,8108** | **0,8358** |
+| **HSV + Canny + NDVI — desvio-padrão** | **0,0406** | **0,0460** | **0,0734** | **0,0595** |
+| **Diferença com NDVI (pontos percentuais)** | **+7,41** | **+1,84** | **+1,15** | **+4,38** |
+| **Divisões espaciais por configuração** | 30 | 30 | 30 | 30 |
+
+![Comparação dos dois conjuntos de atributos com F1-macro médio e desvio-padrão amostral nas quatro regiões](docs/proposta1_ablacao_regional_30_avaliacoes_20261120.svg)
+
+*Figura 3A — Médias de 30 testes espaciais regionais por configuração, com barras de ± 1 desvio-padrão. O experimento da Area1 é aninhado; Sagrada Família utiliza interações e seleção interna exploratória; Lomba Grande e Cristo Rei utilizam modelos regionais de regularização fixa. São **protocolos diferentes**, não uma comparação direta da mesma Regressão Logística congelada.*
+
+**Interpretação:** nesta **bateria de avaliações locais** o uso de NDVI coincide com valores médios maiores de F1 nas quatro regiões, mas a contribuição varia. O ganho de Sagrada Família (**+1,84 p.p.**) aparece com um **modelo de maior flexibilidade, incluindo interações**, após exploração de alternativas. Portanto, não constitui comprovação isolada de que acrescentar NDVI melhora um modelo idêntico treinado somente na Area1. Na avaliação externa congelada, os ganhos com NDVI **não foram uniformes**.
+
+#### 4.6.2. Resultados históricos preservados — transferência do modelo original da Area1
+
+Esta tabela, anteriormente exibida como resultado principal do README, **continua válida para outro protocolo**: 30 divisões espaciais na Area1 e 30 *bootstraps* de blocos de 500 m por região externa, mantendo **sem retreinar** o modelo original de três atributos. Os **120 F1 originais** continuam em [CSV histórico](docs/proposta1_f1_30_avaliacoes_4_regioes.csv) e são descritos no [relatório técnico de encerramento](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md).
+
+| Região | F1-macro médio histórico | Desvio-padrão histórico | Comparação histórica anterior |
+|---|---:|---:|---|
+| **Area1** | **0,8421** | 0,0389 | 0,8542 — média de apenas cinco divisões |
 | **Sagrada Família** | **0,7584** | 0,0330 | 0,7597 — F1 agregado dos pontos elegíveis |
 | **Lomba Grande** | **0,7794** | 0,0337 | 0,7785 — F1 agregado dos pontos elegíveis |
 | **Cristo Rei** | **0,7961** | 0,0377 | 0,8042 — F1 agregado dos pontos elegíveis |
 
+![Médias históricas de F1-macro de 30 avaliações nas quatro regiões com o modelo original da Area1](docs/proposta1_f1_macro_30_avaliacoes_500m.svg)
 
-**Comparação de atributos solicitada — HSV + Canny vs. HSV + Canny + NDVI.**
-A linha de três atributos contém as **médias históricas conferidas** das 30 avaliações. A linha sem NDVI só será preenchida após uma **nova avaliação pareada**, mantendo as mesmas 30 divisões/reamostragens e os mesmos pontos. Não é correto deduzir essa linha da tabela histórica nem reutilizar os resultados de cinco divisões da E4b.
+*Figura 3B — **Experimento histórico de transferência**: a barra de dispersão representa ± 1 desvio-padrão. Os resultados externos são concordâncias com CHMv2 sob reamostragens espaciais do **mesmo modelo congelado**, não novos treinamentos. O F1 de 0,8421 na Area1 difere do novo 0,8438 porque são baterias de avaliação distintas.*
 
-| Configuração de atributos | Area1 | Sagrada Família | Lomba Grande | Cristo Rei |
-|---|---:|---:|---:|---:|
-| Apenas HSV + Canny | **Pendente de execução real** | **Pendente de execução real** | **Pendente de execução real** | **Pendente de execução real** |
-| HSV + Canny + NDVI (referência histórica) | **0,8421** | **0,7584** | **0,7794** | **0,7961** |
+**Os resultados regionais novos não substituem essa avaliação externa.** Os oito F1 da seção 4.6.1 foram obtidos em um experimento diferente, com treinamento local e, em Sagrada Família, pesquisa exploratória de interações; não devem ser usados para reescrever as matrizes de confusão do modelo original.
 
-A implementação auditável para calcular a **nova tabela pareada**, sem misturar o resultado histórico ao novo experimento, está em [`ablacao_hsv_canny_ndvi_quatro_regioes.py`](experimentos/validacao_externa_regioes/ablacao_hsv_canny_ndvi_quatro_regioes.py). O teste automatizado usa exclusivamente dados sintéticos; seus F1 **não** são resultados científicos.
-
-![Médias de F1-macro de 30 avaliações nas quatro regiões](docs/proposta1_f1_macro_30_avaliacoes_500m.svg)
-
-*Figura 3 — O ponto de comparação é a média das 30 avaliações; a barra de dispersão representa **± 1 desvio-padrão**, não intervalo de confiança. A Area1 e as regiões externas utilizam referências e procedimentos distintos.*
-
-O desvio da Area1 de **0,8542** para **0,8421** ocorre ao ampliar o resumo de **5 para 30 divisões** com o mesmo tipo de modelo, e **não significa que a Regressão Logística foi trocada**. Nas regiões externas, as diferenças entre F1 agregado e média bootstrap decorrem da reamostragem dos blocos.
-
-**Não se deve escolher retrospectivamente outro limiar ou modelo com base nas respostas desses pontos externos e depois tratá-los como um teste independente.**
 
 <a id="sec-4-7"></a>
 ### 4.7. Matrizes de confusão e interpretação do F1-macro
@@ -316,7 +338,7 @@ Nas duas classes deste experimento, uma **matriz de confusão** compara a classe
 - **F1 da classe:** média harmônica de precisão e revocação, `2 × precisão × revocação / (precisão + revocação)`.
 - **F1-macro:** média **não ponderada** dos F1 das classes **árvore** e **gramínea**. Penaliza o desempenho ruim em qualquer das duas classes.
 
-**Matrizes reais dos conjuntos externos completos, antes das 30 reamostragens** (linhas: referência CHMv2; colunas: previsão da Regressão Logística):
+**Matrizes reais do experimento histórico com o modelo original treinado somente na Area1**, nos conjuntos externos completos e antes das 30 reamostragens (linhas: referência CHMv2; colunas: previsão da Regressão Logística **congelada**, com HSV + Canny + NDVI). **Essas matrizes NÃO correspondem aos novos resultados regionais da seção 4.6.1:**
 
 | Região | Árvore → árvore | Árvore → gramínea | Gramínea → árvore | Gramínea → gramínea | F1-macro agregado |
 |---|---:|---:|---:|---:|---:|
@@ -330,12 +352,14 @@ Nas duas classes deste experimento, uma **matriz de confusão** compara a classe
 | Lomba Grande | 0,7531 | 0,8039 | 183 |
 | Cristo Rei | 0,8259 | 0,7826 | 181 |
 
-As duas tabelas acima representam **cada conjunto externo original de pontos elegíveis**, e **não** a matriz média das 30 reamostragens. Somar as matrizes de divisões/reamostragens repetidas seria contar os mesmos objetos várias vezes; não fazemos essa interpretação.
+As duas tabelas acima representam **cada conjunto externo original de pontos elegíveis avaliado pelo modelo congelado**, e **não** os novos modelos locais nem a matriz média das 30 reamostragens. Somar as matrizes de divisões/reamostragens repetidas seria contar os mesmos objetos várias vezes; não fazemos essa interpretação. **Não é possível atualizar essas contagens usando apenas médias e desvios-padrão de F1**: seriam necessárias as previsões individuais fora do treino dos novos modelos, sem duplicação de objetos.
 
 <a id="sec-4-8"></a>
 ### 4.8. Discussão da transferência geográfica
 
-Entre as regiões **externas**, Cristo Rei apresentou a maior média de concordância com o CHMv2, seguida por Lomba Grande e Sagrada Família. Isso é um resultado **descritivo deste conjunto de pseudo-rótulos**. Não permite concluir, por si só, que um município tem árvores mais fáceis de reconhecer ou que o modelo é mais preciso em campo naquele município.
+Na **transferência histórica do modelo original congelado**, Cristo Rei apresentou a maior média de concordância com CHMv2, seguida por Lomba Grande e Sagrada Família. Isso é um resultado **descritivo deste conjunto de pseudo-rótulos**. Não permite concluir, por si só, que um município tem árvores mais fáceis de reconhecer ou que o modelo é mais preciso em campo naquele município.
+
+Na **análise regional exploratória**, as médias com HSV + Canny + NDVI foram **0,8438 (Area1)**, **0,8552 (Sagrada Família)**, **0,8108 (Lomba Grande)** e **0,8358 (Cristo Rei)**. A comparação com HSV + Canny sem NDVI favoreceu os três atributos neste conjunto específico de ajustes. Entretanto, **as três regiões externas passaram a fornecer pseudo-rótulos de treinamento**, tornando o experimento uma avaliação **intrarregional**; Sagrada Família recebeu busca adicional de configurações depois da inspeção dos resultados. Portanto, não se deve tomar os quatro ganhos como evidência confirmatória de transferência geográfica nem comparar diretamente suas médias como se os protocolos fossem uniformes.
 
 Possíveis explicações a serem **investigadas**, sem tratá-las como demonstradas, incluem diferenças de iluminação, sombras, geometria dos segmentos, composição vegetal, distribuição dos pontos e características radiométricas dos mosaicos.
 
@@ -353,11 +377,13 @@ A fase computacional foi auditada: uma execução independente, com **modelo ori
 3. `externas_f1_original_sem_reamostragem.csv` — F1 e matrizes nos conjuntos completos.
 4. `TABELA_FINAL_MEDIAS_30_AVALIACOES_500M.csv` — médias e desvios-padrão.
 
-A reprodução confirmada parte dos **atributos, pontos e geometrias derivados**; para reproduzir desde os pixels originais é necessário acessar os ortomosaicos RGB/NIR e executar as etapas anteriores de alinhamento e Quickshift. Os detalhes e a rastreabilidade disponíveis no repositório estão no [registro científico de encerramento](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md) e na [documentação técnica externa](experimentos/validacao_externa_regioes/README.md).
+A reprodução confirmada dos **resultados históricos** parte dos **atributos, pontos e geometrias derivados**; para reproduzir desde os pixels originais é necessário acessar os ortomosaicos RGB/NIR e executar as etapas anteriores de alinhamento e Quickshift. Os detalhes e a rastreabilidade disponíveis no repositório estão no [registro científico de encerramento](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md) e na [documentação técnica externa](experimentos/validacao_externa_regioes/README.md).
+
+A **nova análise regional exploratória** dispõe de [240 F1 individuais](docs/proposta1_ablacao_regional_240_avaliacoes_20261120.csv), [médias/desvios calculados](docs/proposta1_ablacao_regional_resumo_20261120.csv) e [gráfico comparativo](docs/proposta1_ablacao_regional_30_avaliacoes_20261120.svg). Esses documentos preservam os **resultados numéricos**, mas a reprodução integral dos ajustes requer também os CSVs de atributos e rótulos derivados e a configuração das divisões espaciais/seleções internas. A execução de Sagrada Família foi **exploratória e posterior à inspeção de avaliações anteriores**; os números não têm o status de verificação independente pré-especificada.
 
 **Limitação mais relevante:** os rótulos CHMv2 são **automáticos**, não verificados por revisor humano independente. Uma amostra **cega de 180 recortes RGB** (60 por região externa) foi preparada para auditoria, mas **sua anotação humana ainda está pendente**. Portanto, não se afirma validação de campo, acurácia humana confirmada ou ausência de erros sistemáticos no CHMv2.
 
-**Conclusão da Proposta 1:** a **fase de modelagem, avaliação e reprodução computacional foi encerrada** com a Regressão Logística e quatro médias documentadas. A validade da transferência para **rótulos humanos independentes** continua uma questão em aberto.
+**Conclusão da Proposta 1:** o **experimento histórico de transferência geográfica** foi concluído e preservado com as suas quatro médias. A **ablação regional complementar** sugere potencial de HSV + Canny + NDVI quando há treinamento local, mas adota protocolos heterogêneos e exige replicação uniforme e rótulos independentes para sustentar conclusões confirmatórias. A validade da transferência para **rótulos humanos independentes** continua em aberto.
 
 <a id="sec-5"></a>
 ## 5. Proposta 2 — Porte das árvores e proximidade com a rede elétrica
@@ -453,20 +479,20 @@ A metodologia histórica está preservada no [notebook original](Segmentacao_are
 <a id="sec-6-1"></a>
 ### 6.1. Principais resultados
 
-- **Proposta 1:** a Regressão Logística foi avaliada por **30 divisões espaciais** na Area1 (média **0,8421**) e apresentou **concordância média** com referências automáticas CHMv2 entre **0,7584 e 0,7961** nas três regiões externas. Isso caracteriza o comportamento do modelo **sob o protocolo documentado**, não precisão humana confirmada em novos locais.
+- **Proposta 1:** no **experimento histórico de transferência**, a Regressão Logística apresentou F1 médio de **0,8421** na Area1 e concordância média CHMv2 entre **0,7584 e 0,7961** nas regiões externas. Na **ablação local exploratória** com HSV + Canny + NDVI, as médias foram **0,8438 / 0,8552 / 0,8108 / 0,8358** (Area1 / Sagrada Família / Lomba Grande / Cristo Rei, 30 avaliações cada), com **desvios-padrão 0,0406 / 0,0460 / 0,0734 / 0,0595**. Os experimentos **não têm protocolos equivalentes** e o treinamento local com CHMv2 não demonstra validade externa nem precisão humana.
 - **Proposta 2:** a avaliação de **onze famílias alométricas** contra alturas modeladas CHMv2 **não melhorou o controle constante**; índices derivados de superpixel e distância a postes não bastam, isoladamente, para estimar altura real ou risco elétrico.
 
 <a id="sec-6-2"></a>
 ### 6.2. Contribuições e limites
 
-**Contribuições metodológicas:** segmentação em janelas sem reduzir a resolução dos pixels, explicitação da origem e deduplicação das referências, controle espacial na Area1, manutenção de um modelo único congelado para transferência, auditoria de bandas e descrição reproduzível da variabilidade de métricas. A documentação também separa claramente **resultados finais** de **explorações históricas**.
+**Contribuições metodológicas:** segmentação em janelas sem reduzir a resolução dos pixels, explicitação da origem e deduplicação das referências, controle espacial na Area1, manutenção de um modelo único congelado no **experimento de transferência**, auditoria de bandas e descrição reproduzível da variabilidade de métricas. A documentação separa **transferência original**, **ablação com treinamento regional** e **explorações históricas**, indicando suas diferentes fontes de referência.
 
 **Limites:** a validade externa foi medida com **pseudo-rótulos CHMv2**, a radiometria das imagens não passou por calibração física comum, a classe binária não abrange todas as coberturas urbanas e o estudo alométrico não possui medidas de altura de campo.
 
 <a id="sec-7"></a>
 ## 7. Conclusões e trabalhos futuros
 
-A **fase experimental computacional da Proposta 1 está encerrada**, com um modelo original preservado, médias de 30 avaliações por região e reprodução dos resultados derivados verificada. A auditoria visual humana independente dos **180 recortes selecionados** continua pendente; o README **não confunde essa preparação com validação humana concluída**.
+O **experimento principal de transferência geográfica da Proposta 1 está encerrado**, com modelo original preservado e reprodução dos resultados históricos derivados verificada. Um **experimento complementar exploratório** comparou HSV + Canny versus HSV + Canny + NDVI em 30 avaliações por configuração e por região, com treino regional quando aplicável e resultados numéricos disponibilizados. A auditoria visual humana independente dos **180 recortes selecionados** continua pendente; o README **não confunde os pseudo-rótulos CHMv2 nem o treino regional com validação humana ou transferência geográfica confirmada**.
 
 A **Proposta 2 permanece exploratória**: os experimentos descrevem relações e restrições, sem converter índices em alturas reais ou distância horizontal a postes em risco elétrico.
 
@@ -525,7 +551,10 @@ Os **ortomosaicos de grande volume e os arquivos privados** da Area1 não estão
 | Material | Consulta |
 |---|---|
 | Relatório principal e métricas finais | [Proposta 1 — encerramento experimental](experimentos/validacao_externa_regioes/PROPOSTA1_ENCERRAMENTO_EXPERIMENTAL_30_AVALIACOES_500M.md) |
-| **120 valores individuais de F1-macro, 30 por região** | [CSV consolidado e auditável](docs/proposta1_f1_30_avaliacoes_4_regioes.csv) |
+| **120 valores individuais do experimento histórico de transferência** | [CSV original preservado](docs/proposta1_f1_30_avaliacoes_4_regioes.csv) |
+| **240 avaliações da nova ablação regional: 2 configurações × 4 áreas × 30 testes** | [CSV dos F1 individuais](docs/proposta1_ablacao_regional_240_avaliacoes_20261120.csv) |
+| **Oito médias, oito desvios-padrão e ganhos associados ao NDVI** | [CSV-resumo da ablação](docs/proposta1_ablacao_regional_resumo_20261120.csv) |
+| **Gráfico com médias e desvio-padrão da ablação regional** | [SVG comparativo](docs/proposta1_ablacao_regional_30_avaliacoes_20261120.svg) |
 | Estudo dos 257 pontos e CHMv2 | [Alometria V3](docs/v3_alometria_caxias.md) |
 | Tabela completa das 257 árvores e modelos | [CSV de 74 colunas](docs/v3_alturas_publicas/v3_todos_modelos_meta_257_completo.csv) |
 | Onze famílias, controles e resultados | [Relatório científico de comparação](docs/v3_alturas_publicas/v3_11_familias_meta_relatorio.md) |
