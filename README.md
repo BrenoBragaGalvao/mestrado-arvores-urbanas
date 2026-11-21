@@ -396,8 +396,8 @@ A **nova análise regional exploratória** dispõe de [240 F1 individuais](docs/
 
 A Proposta 2 foi organizada em **duas etapas complementares**:
 
-1. **Análise alométrica computacional (Caxias do Sul, RS):** investigar se a área dos segmentos Quickshift, convertida em diâmetro circular equivalente, permite aproximar as **alturas modeladas pelo CHMv2**. O desempenho de onze famílias de equações é confrontado com um **controle constante** e avaliado fora do treinamento, com separação espacial.
-2. **Validação empírica planejada (Candangolândia, DF):** selecionar **12 árvores acessíveis**, preservar suas estimativas **CHMv2 e ETH 2020** e realizar, posteriormente, **medições presenciais com HeightCzech**, de modo a comparar as previsões à altura observada e avaliar **qual modelo apresenta menor erro na amostra**.
+1. **Validação empírica planejada (Candangolândia, DF):** selecionar **12 árvores acessíveis**, preservar suas estimativas **CHMv2 e ETH 2020** e realizar, posteriormente, **medições presenciais com HeightCzech**, de modo a comparar as previsões à altura observada e avaliar **qual modelo apresenta menor erro na amostra**.
+2. **Análise alométrica computacional (Caxias do Sul, RS):** investigar se a área dos segmentos Quickshift, convertida em diâmetro circular equivalente, permite aproximar as **alturas modeladas pelo CHMv2**. O desempenho de onze famílias de equações é confrontado com um **controle constante** e avaliado fora do treinamento, com separação espacial.
 
 A **hipótese a testar** é que a altura diretamente estimada por um modelo de dossel, especialmente o **CHMv2**, possa ser mais útil para esses indivíduos do que inferir altura apenas pela área de um superpixel. **Isso não é conclusão antecipada:** o experimento alométrico usa **CHMv2 como alvo**, não alturas medidas; e somente as futuras medições presenciais poderão indicar se **CHMv2 ou ETH 2020** se aproxima mais das árvores selecionadas. A avaliação da **distância horizontal até postes** é uma linha histórica adicional, que **não mede risco elétrico**.
 
