@@ -1,0 +1,41 @@
+regiao,modelo,segmentos_arvore_prevista,segmentos_graminea_prevista,area_arvore_prevista_ha,area_graminea_prevista_ha,percentual_pixels_arvore_prevista,f1_macro_interno_area1_250m,f1_macro_interno_area1_500m
+area1_caxias,Random Forest,124562,7214,1106.658875,67.36455,94.262078,0.7800579762081752,0.8057202038993229
+area1_caxias,SVM RBF,123368,8408,1096.57465,77.448775,93.403132,0.858613916781654,0.8688997865666789
+area1_caxias,Regressão logística,54520,77256,457.3918,716.631625,38.959342,0.8375528327339948,0.8567141723557405
+area1_caxias,Extra Trees,102833,28943,937.556925,236.4665,79.858451,0.780380251160051,0.7898899901195483
+area1_caxias,KNN,110545,21231,997.847775,176.17565,84.993856,0.8472620055812653,0.8557721490552757
+area1_caxias,HistGradientBoosting,92109,39667,808.179075,365.84435,68.838411,0.7687106929944667,0.7931858793156873
+area1_caxias,Gaussian Naive Bayes,118794,12982,1067.7116,106.311825,90.944659,0.724952603275036,0.7286662888084374
+area1_caxias,Dummy,131776,0,1174.023425,0,100.000000,0.3051043806181528,0.2853096923681216
+sagrada_familia_caxias,Random Forest,295051,23779,2463.9983,214.748975,91.983231,,
+sagrada_familia_caxias,SVM RBF,289994,28836,2423.8062,254.941075,90.482825,,
+sagrada_familia_caxias,Regressão logística,161057,157773,1228.2771,1450.470175,45.852668,,
+sagrada_familia_caxias,Extra Trees,248324,70506,2116.943075,561.8042,79.027353,,
+sagrada_familia_caxias,KNN,263188,55642,2214.165225,464.58205,82.656742,,
+sagrada_familia_caxias,HistGradientBoosting,235942,82888,1923.173975,755.5733,71.793782,,
+sagrada_familia_caxias,Gaussian Naive Bayes,260716,58114,2228.2454,450.501875,83.182367,,
+sagrada_familia_caxias,Dummy,318830,0,2678.747275,0,100.000000,,
+centro_novo_hamburgo,Random Forest,307368,10388,2606.91555,60.2664,97.740447,,
+centro_novo_hamburgo,SVM RBF,317756,0,2667.18195,0,100.000000,,
+centro_novo_hamburgo,Regressão logística,0,317756,0,2667.18195,0.000000,,
+centro_novo_hamburgo,Extra Trees,302228,15528,2593.438575,73.743375,97.235158,,
+centro_novo_hamburgo,KNN,0,317756,0,2667.18195,0.000000,,
+centro_novo_hamburgo,HistGradientBoosting,298987,18769,2568.759925,98.422025,96.309887,,
+centro_novo_hamburgo,Gaussian Naive Bayes,317756,0,2667.18195,0,100.000000,,
+centro_novo_hamburgo,Dummy,317756,0,2667.18195,0,100.000000,,
+lomba_grande_novo_hamburgo,Random Forest,472881,141149,3497.18765,1115.004425,75.824848,,
+lomba_grande_novo_hamburgo,SVM RBF,425151,188879,3151.1263,1461.065775,68.321662,,
+lomba_grande_novo_hamburgo,Regressão logística,317655,296375,2365.7023,2246.489775,51.292363,,
+lomba_grande_novo_hamburgo,Extra Trees,304657,309373,2403.187975,2209.0041,52.105115,,
+lomba_grande_novo_hamburgo,KNN,373875,240155,2776.9243,1835.267775,60.208340,,
+lomba_grande_novo_hamburgo,HistGradientBoosting,445729,168301,3308.963475,1303.2286,71.743835,,
+lomba_grande_novo_hamburgo,Gaussian Naive Bayes,213879,400151,1587.53395,3024.658125,34.420378,,
+lomba_grande_novo_hamburgo,Dummy,614030,0,4612.192075,0,100.000000,,
+cristo_rei_sao_leopoldo,Random Forest,313056,22572,2458.374325,206.036525,92.267089,,
+cristo_rei_sao_leopoldo,SVM RBF,307263,28365,2414.78385,249.627,90.631062,,
+cristo_rei_sao_leopoldo,Regressão logística,202965,132663,1480.79965,1183.6112,55.577001,,
+cristo_rei_sao_leopoldo,Extra Trees,266191,69437,2135.156175,529.254675,80.136146,,
+cristo_rei_sao_leopoldo,KNN,279068,56560,2197.068775,467.342075,82.459834,,
+cristo_rei_sao_leopoldo,HistGradientBoosting,270225,65403,2077.60725,586.8036,77.976234,,
+cristo_rei_sao_leopoldo,Gaussian Naive Bayes,242730,92898,1974.5262,689.88465,74.107422,,
+cristo_rei_sao_leopoldo,Dummy,335628,0,2664.41085,0,100.000000,,

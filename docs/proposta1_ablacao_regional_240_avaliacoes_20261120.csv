@@ -1,0 +1,241 @@
+regiao,configuracao,avaliacao,f1_macro,protocolo,referencia
+Area1,HSV + Canny,1,0.750104,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,2,0.719351,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,3,0.845537,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,4,0.725067,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,5,0.807692,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,6,0.744828,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,7,0.710869,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,8,0.792300,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,9,0.771419,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,10,0.824074,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,11,0.760823,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,12,0.775417,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,13,0.832545,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,14,0.822860,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,15,0.749259,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,16,0.765473,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,17,0.736961,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,18,0.699674,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,19,0.777037,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,20,0.799645,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,21,0.745513,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,22,0.757716,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,23,0.790018,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,24,0.778711,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,25,0.786613,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,26,0.791512,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,27,0.763567,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,28,0.706083,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,29,0.793460,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny,30,0.768437,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,1,0.827902,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,2,0.828737,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,3,0.902178,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,4,0.843137,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,5,0.846097,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,6,0.827640,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,7,0.725688,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,8,0.882761,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,9,0.853238,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,10,0.842105,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,11,0.846007,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,12,0.836462,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,13,0.891311,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,14,0.914235,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,15,0.777455,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,16,0.856044,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,17,0.847981,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,18,0.844078,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,19,0.851913,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,20,0.787567,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,21,0.800762,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,22,0.823609,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,23,0.876685,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,24,0.799730,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,25,0.806911,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,26,0.897883,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,27,0.853266,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,28,0.894190,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,29,0.870108,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,30,0.858561,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Sagrada Família,HSV + Canny,1,0.966630,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,2,0.801743,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,3,0.831250,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,4,0.722222,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,5,0.863267,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,6,0.827628,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,7,0.808081,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,8,0.944444,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,9,0.816162,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,10,0.871457,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,11,0.866667,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,12,0.885621,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,13,0.906926,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,14,0.733333,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,15,0.827640,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,16,0.877758,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,17,0.780220,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,18,0.824615,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,19,0.746154,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,20,0.815674,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,21,0.859783,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,22,0.824615,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,23,0.783333,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,24,0.797915,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,25,0.849268,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,26,0.873016,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,27,0.863636,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,28,0.856818,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,29,0.864773,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny,30,0.812629,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,1,0.899889,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,2,0.826923,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,3,0.860140,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,4,0.805405,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,5,0.916729,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,6,0.877758,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,7,0.872054,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,8,0.916602,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,9,0.841033,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,10,0.768622,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,11,0.835897,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,12,0.942810,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,13,0.883469,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,14,0.759197,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,15,0.854216,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,16,0.876877,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,17,0.815668,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,18,0.856387,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,19,0.803571,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,20,0.769933,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,21,0.882706,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,22,0.850980,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,23,0.858388,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,24,0.879599,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,25,0.880952,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,26,0.874293,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,27,0.863636,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,28,0.928205,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,29,0.840000,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,30,0.812629,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,1,0.856631,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,2,0.761905,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,3,0.818681,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,4,0.821429,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,5,0.854216,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,6,0.752153,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,7,0.618182,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,8,0.709443,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,9,0.896657,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,10,0.728868,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,11,0.872727,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,12,0.907510,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,13,0.648276,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,14,0.719442,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,15,0.857627,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,16,0.758929,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,17,0.831933,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,18,0.784314,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,19,0.763833,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,20,0.829932,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,21,0.813187,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,22,0.878571,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,23,0.773333,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,24,0.773358,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,25,0.754386,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,26,0.890440,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,27,0.831818,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,28,0.891641,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,29,0.794444,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,30,0.784190,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,1,0.856631,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,2,0.790000,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,3,0.870588,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,4,0.821429,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,5,0.854216,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,6,0.794444,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,7,0.618182,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,8,0.774011,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,9,0.896657,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,10,0.837321,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,11,0.918981,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,12,0.907510,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,13,0.648276,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,14,0.719442,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,15,0.883333,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,16,0.758929,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,17,0.899160,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,18,0.784314,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,19,0.798851,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,20,0.829932,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,21,0.778605,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,22,0.846432,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,23,0.725490,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,24,0.801136,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,25,0.754386,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,26,0.924444,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,27,0.801533,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,28,0.850427,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,29,0.794444,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,30,0.784190,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,1,0.895722,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,2,0.775000,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,3,0.870445,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,4,0.799345,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,5,0.665438,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,6,0.749807,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,7,0.799499,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,8,0.810683,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,9,0.812629,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,10,0.826923,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,11,0.788889,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,12,0.792593,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,13,0.860602,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,14,0.720635,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,15,0.779762,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,16,0.729532,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,17,0.869091,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,18,0.745083,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,19,0.901449,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,20,0.727273,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,21,0.804196,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,22,0.890110,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,23,0.666667,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,24,0.836765,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,25,0.897368,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,26,0.655271,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,27,0.827303,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,28,0.657658,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,29,0.813853,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,30,0.791667,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,1,0.870432,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,2,0.801731,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,3,0.936508,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,4,0.828431,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,5,0.727273,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,6,0.832817,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,7,0.874922,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,8,0.810683,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,9,0.841033,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,10,0.832857,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,11,0.842105,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,12,0.828571,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,13,0.860602,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,14,0.824891,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,15,0.891176,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,16,0.837719,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,17,0.904170,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,18,0.805405,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,19,0.968372,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,20,0.755556,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,21,0.888889,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,22,0.890110,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,23,0.718750,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,24,0.810256,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,25,0.897368,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,26,0.757353,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,27,0.828431,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,28,0.730114,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,29,0.813853,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,30,0.864253,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2

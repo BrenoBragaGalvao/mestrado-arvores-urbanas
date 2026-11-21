@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1110" height="620" viewBox="0 0 1110 620" role="img" aria-label="F1-macro medio e desvio-padrao de 30 avaliacoes para HSV mais Canny versus HSV mais Canny mais NDVI nas quatro regioes">
+<rect width="1110" height="620" fill="#ffffff"/><text x="32" y="42" fill="#172c41" font-family="Arial,sans-serif" font-size="25" font-weight="700">Proposta 1 — comparação exploratória de atributos</text><text x="32" y="70" fill="#526174" font-family="Arial,sans-serif" font-size="15">F1-macro médio das 30 avaliações; linhas finas indicam ± 1 desvio-padrão amostral</text>
+<line x1="215" y1="112" x2="215" y2="507" stroke="#e3e8ee" stroke-dasharray="4,6"/><text x="215" y="528" font-family="Arial,sans-serif" font-size="13" text-anchor="middle" fill="#536073">0,0</text>
+<line x1="324" y1="112" x2="324" y2="507" stroke="#e3e8ee" stroke-dasharray="4,6"/><text x="324" y="528" font-family="Arial,sans-serif" font-size="13" text-anchor="middle" fill="#536073">0,2</text>
+<line x1="433" y1="112" x2="433" y2="507" stroke="#e3e8ee" stroke-dasharray="4,6"/><text x="433" y="528" font-family="Arial,sans-serif" font-size="13" text-anchor="middle" fill="#536073">0,4</text>
+<line x1="542" y1="112" x2="542" y2="507" stroke="#e3e8ee" stroke-dasharray="4,6"/><text x="542" y="528" font-family="Arial,sans-serif" font-size="13" text-anchor="middle" fill="#536073">0,6</text>
+<line x1="651" y1="112" x2="651" y2="507" stroke="#e3e8ee" stroke-dasharray="4,6"/><text x="651" y="528" font-family="Arial,sans-serif" font-size="13" text-anchor="middle" fill="#536073">0,8</text>
+<line x1="760" y1="112" x2="760" y2="507" stroke="#e3e8ee" stroke-dasharray="4,6"/><text x="760" y="528" font-family="Arial,sans-serif" font-size="13" text-anchor="middle" fill="#536073">1,0</text>
+<rect x="26" y="120" width="1050" height="91" rx="8" fill="#f5f8fc"/>
+<text x="33" y="161" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#24374b">Area1</text>
+<rect x="215" y="145" width="419.5" height="15" rx="3" fill="#3878bd" opacity="0.90"/>
+<line x1="614.1" y1="153" x2="654.9" y2="153" stroke="#183142" stroke-width="1.7"/><line x1="614.1" y1="148" x2="614.1" y2="158" stroke="#183142" stroke-width="1.7"/><line x1="654.9" y1="148" x2="654.9" y2="158" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="158" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,7698 ± 0,0374</text>
+<rect x="215" y="178" width="459.9" height="15" rx="3" fill="#0f9a89" opacity="0.90"/>
+<line x1="652.7" y1="186" x2="697.0" y2="186" stroke="#183142" stroke-width="1.7"/><line x1="652.7" y1="181" x2="652.7" y2="191" stroke="#183142" stroke-width="1.7"/><line x1="697.0" y1="181" x2="697.0" y2="191" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="191" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,8438 ± 0,0406</text>
+<text x="33" y="256" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#24374b">Sagrada Família</text>
+<rect x="215" y="240" width="456.0" height="15" rx="3" fill="#3878bd" opacity="0.90"/>
+<line x1="641.1" y1="248" x2="701.0" y2="248" stroke="#183142" stroke-width="1.7"/><line x1="641.1" y1="243" x2="641.1" y2="253" stroke="#183142" stroke-width="1.7"/><line x1="701.0" y1="243" x2="701.0" y2="253" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="253" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,8368 ± 0,0550</text>
+<rect x="215" y="273" width="466.1" height="15" rx="3" fill="#0f9a89" opacity="0.90"/>
+<line x1="656.0" y1="281" x2="706.1" y2="281" stroke="#183142" stroke-width="1.7"/><line x1="656.0" y1="276" x2="656.0" y2="286" stroke="#183142" stroke-width="1.7"/><line x1="706.1" y1="276" x2="706.1" y2="286" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="286" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,8552 ± 0,0460</text>
+<rect x="26" y="310" width="1050" height="91" rx="8" fill="#f5f8fc"/>
+<text x="33" y="351" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#24374b">Lomba Grande</text>
+<rect x="215" y="335" width="435.6" height="15" rx="3" fill="#3878bd" opacity="0.90"/>
+<line x1="611.5" y1="343" x2="689.7" y2="343" stroke="#183142" stroke-width="1.7"/><line x1="611.5" y1="338" x2="611.5" y2="348" stroke="#183142" stroke-width="1.7"/><line x1="689.7" y1="338" x2="689.7" y2="348" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="348" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,7993 ± 0,0717</text>
+<rect x="215" y="368" width="441.9" height="15" rx="3" fill="#0f9a89" opacity="0.90"/>
+<line x1="616.9" y1="376" x2="696.9" y2="376" stroke="#183142" stroke-width="1.7"/><line x1="616.9" y1="371" x2="616.9" y2="381" stroke="#183142" stroke-width="1.7"/><line x1="696.9" y1="371" x2="696.9" y2="381" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="381" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,8108 ± 0,0734</text>
+<text x="33" y="446" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#24374b">Cristo Rei</text>
+<rect x="215" y="430" width="431.7" height="15" rx="3" fill="#3878bd" opacity="0.90"/>
+<line x1="607.2" y1="438" x2="686.2" y2="438" stroke="#183142" stroke-width="1.7"/><line x1="607.2" y1="433" x2="607.2" y2="443" stroke="#183142" stroke-width="1.7"/><line x1="686.2" y1="433" x2="686.2" y2="443" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="443" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,7920 ± 0,0725</text>
+<rect x="215" y="463" width="455.5" height="15" rx="3" fill="#0f9a89" opacity="0.90"/>
+<line x1="638.1" y1="471" x2="702.9" y2="471" stroke="#183142" stroke-width="1.7"/><line x1="638.1" y1="466" x2="638.1" y2="476" stroke="#183142" stroke-width="1.7"/><line x1="702.9" y1="466" x2="702.9" y2="476" stroke="#183142" stroke-width="1.7"/>
+<text x="785" y="476" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="#213341">0,8358 ± 0,0595</text>
+<rect x="70" y="554" width="18" height="12" rx="2" fill="#3878bd"/><text x="96" y="566" font-family="Arial,sans-serif" font-size="14" fill="#405367">HSV + Canny</text><rect x="330" y="554" width="18" height="12" rx="2" fill="#0f9a89"/><text x="356" y="566" font-family="Arial,sans-serif" font-size="14" fill="#405367">HSV + Canny + NDVI</text>
+<text x="36" y="597" font-family="Arial,sans-serif" font-size="12" fill="#657687">Area1: validacao aninhada; Sagrada: interacoes selecionadas; Lomba e Cristo: ajuste regional fixo. Não é validação externa.</text>
+</svg>

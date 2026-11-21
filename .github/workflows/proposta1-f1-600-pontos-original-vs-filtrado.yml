@@ -1,0 +1,40 @@
+name: Proposta 1 - F1 em 600 pontos originais (Regressao Logistica)
+on:
+  push:
+    branches:
+      - feature/validacao-geografica-externa
+    paths:
+      - ".github/workflows/proposta1-f1-600-pontos-original-vs-filtrado.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/600_pontos_cegos_CHMv2_congelados.csv"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  f1-seiscentos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar bibliotecas e leitor de RAR
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq p7zip-full
+          python -m pip install --disable-pip-version-check numpy pandas rasterio scikit-image scikit-learn requests
+      - name: Recuperar bandas e segmentos originais e calcular F1 no mesmo conjunto cego
+        env:
+          CHM_F1_OUTPUT: resultado_600_pontos_lr_500m
+        run: |
+          python experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py
+      - name: Preservar CSV de resultados, inclusive em caso de falha
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 600_pontos_A_vs_C_f1_500m
+          path: |
+            resultado_600_pontos_lr_500m/*.csv
+            resultado_600_pontos_lr_500m/*.json
+          if-no-files-found: warn

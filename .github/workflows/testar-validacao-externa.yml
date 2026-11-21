@@ -1,0 +1,27 @@
+name: Testes da validacao geografica externa
+on:
+  push:
+    branches:
+      - feature/validacao-geografica-externa
+    paths:
+      - 'experimentos/validacao_externa_regioes/**/*.py'
+      - 'experimentos/validacao_externa_regioes/requirements.txt'
+      - '.github/workflows/testar-validacao-externa.yml'
+  workflow_dispatch:
+
+jobs:
+  testes-sinteticos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Instalar dependencias do pipeline
+        run: python -m pip install -r experimentos/validacao_externa_regioes/requirements.txt
+      - name: Verificar sintaxe dos quatro scripts
+        run: python -m compileall -q experimentos/validacao_externa_regioes
+      - name: Testes sintéticos (nao sao dados reais)
+        run: python -m pytest -q experimentos/validacao_externa_regioes/testes

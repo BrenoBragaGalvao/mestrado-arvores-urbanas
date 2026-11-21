@@ -1,0 +1,19 @@
+{
+  "_observacao": "NÃO habilitar 'confirmada' sem evidência técnica identificando a QUARTA banda como NIR. Não basta o nome _4BANDAS. Substituir o texto 'fonte' por identificação verificável do produto ou documento do fornecedor; manter este modelo no GitHub e a versão assinada no seu Drive.",
+  "sagrada_familia_caxias": {
+    "confirmada": false,
+    "fonte": ""
+  },
+  "centro_novo_hamburgo": {
+    "confirmada": false,
+    "fonte": ""
+  },
+  "lomba_grande_novo_hamburgo": {
+    "confirmada": false,
+    "fonte": ""
+  },
+  "cristo_rei_sao_leopoldo": {
+    "confirmada": false,
+    "fonte": ""
+  }
+}
