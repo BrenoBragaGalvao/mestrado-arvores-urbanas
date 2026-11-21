@@ -1,0 +1,9 @@
+regiao,configuracao,n_avaliacoes,f1_macro_medio,desvio_padrao_amostral,ganho_com_ndvi_pp,protocolo,referencia
+Area1,HSV + Canny,30,0.769752,0.037389,7.4056,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Area1,HSV + Canny + NDVI,30,0.843808,0.040640,7.4056,area1_validacao_espacial_aninhada,rotulos_originais_area1
+Sagrada Família,HSV + Canny,30,0.836776,0.055005,1.8376,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Sagrada Família,HSV + Canny + NDVI,30,0.855152,0.045951,1.8376,regional_exploratoria_interacoes_selecao_interna,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny,30,0.799269,0.071654,1.1508,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Lomba Grande,HSV + Canny + NDVI,30,0.810776,0.073366,1.1508,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny,30,0.792042,0.072477,4.3779,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
+Cristo Rei,HSV + Canny + NDVI,30,0.835821,0.059489,4.3779,regional_regressao_logistica_C0.1,pseudorrotulos_CHMv2
