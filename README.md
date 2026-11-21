@@ -389,8 +389,6 @@ A **nova análise regional exploratória** dispõe de [240 F1 individuais](docs/
 <a id="sec-5"></a>
 ## 5. Proposta 2 — Porte das árvores e proximidade com a rede elétrica
 
-**Estado:** foi preparada uma **amostra de 12 árvores na Candangolândia (DF)**, com previsões do **Meta/WRI CHMv2**, do **ETH 2020** e protocolo de medição presencial com **HeightCzech**, para verificar qual produto de sensoriamento remoto se aproxima mais das alturas observadas. **Ainda não há alturas de campo**, portanto **não está demonstrado** que CHMv2 seja mais acurado que ETH. Em uma análise complementar na Area1, em Caxias do Sul, as onze equações alométricas testadas **não superaram um preditor constante** ao aproximar alturas modeladas pelo CHMv2; isso não demonstra que equações alométricas sejam universalmente inadequadas. O estudo de proximidade da rede elétrica permanece exploratório.
-
 <a id="sec-5-1"></a>
 ### 5.1. Objetivo e fundamentação
 
