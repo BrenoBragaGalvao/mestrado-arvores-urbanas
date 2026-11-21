@@ -14,7 +14,7 @@ Esta pesquisa investiga como imagens de sensoriamento remoto podem contribuir pa
 | Proposta | Pergunta científica | Situação documentada |
 |---|---|---|
 | **🌳 Proposta 1 — Identificação de árvores e gramíneas** | Um classificador treinado em uma única área consegue discriminar essas duas classes e apresentar concordância com referências automáticas em outras regiões? | **Fase experimental computacional concluída e reproduzida**; validação visual humana independente **pendente** |
-| **⚡ Proposta 2 — Porte e proximidade com a rede elétrica** | A geometria dos segmentos, alturas modeladas de dossel e distâncias a postes permitem construir indicadores exploratórios? | **Estudos exploratórios executados**; sem alturas medidas em campo nem demonstração de risco elétrico |
+| **⚡ Proposta 2 — Porte e proximidade com a rede elétrica** | A geometria dos segmentos, alturas modeladas de dossel e distâncias a postes permitem construir indicadores exploratórios? | **Estudos exploratórios executados**; **12 árvores na Candangolândia selecionadas para medição com HeightCzech**, ainda sem alturas de campo nem demonstração de risco elétrico |
 
 Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmentos, processados em janelas de até **256 × 256 pixels**. Cada segmento foi analisado por meio dos atributos **HSV (componente V), Canny e NDVI**. No **experimento principal de transferência**, a Regressão Logística foi treinada exclusivamente com **510 pontos originais da Area1** (505 segmentos únicos) e aplicada a **Sagrada Família, Lomba Grande e Cristo Rei**, sem novos treinamentos; foram realizadas **30 divisões espaciais na Area1** e **30 reamostragens por região externa**, com referências automáticas **CHMv2** e blocos de **500 m**. **Posteriormente**, realizamos uma análise **complementar e exploratória de ablação de atributos**, com **treinamento e teste regionais** e 30 divisões por região/configuração; os resultados locais **não substituem** os da transferência geográfica do modelo congelado.
 
@@ -72,7 +72,8 @@ Na **Proposta 1**, utilizamos o **Quickshift** para dividir as imagens em segmen
   - [5.3. Equações alométricas](#sec-5-3)
   - [5.4. Resultados e comparações](#sec-5-4)
   - [5.5. Proximidade horizontal com postes](#sec-5-5)
-  - [5.6. Limitações e situação atual](#sec-5-6)
+  - [5.6. Validação de campo — 12 árvores da Candangolândia (DF)](#sec-5-6)
+  - [5.7. Limitações e situação atual](#sec-5-7)
 - [6. Discussão geral e contribuições científicas](#sec-6)
   - [6.1. Principais resultados](#sec-6-1)
   - [6.2. Contribuições e limites](#sec-6-2)
@@ -388,7 +389,7 @@ A **nova análise regional exploratória** dispõe de [240 F1 individuais](docs/
 <a id="sec-5"></a>
 ## 5. Proposta 2 — Porte das árvores e proximidade com a rede elétrica
 
-**Estado:** estudos exploratórios realizados e documentados; **não** há calibração local por altura de campo, medição tridimensional dos cabos ou demonstração de risco elétrico.
+**Estado:** estudos exploratórios realizados e documentados; **iniciada uma etapa de validação de campo planejada com 12 árvores na Candangolândia (DF)**, para comparar CHMv2, ETH 2020 e medições com o aplicativo HeightCzech. **As alturas de campo ainda não foram coletadas**; não há calibração local validada, medição tridimensional dos cabos nem demonstração de risco elétrico.
 
 <a id="sec-5-1"></a>
 ### 5.1. Objetivo e fundamentação
@@ -464,14 +465,73 @@ A análise empregou os pontos `postes.gpkg` para examinar distâncias **horizont
 
 A metodologia histórica está preservada no [notebook original](Segmentacao_area_completa.ipynb) e na [descrição dos índices empíricos](docs/allometria.md).
 
-<a id="sec-5-6"></a>
-### 5.6. Limitações e situação atual da Proposta 2
 
-**O que foi efetivamente feito:** cálculo de índices geométricos, amostragem de **257** alturas modeladas Meta/WRI, comparação de **onze famílias** com controles e análises históricas de distância a postes.
+<a id="sec-5-6"></a>
+### 5.6. Plano de validação de campo — 12 árvores na Candangolândia (DF)
+
+**Motivação e objetivo.** A pedido do orientador, foi organizada uma avaliação local para investigar se as **alturas estimadas por sensoriamento remoto** correspondem à **altura de árvores observadas presencialmente**. Foram selecionados **12 candidatos a árvores em locais de acesso relativamente fácil na Candangolândia (Distrito Federal)**, permitindo visitar as coordenadas e verificar a identidade de cada indivíduo. O novo estudo complementa, sem substituir, os experimentos com 257 pontos em Caxias do Sul.
+
+Serão confrontadas **três referências para os mesmos locais**:
+
+1. **Meta/WRI CHMv2:** estimativas originais da altura do dossel, obtidas previamente do mapa público de [altura de copas do Meta/WRI](https://registry.opendata.aws/dataforgood-fb-forestsv2/). As 12 alturas abaixo são os **valores previamente registrados**, não medições em campo.
+2. **ETH Global Canopy Height 2020:** estimativas do modelo da [ETH Zürich para o ano de 2020](https://langnico.github.io/globalcanopyheight/), de **aproximadamente 10 m de resolução espacial**, produzidas a partir de imagens Sentinel-2 e informações de altura do GEDI. Os 12 números abaixo foram fornecidos como valores previamente extraídos e **não foram recalculados nesta atualização do README**.
+3. **Medição presencial com [HeightCzech](https://iscanforest.fld.czu.cz/heightczech/):** aplicativo para smartphone (disponível para [iPhone](https://apps.apple.com/us/app/heightczech/id6748539466) e [Android](https://play.google.com/store/apps/details?id=com.psurovy.flutterSensorApp)) que usa **câmera e sensores de orientação** para estimar altura a partir de **distância conhecida e visadas para a base e o topo da árvore**. O aplicativo é um **instrumento de estimativa em campo**, sujeito a erros de distância, ângulo e visibilidade, não uma aferição instrumental de precisão comprovada para esta amostra.
+
+#### 5.6.1. Árvores selecionadas e alturas a conferir
+
+**Coordenadas WGS84 (EPSG:4326); alturas em metros.** As coordenadas e as duas colunas de previsões foram mantidas **exatamente como fornecidas**; os links da primeira coluna abrem a localização aproximada no Google Maps. **A medição manual ainda está em branco, pois a visita de campo não ocorreu.**
+
+| Árvore / localização | Latitude (WGS84) | Longitude (WGS84) | CHMv2 original (m) | ETH 2020 (m) | Medição manual — HeightCzech (m) |
+|---|---:|---:|---:|---:|---:|
+| [CAND-01](https://www.google.com/maps/search/?api=1&query=-15.85344927%2C-47.94901704) | -15.85344927 | -47.94901704 | 12 | 12 | **Pendente** |
+| [CAND-02](https://www.google.com/maps/search/?api=1&query=-15.85640769%2C-47.95126177) | -15.85640769 | -47.95126177 | 22 | 17 | **Pendente** |
+| [CAND-03](https://www.google.com/maps/search/?api=1&query=-15.85769557%2C-47.94820182) | -15.85769557 | -47.94820182 | 12 | 16 | **Pendente** |
+| [CAND-04](https://www.google.com/maps/search/?api=1&query=-15.85572076%2C-47.94998299) | -15.85572076 | -47.94998299 | 15 | 14 | **Pendente** |
+| [CAND-05](https://www.google.com/maps/search/?api=1&query=-15.85791926%2C-47.94967912) | -15.85791926 | -47.94967912 | 21 | 22 | **Pendente** |
+| [CAND-06](https://www.google.com/maps/search/?api=1&query=-15.85557351%2C-47.94952372) | -15.85557351 | -47.94952372 | 22 | 13 | **Pendente** |
+| [CAND-07](https://www.google.com/maps/search/?api=1&query=-15.85250612%2C-47.95129829) | -15.85250612 | -47.95129829 | 8 | 4 | **Pendente** |
+| [CAND-08](https://www.google.com/maps/search/?api=1&query=-15.85652138%2C-47.95153397) | -15.85652138 | -47.95153397 | 15 | 16 | **Pendente** |
+| [CAND-09](https://www.google.com/maps/search/?api=1&query=-15.85475037%2C-47.94763657) | -15.85475037 | -47.94763657 | 20 | 17 | **Pendente** |
+| [CAND-10](https://www.google.com/maps/search/?api=1&query=-15.85791200%2C-47.94822363) | -15.85791200 | -47.94822363 | 16 | 16 | **Pendente** |
+| [CAND-11](https://www.google.com/maps/search/?api=1&query=-15.85495867%2C-47.94825533) | -15.85495867 | -47.94825533 | 29 | 18 | **Pendente** |
+| [CAND-12](https://www.google.com/maps/search/?api=1&query=-15.85650280%2C-47.94892150) | -15.85650280 | -47.94892150 | 25 | 18 | **Pendente** |
+
+**Distinção importante:** as duas colunas modeladas representam **estimativas diferentes para cobertura vegetal**; nenhuma é, por si, a altura real. A ETH 2020 utiliza um pixel da ordem de 10 m e pode integrar mais de uma copa e vizinhança; o CHMv2 tem resolução mais fina e também não garante identificação individual. As datas de referência e a resolução diferentes podem explicar parte das divergências. Antes de medir, será verificado se o ponto corresponde **à mesma árvore** nas imagens e no terreno, se ela está presente e se houve poda ou supressão.
+
+**Comparação preliminar entre modelos, sem medidas de campo:** os 12 valores fornecidos diferem em até **11 m** entre CHMv2 e ETH 2020; o **desvio absoluto médio entre as duas séries é 3,83 m** e a **diferença média (CHMv2 − ETH) é +2,83 m**. Esses números avaliam **discordância entre modelos**, **não** erro contra a realidade nem acurácia. As maiores diferenças concentram-se em CAND-11 (29 × 18 m), CAND-06 (22 × 13 m) e CAND-12 (25 × 18 m), pontos prioritários para observação, **sem excluir** os demais da amostra.
+
+#### 5.6.2. Protocolo planejado de medição com HeightCzech
+
+1. **Localização e identificação:** navegar até as coordenadas e conferir por fotografia e inspeção da copa/tronco se o indivíduo encontrado corresponde ao ponto; registrar eventual mudança ou ambiguidade, sem deslocar silenciosamente o ponto para a árvore mais próxima.
+2. **Posicionamento:** escolher local seguro e com visada clara da base do tronco e do ápice; medir e registrar a **distância horizontal real** até a base com trena ou medidor apropriado, evitando estimá-la apenas pelo GPS. Registrar inclinação do terreno, obstáculos, copas sobrepostas e condições de observação.
+3. **Aquisição:** utilizar o **HeightCzech** para apontar a câmera à base e ao topo, informando a distância conforme o fluxo do aplicativo; manter o aparelho firme e seguir as instruções/calibração fornecidas pela versão utilizada.
+4. **Repetição:** realizar preferencialmente **três leituras por árvore**, reposicionando o aparelho e repetindo as visadas; registrar as três alturas, a **mediana** (valor principal), a amplitude entre as leituras e a distância empregada. Se a base ou o topo não puder ser visto, registrar **não mensurável**, sem inventar estimativa.
+5. **Registro e controle de qualidade:** anotar identificação, data/hora, modelo do smartphone, versão do aplicativo, coordenada conferida, distância, condições de terreno, fotos da árvore e motivo de exclusão/ressalva. Se possível, aferir parte das medidas com instrumento florestal ou referência de altura conhecida para avaliar o método do smartphone. Evitar consultar os valores dos mapas durante a leitura para reduzir viés de confirmação.
+
+**Observação metodológica:** a medição em campo com smartphone será tratada como **referência de validação observacional de precisão limitada**, e não como verdade absoluta. As comparações serão feitas **somente entre as mesmas árvores efetivamente identificadas**; casos não mensuráveis ou com correspondência incerta serão destacados, nunca substituídos retrospectivamente por indivíduos de melhor concordância.
+
+#### 5.6.3. Análise planejada após a visita
+
+Para cada árvore mensurável, comparar as alturas do **CHMv2** e **ETH 2020** com a **mediana das três leituras presenciais**. Para cada modelo separadamente, calcular:
+
+- **Erro assinado (m):** altura do modelo − altura de campo (positivo = superestimação).
+- **Erro absoluto por árvore (m):** valor absoluto do erro assinado.
+- **MAE (m):** média dos erros absolutos.
+- **RMSE (m):** raiz da média dos erros ao quadrado.
+- **Viés médio (m):** média dos erros assinados, para identificar tendência de superestimação ou subestimação.
+
+Registrar também o número de árvores efetivamente mensuradas (**n ≤ 12**), dispersão das medidas repetidas e casos divergentes; se possível, apresentar tabela pareada e gráfico de dispersão com a linha 1:1. O modelo com menor MAE nesta amostra estará **mais próximo das leituras presenciais deste protocolo**, não necessariamente validado para o Distrito Federal. A escolha por facilidade de acesso define uma **amostra intencional**, sem representatividade estatística garantida.
+
+**Estado atual:** a seleção das 12 coordenadas e os valores **CHMv2/ETH 2020** estão documentados; as **medições presenciais e as métricas de erro contra campo permanecem pendentes**. Esta etapa não informa distância aos cabos elétricos nem comprova risco de interferência na rede.
+
+<a id="sec-5-7"></a>
+### 5.7. Limitações e situação atual da Proposta 2
+
+**O que foi efetivamente feito:** cálculo de índices geométricos, amostragem de **257** alturas modeladas Meta/WRI, comparação de **onze famílias** com controles, análises históricas de distância a postes e **documentação de 12 árvores na Candangolândia com valores CHMv2 e ETH 2020 fornecidos para posterior conferência presencial**.
 
 **O que não foi comprovado:** altura real dos indivíduos, delimitação botânica de copas, precisão local dos mapas Meta/ETH, superioridade de famílias alométricas sobre o controle constante ou risco elétrico a partir dos pontos de postes.
 
-**Situação:** existe uma **base exploratória documentada** que pode motivar coleta de dados de campo ou novas hipóteses, mas não uma validação operacional de altura e segurança elétrica.
+**Situação:** existe uma **base exploratória documentada** e um **protocolo de medição presencial planejado para 12 árvores na Candangolândia**. Até o preenchimento e conferência das medições com HeightCzech, o projeto **não dispõe de validação de altura por campo**; também não há validação operacional de segurança elétrica.
 
 <a id="sec-6"></a>
 ## 6. Discussão geral e contribuições científicas
@@ -480,7 +540,7 @@ A metodologia histórica está preservada no [notebook original](Segmentacao_are
 ### 6.1. Principais resultados
 
 - **Proposta 1:** no **experimento histórico de transferência**, a Regressão Logística apresentou F1 médio de **0,8421** na Area1 e concordância média CHMv2 entre **0,7584 e 0,7961** nas regiões externas. Na **ablação local exploratória** com HSV + Canny + NDVI, as médias foram **0,8438 / 0,8552 / 0,8108 / 0,8358** (Area1 / Sagrada Família / Lomba Grande / Cristo Rei, 30 avaliações cada), com **desvios-padrão 0,0406 / 0,0460 / 0,0734 / 0,0595**. Os experimentos **não têm protocolos equivalentes** e o treinamento local com CHMv2 não demonstra validade externa nem precisão humana.
-- **Proposta 2:** a avaliação de **onze famílias alométricas** contra alturas modeladas CHMv2 **não melhorou o controle constante**; índices derivados de superpixel e distância a postes não bastam, isoladamente, para estimar altura real ou risco elétrico.
+- **Proposta 2:** a avaliação de **onze famílias alométricas** contra alturas modeladas CHMv2 **não melhorou o controle constante**; índices derivados de superpixel e distância a postes não bastam, isoladamente, para estimar altura real ou risco elétrico. A nova **amostra de 12 árvores na Candangolândia** agrega previsões CHMv2 e ETH 2020 para futura comparação com medidas de campo pelo HeightCzech, **sem validação manual concluída**.
 
 <a id="sec-6-2"></a>
 ### 6.2. Contribuições e limites
@@ -494,9 +554,9 @@ A metodologia histórica está preservada no [notebook original](Segmentacao_are
 
 O **experimento principal de transferência geográfica da Proposta 1 está encerrado**, com modelo original preservado e reprodução dos resultados históricos derivados verificada. Um **experimento complementar exploratório** comparou HSV + Canny versus HSV + Canny + NDVI em 30 avaliações por configuração e por região, com treino regional quando aplicável e resultados numéricos disponibilizados. A auditoria visual humana independente dos **180 recortes selecionados** continua pendente; o README **não confunde os pseudo-rótulos CHMv2 nem o treino regional com validação humana ou transferência geográfica confirmada**.
 
-A **Proposta 2 permanece exploratória**: os experimentos descrevem relações e restrições, sem converter índices em alturas reais ou distância horizontal a postes em risco elétrico.
+A **Proposta 2 permanece exploratória**: além dos experimentos já realizados, foi preparada uma **amostra de 12 árvores acessíveis na Candangolândia (DF)** para confrontar as estimativas CHMv2 e ETH 2020 com medições presenciais usando o aplicativo HeightCzech. **As medições ainda estão pendentes**; índices de porte e distâncias horizontais a postes não constituem medidas de risco elétrico.
 
-**Trabalhos futuros pertinentes**, sem alterar os resultados atuais: completar a anotação cega; considerar novas referências independentes de vegetação; documentar calibração radiométrica se houver novos ensaios; medir alturas/copas em campo; e, para qualquer análise elétrica operacional, obter a geometria dos cabos e os critérios técnicos aplicáveis.
+**Trabalhos futuros pertinentes**, sem alterar os resultados atuais: completar a anotação cega; considerar novas referências independentes de vegetação; documentar calibração radiométrica se houver novos ensaios; **executar o levantamento das 12 árvores da Candangolândia com o HeightCzech e analisar as diferenças contra CHMv2 e ETH 2020**; e, para qualquer análise elétrica operacional, obter a geometria dos cabos e os critérios técnicos aplicáveis.
 
 <a id="sec-8"></a>
 ## 8. Reprodutibilidade e código-fonte
@@ -691,4 +751,4 @@ Por exemplo, na **árvore 1**, a Meta indica **16 m no pixel e 17 m no raio de 5
 
 **Arquivos preservados:** os experimentos e códigos originais permanecem no repositório; as tabelas acima são documentação histórica. O gráfico de 30 avaliações e o fluxograma principal representam os **resultados e o escopo atualmente adotados**.
 
-**Situação de publicação:** esta revisão se aplica exclusivamente à branch `feature/validacao-geografica-externa`. Não altera a `main`, não executa merge do PR #6, não muda a Proposta 2 e não atualiza automaticamente o portal hospedado na pasta `docs`.
+**Situação de publicação:** esta revisão se aplica exclusivamente à branch `feature/validacao-geografica-externa`. Não altera a `main`, não executa merge do PR #6 e não atualiza automaticamente o portal hospedado na pasta `docs`. A Proposta 2 incorpora agora um **protocolo de validação em campo planejado para 12 árvores da Candangolândia**; as estimativas históricas e os resultados da Proposta 1 permanecem preservados.
