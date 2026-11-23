@@ -426,20 +426,22 @@ Serão confrontadas **três referências para os mesmos locais**:
 
 **Coordenadas WGS84 (EPSG:4326); alturas em metros.** As coordenadas e as duas colunas de previsões foram mantidas **exatamente como fornecidas**; os links da primeira coluna abrem a localização aproximada no Google Maps. **A medição manual ainda está em branco, pois a visita de campo não ocorreu.**
 
+**IDs preservados:** cada linha usa o identificador original do conjunto CAND-001 a CAND-025, sem renumeração por ordem de visita. Para executar a etapa de campo, utilize a [ficha de 12 árvores (CSV)](experimentos/proposta2_candangolandia/pontos_12_coleta_heightczech.csv) e o [procedimento automatizado de validação HeightCzech](experimentos/proposta2_candangolandia/README.md). Nenhuma altura presencial foi preenchida nesta ficha.
+
 | Árvore / localização | Latitude (WGS84) | Longitude (WGS84) | CHMv2 original (m) | ETH 2020 (m) | Medição manual — HeightCzech (m) |
 |---|---:|---:|---:|---:|---:|
-| [CAND-01](https://www.google.com/maps/search/?api=1&query=-15.85344927%2C-47.94901704) | -15.85344927 | -47.94901704 | 12 | 12 | **Pendente** |
-| [CAND-02](https://www.google.com/maps/search/?api=1&query=-15.85640769%2C-47.95126177) | -15.85640769 | -47.95126177 | 22 | 17 | **Pendente** |
-| [CAND-03](https://www.google.com/maps/search/?api=1&query=-15.85769557%2C-47.94820182) | -15.85769557 | -47.94820182 | 12 | 16 | **Pendente** |
-| [CAND-04](https://www.google.com/maps/search/?api=1&query=-15.85572076%2C-47.94998299) | -15.85572076 | -47.94998299 | 15 | 14 | **Pendente** |
-| [CAND-05](https://www.google.com/maps/search/?api=1&query=-15.85791926%2C-47.94967912) | -15.85791926 | -47.94967912 | 21 | 22 | **Pendente** |
-| [CAND-06](https://www.google.com/maps/search/?api=1&query=-15.85557351%2C-47.94952372) | -15.85557351 | -47.94952372 | 22 | 13 | **Pendente** |
-| [CAND-07](https://www.google.com/maps/search/?api=1&query=-15.85250612%2C-47.95129829) | -15.85250612 | -47.95129829 | 8 | 4 | **Pendente** |
-| [CAND-08](https://www.google.com/maps/search/?api=1&query=-15.85652138%2C-47.95153397) | -15.85652138 | -47.95153397 | 15 | 16 | **Pendente** |
-| [CAND-09](https://www.google.com/maps/search/?api=1&query=-15.85475037%2C-47.94763657) | -15.85475037 | -47.94763657 | 20 | 17 | **Pendente** |
-| [CAND-10](https://www.google.com/maps/search/?api=1&query=-15.85791200%2C-47.94822363) | -15.85791200 | -47.94822363 | 16 | 16 | **Pendente** |
-| [CAND-11](https://www.google.com/maps/search/?api=1&query=-15.85495867%2C-47.94825533) | -15.85495867 | -47.94825533 | 29 | 18 | **Pendente** |
-| [CAND-12](https://www.google.com/maps/search/?api=1&query=-15.85650280%2C-47.94892150) | -15.85650280 | -47.94892150 | 25 | 18 | **Pendente** |
+| [CAND-002](https://www.google.com/maps/search/?api=1&query=-15.85344927%2C-47.94901704) | -15.85344927 | -47.94901704 | 12 | 12 | **Pendente** |
+| [CAND-004](https://www.google.com/maps/search/?api=1&query=-15.85640769%2C-47.95126177) | -15.85640769 | -47.95126177 | 22 | 17 | **Pendente** |
+| [CAND-006](https://www.google.com/maps/search/?api=1&query=-15.85769557%2C-47.94820182) | -15.85769557 | -47.94820182 | 12 | 16 | **Pendente** |
+| [CAND-007](https://www.google.com/maps/search/?api=1&query=-15.85572076%2C-47.94998299) | -15.85572076 | -47.94998299 | 15 | 14 | **Pendente** |
+| [CAND-008](https://www.google.com/maps/search/?api=1&query=-15.85791926%2C-47.94967912) | -15.85791926 | -47.94967912 | 21 | 22 | **Pendente** |
+| [CAND-012](https://www.google.com/maps/search/?api=1&query=-15.85557351%2C-47.94952372) | -15.85557351 | -47.94952372 | 22 | 13 | **Pendente** |
+| [CAND-013](https://www.google.com/maps/search/?api=1&query=-15.85250612%2C-47.95129829) | -15.85250612 | -47.95129829 | 8 | 4 | **Pendente** |
+| [CAND-015](https://www.google.com/maps/search/?api=1&query=-15.85652138%2C-47.95153397) | -15.85652138 | -47.95153397 | 15 | 16 | **Pendente** |
+| [CAND-016](https://www.google.com/maps/search/?api=1&query=-15.85475037%2C-47.94763657) | -15.85475037 | -47.94763657 | 20 | 17 | **Pendente** |
+| [CAND-019](https://www.google.com/maps/search/?api=1&query=-15.85791200%2C-47.94822363) | -15.85791200 | -47.94822363 | 16 | 16 | **Pendente** |
+| [CAND-020](https://www.google.com/maps/search/?api=1&query=-15.85495867%2C-47.94825533) | -15.85495867 | -47.94825533 | 29 | 18 | **Pendente** |
+| [CAND-023](https://www.google.com/maps/search/?api=1&query=-15.85650280%2C-47.94892150) | -15.85650280 | -47.94892150 | 25 | 18 | **Pendente** |
 
 **Distinção importante:** as duas colunas modeladas representam **estimativas diferentes para cobertura vegetal**; nenhuma é, por si, a altura real. A ETH 2020 utiliza um pixel da ordem de 10 m e pode integrar mais de uma copa e vizinhança; o CHMv2 tem resolução mais fina e também não garante identificação individual. As datas de referência e a resolução diferentes podem explicar parte das divergências. Antes de medir, será verificado se o ponto corresponde **à mesma árvore** nas imagens e no terreno, se ela está presente e se houve poda ou supressão.
 
