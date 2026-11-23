@@ -1,0 +1,41 @@
+name: Proposta 1 - CHMv2 F1 experimental
+on:
+  push:
+    branches:
+      - feature/validacao-geografica-externa
+    paths:
+      - ".github/workflows/chmv2-f1-quatro-regioes.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/chmv2-f1-quatro-regioes.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  calcular-chmv2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Instalar bibliotecas
+        run: python -m pip install --disable-pip-version-check numpy pandas rasterio pyproj scikit-learn requests
+      - name: Baixar CHMv2 e calcular F1 de concordancia
+        env:
+          CHM_OUTPUT: resultado_chmv2
+        run: python experimentos/validacao_externa_regioes/chmv2_verificacao/executar_chmv2_github_actions.py
+      - name: Arquivos com alturas e metricas (sem considerar validacao humana)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chmv2-quatro-regioes-600-pontos
+          path: |
+            resultado_chmv2/600_pontos_mais_CHM.csv
+            resultado_chmv2/resumo_f1_chmv2.json
+          if-no-files-found: warn

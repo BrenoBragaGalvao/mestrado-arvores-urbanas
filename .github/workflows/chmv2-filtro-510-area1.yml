@@ -1,0 +1,88 @@
+name: Proposta 1 - Filtro de 510 pontos originais pelo CHMv2
+on:
+  push:
+    branches:
+      - feature/validacao-geografica-externa
+    paths:
+      - ".github/workflows/chmv2-filtro-510-area1.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/CHM_INPUT_2010_PONTOS_FILTRO_AREA1.csv"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/600_pontos_mascaras_quickshift_originais.csv"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/chmv2-filtro-510-area1.yml"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/CHM_INPUT_2010_PONTOS_FILTRO_AREA1.csv"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py"
+      - "experimentos/validacao_externa_regioes/chmv2_verificacao/600_pontos_mascaras_quickshift_originais.csv"
+permissions:
+  contents: read
+jobs:
+  extrair-alturas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Diagnóstico de acesso às imagens de regiões externas
+        run: |
+          python - <<'PY'
+          import requests
+          for region,id in [('sagrada','1S5gKEFuGyKZtvq4Q33xcCkndwLIrUg91'),('lomba','1N5peFz-NauAYeNgBcauFyX9reJpnROQ6'),('cristo','1HR1PYH8T38SviYIgcOKb5y0QAag9QdKU')]:
+              try:
+                  with requests.get('https://drive.usercontent.google.com/download?export=download&confirm=t&id='+id,stream=True,timeout=(16,16)) as resp:
+                      first=next(resp.iter_content(256),b'')
+                      print('ORIGEM',region,'http',resp.status_code,'content-type',resp.headers.get('content-type'),'bytes',resp.headers.get('content-length'),'prefix',first[:12].hex(),'url',resp.url[:90],'html_tail',resp.text[-1100:] if b'<html' in first.lower() or b'<!doctype' in first.lower() else '',flush=True)
+              except Exception as e:
+                  print('ORIGEM',region,'erro',type(e).__name__,str(e)[:120],flush=True)
+          PY
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Instalar bibliotecas espaciais
+        run: python -m pip install --disable-pip-version-check numpy pandas rasterio pyproj scikit-learn requests
+      - name: Consultar CHMv2 original
+        env:
+          CHM_OUTPUT: resultados_chm_2010
+        run: python experimentos/validacao_externa_regioes/chmv2_verificacao/extrair_chmv2_2010_pontos.py
+      - name: Publicar os 2010 valores de altura e manifesto
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chmv2-area1-510-e-externas-1500
+          path: |
+            resultados_chm_2010/2010_pontos_alturas_chmv2.csv
+            resultados_chm_2010/manifesto_2010_alturas_chmv2.json
+          if-no-files-found: warn
+  f1-seiscentos:
+    if: false # diagnóstico temporário de limite de download do Google Drive
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar sintaxe do extrator dos 600 pontos
+        run: python -m py_compile experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar bibliotecas e leitor de RAR
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq p7zip-full
+          python -m pip install --disable-pip-version-check numpy pandas rasterio scikit-image scikit-learn requests
+      - name: Recuperar bandas e segmentos originais e calcular F1 no mesmo conjunto cego
+        env:
+          CHM_F1_OUTPUT: resultado_600_pontos_lr_500m
+        run: |
+          python experimentos/validacao_externa_regioes/chmv2_verificacao/avaliar_600_pontos_C_vs_A_500m.py
+      - name: Preservar CSV de resultados, inclusive em caso de falha
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 600_pontos_A_vs_C_f1_500m
+          path: |
+            resultado_600_pontos_lr_500m/*.csv
+            resultado_600_pontos_lr_500m/*.json
+          if-no-files-found: warn

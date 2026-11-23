@@ -1,0 +1,31 @@
+name: Proposta 2 - Validacao da ficha HeightCzech Candangolandia
+on:
+  push:
+    branches: [feature/validacao-geografica-externa]
+    paths:
+      - 'experimentos/proposta2_candangolandia/**'
+      - '.github/workflows/testar-proposta2-candangolandia.yml'
+  pull_request:
+    paths:
+      - 'experimentos/proposta2_candangolandia/**'
+      - '.github/workflows/testar-proposta2-candangolandia.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integridade-ficha-e-calculo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verificar sintaxe
+        run: python -m compileall -q experimentos/proposta2_candangolandia
+      - name: Testar regras e calculos com alturas totalmente sinteticas
+        run: python -m unittest discover -v -s experimentos/proposta2_candangolandia -p 'test_*.py'
+      - name: Processar ficha original vazia (sem imputar alturas)
+        run: |
+          python experimentos/proposta2_candangolandia/validar_heightczech_12_arvores.py --saida "$RUNNER_TEMP/campo_pendente"
+          python -c "import json,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP'])/'campo_pendente'/'resumo_validacao_campo.json'; d=json.loads(p.read_text()); assert d['status']=='AGUARDA_CAMPO' and d['metricas'] is None and d['arvores_medidas_pareadas']==0"
