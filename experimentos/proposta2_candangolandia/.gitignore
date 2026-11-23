@@ -1,0 +1,5 @@
+# Não versionar coleta de campo, dados pessoais ou resultados com leituras individuais.
+medicoes_privadas*.csv
+*_preenchido.csv
+resultado_validacao/
+resultado_campo/
